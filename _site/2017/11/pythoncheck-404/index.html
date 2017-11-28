@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <title>python检测404页面</title>
+  <meta name="description" content="某些网站为了实现友好的用户交互，提供了一种自定义的错误页面，而不是显示一个大大的404 ，比如CSDN上的404提示页面如下：这样虽然提高了用户体验，但是在编写对应POC进行检测的时候如果只根据返回的HTTP头部信息判断，则很可能造成误报，为了能准确检测到404页面，需要从状态码和页面内容两个方面来进行判断。从状...">
+  <meta name="author" content="Wei Wang">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="python检测404页面">
+  <meta name="twitter:description" content="某些网站为了实现友好的用户交互，提供了一种自定义的错误页面，而不是显示一个大大的404 ，比如CSDN上的404提示页面如下：这样虽然提高了用户体验，但是在编写对应POC进行检测的时候如果只根据返回的HTTP头部信息判断，则很可能造成误报，为了能准确检测到404页面，需要从状态码和页面内容两个方面来进行判断。从状...">
+  
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="python检测404页面">
+  <meta property="og:description" content="某些网站为了实现友好的用户交互，提供了一种自定义的错误页面，而不是显示一个大大的404 ，比如CSDN上的404提示页面如下：这样虽然提高了用户体验，但是在编写对应POC进行检测的时候如果只根据返回的HTTP头部信息判断，则很可能造成误报，为了能准确检测到404页面，需要从状态码和页面内容两个方面来进行判断。从状...">
+  
+  <link rel="icon" type="image/png" href="/assets/images/favicon.png" />
+  <link href="/assets/images/favicon.png" rel="shortcut icon" type="image/png">
+  
+  <link rel="stylesheet" href="/css/main.css">
+  <link href="//netdna.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet">
+
+  <link rel="canonical" href="http://localhost:4000/2017/11/pythoncheck-404/">
+  <link rel="alternate" type="application/rss+xml" title="Masimaro's Blog" href="http://localhost:4000/feed.xml">
+  
+  <meta name="google-site-verification" content="1-1ZlHoRvM0T2FqPbW2S-qLgYXN6rsn52kErlMPd_gw" />
+  
+</head>
+
+
+  <body>
+
+    <span class="mobile btn-mobile-menu">
+        <i class="fa fa-list btn-mobile-menu__icon"></i>
+        <i class="fa fa-angle-up btn-mobile-close__icon hidden"></i>
+    </span>
+    
+    <header class="panel-cover panel-cover--collapsed" style="background-image: url('/assets/images/background-cover.jpg')">
+  <div class="panel-main">
+
+    <div class="panel-main__inner panel-inverted">
+    <div class="panel-main__content">
+
+        <a href="/#blog" title="前往 Masimaro's Blog 的主页" class="blog-button"><img src="/assets/images/avatar.jpg" width="80" alt="Masimaro's Blog logo" class="panel-cover__logo logo" /></a>
+        <h1 class="panel-cover__title panel-title"><a href="/#blog" title="link to homepage for Masimaro's Blog" class="blog-button">Masimaro's Blog</a></h1>
+        
+        <span class="panel-cover__subtitle panel-subtitle">Masimaro 的个人博客——学习，交流，进步，提高</span>
+        
+        <hr class="panel-cover__divider" />
+        <p class="panel-cover__description"></p>
+        <hr class="panel-cover__divider panel-cover__divider--secondary" />
+        
+        
+        
+        <div class="navigation-wrapper">
+          <div>
+            <nav class="cover-navigation cover-navigation--primary">
+              <ul class="navigation">
+                <li class="navigation__item"><a href="/#blog" title="查看博客" class="blog-button">Blog</a></li>
+                
+              </ul>
+            </nav>
+          </div>
+          
+          <div><nav class="cover-navigation navigation--social">
+  <ul class="navigation">
+
+  
+  <!-- Weibo -->
+  <li class="navigation__item">
+    <a href="http://weibo.com/https://weibo.com/p/1005052343726384/home?from=page_100505&mod=TAB&is_all=1#place" title="@https://weibo.com/p/1005052343726384/home?from=page_100505&mod=TAB&is_all=1#place 的微博" target="_blank">
+      <i class='social fa fa-weibo'></i>
+      <span class="label">Weibo</span>
+    </a>
+  </li>
+  
+
+  
+  <!-- Github -->
+  <li class="navigation__item">
+    <a href="https://github.com/https://github.com/HaiLateBoy/" title="@https://github.com/HaiLateBoy/ 的 Github" target="_blank">
+      <i class='social fa fa-github'></i>
+      <span class="label">Github</span>
+    </a>
+  </li>
+  
+  
+  
+  <!-- Twitter -->
+  <li class="navigation__item">
+    <a href="http://twitter.com/http://blog.csdn.net/lanuage" title="@http://blog.csdn.net/lanuage" target="_blank">
+      <i class='social fa fa-twitter'></i>
+      <span class="label">Twitter</span>
+    </a>
+  </li>
+  
+
+  
+  <!-- Google Plus -->
+  <li class="navigation__item">
+    <a href="https://plus.google.com/101936521088591215836" rel="author" title="Google+" target="_blank">
+      <i class='social fa fa-google-plus-square'></i>
+      <span class="label">Google Plus</span>
+    </a>
+  </li>
+  
+
+  <!-- RSS -->
+  <li class="navigation__item">
+    <a href="/feed.xml" rel="author" title="RSS" target="_blank">
+      <i class='social fa fa-rss'></i>
+      <span class="label">RSS</span>
+    </a>
+  </li>
+
+  
+  <!-- Email -->
+  <li class="navigation__item">
+    <a href="mailto:liu1793222129@163.com" title="Contact me">
+      <i class='social fa fa-envelope'></i>
+      <span class="label">Email</span>
+    </a>
+  </li>
+  
+
+  </ul>
+</nav>
+</div>
+        </div>
+      </div>
+    </div>
+    
+    
+    <div class="panel-cover--overlay cover-red"></div>
+    
+  </div>
+</header>
+
+
+    <div class="content-wrapper">
+        <div class="content-wrapper__inner">
+            <article class="post-container post-container--single" itemscope itemtype="http://schema.org/BlogPosting">
+  <header class="post-header">
+    <div class="post-meta">
+      <time datetime="2017-11-27 23:07:24 +0900" itemprop="datePublished" class="post-meta__date date">2017-11-27</time> &#8226; <span class="post-meta__tags tags"></span>
+    </div>
+    <h1 class="post-title">python检测404页面</h1>
+  </header>
+
+  <section class="post">
+    <p>某些网站为了实现友好的用户交互，提供了一种自定义的错误页面，而不是显示一个大大的404 ，比如CSDN上的404提示页面如下：
+<img src="/img/2017-11-27/404.png" alt="404页面" />
+这样虽然提高了用户体验，但是在编写对应POC进行检测的时候如果只根据返回的HTTP头部信息判断，则很可能造成误报，为了能准确检测到404页面，
+需要从状态码和页面内容两个方面来进行判断。
+从状态码来判断比较简单。可以直接使用requests库发送http请求，得到响应码即可。
+从页面内容上进行判断的话，采用的思路是访问web站点上明显不存在的页面，获取页面内容进行保存，然后访问目标页面，将二者进行比较，如果相似度达到某一阈值，则该页面为404页面，否则为正常页面。
+为了判断两个页面的相似度，采用Python的simhash库，这个库具体实现的算法我不太懂，但是Python的好处就是：不懂无所谓，直接拿来用就行。这里也只是简单的拿来用一下：</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c">#-*- encoding:utf-8 -*-</span>
+<span class="c"># 404 页面识别</span>
+<span class="kn">from</span> <span class="nn">hashes.simhash</span> <span class="kn">import</span> <span class="n">simhash</span>
+<span class="kn">import</span> <span class="nn">requests</span>
+
+<span class="k">class</span> <span class="nc">page_404</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">domain</span><span class="p">):</span> <span class="c">#检测站点</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_404_page</span> <span class="o">=</span> <span class="p">[]</span> <span class="c"># 404页面</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_404_url</span> <span class="o">=</span> <span class="p">[]</span> <span class="c">#404 url</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_404_path</span> <span class="o">=</span> <span class="p">[</span><span class="s">"test_404.html"</span><span class="p">,</span> <span class="s">"404_test.html"</span><span class="p">,</span> <span class="s">"helloworld.html"</span><span class="p">,</span> <span class="s">"test.asp?action=modify&amp;newsid=122</span><span class="si">%20</span><span class="s">and</span><span class="si">%201</span><span class="s">=2</span><span class="si">%20</span><span class="s">union</span><span class="si">%20</span><span class="s">select</span><span class="si">%201</span><span class="s">,2,admin</span><span class="si">%2</span><span class="s">bpassword,4,5,6,7</span><span class="si">%20</span><span class="s">from</span><span class="si">%20</span><span class="s">shopxp_admin"</span><span class="p">]</span> <span class="c">#404页面路径，用于生成一部分404页面</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_404_code</span> <span class="o">=</span> <span class="p">[</span><span class="mi">200</span><span class="p">,</span> <span class="mi">301</span><span class="p">,</span> <span class="mi">302</span><span class="p">]</span> <span class="c">#当前可能是404页面的http请求的返回值</span>
+        <span class="c">#自己构造404url，以便收集一些404页面的信息</span>
+        <span class="k">for</span> <span class="n">path</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_404_path</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">path</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_404_path</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">domain</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s">"/"</span><span class="p">:</span>
+                    <span class="n">url</span> <span class="o">=</span> <span class="n">domain</span> <span class="o">+</span> <span class="n">path</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">url</span> <span class="o">=</span> <span class="n">domain</span> <span class="o">+</span> <span class="s">"/"</span> <span class="o">+</span> <span class="n">path</span>
+                <span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">response</span><span class="o">.</span><span class="n">status_code</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_404_code</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">kb_appent</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">content</span><span class="p">,</span> <span class="n">url</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">kb_appent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">_404_page</span><span class="p">,</span> <span class="n">_404_url</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">_404_page</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_404_page</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_404_page</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">_404_page</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">_404_url</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_404_url</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_404_url</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">_404_url</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">is_similar_page</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">page1</span><span class="p">,</span> <span class="n">page2</span><span class="p">):</span>
+        <span class="n">hash1</span> <span class="o">=</span> <span class="n">simhash</span><span class="p">(</span><span class="n">page1</span><span class="p">)</span>
+        <span class="n">hash2</span> <span class="o">=</span> <span class="n">simhash</span><span class="p">(</span><span class="n">page2</span><span class="p">)</span>
+        <span class="n">similar</span> <span class="o">=</span> <span class="n">hash1</span><span class="o">.</span><span class="n">similarity</span><span class="p">(</span><span class="n">hash2</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">similar</span> <span class="o">&gt;</span> <span class="mf">0.85</span><span class="p">:</span> <span class="c">#当前阈值定义为0.85</span>
+            <span class="k">return</span> <span class="bp">True</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">False</span>
+
+    <span class="k">def</span> <span class="nf">is_404</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="p">):</span>
+		<span class="k">if</span> <span class="n">url</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_404_url</span><span class="p">:</span>
+			<span class="k">return</span> <span class="bp">True</span>
+		
+        <span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">response</span><span class="o">.</span><span class="n">status_code</span> <span class="o">==</span> <span class="mi">404</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">True</span>
+        <span class="k">if</span> <span class="n">response</span><span class="o">.</span><span class="n">status_code</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_404_code</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">page</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_404_page</span><span class="p">:</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_similar_page</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">content</span><span class="p">,</span> <span class="n">page</span><span class="p">):</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">kb_appent</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">response</span><span class="o">.</span><span class="n">content</span><span class="p">)</span> <span class="c">#如果是404页面，则保存当前的url和页面信息</span>
+                    <span class="k">return</span> <span class="bp">True</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="bp">False</span>
+        <span class="k">return</span> <span class="bp">False</span>
+</code></pre></div></div>
+<p>上面的代码中，检测类中主要保存了这样几个信息：
+_404_page：404页面，用于与其他请求的页面进行相似度判断，以便识别404页面，这里用列表主要为了防止一个站点有多种404页面，这段代码运行时间越长它的准确度越高
+_404_url：404 页面的url，保存之前判断出页面是404的url，已经判断出来的就不再判断，为了提升效率
+_404_path：构建不存在页面的url，最后一个是一个sql注入的代码，这里为了识别出那些被防火墙拦截而显示的错误页面
+_404_code：可能返回404页面的响应码，如果响应码为这些，则需要对页面进行判断
+类在初始化时需要传入一个域名，根据这个域名来拼接几个不存在的或者会被防火墙拦截的请求并提交这些请求，得到返回信息，将这些信息作为判断的信息进行保存。
+在判断时首先根据之前保存的404 url信息进行判断，如果当前url是404页面则直接返回，提高效率。然后提交正常的http请求并获取响应信息，
+如果响应码为404则返回True，否则再状态码是否在_404_code列表中，最后再与之前保存的404页面信息进行比较得到结果。
+这段代码的测试代码如下：</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">page_404</span> <span class="kn">import</span> <span class="n">page_404</span>
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">'__main__'</span><span class="p">:</span>
+    <span class="n">domain</span> <span class="o">=</span> <span class="s">"http://xzylrd.gov.cn"</span>
+    <span class="n">check_404</span> <span class="o">=</span> <span class="n">page_404</span><span class="p">(</span><span class="n">domain</span><span class="p">)</span>
+    <span class="n">dest_url</span> <span class="o">=</span> <span class="s">"http://xzylrd.gov.cn/TEXTBOX2.ASP?action=modify&amp;newsid=122</span><span class="si">%20</span><span class="s">and</span><span class="si">%201</span><span class="s">=2</span><span class="si">%20</span><span class="s">union</span><span class="si">%20</span><span class="s">select</span><span class="si">%201</span><span class="s">,2,admin</span><span class="si">%2</span><span class="s">bpassword,4,5,6,7</span><span class="si">%20</span><span class="s">from</span><span class="si">%20</span><span class="s">shopxp_admin"</span>
+    <span class="k">print</span> <span class="p">(</span><span class="n">check_404</span><span class="o">.</span><span class="n">is_404</span><span class="p">(</span><span class="n">dest_url</span><span class="p">))</span>
+</code></pre></div></div>
+
+  </section>
+</article>
+
+<section class="read-more">
+   
+   
+   
+   
+   <div class="read-more-item">
+       <span class="read-more-item-dim">更早的文章</span>
+       <h2 class="post-list__post-title post-title"><a href="/2016/02/hello-world-vno/" title="link to Hello World - Vno">Hello World - Vno</a></h2>
+       <p class="excerpt">What’s thisVno Jekyll is a theme for Jekyll. It is a port of my Ghost theme vno, which is originally developed from Dale Anthony’s Uno.Usage$ git clone https://github.com/onevcat/vno-jekyll.git your_site$ cd your_site$ bundler install$ bundler exe...&hellip;</p>
+       <div class="post-list__meta"><time datetime="2016-02-16 15:32:24 +0900" class="post-list__meta--date date">2016-02-16</time> &#8226; <span class="post-list__meta--tags tags"></span><a class="btn-border-small" href=/2016/02/hello-world-vno/>继续阅读</a></div>
+   </div>
+   
+</section>
+
+<section class="post-comments">
+  
+    <div id="disqus_thread"></div>
+    <script>
+    
+    var disqus_config = function () {
+        this.page.url = "http://localhost:4000/2017/11/pythoncheck-404/";
+        this.page.identifier = "/2017/11/pythoncheck-404/";
+    };
+
+    var disqus_shortname = 'masimaro';
+    
+    (function() { // DON'T EDIT BELOW THIS LINE
+        var d = document, s = d.createElement('script');
+        s.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+            (d.head || d.body).appendChild(s);
+        })();
+    </script>
+    <noscript>要查看<a href="http://disqus.com/?ref_noscript"> Disqus </a>评论，请启用 JavaScript</noscript>
+    
+  
+  
+  
+  
+</section>
+
+
+<div id="disqus_thread"></div>
+<script type="text/javascript">
+var disqus_shortname = 'masimaro'; // 注意，这里的 example 要替换为你自己的短域名
+/* * * 下面这些不需要改动 * * */
+(function() {
+  var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+  dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+  (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+})();
+</script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="http://disqus.com" class="dsq-brlink">blog comments powered by <span class="logo-disqus">Disqus</span></a>
+
+            <section class="footer">
+    <footer>
+    	<span class="footer__copyright">本站点采用<a href="http://creativecommons.org/licenses/by-nc-sa/4.0/">知识共享 署名-非商业性使用-相同方式共享 4.0 国际 许可协议</a></span>
+        <span class="footer__copyright">由 <a href="https://jekyllrb.com">Jekyll</a> 于 2017-11-28 生成，感谢 <a href="https://www.digitalocean.com/?refcode=30ed2d146762">Digital Ocean</a> 为本站提供稳定的 VPS 服务</span>
+        <span class="footer__copyright">本站采用 <a href="https://github.com/onevcat/vno-jekyll">Vno - Jekyll</a> 作为主题，您可以在 GitHub 找到<a href="https://github.com/onevcat/OneV-s-Den">本站源码</a> - &copy; 2017</span>
+    </footer>
+</section>
+
+        </div>
+    </div>
+    
+    <script type="text/javascript" src="//code.jquery.com/jquery-1.11.3.min.js"></script>
+
+<script type="text/javascript" src="/js/main.js"></script>
+
+
+
+    
+  </body>
+
+</html>

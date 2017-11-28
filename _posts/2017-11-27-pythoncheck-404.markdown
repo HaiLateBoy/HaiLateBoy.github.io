@@ -1,0 +1,83 @@
+---
+layout: post
+title: python检测404页面
+date: 2017-11-27 23:07:24.000000000 +09:00
+---
+某些网站为了实现友好的用户交互，提供了一种自定义的错误页面，而不是显示一个大大的404 ，比如CSDN上的404提示页面如下：
+![404页面](/img/2017-11-27/404.png)
+这样虽然提高了用户体验，但是在编写对应POC进行检测的时候如果只根据返回的HTTP头部信息判断，则很可能造成误报，为了能准确检测到404页面，
+需要从状态码和页面内容两个方面来进行判断。
+从状态码来判断比较简单。可以直接使用requests库发送http请求，得到响应码即可。
+从页面内容上进行判断的话，采用的思路是访问web站点上明显不存在的页面，获取页面内容进行保存，然后访问目标页面，将二者进行比较，如果相似度达到某一阈值，则该页面为404页面，否则为正常页面。
+为了判断两个页面的相似度，采用Python的simhash库，这个库具体实现的算法我不太懂，但是Python的好处就是：不懂无所谓，直接拿来用就行。这里也只是简单的拿来用一下：
+```python
+#-*- encoding:utf-8 -*-
+# 404 页面识别
+from hashes.simhash import simhash
+import requests
+
+class page_404:
+    def __init__(self, domain): #检测站点
+        self._404_page = [] # 404页面
+        self._404_url = [] #404 url
+        self._404_path = ["test_404.html", "404_test.html", "helloworld.html", "test.asp?action=modify&newsid=122%20and%201=2%20union%20select%201,2,admin%2bpassword,4,5,6,7%20from%20shopxp_admin"] #404页面路径，用于生成一部分404页面
+        self._404_code = [200, 301, 302] #当前可能是404页面的http请求的返回值
+        #自己构造404url，以便收集一些404页面的信息
+        for path in self._404_path:
+            for path in self._404_path:
+                if domain[-1] == "/":
+                    url = domain + path
+                else:
+                    url = domain + "/" + path
+                response = requests.get(url)
+                if response.status_code in self._404_code:
+                    self.kb_appent(response.content, url)
+
+    def kb_appent(self, _404_page, _404_url):
+        if _404_page not in self._404_page:
+            self._404_page.append(_404_page)
+        if _404_url not in self._404_url:
+            self._404_url.append(_404_url)
+
+    def is_similar_page(self, page1, page2):
+        hash1 = simhash(page1)
+        hash2 = simhash(page2)
+        similar = hash1.similarity(hash2)
+        if similar > 0.85: #当前阈值定义为0.85
+            return True
+        else:
+            return False
+
+    def is_404(self, url):
+		if url in self._404_url:
+			return True
+		
+        response = requests.get(url)
+        if response.status_code == 404:
+            return True
+        if response.status_code in self._404_code:
+            for page in self._404_page:
+                if self.is_similar_page(response.content, page):
+                    self.kb_appent(url, response.content) #如果是404页面，则保存当前的url和页面信息
+                    return True
+                else:
+                    return False
+        return False
+```
+上面的代码中，检测类中主要保存了这样几个信息：
+_404_page：404页面，用于与其他请求的页面进行相似度判断，以便识别404页面，这里用列表主要为了防止一个站点有多种404页面，这段代码运行时间越长它的准确度越高
+_404_url：404 页面的url，保存之前判断出页面是404的url，已经判断出来的就不再判断，为了提升效率
+_404_path：构建不存在页面的url，最后一个是一个sql注入的代码，这里为了识别出那些被防火墙拦截而显示的错误页面
+_404_code：可能返回404页面的响应码，如果响应码为这些，则需要对页面进行判断
+类在初始化时需要传入一个域名，根据这个域名来拼接几个不存在的或者会被防火墙拦截的请求并提交这些请求，得到返回信息，将这些信息作为判断的信息进行保存。
+在判断时首先根据之前保存的404 url信息进行判断，如果当前url是404页面则直接返回，提高效率。然后提交正常的http请求并获取响应信息，
+如果响应码为404则返回True，否则再状态码是否在_404_code列表中，最后再与之前保存的404页面信息进行比较得到结果。
+这段代码的测试代码如下：
+```python
+from page_404 import page_404
+if __name__ == '__main__':
+    domain = "http://xzylrd.gov.cn"
+    check_404 = page_404(domain)
+    dest_url = "http://xzylrd.gov.cn/TEXTBOX2.ASP?action=modify&newsid=122%20and%201=2%20union%20select%201,2,admin%2bpassword,4,5,6,7%20from%20shopxp_admin"
+    print (check_404.is_404(dest_url))
+```
