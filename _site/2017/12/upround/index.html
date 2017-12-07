@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <title>向上取整算法</title>
+  <meta name="description" content="在进行内存分配的时候一般都需要在实际使用内存大小的基础上进行内存对齐，比如一般32位平台进行4字节对齐，而64位平台使用8字节对齐等等。一般采用的算法是先利用公式（其中a是实际使用的内存， b是对齐值）然后根据这个值乘以b即可得到对应的对齐值">
+  <meta name="author" content="Wei Wang">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="向上取整算法">
+  <meta name="twitter:description" content="在进行内存分配的时候一般都需要在实际使用内存大小的基础上进行内存对齐，比如一般32位平台进行4字节对齐，而64位平台使用8字节对齐等等。一般采用的算法是先利用公式（其中a是实际使用的内存， b是对齐值）然后根据这个值乘以b即可得到对应的对齐值">
+  
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="向上取整算法">
+  <meta property="og:description" content="在进行内存分配的时候一般都需要在实际使用内存大小的基础上进行内存对齐，比如一般32位平台进行4字节对齐，而64位平台使用8字节对齐等等。一般采用的算法是先利用公式（其中a是实际使用的内存， b是对齐值）然后根据这个值乘以b即可得到对应的对齐值">
+  
+  <link rel="icon" type="image/png" href="/assets/images/favicon.png" />
+  <link href="/assets/images/favicon.png" rel="shortcut icon" type="image/png">
+  
+  <link rel="stylesheet" href="/css/main.css">
+  <link href="//netdna.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet">
+
+  <link rel="canonical" href="http://localhost:4000/2017/12/upround/">
+  <link rel="alternate" type="application/rss+xml" title="Masimaro's Blog" href="http://localhost:4000/feed.xml">
+  
+  <meta name="google-site-verification" content="1-1ZlHoRvM0T2FqPbW2S-qLgYXN6rsn52kErlMPd_gw" />
+  
+</head>
+
+
+  <body>
+
+    <span class="mobile btn-mobile-menu">
+        <i class="fa fa-list btn-mobile-menu__icon"></i>
+        <i class="fa fa-angle-up btn-mobile-close__icon hidden"></i>
+    </span>
+    
+    <header class="panel-cover panel-cover--collapsed" style="background-image: url('/assets/images/background-cover.jpg')">
+  <div class="panel-main">
+
+    <div class="panel-main__inner panel-inverted">
+    <div class="panel-main__content">
+
+        <a href="/#blog" title="前往 Masimaro's Blog 的主页" class="blog-button"><img src="/assets/images/avatar.jpg" width="80" alt="Masimaro's Blog logo" class="panel-cover__logo logo" /></a>
+        <h1 class="panel-cover__title panel-title"><a href="/#blog" title="link to homepage for Masimaro's Blog" class="blog-button">Masimaro's Blog</a></h1>
+        
+        <span class="panel-cover__subtitle panel-subtitle">Masimaro 的个人博客——学习，交流，进步，提高</span>
+        
+        <hr class="panel-cover__divider" />
+        <p class="panel-cover__description"></p>
+        <hr class="panel-cover__divider panel-cover__divider--secondary" />
+        
+        
+        
+        <div class="navigation-wrapper">
+          <div>
+            <nav class="cover-navigation cover-navigation--primary">
+              <ul class="navigation">
+                <li class="navigation__item"><a href="/#blog" title="查看博客" class="blog-button">Blog</a></li>
+                
+              </ul>
+            </nav>
+          </div>
+          
+          <div><nav class="cover-navigation navigation--social">
+  <ul class="navigation">
+
+  
+  <!-- Weibo -->
+  <li class="navigation__item">
+    <a href="http://weibo.com/https://weibo.com/p/1005052343726384/home?from=page_100505&mod=TAB&is_all=1#place" title="@https://weibo.com/p/1005052343726384/home?from=page_100505&mod=TAB&is_all=1#place 的微博" target="_blank">
+      <i class='social fa fa-weibo'></i>
+      <span class="label">Weibo</span>
+    </a>
+  </li>
+  
+
+  
+  <!-- Github -->
+  <li class="navigation__item">
+    <a href="https://github.com/https://github.com/HaiLateBoy/" title="@https://github.com/HaiLateBoy/ 的 Github" target="_blank">
+      <i class='social fa fa-github'></i>
+      <span class="label">Github</span>
+    </a>
+  </li>
+  
+  
+  
+  <!-- Twitter -->
+  <li class="navigation__item">
+    <a href="http://twitter.com/http://blog.csdn.net/lanuage" title="@http://blog.csdn.net/lanuage" target="_blank">
+      <i class='social fa fa-twitter'></i>
+      <span class="label">Twitter</span>
+    </a>
+  </li>
+  
+
+  
+  <!-- Google Plus -->
+  <li class="navigation__item">
+    <a href="https://plus.google.com/101936521088591215836" rel="author" title="Google+" target="_blank">
+      <i class='social fa fa-google-plus-square'></i>
+      <span class="label">Google Plus</span>
+    </a>
+  </li>
+  
+
+  <!-- RSS -->
+  <li class="navigation__item">
+    <a href="/feed.xml" rel="author" title="RSS" target="_blank">
+      <i class='social fa fa-rss'></i>
+      <span class="label">RSS</span>
+    </a>
+  </li>
+
+  
+  <!-- Email -->
+  <li class="navigation__item">
+    <a href="mailto:liu1793222129@163.com" title="Contact me">
+      <i class='social fa fa-envelope'></i>
+      <span class="label">Email</span>
+    </a>
+  </li>
+  
+
+  </ul>
+</nav>
+</div>
+        </div>
+      </div>
+    </div>
+    
+    
+    <div class="panel-cover--overlay cover-red"></div>
+    
+  </div>
+</header>
+
+
+    <div class="content-wrapper">
+        <div class="content-wrapper__inner">
+            <article class="post-container post-container--single" itemscope itemtype="http://schema.org/BlogPosting">
+  <header class="post-header">
+    <div class="post-meta">
+      <time datetime="2017-12-07 20:59:24 +0900" itemprop="datePublished" class="post-meta__date date">2017-12-07</time> &#8226; <span class="post-meta__tags tags"></span>
+    </div>
+    <h1 class="post-title">向上取整算法</h1>
+  </header>
+
+  <section class="post">
+    <p>在进行内存分配的时候一般都需要在实际使用内存大小的基础上进行内存对齐，比如一般32位平台进行4字节对齐，而64位平台使用8字节对齐等等。
+一般采用的算法是先利用公式
+<script type="math/tex">int(\frac{a + b - 1} { b})</script>（其中a是实际使用的内存， b是对齐值）
+然后根据这个值乘以b即可得到对应的对齐值</p>
+
+<h2 id="公式推导">公式推导</h2>
+<p>$ 假设 A = NB +M (M  \in \left[0,B-1\right])$
+$\because\frac{A}{B} = N + \frac{M}{B}$
+$\because M \in\left[0, B-1\right]$
+$\therefore \frac{A}{B} \leq \frac{NB +B -1}{B} \leq \frac{A + B -1}{B}$
+从上面可以得出$\frac{A}{B}$向上取整可能是int($\frac{A+B-1}{B}$)但是具体是否有比它小的整数，仍然不能确定.因此我们根据推导一下这个结果与$\frac{A}{B}$向上取整的结果是否相同
+$ 假设 A = NB +M (M  \in \left[0,B-1\right])$
+$当M = 0时UP(\frac{A}{B}) = N$
+$当M \neq 0时，UP(\frac{A}{B}) = N$
+而针对int($\frac{A+B-1}{B}$)的结果
+$当M = 0时int(\frac{A+B-1}{B} )=int(\frac{NB+B -1}{B}) = int(N + 1 - \frac{1}{B}) $
+$\because \frac{1}{B} &lt; 1$
+$\therefore int(\frac{A+B-1}{B} )$
+$当 M \neq 0 时int(\frac{A+B-1}{B} ) = int(\frac{NB +M + B -1}{B}) = int(N + 1 + \frac{M-1}{B})$
+$当M = 1时 int(\frac{A+B-1}{B} ) = int(N + 1 + \frac{M-1}{B}) = N + 1$
+$当1 &lt; M \leq B-1时 \frac{M -1}{B} &lt; 1$
+$\therefore  int(\frac{A+B-1}{B} ) = int(N + 1 + \frac{M-1}{B}) = N$
+从上面的推导来看二者的值完全相同所以可以得出结论
+<script type="math/tex">UP(\frac{A}{B}) = int(\frac{A + B - 1}{B})</script>
+所以当我们对A字节的内存进行B字节的对齐时可以使用公式
+<script type="math/tex">int(\frac{A + B - 1}{B}) \times B</script>
+##补充
+其实还有一个算法</p>
+<div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kt">long</span><span class="p">(</span><span class="n">A</span> <span class="o">+</span> <span class="n">B</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">&amp;~</span> <span class="p">(</span><span class="n">B</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+</code></pre></div></div>
+<p>也可以计算，但是我没有弄清楚它的原理是什么，暂时不管先记住再说^_^</p>
+
+  </section>
+</article>
+
+<section class="read-more">
+   
+   
+   
+   
+   <div class="read-more-item">
+       <span class="read-more-item-dim">更早的文章</span>
+       <h2 class="post-list__post-title post-title"><a href="/2017/11/pythoncheck-404/" title="link to python检测404页面">python检测404页面</a></h2>
+       <p class="excerpt">某些网站为了实现友好的用户交互，提供了一种自定义的错误页面，而不是显示一个大大的404 ，比如CSDN上的404提示页面如下：这样虽然提高了用户体验，但是在编写对应POC进行检测的时候如果只根据返回的HTTP头部信息判断，则很可能造成误报，为了能准确检测到404页面，需要从状态码和页面内容两个方面来进行判断。从状态码来判断比较简单。可以直接使用requests库发送http请求，得到响应码即可。从页面内容上进行判断的话，采用的思路是访问web站点上明显不存在的页面，获取页面内容进行保存，然...&hellip;</p>
+       <div class="post-list__meta"><time datetime="2017-11-27 23:07:24 +0900" class="post-list__meta--date date">2017-11-27</time> &#8226; <span class="post-list__meta--tags tags"></span><a class="btn-border-small" href=/2017/11/pythoncheck-404/>继续阅读</a></div>
+   </div>
+   
+</section>
+
+<section class="post-comments">
+  
+    <div id="disqus_thread"></div>
+    <script>
+    
+    var disqus_config = function () {
+        this.page.url = "http://localhost:4000/2017/12/upround/";
+        this.page.identifier = "/2017/12/upround/";
+    };
+
+    var disqus_shortname = 'masimaro';
+    
+    (function() { // DON'T EDIT BELOW THIS LINE
+        var d = document, s = d.createElement('script');
+        s.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+            (d.head || d.body).appendChild(s);
+        })();
+    </script>
+    <noscript>要查看<a href="http://disqus.com/?ref_noscript"> Disqus </a>评论，请启用 JavaScript</noscript>
+    
+  
+  
+  
+  
+</section>
+
+
+<div id="disqus_thread"></div>
+<script type="text/javascript">
+var disqus_shortname = 'masimaro'; // 注意，这里的 example 要替换为你自己的短域名
+/* * * 下面这些不需要改动 * * */
+(function() {
+  var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+  dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+  (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+})();
+</script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="http://disqus.com" class="dsq-brlink">blog comments powered by <span class="logo-disqus">Disqus</span></a>
+
+            <section class="footer">
+    <footer>
+    	<span class="footer__copyright">本站点采用<a href="http://creativecommons.org/licenses/by-nc-sa/4.0/">知识共享 署名-非商业性使用-相同方式共享 4.0 国际 许可协议</a></span>
+        <span class="footer__copyright">由 <a href="https://jekyllrb.com">Jekyll</a> 于 2017-12-07 生成，感谢 <a href="https://www.digitalocean.com/?refcode=30ed2d146762">Digital Ocean</a> 为本站提供稳定的 VPS 服务</span>
+        <span class="footer__copyright">本站采用 <a href="https://github.com/onevcat/vno-jekyll">Vno - Jekyll</a> 作为主题，您可以在 GitHub 找到<a href="https://github.com/onevcat/OneV-s-Den">本站源码</a> - &copy; 2017</span>
+    </footer>
+</section>
+
+        </div>
+    </div>
+    
+    <script type="text/javascript" src="//code.jquery.com/jquery-1.11.3.min.js"></script>
+
+<script type="text/javascript" src="/js/main.js"></script>
+
+
+
+    
+  </body>
+
+</html>
