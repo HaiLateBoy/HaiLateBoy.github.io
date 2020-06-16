@@ -1,0 +1,1364 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<script src="//cdn.bootcss.com/pace/1.0.2/pace.min.js"></script>
+<link href="//cdn.bootcss.com/pace/1.0.2/themes/pink/pace-theme-flash.css" rel="stylesheet">
+<style>
+    .pace .pace-progress {
+        background: #1E92FB; /*进度条颜色*/
+        height: 3px;
+    }
+    .pace .pace-progress-inner {
+         box-shadow: 0 0 10px #1E92FB, 0 0 5px     #1E92FB; /*阴影颜色*/
+    }
+    .pace .pace-activity {
+        border-top-color: #1E92FB;    /*上边框颜色*/
+        border-left-color: #1E92FB;    /*左边框颜色*/
+    }
+</style>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.3" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.3">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.3">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.3">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.3" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="WinSock2 API, SOCKET 池, 聚合与散播" />
+
+
+
+
+  
+
+
+  <link rel="alternate" href="/atom.xml" title="Masimaro's blog" type="application/atom+xml" />
+
+
+
+
+
+
+<meta name="description" content="之前在WinSock2.0 API 中说到，像DisConnectEx 函数这样，它具有回收SOCKET的功能，而像AcceptEx这样的函数，它不会自己在内部创建新的SOCKET，需要外部传入SOCKET作为传输数据用的SOCEKT，使用这两个函数，我们可以做到，事先创建大量的SOCKET，然后使用AcceptEx函数从创建的SOCKET中选择一个作为连接用的SOCKET，在不用这个SOCKET">
+<meta property="og:type" content="article">
+<meta property="og:title" content="WinSock Socket 池">
+<meta property="og:url" content="http://www.masimaroweb.com/socket-pool.html">
+<meta property="og:site_name" content="Masimaro&#39;s blog">
+<meta property="og:description" content="之前在WinSock2.0 API 中说到，像DisConnectEx 函数这样，它具有回收SOCKET的功能，而像AcceptEx这样的函数，它不会自己在内部创建新的SOCKET，需要外部传入SOCKET作为传输数据用的SOCEKT，使用这两个函数，我们可以做到，事先创建大量的SOCKET，然后使用AcceptEx函数从创建的SOCKET中选择一个作为连接用的SOCKET，在不用这个SOCKET">
+<meta property="article:published_time" content="2018-08-11T02:47:18.000Z">
+<meta property="article:modified_time" content="2018-08-12T05:20:33.908Z">
+<meta property="article:author" content="Masimaro">
+<meta property="article:tag" content="WinSock2 API">
+<meta property="article:tag" content=" SOCKET 池">
+<meta property="article:tag" content=" 聚合与散播">
+<meta name="twitter:card" content="summary">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.3',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+
+  <link rel="canonical" href="http://www.masimaroweb.com/socket-pool.html"/>
+
+
+
+
+
+  <title>WinSock Socket 池 | Masimaro's blog</title>
+  
+
+
+
+
+
+
+
+
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Masimaro's blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <h1 class="site-subtitle" itemprop="description"></h1>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="搜索..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://www.masimaroweb.com/socket-pool.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Masimaro">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Masimaro's blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h2 class="post-title" itemprop="name headline">WinSock Socket 池</h2>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-08-11T10:47:18+08:00">
+                2018-08-11
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Windows-%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B/" itemprop="url" rel="index">
+                    <span itemprop="name">Windows 网络编程</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/socket-pool.html#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="socket-pool.html" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="page-pv"><i class="fa fa-file-o">本文总阅读量</i>
+            <span class="busuanzi-value" id="busuanzi_value_page_pv" ></span>次
+            </span>
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>之前在WinSock2.0 API 中说到，像DisConnectEx 函数这样，它具有回收SOCKET的功能，而像AcceptEx这样的函数，它不会自己在内部创建新的SOCKET，需要外部传入SOCKET作为传输数据用的SOCEKT，使用这两个函数，我们可以做到，事先创建大量的SOCKET，然后使用AcceptEx函数从创建的SOCKET中选择一个作为连接用的SOCKET，在不用这个SOCKET的时候使用DisConnectEx回收。这样的功能就是一个SOCKET池的功能。</p>
+<a id="more"></a>
+<h2 id="SOCKET池"><a href="#SOCKET池" class="headerlink" title="SOCKET池"></a>SOCKET池</h2><p>WinSock 函数就是为了提升程序的性能而产生的，这些函数主要使用与TCP协议，我们可以在程序启动的时候创建大量的SOCKET句柄，在必要的时候直接使用AcceptEx这样的函数来使用已有的SOCKET作为与客户端的连接，在适当的时候使用WSARecv、WSASend等函数金星秀数据收发操作。而在不用SOCKET的时候使用DisConnectEx 回收，这样在响应用户请求的时候就省去了大量SOCKET创建和销毁的时间，从而提高的响应速度。</p>
+<p>IOCP本身也是一个线程池，如果用它结合WinSock 的线程池将会是Windows系统上最佳的性能组合，当然在此基础上可以考虑加入线程池、内存池的相关技术来进一步提高程序的性能。这里我想顺便扯点关于程序优化的理解。</p>
+<p>程序优化主要考虑对函数进行优化，毕竟在C/C++中函数是最常用，最基本的语法块，它的使用十分常见。函数的优化一般有下面几个需要考虑的部分</p>
+<ol>
+<li>是否需要大量调用这个函数。针对需要大量调用某个函数的情况，可以考虑对算法进行优化，减少函数的调用</li>
+<li>函数中是否有耗时的操作，如果有可以考虑使用异步的方式，或者将函数中的任务放到另外的线程（只有当我们确实不关心这个耗时操作的结果的时候，也就是说不涉及到同步的时候）</li>
+<li>函数中是否有大量的资源调用，如果有，可以考虑使用资源池的方式避免大量资源的申请与释放操作</li>
+</ol>
+<p>下面是一个使用SOCKET池的客户端的实例</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;process.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">"MSScokFunc.h"</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> SERVICE_IP <span class="meta-string">"119.75.213.61"</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> MAX_CONNECT_SOCKET 500</span></span><br><span class="line"><span class="function"><span class="keyword">unsigned</span> <span class="keyword">int</span> WINAPI <span class="title">IOCPThreadProc</span><span class="params">(LPVOID lpParam)</span></span>;</span><br><span class="line"></span><br><span class="line">LONG g_nPorts = <span class="number">0</span>;</span><br><span class="line">CMSScokFunc g_MsSockFunc;</span><br><span class="line"></span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> _<span class="title">tag_CLEINT_OVERLAPPED</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">	OVERLAPPED overlapped;</span><br><span class="line">	ULONG ulNetworkEvents;</span><br><span class="line">	DWORD dwFlags;</span><br><span class="line">	DWORD wConnectPort;</span><br><span class="line">	DWORD dwTransBytes;</span><br><span class="line">	<span class="keyword">char</span> *pBuf;</span><br><span class="line">	DWORD dwBufSize;</span><br><span class="line">	SOCKET sConnect;</span><br><span class="line">&#125;CLIENT_OVERLAPPED, *LPCLIENT_OVERLAPPED;</span><br><span class="line"></span><br><span class="line">SOCKADDR_IN g_LocalSockAddr = &#123;AF_INET&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	WSADATA wd = &#123;<span class="number">0</span>&#125;;</span><br><span class="line">	WSAStartup(MAKEWORD(<span class="number">2</span>, <span class="number">2</span>), &amp;wd);</span><br><span class="line">	SYSTEM_INFO si = &#123;<span class="number">0</span>&#125;;</span><br><span class="line">	<span class="keyword">const</span> <span class="keyword">int</span> on = <span class="number">1</span>;</span><br><span class="line">	GetSystemInfo(&amp;si);</span><br><span class="line">	HANDLE hIOCP = CreateIoCompletionPort(INVALID_HANDLE_VALUE, <span class="literal">NULL</span>, <span class="literal">NULL</span>, si.dwNumberOfProcessors);</span><br><span class="line"></span><br><span class="line">	HANDLE *pThreadArray = (HANDLE *)HeapAlloc(GetProcessHeap(), HEAP_ZERO_MEMORY, <span class="keyword">sizeof</span>(HANDLE) * <span class="number">2</span> * si.dwNumberOfProcessors);</span><br><span class="line">	<span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; <span class="number">2</span> * si.dwNumberOfProcessors; i++)</span><br><span class="line">	&#123;</span><br><span class="line">		HANDLE hThread = (HANDLE)_beginthreadex(<span class="literal">NULL</span>, <span class="number">0</span>, IOCPThreadProc, &amp;hIOCP, <span class="number">0</span>, <span class="literal">NULL</span>);</span><br><span class="line">		pThreadArray[i] = hThread;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	g_MsSockFunc.LoadAllFunc(AF_INET, SOCK_STREAM, IPPROTO_IP);</span><br><span class="line">	LPCLIENT_OVERLAPPED *pOverlappedArray = (LPCLIENT_OVERLAPPED *)HeapAlloc(GetProcessHeap(), HEAP_ZERO_MEMORY, <span class="keyword">sizeof</span>(LPCLIENT_OVERLAPPED) * MAX_CONNECT_SOCKET);</span><br><span class="line">	SOCKET *pSocketsArray = (SOCKET *)HeapAlloc(GetProcessHeap(), HEAP_ZERO_MEMORY, <span class="keyword">sizeof</span>(SOCKET) * MAX_CONNECT_SOCKET);</span><br><span class="line"></span><br><span class="line">	<span class="keyword">int</span> nIndex = <span class="number">0</span>;</span><br><span class="line">	g_LocalSockAddr.sin_addr.s_addr = INADDR_ANY;</span><br><span class="line">	g_LocalSockAddr.sin_port = htons(<span class="number">0</span>); <span class="comment">//让系统自动分配</span></span><br><span class="line"></span><br><span class="line">	<span class="built_in">printf</span>(<span class="string">"开始端口扫描........\n"</span>);</span><br><span class="line"></span><br><span class="line">	<span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; MAX_CONNECT_SOCKET; i++)</span><br><span class="line">	&#123;</span><br><span class="line">		g_nPorts++;</span><br><span class="line">		SOCKET sConnectSock = WSASocket(AF_INET, SOCK_STREAM, IPPROTO_IP, <span class="literal">NULL</span>, <span class="literal">NULL</span>, WSA_FLAG_OVERLAPPED);</span><br><span class="line">		<span class="comment">//允许地址重用</span></span><br><span class="line">		setsockopt(sConnectSock, SOL_SOCKET, SO_REUSEADDR, (<span class="keyword">char</span> *)&amp;on, <span class="keyword">sizeof</span>(on));</span><br><span class="line"></span><br><span class="line">		bind(sConnectSock, (SOCKADDR*)&amp;g_LocalSockAddr, <span class="keyword">sizeof</span>(SOCKADDR_IN));</span><br><span class="line"></span><br><span class="line">		SOCKADDR_IN sockAddr = &#123;<span class="number">0</span>&#125;;</span><br><span class="line">		sockAddr.sin_addr.s_addr = inet_addr(SERVICE_IP);</span><br><span class="line">		sockAddr.sin_family = AF_INET;</span><br><span class="line">		sockAddr.sin_port = htons(g_nPorts);</span><br><span class="line"></span><br><span class="line">		LPCLIENT_OVERLAPPED lpoc = (LPCLIENT_OVERLAPPED)HeapAlloc(GetProcessHeap(), HEAP_ZERO_MEMORY, <span class="keyword">sizeof</span>(CLIENT_OVERLAPPED));</span><br><span class="line">		lpoc-&gt;ulNetworkEvents = FD_CONNECT;</span><br><span class="line">		lpoc-&gt;wConnectPort = g_nPorts;</span><br><span class="line">		lpoc-&gt;sConnect = sConnectSock;</span><br><span class="line">		lpoc-&gt;pBuf = (<span class="keyword">char</span>*)HeapAlloc(GetProcessHeap(), HEAP_ZERO_MEMORY, <span class="keyword">sizeof</span>(SOCKADDR_IN));</span><br><span class="line">		lpoc-&gt;dwBufSize = <span class="keyword">sizeof</span>(SOCKADDR_IN);</span><br><span class="line">		CopyMemory(lpoc-&gt;pBuf, &amp;sockAddr, <span class="keyword">sizeof</span>(SOCKADDR_IN));</span><br><span class="line"></span><br><span class="line">		<span class="keyword">if</span>(!g_MsSockFunc.ConnectEx(sConnectSock, (SOCKADDR*)lpoc-&gt;pBuf, <span class="keyword">sizeof</span>(SOCKADDR_IN), <span class="literal">NULL</span>, <span class="number">0</span>, &amp;lpoc-&gt;dwTransBytes, &amp;lpoc-&gt;overlapped))</span><br><span class="line">		&#123;</span><br><span class="line">			<span class="keyword">if</span> (WSAGetLastError() != ERROR_IO_PENDING)</span><br><span class="line">			&#123;</span><br><span class="line">				<span class="built_in">printf</span>(<span class="string">"第(%d)个socket调用ConnectEx失败, 错误码为:%08x\n"</span>, i, WSAGetLastError());</span><br><span class="line">				HeapFree(GetProcessHeap(), HEAP_ZERO_MEMORY, lpoc);</span><br><span class="line">				closesocket(sConnectSock);</span><br><span class="line">				<span class="keyword">continue</span>;</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line"></span><br><span class="line">		CreateIoCompletionPort((HANDLE)sConnectSock, hIOCP, <span class="literal">NULL</span>, <span class="number">0</span>);</span><br><span class="line"></span><br><span class="line">		pSocketsArray[nIndex] = sConnectSock;</span><br><span class="line">		pOverlappedArray[nIndex] = lpoc;</span><br><span class="line">		nIndex++;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	g_nPorts = nIndex;</span><br><span class="line"></span><br><span class="line">	WaitForMultipleObjects(<span class="number">2</span> * si.dwNumberOfProcessors, pThreadArray, TRUE, INFINITE);</span><br><span class="line"></span><br><span class="line">	<span class="built_in">printf</span>(<span class="string">"端口扫描结束.......\n"</span>);</span><br><span class="line"></span><br><span class="line">	<span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; <span class="number">2</span> * si.dwNumberOfProcessors; i++)</span><br><span class="line">	&#123;</span><br><span class="line">		CloseHandle(pThreadArray[i]);</span><br><span class="line">	&#125;</span><br><span class="line">	HeapFree(GetProcessHeap(), <span class="number">0</span>, pThreadArray);</span><br><span class="line">	<span class="built_in">printf</span>(<span class="string">"清理对应线程完成........\n"</span>);</span><br><span class="line"></span><br><span class="line">	CloseHandle(hIOCP);</span><br><span class="line">	<span class="built_in">printf</span>(<span class="string">"清理完成端口句柄完成........\n"</span>);</span><br><span class="line"></span><br><span class="line">	<span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; nIndex; i++)</span><br><span class="line">	&#123;</span><br><span class="line">		closesocket(pSocketsArray[i]);</span><br><span class="line">		HeapFree(GetProcessHeap(), <span class="number">0</span>, pOverlappedArray[i]);</span><br><span class="line">	&#125;</span><br><span class="line">	HeapFree(GetProcessHeap(), <span class="number">0</span>, pSocketsArray);</span><br><span class="line">	HeapFree(GetProcessHeap(), <span class="number">0</span>, pOverlappedArray);</span><br><span class="line">	<span class="built_in">printf</span>(<span class="string">"清理sockets池成功...............\n"</span>);</span><br><span class="line"></span><br><span class="line">	WSACleanup();</span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">unsigned</span> <span class="keyword">int</span> WINAPI <span class="title">IOCPThreadProc</span><span class="params">(LPVOID lpParam)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	HANDLE hIOCP = *(HANDLE*)lpParam;</span><br><span class="line">	LPOVERLAPPED lpoverlapped = <span class="literal">NULL</span>;</span><br><span class="line">	LPCLIENT_OVERLAPPED lpoc = <span class="literal">NULL</span>;</span><br><span class="line">	DWORD dwNumbersOfBytesTransfer = <span class="number">0</span>;</span><br><span class="line">	ULONG uCompleteKey = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">while</span> (g_nPorts &lt; <span class="number">65536</span>) <span class="comment">//探测所有的65535个端口号</span></span><br><span class="line">	&#123;</span><br><span class="line">		<span class="keyword">int</span> nRet = GetQueuedCompletionStatus(hIOCP, &amp;dwNumbersOfBytesTransfer, &amp;uCompleteKey, &amp;lpoverlapped, INFINITE);</span><br><span class="line">		lpoc = CONTAINING_RECORD(lpoverlapped, CLIENT_OVERLAPPED, overlapped);</span><br><span class="line">		<span class="keyword">switch</span> (lpoc-&gt;ulNetworkEvents)</span><br><span class="line">		&#123;</span><br><span class="line">		<span class="keyword">case</span> FD_CONNECT:</span><br><span class="line">			&#123;</span><br><span class="line">				<span class="keyword">int</span> nErrorCode = WSAGetLastError();</span><br><span class="line">				<span class="keyword">if</span> (ERROR_SEM_TIMEOUT != nErrorCode)</span><br><span class="line">				&#123;</span><br><span class="line">					<span class="built_in">printf</span>(<span class="string">"当前Ip端口[%d]处于开放状态\n"</span>, lpoc-&gt;wConnectPort);</span><br><span class="line">				&#125;</span><br><span class="line"></span><br><span class="line">				lpoc-&gt;ulNetworkEvents = FD_CLOSE;</span><br><span class="line">				shutdown(lpoc-&gt;sConnect, SD_BOTH);</span><br><span class="line">				g_MsSockFunc.DisConnectEx(lpoc-&gt;sConnect, lpoverlapped, TF_REUSE_SOCKET, <span class="number">0</span>);</span><br><span class="line">			&#125;</span><br><span class="line">			<span class="keyword">break</span>;</span><br><span class="line"></span><br><span class="line">		<span class="keyword">case</span> FD_CLOSE:</span><br><span class="line">			&#123;</span><br><span class="line">				InterlockedIncrement(&amp;g_nPorts); <span class="comment">//进行原子操作的自增1</span></span><br><span class="line">				lpoc-&gt;wConnectPort = g_nPorts;</span><br><span class="line">				lpoc-&gt;ulNetworkEvents = FD_CONNECT;</span><br><span class="line"></span><br><span class="line">				SOCKADDR_IN sockAddr = &#123;<span class="number">0</span>&#125;;</span><br><span class="line">				sockAddr.sin_addr.s_addr = inet_addr(SERVICE_IP);</span><br><span class="line">				sockAddr.sin_family = AF_INET;</span><br><span class="line">				sockAddr.sin_port = htons(g_nPorts);</span><br><span class="line">				lpoc-&gt;pBuf = (<span class="keyword">char</span>*)HeapAlloc(GetProcessHeap(), HEAP_ZERO_MEMORY, <span class="keyword">sizeof</span>(SOCKADDR_IN));</span><br><span class="line">				lpoc-&gt;dwBufSize = <span class="keyword">sizeof</span>(SOCKADDR_IN);</span><br><span class="line">				CopyMemory(lpoc-&gt;pBuf, &amp;sockAddr, <span class="keyword">sizeof</span>(SOCKADDR_IN));</span><br><span class="line"></span><br><span class="line">				g_MsSockFunc.ConnectEx(lpoc-&gt;sConnect, (SOCKADDR*)&amp;sockAddr, <span class="keyword">sizeof</span>(SOCKADDR), <span class="literal">NULL</span>, <span class="number">0</span>, &amp;lpoc-&gt;dwTransBytes, &amp;lpoc-&gt;overlapped);</span><br><span class="line">			&#125;</span><br><span class="line">			<span class="keyword">break</span>;</span><br><span class="line">		<span class="keyword">default</span>:</span><br><span class="line">			&#123;</span><br><span class="line">				lpoc-&gt;ulNetworkEvents = FD_CLOSE;</span><br><span class="line">				HeapFree(GetProcessHeap(), <span class="number">0</span>, lpoc-&gt;pBuf);</span><br><span class="line">				lpoc-&gt;pBuf = <span class="literal">NULL</span>;</span><br><span class="line">				lpoc-&gt;dwBufSize = <span class="number">0</span>;</span><br><span class="line">				g_MsSockFunc.DisConnectEx(lpoc-&gt;sConnect, lpoverlapped, TF_REUSE_SOCKET, <span class="number">0</span>);</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这例子的主要功能是针对具体的IP或者主机名进行TCP的端口探测，这里的端口探测也是采用最简单的方式，向对应的端口发送TCP连接的请求，如果能连上则表示该端口开放，否则认为端口未开放。<br>上述示例中，首先创建IOCP并绑定线程，这里我们绑定处理器数的2倍个线程，并且指定并行的线程数为CPU核数。接着创建对应的结构保存对应的连接信息。</p>
+<p>然后就是在循环中创建足够数量的SOCKET，这里我们只创建了500个，在每个SOCKET连接完成并回收后再次进行提交去探测后面的端口。注意这里我们先对每个SOCKET进行了绑定，这个在一般的SOCKET客户端服务器模型中没有这个操作，这个操作是WinSock API2.0需要的操作。 创建了足够的socket后，使用ConnectEx进行连接。</p>
+<p>在线程池中对相关的完成通知进行了处理，这里分了下面几种情况</p>
+<ul>
+<li>如果是连接成功了，表示这个端口是开放的，这个时候打印对应的端口并进行断开连接和回收SOCKET</li>
+<li>如果是断开连接的操作完成，再次进行提交</li>
+<li>如果是其他的通知我们认为是出错了，也就是这个端口没有开放，此时也是回收当前的SOCKET</li>
+</ul>
+<p>最后当所有端口都探测完成后完成端口线程退出，程序进入资源回收的阶段，这个阶段的顺序如下:</p>
+<ol>
+<li>关闭线程句柄</li>
+<li>关闭IOCP句柄</li>
+<li>关闭监听的SOCKET</li>
+<li>关闭其余套接字</li>
+<li>回收其他资源</li>
+</ol>
+<p>这个顺序也是有一定讲究的，我们先关闭IOCP的相关，如果后续还有需要处理的完成通知，由于此时IOCP已经关闭了，所以这里程序不再处理这些请求，接着关闭监听套接字表示程序已经不再接受连接的请求。这个时候程序已经与服务端彻底断开。后面再清理其余资源。</p>
+<h2 id="WSABUF-参数"><a href="#WSABUF-参数" class="headerlink" title="WSABUF 参数"></a>WSABUF 参数</h2><p>在WSASend 和WSARecv的参数中总有一个WSABUF的参数，这个参数很简单的就只有一个缓冲区指针和缓冲区长度，加上函数后面表示WSABUF的个数的参数，很容易想到这些函数可以发送WSABUF的数组，从而可以发送多个数据，但是这就有问题了，发送大数据的话，我们直接申请大一点的缓冲就完了，为什么要额外的定义这么一个结构呢？回答这个问题的关键在于散播和聚集这种I/O处理的机制</p>
+<p>散播和聚集I/O是一种起源于高级硬盘I/O的技术，它的本质是将一组比较分散的小碎块数据组合成一个大块的IO数据操作，或者反过来是将一个大块的I/O操作拆分为几个小块的I/O操作。它的好处是,比如分散写入不同大小的几个小数据(各自是几个字节),这对于传统硬盘的写入来说是比较麻烦的一种操作,传统的磁盘需要经历几次机械臂的转动寻址,而通过聚集写操作,它会在驱动层将这些小块内存先拼装成一个大块内存,然后只调用一次写入操作,一次性写入硬盘。这样之后,就充分的发挥了高级硬盘系统(DMA/SCSI/RAID等)的连续写入读取的性能优势,而这些设备对于小块数据的读写是没有任何优势的,甚至性能是下降的。</p>
+<p>而在Winsock中将这种理念发挥到了SOCKET的传输上。WSABUF正是用于这个理念的产物。</p>
+<p>作为WSASend、WSASendto、WSARecv、WSARecvFrom等函数的数组参数,最终WSABUF数组可以描述多个分散的缓冲块用于收发。在发送的时候底层驱动会将多个WSABUF数据块组合成一个大块的内存缓冲，并一次发送出去，而在接收时会将收到的数据进行拆分，拆分成原来的小块数据，也就是说聚合散播的特性不仅能提高发送的效率，而且支持发送和接收结构化的数据。</p>
+<p>其实在使用聚合散播的时候主要是应用它来进行数据包的拆分，方便封装自定义协议。</p>
+<p>在一些应用中,每个数据包都是有自定义的结构的,这些结构就被称为自定义的协议。<br>其中最常见的封装就是一个协议头用以说明包类型和长度,然后是包数据,最后是一个包尾里面存放用于校验数据的CRC码等。但是对于面向伪流的协议来说,这样的结构会带来一个比较头疼的问题——粘包,即多个小的数据包会被连在一起被接收端接收,然后就是头疼和麻烦的拆包过程。而如果使用了散播和聚集I/O方法,那么所有的工作就简单了,可以定义一个3元素的WSABUF结构数组分别发送包头/包数据/包尾。然后接收端先用一个WSABUF接收包头,然后根据包头指出的长度准备包数据/包尾的缓冲,再用2元素的WSABUF接收剩下的数据。同时对于使用了IOCP+重叠I/O的通讯应用来说,在复杂的多线程环境下散播和聚集I/O方法依然可以很可靠的工作。</p>
+<p>下面是一个使用聚合散播的服务器的例子:</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">"MSScokFunc.h"</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">"MSScokFunc.h"</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;process.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> _<span class="title">tag_CLIENT_OVERLAPPED</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">	OVERLAPPED overlapped;</span><br><span class="line">	<span class="keyword">char</span> *pBuf;</span><br><span class="line">	<span class="keyword">size_t</span> dwBufSize;</span><br><span class="line">	DWORD dwFlag;</span><br><span class="line">	DWORD dwTransBytes;</span><br><span class="line">	<span class="keyword">long</span> lNetworkEvents;</span><br><span class="line">	SOCKET sListen;</span><br><span class="line">	SOCKET sClient;</span><br><span class="line">&#125;CLIENT_OVERLAPPED, *LPCLIENT_OVERLAPPED;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">unsigned</span> <span class="keyword">int</span> WINAPI <span class="title">IOCPThreadProc</span><span class="params">(LPVOID lpParameter)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	HANDLE hIOCP = *(HANDLE*)lpParameter;</span><br><span class="line">	DWORD dwNumberOfTransfered;</span><br><span class="line">	ULONG uKey = <span class="number">0</span>;</span><br><span class="line">	LPOVERLAPPED lpOverlapped = <span class="literal">NULL</span>;</span><br><span class="line">	LPCLIENT_OVERLAPPED lpoc = <span class="literal">NULL</span>;</span><br><span class="line"></span><br><span class="line">	BOOL bLoop = TRUE;</span><br><span class="line">	<span class="keyword">while</span> (bLoop)</span><br><span class="line">	&#123;</span><br><span class="line">		GetQueuedCompletionStatus(hIOCP, &amp;dwNumberOfTransfered, &amp;uKey, &amp;lpOverlapped, INFINITE);</span><br><span class="line">		lpoc = CONTAINING_RECORD(lpOverlapped, CLIENT_OVERLAPPED, overlapped);</span><br><span class="line">		<span class="keyword">switch</span> (lpoc-&gt;lNetworkEvents)</span><br><span class="line">		&#123;</span><br><span class="line">		<span class="keyword">case</span> FD_CLOSE:</span><br><span class="line">			&#123;</span><br><span class="line">				<span class="keyword">if</span> (lpoc-&gt;sListen == INVALID_SOCKET)</span><br><span class="line">				&#123;</span><br><span class="line">					bLoop = FALSE;</span><br><span class="line">				&#125;<span class="keyword">else</span></span><br><span class="line">				&#123;</span><br><span class="line">					<span class="comment">//再次提交AcceptEx</span></span><br><span class="line">					<span class="built_in">printf</span>(<span class="string">"线程(%08x)回收socket(%08x)成功\n"</span>, GetCurrentThreadId(), lpoc-&gt;sClient);</span><br><span class="line">					lpoc-&gt;dwBufSize = <span class="number">2</span> * (<span class="keyword">sizeof</span>(SOCKADDR_IN) + <span class="number">16</span>);</span><br><span class="line">					lpoc-&gt;lNetworkEvents = FD_ACCEPT;</span><br><span class="line">					lpoc-&gt;pBuf = (<span class="keyword">char</span>*)HeapAlloc(GetProcessHeap(), HEAP_ZERO_MEMORY, <span class="number">2</span> * (<span class="keyword">sizeof</span>(SOCKADDR_IN) + <span class="number">16</span>));</span><br><span class="line"></span><br><span class="line">					g_MsSockFunc.AcceptEx(lpoc-&gt;sListen, lpoc-&gt;sClient, lpoc-&gt;pBuf, <span class="number">0</span>, <span class="keyword">sizeof</span>(SOCKADDR_IN) + <span class="number">16</span>, <span class="keyword">sizeof</span>(SOCKADDR_IN) + <span class="number">16</span>, &amp;lpoc-&gt;dwTransBytes, &amp;lpoc-&gt;overlapped);</span><br><span class="line"></span><br><span class="line">				&#125;</span><br><span class="line">			&#125;</span><br><span class="line">			<span class="keyword">break</span>;</span><br><span class="line"></span><br><span class="line">		<span class="keyword">case</span> FD_ACCEPT:</span><br><span class="line">			&#123;</span><br><span class="line">				SOCKADDR_IN *pRemoteSockAddr = <span class="literal">NULL</span>;</span><br><span class="line">				<span class="keyword">int</span> nRemoteSockAddrLength = <span class="number">0</span>;</span><br><span class="line">				SOCKADDR_IN *pLocalSockAddr = <span class="literal">NULL</span>;</span><br><span class="line">				<span class="keyword">int</span> nLocalSockAddrLength = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">				g_MsSockFunc.GetAcceptExSockAddrs(lpoc-&gt;pBuf, <span class="number">0</span>, <span class="keyword">sizeof</span>(SOCKADDR_IN) + <span class="number">16</span>, <span class="keyword">sizeof</span>(SOCKADDR_IN) + <span class="number">16</span>, (LPSOCKADDR*)&amp;pLocalSockAddr, &amp;nRemoteSockAddrLength, (LPSOCKADDR*)&amp;pRemoteSockAddr, &amp;nRemoteSockAddrLength);</span><br><span class="line">				<span class="built_in">printf</span>(<span class="string">"有客户端[%s:%d]连接进来，当前通信地址[%s:%d]......\n"</span>, inet_ntoa(pRemoteSockAddr-&gt;sin_addr), ntohs(pRemoteSockAddr-&gt;sin_port), inet_ntoa(pLocalSockAddr-&gt;sin_addr), ntohs(pLocalSockAddr-&gt;sin_port));</span><br><span class="line"></span><br><span class="line">				<span class="comment">//设置当前通信用socket继承监听socket的相关属性</span></span><br><span class="line">				<span class="keyword">int</span> nRet = ::setsockopt(lpoc-&gt;sClient, SOL_SOCKET, SO_UPDATE_ACCEPT_CONTEXT, (<span class="keyword">char</span> *)&amp;lpoc-&gt;sListen, <span class="keyword">sizeof</span>(SOCKET));</span><br><span class="line"></span><br><span class="line">				<span class="comment">//投递WSARecv消息, 这里仅仅是为了发起WSARecv调用而不接受数据，设置缓冲为0可以节约内存</span></span><br><span class="line">				WSABUF buf = &#123;<span class="number">0</span>, <span class="literal">NULL</span>&#125;;</span><br><span class="line">				HeapFree(GetProcessHeap(), <span class="number">0</span>, lpoc-&gt;pBuf);</span><br><span class="line">				lpoc-&gt;lNetworkEvents = FD_READ;</span><br><span class="line">				lpoc-&gt;pBuf = <span class="literal">NULL</span>;</span><br><span class="line">				lpoc-&gt;dwBufSize = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">				WSARecv(lpoc-&gt;sClient, &amp;buf, <span class="number">1</span>, &amp;lpoc-&gt;dwTransBytes, &amp;lpoc-&gt;dwFlag, &amp;lpoc-&gt;overlapped, <span class="literal">NULL</span>);</span><br><span class="line">			&#125;</span><br><span class="line">			<span class="keyword">break</span>;</span><br><span class="line"></span><br><span class="line">		<span class="keyword">case</span> FD_READ:</span><br><span class="line">			&#123;</span><br><span class="line">				WSABUF buf[<span class="number">2</span>] = &#123;<span class="number">0</span>&#125;;</span><br><span class="line">        DWORD dwBufLen = <span class="number">0</span>;</span><br><span class="line">				buf[<span class="number">0</span>].buf = (<span class="keyword">char</span>*)&amp;dwBufLen;</span><br><span class="line">				buf[<span class="number">0</span>].len = <span class="keyword">sizeof</span>(DWORD);</span><br><span class="line"></span><br><span class="line">				<span class="comment">//当调用此处的时候已经完成了接收数据的操作，此时只要调用WSARecv将数据放入指定内存即可,这个时候不需要使用重叠IO操作了</span></span><br><span class="line">				<span class="keyword">int</span> nRet = WSARecv(lpoc-&gt;sClient, buf, <span class="number">1</span>, &amp;lpoc-&gt;dwTransBytes, &amp;lpoc-&gt;dwFlag, <span class="literal">NULL</span>, <span class="literal">NULL</span>);</span><br><span class="line"></span><br><span class="line">				DWORD dwBufSize = dwBufLen;</span><br><span class="line">				buf[<span class="number">1</span>].buf = (<span class="keyword">char</span>*)HeapAlloc(GetProcessHeap(), HEAP_ZERO_MEMORY, dwBufSize);</span><br><span class="line">				buf[<span class="number">1</span>].len = dwBufLen;</span><br><span class="line"></span><br><span class="line">				WSARecv(lpoc-&gt;sClient, &amp;buf[<span class="number">1</span>], <span class="number">1</span>, &amp;lpoc-&gt;dwTransBytes, &amp;lpoc-&gt;dwFlag, <span class="literal">NULL</span>, <span class="literal">NULL</span>);</span><br><span class="line"></span><br><span class="line">				<span class="built_in">printf</span>(<span class="string">"client&gt;%s\n"</span>, buf[<span class="number">1</span>].buf);</span><br><span class="line"></span><br><span class="line">				lpoc-&gt;pBuf = buf[<span class="number">1</span>].buf; <span class="comment">//这块内存将在FD_WRITE事件中释放</span></span><br><span class="line">				lpoc-&gt;dwBufSize = buf[<span class="number">1</span>].len;</span><br><span class="line"></span><br><span class="line">				lpoc-&gt;lNetworkEvents = FD_WRITE;</span><br><span class="line">				lpoc-&gt;dwFlag = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">				WSASend(lpoc-&gt;sClient, buf, <span class="number">2</span>, &amp;lpoc-&gt;dwTransBytes, lpoc-&gt;dwFlag, &amp;lpoc-&gt;overlapped, <span class="literal">NULL</span>);</span><br><span class="line">			&#125;</span><br><span class="line">			<span class="keyword">break</span>;</span><br><span class="line"></span><br><span class="line">		<span class="keyword">case</span> FD_WRITE:</span><br><span class="line">			&#123;</span><br><span class="line">				<span class="built_in">printf</span>(<span class="string">"线程[%08x]完成事件(WSASend),缓冲(%d),长度(%d), 发送长度(%d)\n"</span>, GetCurrentThreadId(), lpoc-&gt;pBuf, lpoc-&gt;dwTransBytes, dwNumberOfTransfered);</span><br><span class="line">				HeapFree(GetProcessHeap(), <span class="number">0</span>, lpoc-&gt;pBuf);</span><br><span class="line">				lpoc-&gt;dwFlag = <span class="number">0</span>;</span><br><span class="line">				lpoc-&gt;lNetworkEvents = FD_CLOSE;</span><br><span class="line">				lpoc-&gt;pBuf = <span class="literal">NULL</span>;</span><br><span class="line"></span><br><span class="line">				shutdown(lpoc-&gt;sClient, SD_BOTH);</span><br><span class="line">				g_MsSockFunc.DisConnectEx(lpoc-&gt;sClient, &amp;lpoc-&gt;overlapped, TF_REUSE_SOCKET, <span class="number">0</span>);</span><br><span class="line">			&#125;</span><br><span class="line">			<span class="keyword">break</span>;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="built_in">printf</span>(<span class="string">"线程[%08x] 退出.......\n"</span>, GetCurrentThreadId());</span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这里没有展示main函数的内容，main函数的内容与之前的相似，在开始的时候进行一些初始化，在结束的时候进行资源的回收操作。这里需要注意的是在main函数中给定的退出条件:</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">CLIENT_OVERLAPPED CloseOverlapped = &#123;<span class="number">0</span>&#125;;</span><br><span class="line">	CloseOverlapped.lNetworkEvents = FD_CLOSE;</span><br><span class="line">	CloseOverlapped.sListen = INVALID_SOCKET;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; <span class="number">2</span> * si.dwNumberOfProcessors; i++)</span><br><span class="line">	&#123;</span><br><span class="line">		PostQueuedCompletionStatus(hIOCP, <span class="number">0</span>, <span class="literal">NULL</span>, (LPOVERLAPPED)&amp;CloseOverlapped.overlapped);</span><br><span class="line">	&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在线程中，首先判断当前完成事件的类型</p>
+<ul>
+<li>如果是 FD_CLOSE 事件，首先判断socket是否为 INVALID_SOCKET，如果是则表明是主程序需要退出线程，此时退出，否则只进行回收与再提交的操作</li>
+<li>如果是 FD_ACCEPT 事件，则表明有客户端连接上来，此时解析客户端的信息并提交WSARecv的信息，注意这里在提交WSARecv时给的缓冲是NULL,这里表示我只需要一个完成的通知，在完成收到客户端数据后会触发FD_READ,而不需要进行数据的写入，一般在提交WSARecv后，系统内核会锁住我们提供的WSABUF结构所表示的那块内存直到，写入完成，而从我们提交WSARecv到真正获取到客户端传过来的数据，这个是需要一定时间的，而在这个时间中虽然CPU不会等待，但是这个内存被占用了，我们认为这也是一种浪费。特别是在服务端需要频繁的调用WSASend、WSARecv这样的操作，如果每一个都锁定一定的缓冲，这个内存消耗也是惊人的。所以这里传入NULL,只让其进行事件通知，而写入的操作由程序自己做。</li>
+<li>当事件是FD_READ时才正式进行数据的写入操作，此时再次调用WSARecv，这个时候需要注意，我们已经接收到了客户端的数据完成通知，也就是说现在明确的知道客户端已经发送了数据，而且内核已经收到数据，此时就不需要再使用异步了，只需要使用同步简单的读取数据即可。 在读取数据的时候首先根据WSABUF数组的第一个元素获取数据包的长度，然后分配对应的缓冲，接着接收后面真实的数据包。最后调用WSASend将数据原样返回。</li>
+<li>当完成通知事件是 FD_WRITE时表示我们已经完成了发送数据到客户端的操作，此时断开与客户端的连接并清理对应的缓冲。</li>
+</ul>
+<h2 id="提高服务程序性能的一般方式"><a href="#提高服务程序性能的一般方式" class="headerlink" title="提高服务程序性能的一般方式"></a>提高服务程序性能的一般方式</h2><p>对于实际的面向网络的服务(主要指使用TCP协议的服务应用)来说,大致可以分为两大类:连接密集型/传输密集型。连接密集型服务的主要设计目标就是以最大的性能响应尽可能多的客户端连接请求,比如一个Web服务<br>传输密集型服务的设计目标就是针对每个已有连接做到尽可能大的数据传输量,有时以牺牲连接数为代价,比如一个FTP服务器。而针对像UDP这样无连接的协议，我们认为它主要负责传输数据，所以这里把它归结为传输密集型</p>
+<p>对于面向连接的服务(主要指使用TCP协议的服务)来说,主要设计考虑的是如下几个环节:</p>
+<ol>
+<li>接受连接</li>
+<li>数据传输</li>
+<li>IOCP+线程池接力</li>
+<li>其它性能优化考虑</li>
+</ol>
+<h3 id="接收连接"><a href="#接收连接" class="headerlink" title="接收连接"></a>接收连接</h3><p>接收连接一般都采用AcceptEx的重叠IO方式来进行等待，并且一般需要加上SOCKET池的机制，开始时可能准备的AcceptEx数量可能会不足,此时可以另起线程在监听SOCKET句柄上等待FD_ACCEPT事件来决定何时再次投递大量的AcceptEx进行等待<br>当然再次调用AcceptEx时需要创建大量的SOCKET句柄,这个工作最好不要在IOCP线程池线程中进行,以防创建过程耗时而造成现有SOCKET服务响应性能下降。</p>
+<p>最终需要注意的就是,任何处于”等待”AcceptEx状态的SOCKET句柄都不要直接调用closesocket,这样会造成严重的内核内存泄漏。应该先关闭监听套接字，防止在关闭SOCKET的时候有客户端连接进来，然后再调用closesocket来断开。</p>
+<h3 id="数据传输"><a href="#数据传输" class="headerlink" title="数据传输"></a>数据传输</h3><p>在这个环节中可以将SOCKET句柄上的接收和发送数据缓冲区设置为0，这样可以节约系统内核的缓冲,尤其是在管理大量连接SOCKET句柄的服务中,因为一个句柄上这个缓冲大小约为17K,当SOCKET句柄数量巨大时这个缓冲耗费还是惊人的。设置缓冲为0的方法如下:</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> iBufLen= <span class="number">0</span>;</span><br><span class="line">setsockopt(skAccept,SOL_SOCKET,SO_SNDBUF,(<span class="keyword">const</span> <span class="keyword">char</span>*)&amp;iBufLen,<span class="keyword">sizeof</span>(<span class="keyword">int</span>));</span><br><span class="line">setsockopt(skAccept,SOL_SOCKET,SO_RCVBUF,(<span class="keyword">const</span> <span class="keyword">char</span>*)&amp;iBufLen,<span class="keyword">sizeof</span>(<span class="keyword">int</span>));</span><br></pre></td></tr></table></figure>
+
+<h3 id="IOCP-线程池"><a href="#IOCP-线程池" class="headerlink" title="IOCP + 线程池"></a>IOCP + 线程池</h3><p>为了性能的考虑,一般网络服务应用都使用IOCP+重叠I/O+SOCKET池的方式来实现具体的服务应用。这其中需要注意的一个问题就是IOCP线程池中的线程不要用于过于耗时或复杂的操作,比如:访问数据库操作,存取文件操作,复杂的数据计算操作等。这些操作因为会严重占用SOCKET操作的IOCP线程资源因此会极大降低服务应用的响应性能。但是很多实际的应用中确实需要在服务端进行这些操作,那么如何来平衡这个问题呢? 这时就需要另起线程或线程池来接力IOCP线程池的工作。比如在WSARecv的完成通知中,将接收到的缓冲直接传递给QueueUserWorkItem线程池方法,启动线程池中的线程去处理数据,而IOCP线程池则继续专心于网络服务。这也就是一般书上都会说的专门的线程干专门的事</p>
+<h3 id="其他的性能考虑"><a href="#其他的性能考虑" class="headerlink" title="其他的性能考虑"></a>其他的性能考虑</h3><p>其他的性能主要是使用之前提到的聚合与散播机制，或者对函数和代码执行流程进行优化</p>
+<p>关于IOCP 聚合与散播的代码全放在码云上了: <a href="https://gitee.com/masimaro/codes/teo94n8jkzcd23iqxgswa69#IOCP" target="_blank" rel="noopener">示例代码</a></p>
+<hr />
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+      <div>
+        <div style="padding: 10px 0; margin: 20px auto; width: 90%; text-align: center;">
+  <div></div>
+  <button id="rewardButton" disable="enable" onclick="var qr = document.getElementById('QR'); if (qr.style.display === 'none') {qr.style.display='block';} else {qr.style.display='none'}">
+    <span>打赏</span>
+  </button>
+  <div id="QR" style="display: none;">
+
+    
+      <div id="wechat" style="display: inline-block">
+        <img id="wechat_qr" src="/images/wechatreward.png" alt="Masimaro 微信支付"/>
+        <p>微信支付</p>
+      </div>
+    
+
+    
+      <div id="alipay" style="display: inline-block">
+        <img id="alipay_qr" src="/images/alipayreward.png" alt="Masimaro 支付宝"/>
+        <p>支付宝</p>
+      </div>
+    
+
+    
+
+  </div>
+</div>
+
+      </div>
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/WinSock2-API/" rel="tag"><i class="fa fa-tag"></i> WinSock2 API</a>
+          
+            <a href="/tags/SOCKET-%E6%B1%A0/" rel="tag"><i class="fa fa-tag"></i> SOCKET 池</a>
+          
+            <a href="/tags/%E8%81%9A%E5%90%88%E4%B8%8E%E6%95%A3%E6%92%AD/" rel="tag"><i class="fa fa-tag"></i> 聚合与散播</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/c-call-python.html" rel="next" title="C++ 调用Python3">
+                <i class="fa fa-chevron-left"></i> C++ 调用Python3
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/20180819.html" rel="prev" title="毕业两年的反思">
+                毕业两年的反思 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        
+  <div class="bdsharebuttonbox">
+    <a href="#" class="bds_tsina" data-cmd="tsina" title="分享到新浪微博"></a>
+    <a href="#" class="bds_douban" data-cmd="douban" title="分享到豆瓣网"></a>
+    <a href="#" class="bds_sqq" data-cmd="sqq" title="分享到QQ好友"></a>
+    <a href="#" class="bds_qzone" data-cmd="qzone" title="分享到QQ空间"></a>
+    <a href="#" class="bds_weixin" data-cmd="weixin" title="分享到微信"></a>
+    <a href="#" class="bds_tieba" data-cmd="tieba" title="分享到百度贴吧"></a>
+    <a href="#" class="bds_twi" data-cmd="twi" title="分享到Twitter"></a>
+    <a href="#" class="bds_fbook" data-cmd="fbook" title="分享到Facebook"></a>
+    <a href="#" class="bds_more" data-cmd="more"></a>
+    <a class="bds_count" data-cmd="count"></a>
+  </div>
+  <script>
+    window._bd_share_config = {
+      "common": {
+        "bdText": "",
+        "bdMini": "2",
+        "bdMiniList": false,
+        "bdPic": ""
+      },
+      "share": {
+        "bdSize": "16",
+        "bdStyle": "0"
+      },
+      "image": {
+        "viewList": ["tsina", "douban", "sqq", "qzone", "weixin", "twi", "fbook"],
+        "viewText": "分享到：",
+        "viewSize": "16"
+      }
+    }
+  </script>
+
+<script>
+  with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='//bdimg.share.baidu.com/static/api/js/share.js?cdnversion='+~(-new Date()/36e5)];
+</script>
+
+      
+	  
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      <div id="disqus_thread">
+        <noscript>
+          Please enable JavaScript to view the
+          <a href="https://disqus.com/?ref_noscript" target="_blank" rel="noopener">comments powered by Disqus.</a>
+        </noscript>
+      </div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/avatar.jpg"
+                alt="Masimaro" />
+            
+              <p class="site-author-name" itemprop="name">Masimaro</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/%20%7C%7C%20archive">
+              
+                  <span class="site-state-item-count">94</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">18</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">141</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          <div class="links-of-author motion-element">
+            
+              
+                <span class="links-of-author-item">
+                  <a href="https://github.com/aMonst" target="_blank" title="GitHub">
+                    
+                      <i class="fa fa-fw fa-globe"></i>GitHub</a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="http://weibo.com/your-user-name" target="_blank" title="微博">
+                    
+                      <i class="fa fa-fw fa-globe"></i>微博</a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="http://blog.csdn.net/lanuage" target="_blank" title="CSDN博客">
+                    
+                      <i class="fa fa-fw fa-globe"></i>CSDN博客</a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="http://www.jianshu.com/u/7261ff9df286" target="_blank" title="简书">
+                    
+                      <i class="fa fa-fw fa-globe"></i>简书</a>
+                </span>
+              
+            
+          </div>
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#SOCKET池"><span class="nav-number">1.</span> <span class="nav-text">SOCKET池</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#WSABUF-参数"><span class="nav-number">2.</span> <span class="nav-text">WSABUF 参数</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#提高服务程序性能的一般方式"><span class="nav-number">3.</span> <span class="nav-text">提高服务程序性能的一般方式</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#接收连接"><span class="nav-number">3.1.</span> <span class="nav-text">接收连接</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#数据传输"><span class="nav-number">3.2.</span> <span class="nav-text">数据传输</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#IOCP-线程池"><span class="nav-number">3.3.</span> <span class="nav-text">IOCP + 线程池</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#其他的性能考虑"><span class="nav-number">3.4.</span> <span class="nav-text">其他的性能考虑</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love" id="heart">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Masimaro</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io" rel="external nofollow">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next" rel="external nofollow">NexT.Mist</a> v5.1.3</div>
+
+
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv">
+      <i class="fa fa-user">本次访客数</i>
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+      人次
+    </span>
+  
+
+  
+    <span class="site-pv">
+      <i class="fa fa-eye">本站总访问量</i>
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+      次
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.3"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.3"></script>
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.3"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.3"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.3"></script>
+
+
+
+  
+
+
+  
+
+    
+      <script id="dsq-count-scr" src="https://masimaroweb.disqus.com/count.js" async></script>
+    
+
+    
+      <script type="text/javascript">
+        var disqus_config = function () {
+          this.page.url = 'http://www.masimaroweb.com/socket-pool.html';
+          this.page.identifier = 'socket-pool.html';
+          this.page.title = 'WinSock Socket 池';
+        };
+        var d = document, s = d.createElement('script');
+        s.src = 'https://masimaroweb.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', '' + +new Date());
+        (d.head || d.body).appendChild(s);
+      </script>
+    
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+  
+
+
+  
+
+  
+
+</body>
+</html>
+
+<!-- 页面点击小红心 -->
+<script type="text/javascript" src="/js/src/love.js"></script>

@@ -1,0 +1,1366 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<script src="//cdn.bootcss.com/pace/1.0.2/pace.min.js"></script>
+<link href="//cdn.bootcss.com/pace/1.0.2/themes/pink/pace-theme-flash.css" rel="stylesheet">
+<style>
+    .pace .pace-progress {
+        background: #1E92FB; /*进度条颜色*/
+        height: 3px;
+    }
+    .pace .pace-progress-inner {
+         box-shadow: 0 0 10px #1E92FB, 0 0 5px     #1E92FB; /*阴影颜色*/
+    }
+    .pace .pace-activity {
+        border-top-color: #1E92FB;    /*上边框颜色*/
+        border-left-color: #1E92FB;    /*左边框颜色*/
+    }
+</style>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.3" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.3">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.3">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.3">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.3" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="VC++反汇编分析, 函数原理, C语言, 调用约定, 函数栈" />
+
+
+
+
+  
+
+
+  <link rel="alternate" href="/atom.xml" title="Masimaro's blog" type="application/atom+xml" />
+
+
+
+
+
+
+<meta name="description" content="C语言作为面向过程的语言，函数是其中最重要的部分，同时函数也是C种的一个难点，这篇文章希望通过汇编的方式说明函数的实现原理。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="C函数原理">
+<meta property="og:url" content="http://www.masimaroweb.com/c-function-principle.html">
+<meta property="og:site_name" content="Masimaro&#39;s blog">
+<meta property="og:description" content="C语言作为面向过程的语言，函数是其中最重要的部分，同时函数也是C种的一个难点，这篇文章希望通过汇编的方式说明函数的实现原理。">
+<meta property="og:image" content="http://img.blog.csdn.net/20160419204122410">
+<meta property="og:image" content="http://img.blog.csdn.net/20160420202000196">
+<meta property="og:image" content="http://img.blog.csdn.net/20160420203205056">
+<meta property="og:image" content="http://img.blog.csdn.net/20160420202145885">
+<meta property="article:published_time" content="2018-01-15T14:57:02.000Z">
+<meta property="article:modified_time" content="2018-01-22T14:49:07.698Z">
+<meta property="article:author" content="Masimaro">
+<meta property="article:tag" content="VC++反汇编分析">
+<meta property="article:tag" content=" 函数原理">
+<meta property="article:tag" content=" C语言">
+<meta property="article:tag" content=" 调用约定">
+<meta property="article:tag" content=" 函数栈">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://img.blog.csdn.net/20160419204122410">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.3',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+
+  <link rel="canonical" href="http://www.masimaroweb.com/c-function-principle.html"/>
+
+
+
+
+
+  <title>C函数原理 | Masimaro's blog</title>
+  
+
+
+
+
+
+
+
+
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Masimaro's blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <h1 class="site-subtitle" itemprop="description"></h1>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="搜索..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://www.masimaroweb.com/c-function-principle.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Masimaro">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Masimaro's blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h2 class="post-title" itemprop="name headline">C函数原理</h2>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-15T22:57:02+08:00">
+                2018-01-15
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/VC-%E5%8F%8D%E6%B1%87%E7%BC%96%E5%88%86%E6%9E%90/" itemprop="url" rel="index">
+                    <span itemprop="name">VC++反汇编分析</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/c-function-principle.html#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="c-function-principle.html" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="page-pv"><i class="fa fa-file-o">本文总阅读量</i>
+            <span class="busuanzi-value" id="busuanzi_value_page_pv" ></span>次
+            </span>
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>C语言作为面向过程的语言，函数是其中最重要的部分，同时函数也是C种的一个难点，这篇文章希望通过汇编的方式说明函数的实现原理。</p>
+<a id="more"></a>
+<h1 id="栈结构与相关的寄存器"><a href="#栈结构与相关的寄存器" class="headerlink" title="栈结构与相关的寄存器"></a>栈结构与相关的寄存器</h1><p>在计算中，栈是十分重要的一种数据结构，同时也是CPU直接支持的一种数据结构，栈采用先进后出的方式。CPU中分别用两个寄存器ebp和esp来保存栈底地址和栈顶地址，在CPU层面只需要ebp的值大于ESP的值两个寄存器所指向的内存的中间的部分就构成了一个栈。汇编中采用push和pop两个指令来表示入栈和出栈，这两个指令后面直接跟寄存器或者内存地址，表示将相应的值放入栈中，比如push eax相当于指令sub esp, 4; mov [esp], eax而pop eax相当于mov [esp], eax; add esp, 4。<br>    另外CPU中有一个专门记录下一条指令的寄存器eip，这样每当执行一条指令，eip寄存器加上相应指令的长度，这样每一条指令执行完成后，eip都执向下一条指令的地址。只要能够保存函数调用前，下一句代码的地址，这样在函数执行完成后将这个地址赋值给eip寄存器，就能够回到调用者的位置，这是函数实现的基本依据。</p>
+<h1 id="函数的调用"><a href="#函数的调用" class="headerlink" title="函数的调用"></a>函数的调用</h1><p>我们通过这样一段代码来说明函数的调用过程</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">add</span><span class="params">(<span class="keyword">int</span> a, <span class="keyword">int</span> b)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">int</span> c = a + b;</span><br><span class="line">    <span class="keyword">return</span> c;</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">(<span class="keyword">int</span> argc, <span class="keyword">char</span>* argv[])</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    add(<span class="number">1</span>, <span class="number">2</span>);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>它对应的反汇编代码如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">;这是调用函数之前所做的准备，代码在main函数中</span><br><span class="line">004012A8   push        2</span><br><span class="line">004012AA   push        1</span><br><span class="line">004012AC   call        @ILT+0(add) (00401005)</span><br><span class="line">004012B1   add         esp,8</span><br><span class="line"></span><br><span class="line">;函数中的汇编代码</span><br><span class="line">00401250   push        ebp</span><br><span class="line">00401251   mov         ebp,esp</span><br><span class="line">00401253   sub         esp,44h</span><br><span class="line">00401256   push        ebx</span><br><span class="line">00401257   push        esi</span><br><span class="line">00401258   push        edi</span><br><span class="line">00401259   lea         edi,[ebp-44h]</span><br><span class="line">0040125C   mov         ecx,11h</span><br><span class="line">00401261   mov         eax,0CCCCCCCCh</span><br><span class="line">00401266   rep stos    dword ptr [edi]</span><br><span class="line">;后面的就是函数中的实现代码</span><br></pre></td></tr></table></figure>
+<p>首先在调用函数之前进行参数压栈，首先将参数列表中的参数从右至左，依次压栈，然后调用一句call指令，跳转到函数代码处，call指令主要有两个作用，一个是eip的值压入栈中，然后使用jmp指令，跳转到对应函数的实现位置，此时栈中的值如下图：<br><img src="http://img.blog.csdn.net/20160419204122410" alt="图1"><br>在函数实现的位置，首先将ebp压栈，这个时候的ebp保存的是调用者的栈帧的栈底地址。然后将ESP赋值给ebp，这些指令执行后栈中的内容如下图所示：<br><img src="http://img.blog.csdn.net/20160420202000196" alt="图2"><br>此时ebp与ESP相等，ebp上面的部分都是该函数的函数栈帧，用于保存该函数的局部变量。接下来将ESP的值减去44h，并对ESP和ebp之间的内存进行初始化为0xcc，而0xcc转化为字符串就是一系列的“烫”，还记得以前在vc6.0中写程序时经常出现的“烫烫烫”吗。这些指令就是初始化一个栈空间，这个空间大小为48h，以后在函数中定义变量时是利用ebp来做偏移，ESP因为是栈顶指针会一直变化，所以采用了一个不变的栈底指针作为偏移的基址。比如下面是add函数的语句对应的代码：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">10:       int c &#x3D; a + b;</span><br><span class="line">00401268   mov         eax,dword ptr [ebp+8]</span><br><span class="line">0040126B   add         eax,dword ptr [ebp+0Ch]</span><br><span class="line">0040126E   mov         dword ptr [ebp-4],eax</span><br></pre></td></tr></table></figure>
+<p>初始化变量C的时候，变量的地址是ebp - 4,而从上面的图中可以看出ebp + 8指向的是第一个参数，ebp + 4指向的是保存的EIP的值。现在我们来证实一下，通过VC6.0的调试功能，查看寄存器的值，此时我们得到如下的图：<br><img src="http://img.blog.csdn.net/20160420203205056" alt="这里写图片描述"><br>在图中明显的看出此时ebp的值为0x0012FEEC,而ebp + 4则是0x0012FEF0,这个地址对应的位置存储的值为0x004012B1，看到了吗，这个地址对应的代码是不是add esp, 8；这句话是不是在call之后。<br>当函数返回时执行下面的语句：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">00401271   mov         eax,dword ptr [ebp-4]</span><br><span class="line">12:   &#125;</span><br><span class="line">00401274   pop         edi</span><br><span class="line">00401275   pop         esi</span><br><span class="line">00401276   pop         ebx</span><br><span class="line">00401277   mov         esp,ebp</span><br><span class="line">00401279   pop         ebp</span><br><span class="line">0040127A   ret</span><br></pre></td></tr></table></figure>
+<p>当我们执行完了这些代码，函数栈的环境已经形成了，下面是整个栈帧环境的示意图：<br><img src="http://img.blog.csdn.net/20160420202145885" alt="图3"><br>首先还原之前保存的寄存器环境，这几个寄存器没有太大的作用，只是编译器判断以后可能使用到它们，因而将其之前的值保存，但是与函数的实现没有太大关系，在这并不关心。之前在进入函数时首先将esp指向的位置抬高了44h，但是在这并没有看到将esp指向的位置降低44h的操作，但是它有一句mov esp, ebp，这句话就是用来还原栈环境的，还记得之前的图吗，ebp指向当前函数栈帧的栈底，通过这一句可以直接将esp还原，使其指向正确的位置。想想我当初学8086汇编利用栈操作时，不知道这个寄存器，当时压入的数据与弹出的数据不匹配结果还原到了错误的地址执行代码，可是花了好多时间调试才发现，甚是苦逼。现在好了，利用一句话直接将esp指向正确的位置，减少了不少工作，不必去记你到底压入了多少内容，也不必刻意的去将这些内容弹出。到这，栈环境又回到了当初图2的情景。然后进行了一句pop ebp将之前存储的ebp的内容还原，这个时候ebp指向的是调用者的函数栈帧的栈底位置。<br>       在上述的最后有一句ret，相当于先执行pop eip，将之前保存的eip的值还原，这样CPU执行的下句代码就是eip指向的内存位置的代码。</p>
+<h1 id="函数中的参数传递"><a href="#函数中的参数传递" class="headerlink" title="函数中的参数传递"></a>函数中的参数传递</h1><p>从上面的代码中可以看出，函数的形参与实参并不是同一个变量，它们所在的内存地址不同，这样就解释了为什么形参的改变无法影响实参，只有通过传入地址才能改变实参。我们这传递的是具体的变量值，现在我们不这么做，当传递一个结构体的话会怎么样？下面是一段测试代码：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">struct NUM</span><br><span class="line">&#123;</span><br><span class="line">    int a;</span><br><span class="line">    int b;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">int add(NUM num)</span><br><span class="line">&#123;</span><br><span class="line">    int c &#x3D; num.a + num.b;</span><br><span class="line">    return c;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">int main(int argc, char* argv[])</span><br><span class="line">&#123;</span><br><span class="line">    NUM num;</span><br><span class="line">    num.a &#x3D; 1;</span><br><span class="line">    num.b &#x3D; 2;</span><br><span class="line">    add(num);</span><br><span class="line">    return 0;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>下面是它的反汇编代码：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">23:       num.a &#x3D; 1;</span><br><span class="line">004012A8   mov         dword ptr [ebp-8],1</span><br><span class="line">24:       num.b &#x3D; 2;</span><br><span class="line">004012AF   mov         dword ptr [ebp-4],2</span><br><span class="line">25:       add(num);</span><br><span class="line">004012B6   mov         eax,dword ptr [ebp-4]</span><br><span class="line">004012B9   push        eax</span><br><span class="line">004012BA   mov         ecx,dword ptr [ebp-8]</span><br><span class="line">004012BD   push        ecx</span><br><span class="line">004012BE   call        @ILT+0(add) (00401005)</span><br></pre></td></tr></table></figure>
+<p>从汇编代码中可以看到，结构体在丁一时，它里面的成员是从低地址到高地址依次定义的。ebp - 8是 成员a的地址，ebp - 4是成员b的地址，在传参时，首先压入栈中的是ebp - 4 然后是ebp - 8。这样在函数栈中仍然保持着定义时候的顺序，这么做与C在底层对结构体的处理有关。其实对于参数大于4个字节的情况，一般是采用拷贝的方式，将参数所在内存中的内容依次拷贝到函数栈中。只是例子中的结构体只有两个整形成员，因此采用的是两次入栈的操作。比如我们在上面例子的结构体中添加一个char szBuf[255]的成员，这个时候在传参时会执行这样的语句：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">004012C2   sub         esp,108h</span><br><span class="line">004012C8   mov         ecx,42h</span><br><span class="line">004012CD   lea         esi,[ebp-108h]</span><br><span class="line">004012D3   mov         edi,esp</span><br><span class="line">004012D5   rep movs    dword ptr [edi],dword ptr [esi]</span><br><span class="line">004012D7   call        @ILT+0(add) (00401005)</span><br><span class="line">004012DC   add         esp,108h</span><br></pre></td></tr></table></figure>
+<p>rep movs  dword ptr [edi], dword ptr [esi]指令是将esi所指向的内存依次复制到edi所指向的内存中，赋值的大小是ecx个字节，而每次赋值dword也就是4个字节。</p>
+<h1 id="函数的返回值"><a href="#函数的返回值" class="headerlink" title="函数的返回值"></a>函数的返回值</h1><p>函数可以返回不同的值，一般利用return语句返回，但是在上面的说明中并没有这样的指令，唯一用来返回的ret指令，只是修改栈的内容并做一个跳转，并没有实际的返回什么，下面我们就来看看函数是如何返回值的。<br>我们用第一段C代码来说明函数是如何返回的，下面是add函数和main函数的return语句对应的反汇编代码：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">;main函数的反汇编代码</span><br><span class="line">17:       return 0;</span><br><span class="line">004012B4   xor         eax,eax</span><br><span class="line">;函数add的反汇编代码</span><br><span class="line">00401268   mov         eax,dword ptr [ebp+8]</span><br><span class="line">0040126B   add         eax,dword ptr [ebp+0Ch]</span><br><span class="line">0040126E   mov         dword ptr [ebp-4],eax</span><br><span class="line">11:       return c;</span><br><span class="line">00401271   mov         eax,dword ptr [ebp-4]</span><br><span class="line">;对于返回值的使用</span><br><span class="line">16:       int c &#x3D; add(1, 2);</span><br><span class="line">004012A8   push        2</span><br><span class="line">004012AA   push        1</span><br><span class="line">004012AC   call        @ILT+0(add) (00401005)</span><br><span class="line">004012B1   add         esp,8</span><br><span class="line">004012B4   mov         dword ptr [ebp-4],eax</span><br><span class="line">17:       return 0;</span><br><span class="line">004012B7   xor         eax,eax</span><br></pre></td></tr></table></figure>
+<p>在main的返回值中，首先执行的是xor eax, eax将eax清零，然后调用ret，在add函数中，将实参相加的结果保存到eax中，然后返回，这样我们猜测函数可能通过eax来保存函数的返回值。同时在main函数中我们将返回值保存到另一个变量中，int c = add(1, 2)的反汇编代码可以看出，最终是执行了mov [ebp - 4], eax。所以从这可以看出函数如果返回四个字节的内容时会用eax保存这个返回值。如果小于4个呢，下面一段反汇编代码说明了这一点</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">16:       short c &#x3D; add(1, 2);</span><br><span class="line">004012A8   push        2</span><br><span class="line">004012AA   push        1</span><br><span class="line">004012AC   call        @ILT+10(add) (0040100f)</span><br><span class="line">004012B1   add         esp,8</span><br><span class="line">004012B4   mov         word ptr [ebp-4],ax</span><br></pre></td></tr></table></figure>
+<p>这段代码说明当小于4个字节时仍然会使用eax寄存器的低位存储返回值。如果大于4个字节该如何处理？</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">struct NUM</span><br><span class="line">&#123;</span><br><span class="line">    int a;</span><br><span class="line">    char szBuf[255];</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">NUM Ret(NUM num)</span><br><span class="line">&#123;</span><br><span class="line">    return num;</span><br><span class="line">&#125;</span><br><span class="line">int main(int argc, char* argv[])</span><br><span class="line">&#123;</span><br><span class="line">    NUM num &#x3D; &#123;0&#125;;</span><br><span class="line">    NUM num1 &#x3D; Ret(num);</span><br><span class="line">    return 0;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>对应的反汇编代码如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">;main 函数的返回值部分</span><br><span class="line">004012EE   mov         esi,eax</span><br><span class="line">004012F0   mov         ecx,41h</span><br><span class="line">004012F5   lea         edi,[ebp-30Ch]</span><br><span class="line">004012FB   rep movs    dword ptr [edi],dword ptr [esi]</span><br><span class="line">004012FD   mov         ecx,41h</span><br><span class="line">00401302   lea         esi,[ebp-30Ch]</span><br><span class="line">00401308   lea         edi,[ebp-208h]</span><br><span class="line">0040130E   rep movs    dword ptr [edi],dword ptr [esi]</span><br><span class="line">;Ret函数的返回值部分</span><br><span class="line">16:       return num;</span><br><span class="line">00401268   mov         ecx,41h</span><br><span class="line">0040126D   lea         esi,[ebp+0Ch]</span><br><span class="line">00401270   mov         edi,dword ptr [ebp+8]</span><br><span class="line">00401273   rep movs    dword ptr [edi],dword ptr [esi]</span><br><span class="line">00401275   mov         eax,dword ptr [ebp+8]</span><br><span class="line">17:   &#125;</span><br></pre></td></tr></table></figure>
+<p>当返回值大于4个字节时会采用其他模式，这个时候不再采用寄存器作为中间通道传递返回值，而是直接通过内存拷贝的方式来进行参数传递，在返回时，进行了内存拷贝将返回值拷贝到ebp + 8的位置，并将这个的首地址赋值给eax,使用这个值时，利用eax找到返回值所在内存的首地址，然后将这段内存的内容拷贝到相关变量所在的内存中，从在还看出了一个问题，就是返回值所在的内存的首地址为ebp + 8，如果没有保存这个值，并立即调用下一个函数的话，ebp + 8所在位置就会变成下一个函数的函数栈，这样这个返回值就丢失了，并且这个eax寄存器也会被下一个函数的返回值给覆盖，所以在调用函数后，如果不保存这个返回值，返回值就会丢失，也不能被引用。另外从上面可以看出，当参数或者返回值大于4个字节时，都要经历内存的拷贝，这样会大大降低效率，所以在参数或者返回值大于4个字节时一般利用指针或者引用来传值，如果不想函数改变出入或者传出的值，可以使用const关键字。<br>#局部变量的作用域<br>讨论局部变量的作用域，首先来看局部变量在函数中是如何存储的。还是来看看上面的例子中的一段汇编代码</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">10:       int c &#x3D; a + b;</span><br><span class="line">00401268   mov         eax,dword ptr [ebp+8]</span><br><span class="line">0040126B   add         eax,dword ptr [ebp+0Ch]</span><br><span class="line">0040126E   mov         dword ptr [ebp-4],eax</span><br></pre></td></tr></table></figure>
+<p>在函数中定义了一个局部变量C，在反汇编代码中，可以看出C变量所在的地址为ebp -4 的位置，根据上面的图3，可以看到，这个变量是在函数栈中，在函数中使用ebp间接寻址的方式来访问，在上面的分析中编译器预留了44h的空间用来保存局部变量。在编译时编译器会计算在函数中定义的局部变量所占内存的大小，根据这个大小来为函数分配合适的栈也就是说这个时候不在是sub esp, 44h了而是根据具体需要多大的空间来抬高esp，这个就不用例子演示了，感兴趣的朋友可以写一个简单的例子来验证一下。当函数调用完成后，ebp还原到调用者的栈底部，这个时候不可能再使用ebp间接寻址的方式来找到在上一个函数中定义的局部变量了，及时我们及时保存了这个变量的地址，也有可能在调用下一个函数时，这个地址所在的内存变成了下一个函数的函数栈，被下一个函数的内容所替代。所以C中局部变量只在本函数中使用。至于在复合语句块中定义的局部变量出了这个复合语句块就不能使用，这个纯粹是语法上面的限制，其实这个时候还是可以利用ebp间接寻址的方式来访问。<br>#函数的三种调用约定<br>我们知道函数中十分重要的一个部分是对栈空间的使用和最后栈空间的回收，不同的函数类型有不同的参数压栈与栈空间还原的方式，具体使用哪一种方式，需要事先与编译器约定好，以便生成对应的机器码来处理。下面我们来探究这三种调用方式。</p>
+<h2 id="stdcall方式"><a href="#stdcall方式" class="headerlink" title="stdcall方式"></a>stdcall方式</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> _stdcall <span class="title">Print</span><span class="params">(<span class="keyword">int</span> i, <span class="keyword">int</span> k)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">int</span> j = <span class="number">0</span>;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">"i = %d\n, k = %d\n"</span>, i, k);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">(<span class="keyword">int</span> argc, <span class="keyword">char</span>* argv[])</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    Print(<span class="number">10</span>, <span class="number">20</span>);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>下面是对应的反汇编代码</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">;main函数中的反汇编代码</span><br><span class="line">16:       Print(10, 20);</span><br><span class="line">004012C8   push        14h</span><br><span class="line">004012CA   push        0Ah</span><br><span class="line">004012CC   call        @ILT+0(Print) (00401005)</span><br><span class="line">;Print函数中反汇编代码</span><br><span class="line">00401268   mov         dword ptr [ebp-4],0</span><br><span class="line">11:       printf(&quot;i &#x3D; %d\n, k &#x3D; %d\n&quot;, i, k);</span><br><span class="line">0040126F   mov         eax,dword ptr [ebp+0Ch]</span><br><span class="line">00401272   push        eax</span><br><span class="line">00401273   mov         ecx,dword ptr [ebp+8]</span><br><span class="line">00401276   push        ecx</span><br><span class="line">00401277   push        offset string &quot;i &#x3D; %d\n, k &#x3D; %d\n&quot; (0042f01c)</span><br><span class="line">0040127C   call        printf (00401570)</span><br><span class="line">00401281   add         esp,0Ch</span><br><span class="line">12:   &#125;</span><br><span class="line">00401284   pop         edi</span><br><span class="line">00401285   pop         esi</span><br><span class="line">00401286   pop         ebx</span><br><span class="line">00401287   add         esp,44h</span><br><span class="line">0040128A   cmp         ebp,esp</span><br><span class="line">0040128C   call        __chkesp (00401410)</span><br><span class="line">00401291   mov         esp,ebp</span><br><span class="line">00401293   pop         ebp</span><br><span class="line">00401294   ret         8</span><br></pre></td></tr></table></figure>
+<p>从上面的代码中可以看出在调用函数Print函数时，首先压入栈中的参数是0x14，然后是0x0A，这两个值对应的是20和10，也就是说这种调用方式参数采用的是从右至左压栈，然后我们看到在函数栈环境的初始化中，与之前所说的基本相同，在返回时有一句ret 8这句话是相当于先执行了ret，然后执行了add esp , 8的操作，在调用这句话之前，esp保存的是该函数栈底的指针，esp + 8 正好跳过了之前为形参准备的栈空间，也就是说这种调用方式是由被调函数本身来完成最后栈空间的回收工作。</p>
+<h2 id="cdecl方式"><a href="#cdecl方式" class="headerlink" title="cdecl方式"></a>cdecl方式</h2><p>这种方式是C/C++默认的函数调用方式。我们将上述代码中的_stdcall改为 _cdecl，下面是函数的部分反汇编代码：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">;main部分</span><br><span class="line">16:       Print(10, 20);</span><br><span class="line">004012C8   push        14h</span><br><span class="line">004012CA   push        0Ah</span><br><span class="line">004012CC   call        @ILT+0(Print) (00401005)</span><br><span class="line">004012D1   add         esp,8</span><br><span class="line">;print函数部分</span><br><span class="line">0040128C   call        __chkesp (00401410)</span><br><span class="line">00401291   mov         esp,ebp</span><br><span class="line">00401293   pop         ebp</span><br><span class="line">00401294   ret</span><br></pre></td></tr></table></figure>
+<p>函数栈的初始化工作的代码基本相同，这里就不再粘贴这段代码了。首先在调用这个函数时压栈方式也是从右至左一次压栈，但是函数调用完毕，返回时只要一句ret，而在main函数中多了一句add esp, 8从这个地方可以很明显的看出，最后参数所在空间的释放是由main函数释放，也就是函数栈的释放是由调用方来完成。还记得在Windows SDK程序中的WinMain函数前面的WINAPI吗，其实它是一个宏，表示的正式这种调用方式。</p>
+<h2 id="fastcall"><a href="#fastcall" class="headerlink" title="fastcall"></a>fastcall</h2><p>fastcall是采用一种特殊的方式调用，一般函数的做法是将参数压入函数栈中，采用的是内存拷贝的方式，而这种方式为了体现fast的特性，部分参数是用寄存器来传值，我们知道寄存器的存取速度是大于内存的，所以这种方式也就可以提高程序的运行效率，但是寄存器数量是有限的，因此这种方式是采用寄存器与内存混合使用的方式来传递参数。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span>  _fastcall <span class="title">Print</span><span class="params">(<span class="keyword">int</span> i, <span class="keyword">int</span> k, <span class="keyword">int</span> a, <span class="keyword">int</span> b)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">int</span> j = <span class="number">0</span>;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">"i = %d\n, k = %d, a = %d, b = %d\n"</span>, i, k, a, b);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">(<span class="keyword">int</span> argc, <span class="keyword">char</span>* argv[])</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    Print(<span class="number">10</span>, <span class="number">20</span>, <span class="number">30</span>, <span class="number">40</span>);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>对应的反汇编代码如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">;main函数的部分</span><br><span class="line">16:       Print(10, 20, 30, 40);</span><br><span class="line">004012D8   push        28h;栈内存传参</span><br><span class="line">004012DA   push        1Eh</span><br><span class="line">004012DC   mov         edx,14h;寄存器传参</span><br><span class="line">004012E1   mov         ecx,0Ah</span><br><span class="line">004012E6   call        @ILT+0(Print) (00401005)</span><br><span class="line">17:       return 0;</span><br><span class="line">;print函数返回部分</span><br><span class="line">00401294   pop         edi</span><br><span class="line">00401295   pop         esi</span><br><span class="line">00401296   pop         ebx</span><br><span class="line">00401297   add         esp,4Ch</span><br><span class="line">0040129A   cmp         ebp,esp</span><br><span class="line">0040129C   call        __chkesp (00401420)</span><br><span class="line">004012A1   mov         esp,ebp</span><br><span class="line">004012A3   pop         ebp</span><br><span class="line">004012A4   ret         8 ;平衡函数栈帧</span><br></pre></td></tr></table></figure>
+<p>从上面的反汇编代码可以看出，这种调用方式是采用寄存器与函数栈混合传参的方式，在返回时，由函数本身平衡栈帧。<br>#不定参函数<br>在函数中，可以使用这样一种技术：传入的参数个数可变，，比如像printf和scan，这种函数至少需要一个参数，并且需要知道参数个数，和各个参数类型，比如printf传入一个格式字符串来表示参数个数和参数的类型。从上面所说的函数的原理来看，参数是从右至左压栈，这样只需要知道第一个参数的地址，就可以依次向下寻找到各个参数的地址，通过各个参数的类型向下寻址，比如当前参数类型是int型，那么它的下一个参数的地址就是这个地址加4的位置，同时为了防止越界访问，给出了参数个数。下面我们用一个简单的例子来说明如何使用这种方式寻址。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//规定函数的第一个参数表示后续参数的个数，后面的参数全为int</span></span><br><span class="line"><span class="function"><span class="keyword">void</span>  <span class="title">Print</span><span class="params">(<span class="keyword">int</span> nCout,...)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">int</span> *p = &amp;nCout;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; nCout;i++)</span><br><span class="line">    &#123;</span><br><span class="line">        p++;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">"%d\t"</span>, *p);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">(<span class="keyword">int</span> argc, <span class="keyword">char</span>* argv[])</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    Print(<span class="number">3</span>, <span class="number">20</span>, <span class="number">30</span>, <span class="number">40</span>);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>我们知道参数列表中的参数都是从右至左依次压入函数栈中，所以这些参数肯定是依次存放，且第一个参数所在的地址应该是最小的，以后只需要依次根据将指针向下偏移即可寻址到不同的参数，C语言为了简化这个操作，定义了一组宏va_list  va_start va_arg va_end。这组宏的实现原理其实与上面我们写的代码差不多。由于传递的参数个数不确定，所以这个函数本身并不知道有多少个参数会传入，所以希望函数本身来平衡函数栈是不可能的，只有在调用之时才知道这个参数的个数，所以平衡栈的工作只能是由调用者来做，所以上述三种方式只有_cdecl这种方式可以使用不定参函数。<br>最后我们来总结一下函数的调用一般经过如下步骤：</p>
+<ol>
+<li>首先从右至左将参数压入栈中</li>
+<li>然后调用call指令保存eip寄存器的值，然后跳转到函数代码</li>
+<li>将上一个函数的栈底地址ebp的值压入栈中</li>
+<li>将此时esp的值保存到ebp中，作为该函数的函数栈的栈底地址</li>
+<li>根据函数中局部变量的个数抬高esp的值并初始化这段栈空间</li>
+<li>将其余寄存器的值压栈</li>
+<li>执行函数代码</li>
+<li>通过eax或者内存拷贝的方式保存返回值</li>
+<li>将上面保存的寄存器的值出栈</li>
+<li>执行esp = ebp，时esp指向函数栈的栈底</li>
+<li>pop ebp 还原之前保存的值，使ebp指向调用者的函数栈栈底</li>
+<li>ret 返回或者ret n(n为整数)指令返回到调用者的下一句代码</li>
+<li>平衡堆栈（根据约定方式决定是否有这步）<hr />
+</li>
+</ol>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+      <div>
+        <div style="padding: 10px 0; margin: 20px auto; width: 90%; text-align: center;">
+  <div></div>
+  <button id="rewardButton" disable="enable" onclick="var qr = document.getElementById('QR'); if (qr.style.display === 'none') {qr.style.display='block';} else {qr.style.display='none'}">
+    <span>打赏</span>
+  </button>
+  <div id="QR" style="display: none;">
+
+    
+      <div id="wechat" style="display: inline-block">
+        <img id="wechat_qr" src="/images/wechatreward.png" alt="Masimaro 微信支付"/>
+        <p>微信支付</p>
+      </div>
+    
+
+    
+      <div id="alipay" style="display: inline-block">
+        <img id="alipay_qr" src="/images/alipayreward.png" alt="Masimaro 支付宝"/>
+        <p>支付宝</p>
+      </div>
+    
+
+    
+
+  </div>
+</div>
+
+      </div>
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/VC/" rel="tag"><i class="fa fa-tag"></i> VC++</a>
+          
+            <a href="/tags/%E5%8F%8D%E6%B1%87%E7%BC%96/" rel="tag"><i class="fa fa-tag"></i> 反汇编</a>
+          
+            <a href="/tags/C-%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86/" rel="tag"><i class="fa fa-tag"></i> C++实现原理</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/c-loop.html" rel="next" title="C语言循环的实现">
+                <i class="fa fa-chevron-left"></i> C语言循环的实现
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/talk%20about%20study%20and%20learn.html" rel="prev" title="谈谈我所理解的学习">
+                谈谈我所理解的学习 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        
+  <div class="bdsharebuttonbox">
+    <a href="#" class="bds_tsina" data-cmd="tsina" title="分享到新浪微博"></a>
+    <a href="#" class="bds_douban" data-cmd="douban" title="分享到豆瓣网"></a>
+    <a href="#" class="bds_sqq" data-cmd="sqq" title="分享到QQ好友"></a>
+    <a href="#" class="bds_qzone" data-cmd="qzone" title="分享到QQ空间"></a>
+    <a href="#" class="bds_weixin" data-cmd="weixin" title="分享到微信"></a>
+    <a href="#" class="bds_tieba" data-cmd="tieba" title="分享到百度贴吧"></a>
+    <a href="#" class="bds_twi" data-cmd="twi" title="分享到Twitter"></a>
+    <a href="#" class="bds_fbook" data-cmd="fbook" title="分享到Facebook"></a>
+    <a href="#" class="bds_more" data-cmd="more"></a>
+    <a class="bds_count" data-cmd="count"></a>
+  </div>
+  <script>
+    window._bd_share_config = {
+      "common": {
+        "bdText": "",
+        "bdMini": "2",
+        "bdMiniList": false,
+        "bdPic": ""
+      },
+      "share": {
+        "bdSize": "16",
+        "bdStyle": "0"
+      },
+      "image": {
+        "viewList": ["tsina", "douban", "sqq", "qzone", "weixin", "twi", "fbook"],
+        "viewText": "分享到：",
+        "viewSize": "16"
+      }
+    }
+  </script>
+
+<script>
+  with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='//bdimg.share.baidu.com/static/api/js/share.js?cdnversion='+~(-new Date()/36e5)];
+</script>
+
+      
+	  
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      <div id="disqus_thread">
+        <noscript>
+          Please enable JavaScript to view the
+          <a href="https://disqus.com/?ref_noscript" target="_blank" rel="noopener">comments powered by Disqus.</a>
+        </noscript>
+      </div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/avatar.jpg"
+                alt="Masimaro" />
+            
+              <p class="site-author-name" itemprop="name">Masimaro</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/%20%7C%7C%20archive">
+              
+                  <span class="site-state-item-count">94</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">18</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">141</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          <div class="links-of-author motion-element">
+            
+              
+                <span class="links-of-author-item">
+                  <a href="https://github.com/aMonst" target="_blank" title="GitHub">
+                    
+                      <i class="fa fa-fw fa-globe"></i>GitHub</a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="http://weibo.com/your-user-name" target="_blank" title="微博">
+                    
+                      <i class="fa fa-fw fa-globe"></i>微博</a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="http://blog.csdn.net/lanuage" target="_blank" title="CSDN博客">
+                    
+                      <i class="fa fa-fw fa-globe"></i>CSDN博客</a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="http://www.jianshu.com/u/7261ff9df286" target="_blank" title="简书">
+                    
+                      <i class="fa fa-fw fa-globe"></i>简书</a>
+                </span>
+              
+            
+          </div>
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#栈结构与相关的寄存器"><span class="nav-number">1.</span> <span class="nav-text">栈结构与相关的寄存器</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#函数的调用"><span class="nav-number">2.</span> <span class="nav-text">函数的调用</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#函数中的参数传递"><span class="nav-number">3.</span> <span class="nav-text">函数中的参数传递</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#函数的返回值"><span class="nav-number">4.</span> <span class="nav-text">函数的返回值</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#stdcall方式"><span class="nav-number">4.1.</span> <span class="nav-text">stdcall方式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#cdecl方式"><span class="nav-number">4.2.</span> <span class="nav-text">cdecl方式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#fastcall"><span class="nav-number">4.3.</span> <span class="nav-text">fastcall</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love" id="heart">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Masimaro</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io" rel="external nofollow">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next" rel="external nofollow">NexT.Mist</a> v5.1.3</div>
+
+
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv">
+      <i class="fa fa-user">本次访客数</i>
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+      人次
+    </span>
+  
+
+  
+    <span class="site-pv">
+      <i class="fa fa-eye">本站总访问量</i>
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+      次
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.3"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.3"></script>
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.3"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.3"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.3"></script>
+
+
+
+  
+
+
+  
+
+    
+      <script id="dsq-count-scr" src="https://masimaroweb.disqus.com/count.js" async></script>
+    
+
+    
+      <script type="text/javascript">
+        var disqus_config = function () {
+          this.page.url = 'http://www.masimaroweb.com/c-function-principle.html';
+          this.page.identifier = 'c-function-principle.html';
+          this.page.title = 'C函数原理';
+        };
+        var d = document, s = d.createElement('script');
+        s.src = 'https://masimaroweb.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', '' + +new Date());
+        (d.head || d.body).appendChild(s);
+      </script>
+    
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+  
+
+
+  
+
+  
+
+</body>
+</html>
+
+<!-- 页面点击小红心 -->
+<script type="text/javascript" src="/js/src/love.js"></script>

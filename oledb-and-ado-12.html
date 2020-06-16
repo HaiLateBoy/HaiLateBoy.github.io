@@ -1,0 +1,1459 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<script src="//cdn.bootcss.com/pace/1.0.2/pace.min.js"></script>
+<link href="//cdn.bootcss.com/pace/1.0.2/themes/pink/pace-theme-flash.css" rel="stylesheet">
+<style>
+    .pace .pace-progress {
+        background: #1E92FB; /*进度条颜色*/
+        height: 3px;
+    }
+    .pace .pace-progress-inner {
+         box-shadow: 0 0 10px #1E92FB, 0 0 5px     #1E92FB; /*阴影颜色*/
+    }
+    .pace .pace-activity {
+        border-top-color: #1E92FB;    /*上边框颜色*/
+        border-left-color: #1E92FB;    /*左边框颜色*/
+    }
+</style>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.3" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.3">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.3">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.3">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.3" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="OLEDB, 数据库编程, VC++, 数据库, 静态绑定, 数据类型转化" />
+
+
+
+
+  
+
+
+  <link rel="alternate" href="/atom.xml" title="Masimaro's blog" type="application/atom+xml" />
+
+
+
+
+
+
+<meta name="description" content="OLEDB 提供了静态绑定和动态绑定两种方式，相比动态绑定来说，静态绑定在使用上更加简单，而在灵活性上不如动态绑定，动态绑定在前面已经介绍过了，本文主要介绍OLEDB中的静态，以及常用的数据类型转化接口。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="OLEDB 静态绑定和数据转化接口">
+<meta property="og:url" content="http://www.masimaroweb.com/oledb-and-ado-12.html">
+<meta property="og:site_name" content="Masimaro&#39;s blog">
+<meta property="og:description" content="OLEDB 提供了静态绑定和动态绑定两种方式，相比动态绑定来说，静态绑定在使用上更加简单，而在灵活性上不如动态绑定，动态绑定在前面已经介绍过了，本文主要介绍OLEDB中的静态，以及常用的数据类型转化接口。">
+<meta property="article:published_time" content="2018-04-27T12:13:54.000Z">
+<meta property="article:modified_time" content="2018-04-27T13:23:15.475Z">
+<meta property="article:author" content="Masimaro">
+<meta property="article:tag" content="OLEDB">
+<meta property="article:tag" content=" 数据库编程">
+<meta property="article:tag" content=" VC++">
+<meta property="article:tag" content=" 数据库">
+<meta property="article:tag" content=" 静态绑定">
+<meta property="article:tag" content=" 数据类型转化">
+<meta name="twitter:card" content="summary">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.3',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+
+  <link rel="canonical" href="http://www.masimaroweb.com/oledb-and-ado-12.html"/>
+
+
+
+
+
+  <title>OLEDB 静态绑定和数据转化接口 | Masimaro's blog</title>
+  
+
+
+
+
+
+
+
+
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Masimaro's blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <h1 class="site-subtitle" itemprop="description"></h1>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="搜索..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://www.masimaroweb.com/oledb-and-ado-12.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Masimaro">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Masimaro's blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h2 class="post-title" itemprop="name headline">OLEDB 静态绑定和数据转化接口</h2>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-04-27T20:13:54+08:00">
+                2018-04-27
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/windows-%E6%95%B0%E6%8D%AE%E5%BA%93%E7%BC%96%E7%A8%8B/" itemprop="url" rel="index">
+                    <span itemprop="name">windows 数据库编程</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/oledb-and-ado-12.html#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="oledb-and-ado-12.html" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="page-pv"><i class="fa fa-file-o">本文总阅读量</i>
+            <span class="busuanzi-value" id="busuanzi_value_page_pv" ></span>次
+            </span>
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>OLEDB 提供了静态绑定和动态绑定两种方式，相比动态绑定来说，静态绑定在使用上更加简单，而在灵活性上不如动态绑定，动态绑定在前面已经介绍过了，本文主要介绍OLEDB中的静态，以及常用的数据类型转化接口。</p>
+<a id="more"></a>
+<h2 id="静态绑定"><a href="#静态绑定" class="headerlink" title="静态绑定"></a>静态绑定</h2><p>之前的例子都是根据返回的COLUMNINFO结构来知晓数据表中各项的具体信息，然后进行绑定操作，这个操作由于可以动态的针对不同的数据类型绑定为不同的类型，因此称之为动态绑定。动态绑定是建立在我们对数据库中表结构一无所知，而又需要对数据库进行编程，但是一般在实际的项目中开发人员都是知道数据库的具体结构的，而且一旦数据库设计好了后续更改的可能性也不太大，因此可以采取静态绑定的方式来减少编程的复杂度。<br>在进行静态绑定时，一般针对每个数据库表结构定义一个结构体用来描述表的各项数据，然后利用结构体的偏移来绑定到数据库中。</p>
+<h3 id="数据关系对应表"><a href="#数据关系对应表" class="headerlink" title="数据关系对应表"></a>数据关系对应表</h3><p>一般静态绑定需要将数据库表的各项数据与结构体中的成员一一对应，这个时候就涉及到数据库数据类型到C/C++中数据类型的转化，下表列举了常见的数据库类型到C/C++数据类型的转化关系</p>
+<table>
+<thead>
+<tr>
+<th align="left">数据库类型</th>
+<th align="left">OLEDB 类型</th>
+<th align="left">C/C++类型</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">binary</td>
+<td align="left">DBTYPE_BYTES/DBTYPE_IUNKNOWN</td>
+<td align="left">BYTE[length]/BLOB</td>
+</tr>
+<tr>
+<td align="left">varbinary</td>
+<td align="left">DBTYPE_BYTES/DBTYPE_IUNKNOWN</td>
+<td align="left">BLOB</td>
+</tr>
+<tr>
+<td align="left">bit</td>
+<td align="left">DBTYPE_BOOL</td>
+<td align="left">VARIANT_BOOL</td>
+</tr>
+<tr>
+<td align="left">char</td>
+<td align="left">DBTYPE_STR</td>
+<td align="left">char[length]</td>
+</tr>
+<tr>
+<td align="left">varchar</td>
+<td align="left">DBTYPE_STR</td>
+<td align="left">char[length]</td>
+</tr>
+<tr>
+<td align="left">nvarchar</td>
+<td align="left">DBTYPE_WSTR</td>
+<td align="left">wchar_t[length]</td>
+</tr>
+<tr>
+<td align="left">nchar</td>
+<td align="left">DBTYPE_WSTR</td>
+<td align="left">wchar_t[length]</td>
+</tr>
+<tr>
+<td align="left">text</td>
+<td align="left">DBTYPE_STR/DBTYPE_IUNKNOWN</td>
+<td align="left">BLOB</td>
+</tr>
+<tr>
+<td align="left">image</td>
+<td align="left">DBTYPE_BYTES/DBTYPE_IUNKNOWN</td>
+<td align="left">BLOB</td>
+</tr>
+<tr>
+<td align="left">ntext</td>
+<td align="left">DBTYPE_WSTR/DBTYPE_IUNKNOWN</td>
+<td align="left">BLOB</td>
+</tr>
+<tr>
+<td align="left">tinyint</td>
+<td align="left">DBTYPE_UI1</td>
+<td align="left">BYTE</td>
+</tr>
+<tr>
+<td align="left">smallint</td>
+<td align="left">DBTYPE_I2</td>
+<td align="left">SHORT</td>
+</tr>
+<tr>
+<td align="left">int</td>
+<td align="left">DBTYPE_I4</td>
+<td align="left">LONG</td>
+</tr>
+<tr>
+<td align="left">bigint</td>
+<td align="left">DBTYPE_I8</td>
+<td align="left">LARGE_INTEGER</td>
+</tr>
+<tr>
+<td align="left">real</td>
+<td align="left">DBTYPE_R4</td>
+<td align="left">float</td>
+</tr>
+<tr>
+<td align="left">float</td>
+<td align="left">DBTYPE_R8</td>
+<td align="left">double</td>
+</tr>
+<tr>
+<td align="left">money</td>
+<td align="left">DBTYPE_CY</td>
+<td align="left">LARGE_INTEGER</td>
+</tr>
+<tr>
+<td align="left">numeric</td>
+<td align="left">DBTYPE_NUMERIC</td>
+<td align="left">typedef struct tagDB_NUMERIC {<br/>&nbsp;&nbsp;&nbsp;&nbsp;BYTE precision;<br/>&nbsp;&nbsp;&nbsp;&nbsp;BYTE scale;<br/>&nbsp;&nbsp;&nbsp;&nbsp;BYTE sign;<br/>&nbsp;&nbsp;&nbsp;&nbsp;BYTE val[16];<br>} DB_NUMERIC;</td>
+</tr>
+<tr>
+<td align="left">decimal</td>
+<td align="left">DBTYPE_NUMERIC</td>
+<td align="left">typedef struct tagDB_NUMERIC {<br/>&nbsp;&nbsp;&nbsp;&nbsp;BYTE precision;<br/>&nbsp;&nbsp;&nbsp;&nbsp;BYTE scale;<br/>&nbsp;&nbsp;&nbsp;&nbsp;BYTE sign;<br/>&nbsp;&nbsp;&nbsp;&nbsp;BYTE val[16];<br/>} DB_NUMERIC;</td>
+</tr>
+<tr>
+<td align="left">sysname</td>
+<td align="left">DBTYPE_WSTR</td>
+<td align="left">wchar_t[length]</td>
+</tr>
+<tr>
+<td align="left">datetime</td>
+<td align="left">DBTYPE_DBTIMESTAMP</td>
+<td align="left">typedef struct tagDBTIMESTAMP {<br/>&nbsp;&nbsp;&nbsp;&nbsp;SHORT   year;<br/>&nbsp;&nbsp;&nbsp;&nbsp;USHORT  month;<br/>&nbsp;&nbsp;&nbsp;&nbsp;USHORT  day;<br/>&nbsp;&nbsp;&nbsp;&nbsp;USHORT  hour;<br/>&nbsp;&nbsp;&nbsp;&nbsp;USHORT  minute;<br/>&nbsp;&nbsp;&nbsp;&nbsp;USHORT  second;<br/>&nbsp;&nbsp;&nbsp;&nbsp;ULONG   fraction;<br/>}DBTIMESTAMP;</td>
+</tr>
+<tr>
+<td align="left">timestamp</td>
+<td align="left">DBTYPE_BYTES</td>
+<td align="left">BYTE[length]</td>
+</tr>
+<tr>
+<td align="left">uniqueidentifier</td>
+<td align="left">DBTYPE_GUID</td>
+<td align="left">GUID</td>
+</tr>
+</tbody></table>
+<h2 id="实例"><a href="#实例" class="headerlink" title="实例"></a>实例</h2><p>下面是一个静态绑定的例子</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//静态绑定的结构</span></span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> _<span class="title">tag_DBSTRUCT</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">	DBSTATUS dbCodeStatus;</span><br><span class="line">	ULONG uCodeLength;</span><br><span class="line">	<span class="keyword">int</span> nCode;</span><br><span class="line"></span><br><span class="line">	DBSTATUS dbNameStatus;</span><br><span class="line">	ULONG uNameLength;</span><br><span class="line">	WCHAR szName[NAME_LENGTH];</span><br><span class="line">&#125;DBSTRUCT, *LPDBSTRUCT;</span><br><span class="line"></span><br><span class="line">dbBindings[<span class="number">0</span>].bPrecision = <span class="number">0</span>;</span><br><span class="line">	dbBindings[<span class="number">0</span>].bScale = <span class="number">0</span>;</span><br><span class="line">	dbBindings[<span class="number">0</span>].cbMaxLen = <span class="keyword">sizeof</span>(<span class="keyword">int</span>);</span><br><span class="line">	dbBindings[<span class="number">0</span>].dwMemOwner = DBMEMOWNER_CLIENTOWNED;</span><br><span class="line">	dbBindings[<span class="number">0</span>].dwPart = DBPART_STATUS | DBPART_LENGTH | DBPART_VALUE;</span><br><span class="line">	dbBindings[<span class="number">0</span>].iOrdinal = pdbColumnInfo[<span class="number">0</span>].iOrdinal;</span><br><span class="line">	dbBindings[<span class="number">0</span>].obStatus = offsetof(DBSTRUCT, dbCodeStatus);</span><br><span class="line">	dbBindings[<span class="number">0</span>].obLength = offsetof(DBSTRUCT, uCodeLength);</span><br><span class="line">	dbBindings[<span class="number">0</span>].obValue = offsetof(DBSTRUCT, nCode);</span><br><span class="line">	dbBindings[<span class="number">0</span>].wType = DBTYPE_I4;</span><br><span class="line"></span><br><span class="line">	dbBindings[<span class="number">1</span>].bPrecision = <span class="number">0</span>;</span><br><span class="line">	dbBindings[<span class="number">1</span>].bScale = <span class="number">0</span>;</span><br><span class="line">	dbBindings[<span class="number">1</span>].cbMaxLen = <span class="keyword">sizeof</span>(WCHAR) * NAME_LENGTH;</span><br><span class="line">	dbBindings[<span class="number">1</span>].dwMemOwner = DBMEMOWNER_CLIENTOWNED;</span><br><span class="line">	dbBindings[<span class="number">1</span>].dwPart = DBPART_STATUS | DBPART_LENGTH | DBPART_VALUE;</span><br><span class="line">	dbBindings[<span class="number">1</span>].iOrdinal = pdbColumnInfo[<span class="number">1</span>].iOrdinal;</span><br><span class="line">	dbBindings[<span class="number">1</span>].obStatus = offsetof(DBSTRUCT, dbNameStatus);</span><br><span class="line">	dbBindings[<span class="number">1</span>].obLength = offsetof(DBSTRUCT, uNameLength);</span><br><span class="line">	dbBindings[<span class="number">1</span>].obValue = offsetof(DBSTRUCT, szName);</span><br><span class="line">	dbBindings[<span class="number">1</span>].wType = DBTYPE_WSTR;</span><br><span class="line"></span><br><span class="line">	hRes = pIAccessor-&gt;CreateAccessor(DBACCESSOR_ROWDATA, <span class="number">2</span>, dbBindings, <span class="number">0</span>, &amp;hAccessor, <span class="literal">NULL</span>);</span><br><span class="line">	pdbStruct = (DBSTRUCT*)COM_ALLOC(<span class="keyword">sizeof</span>(DBSTRUCT) * cRows);</span><br><span class="line"></span><br><span class="line">	<span class="keyword">while</span> (TRUE)</span><br><span class="line">	&#123;</span><br><span class="line">		hRes = pIRowset-&gt;GetNextRows(DB_NULL_HCHAPTER, <span class="number">0</span>, cRows, &amp;cRowsObtained, &amp;prghRows);</span><br><span class="line">		<span class="keyword">if</span> (hRes != S_OK &amp;&amp; cRowsObtained == <span class="number">0</span>)</span><br><span class="line">		&#123;</span><br><span class="line">			<span class="keyword">break</span>;</span><br><span class="line">		&#125;</span><br><span class="line"></span><br><span class="line">		ZeroMemory(pdbStruct, <span class="keyword">sizeof</span>(DBSTRUCT) * cRows);</span><br><span class="line">		<span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; cRowsObtained; i++)</span><br><span class="line">		&#123;</span><br><span class="line">			hRes = pIRowset-&gt;GetData(prghRows[i], hAccessor, &amp;pdbStruct[i]);</span><br><span class="line">			<span class="keyword">if</span> (!FAILED(hRes))</span><br><span class="line">			&#123;</span><br><span class="line">				COM_PRINTF(_T(<span class="string">"%012d\t%s\n"</span>), pdbStruct[i].nCode, pdbStruct[i].szName);</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line"></span><br><span class="line">		pIRowset-&gt;ReleaseRows(cRowsObtained, prghRows, <span class="literal">NULL</span>, <span class="literal">NULL</span>, <span class="literal">NULL</span>);</span><br><span class="line">	&#125;</span><br></pre></td></tr></table></figure>
+<p>我们针对之前的行政区表来进行演示，在这个表中我们只查询其中的两列数据，与之前的例子相似，针对每列定义3项数据，分别是状态，长度和真实的数据，在绑定的时候就不需要计算总体需要内存的大小，行内存大小就是结构体的大小，在绑定的时候我们结构体成员在结构体中的偏移作为返回数据时各项在缓冲中的偏移。而在访问数据时就需要自己计算偏移，直接使用结构体中的成员即可。<br>从上面的例子，我总结了静态绑定和动态绑定之间的差别：</p>
+<ol>
+<li>其实从本质上将动态绑定和静态绑定没有区别，都是分配一段缓冲作为行集的缓冲，然后在使用的时候进行偏移的计算</li>
+<li>静态绑定是利用我们提前知道数据库的结构，实现通过结构体来安排各项在缓冲中的偏移所占内存的大小。</li>
+<li>动态绑定中所有成员的分配和所占内存大小都是根据COLUMNINFO结构事后动态分配的，需要自己计算偏移。</li>
+<li>相比于动态绑定来说，静态绑定不需要获取数据库的各项的属性信息，不需要自己计算各项的偏移，相对比较简单，适用于事先知道数据库的表结构，使用相对固定，一旦数据库结构改变就需要改变代码</li>
+<li>动态绑定可以适用于几乎任何情形，可扩展性强，几乎不需要考虑数据库表结构变更问题。代码灵活，但是需要自己计算偏移，自己分配管理内存，相对来说对程序员的功力要求更高一些。</li>
+</ol>
+<h2 id="数据类型转化"><a href="#数据类型转化" class="headerlink" title="数据类型转化"></a>数据类型转化</h2><p>数据库中数据类型繁多，而对应到具体的编程语言上有不同的展示方式，具体的语言中对同一种数据库类型有不同的数据类型对应，甚至有的可能并没有什么类型可以直接对应，这就涉及到一个从数据库数据类型到具体编程语言数据类型之间进行转换的问题，针对这一问题OLEDB提供了一个接口——IDataConvert<br>一般情况下任何数据类型都可以转化为相应格式的字符串，而对应的字符串又可以反过来转化为数据库中相应的数据类型。当然一些特殊转换也是允许的,比如:整型数据间的转换,浮点数间的转换等。这也是使用这个数据转化接口的主要原则。</p>
+<h3 id="数据转换接口的使用"><a href="#数据转换接口的使用" class="headerlink" title="数据转换接口的使用"></a>数据转换接口的使用</h3><ol>
+<li>使用COM标准的方式创建IDataConver接口（调用CreateInstance函数传入CLSID_OLEDB_CONVERSIONLIBRARY创建一个IID_IDataConvert接口）</li>
+<li>接着调用该接口的DataConvert方法可以进行数据转化</li>
+<li>调用接口的CanConvert可以知道两种数据类型之间能否进行转化。</li>
+<li>调用GetConversionSize可以知道源数据类型转化为指定类型时需要的缓冲大小。</li>
+</ol>
+<h3 id="实例-1"><a href="#实例-1" class="headerlink" title="实例"></a>实例</h3><p>这个例子相对比较简单，就简单的在之前打印数据库数据中加了一句转化为字符串的操作，然后打印，就不在文中展示了，具体的例子见我放到码云中的代码片段</p>
+<p>例子代码:</p>
+<ol>
+<li><a href="https://gitee.com/masimaro/codes/tcesnrul0g2yi76bam5dj19#StaticBind" target="_blank" rel="noopener">静态绑定</a></li>
+<li><a href="https://gitee.com/masimaro/codes/tcesnrul0g2yi76bam5dj19#DataConvert" target="_blank" rel="noopener">数据类型转化</a><hr />
+</li>
+</ol>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+      <div>
+        <div style="padding: 10px 0; margin: 20px auto; width: 90%; text-align: center;">
+  <div></div>
+  <button id="rewardButton" disable="enable" onclick="var qr = document.getElementById('QR'); if (qr.style.display === 'none') {qr.style.display='block';} else {qr.style.display='none'}">
+    <span>打赏</span>
+  </button>
+  <div id="QR" style="display: none;">
+
+    
+      <div id="wechat" style="display: inline-block">
+        <img id="wechat_qr" src="/images/wechatreward.png" alt="Masimaro 微信支付"/>
+        <p>微信支付</p>
+      </div>
+    
+
+    
+      <div id="alipay" style="display: inline-block">
+        <img id="alipay_qr" src="/images/alipayreward.png" alt="Masimaro 支付宝"/>
+        <p>支付宝</p>
+      </div>
+    
+
+    
+
+  </div>
+</div>
+
+      </div>
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/VC/" rel="tag"><i class="fa fa-tag"></i> VC++</a>
+          
+            <a href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93/" rel="tag"><i class="fa fa-tag"></i> 数据库</a>
+          
+            <a href="/tags/OLEDB/" rel="tag"><i class="fa fa-tag"></i> OLEDB</a>
+          
+            <a href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93%E7%BC%96%E7%A8%8B/" rel="tag"><i class="fa fa-tag"></i> 数据库编程</a>
+          
+            <a href="/tags/%E9%9D%99%E6%80%81%E7%BB%91%E5%AE%9A/" rel="tag"><i class="fa fa-tag"></i> 静态绑定</a>
+          
+            <a href="/tags/%E6%95%B0%E6%8D%AE%E8%BD%AC%E5%8C%96%E5%AF%B9%E8%B1%A1%E6%8E%A5%E5%8F%A3/" rel="tag"><i class="fa fa-tag"></i> 数据转化对象接口</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/oledb-and-ado-11.html" rel="next" title="OLEDB存取BLOB型数据">
+                <i class="fa fa-chevron-left"></i> OLEDB存取BLOB型数据
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/python-deal-with-re.html" rel="prev" title="Python处理正则表达式超时的办法">
+                Python处理正则表达式超时的办法 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        
+  <div class="bdsharebuttonbox">
+    <a href="#" class="bds_tsina" data-cmd="tsina" title="分享到新浪微博"></a>
+    <a href="#" class="bds_douban" data-cmd="douban" title="分享到豆瓣网"></a>
+    <a href="#" class="bds_sqq" data-cmd="sqq" title="分享到QQ好友"></a>
+    <a href="#" class="bds_qzone" data-cmd="qzone" title="分享到QQ空间"></a>
+    <a href="#" class="bds_weixin" data-cmd="weixin" title="分享到微信"></a>
+    <a href="#" class="bds_tieba" data-cmd="tieba" title="分享到百度贴吧"></a>
+    <a href="#" class="bds_twi" data-cmd="twi" title="分享到Twitter"></a>
+    <a href="#" class="bds_fbook" data-cmd="fbook" title="分享到Facebook"></a>
+    <a href="#" class="bds_more" data-cmd="more"></a>
+    <a class="bds_count" data-cmd="count"></a>
+  </div>
+  <script>
+    window._bd_share_config = {
+      "common": {
+        "bdText": "",
+        "bdMini": "2",
+        "bdMiniList": false,
+        "bdPic": ""
+      },
+      "share": {
+        "bdSize": "16",
+        "bdStyle": "0"
+      },
+      "image": {
+        "viewList": ["tsina", "douban", "sqq", "qzone", "weixin", "twi", "fbook"],
+        "viewText": "分享到：",
+        "viewSize": "16"
+      }
+    }
+  </script>
+
+<script>
+  with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='//bdimg.share.baidu.com/static/api/js/share.js?cdnversion='+~(-new Date()/36e5)];
+</script>
+
+      
+	  
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      <div id="disqus_thread">
+        <noscript>
+          Please enable JavaScript to view the
+          <a href="https://disqus.com/?ref_noscript" target="_blank" rel="noopener">comments powered by Disqus.</a>
+        </noscript>
+      </div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/avatar.jpg"
+                alt="Masimaro" />
+            
+              <p class="site-author-name" itemprop="name">Masimaro</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/%20%7C%7C%20archive">
+              
+                  <span class="site-state-item-count">94</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">18</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">141</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          <div class="links-of-author motion-element">
+            
+              
+                <span class="links-of-author-item">
+                  <a href="https://github.com/aMonst" target="_blank" title="GitHub">
+                    
+                      <i class="fa fa-fw fa-globe"></i>GitHub</a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="http://weibo.com/your-user-name" target="_blank" title="微博">
+                    
+                      <i class="fa fa-fw fa-globe"></i>微博</a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="http://blog.csdn.net/lanuage" target="_blank" title="CSDN博客">
+                    
+                      <i class="fa fa-fw fa-globe"></i>CSDN博客</a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="http://www.jianshu.com/u/7261ff9df286" target="_blank" title="简书">
+                    
+                      <i class="fa fa-fw fa-globe"></i>简书</a>
+                </span>
+              
+            
+          </div>
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#静态绑定"><span class="nav-number">1.</span> <span class="nav-text">静态绑定</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#数据关系对应表"><span class="nav-number">1.1.</span> <span class="nav-text">数据关系对应表</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#实例"><span class="nav-number">2.</span> <span class="nav-text">实例</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#数据类型转化"><span class="nav-number">3.</span> <span class="nav-text">数据类型转化</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#数据转换接口的使用"><span class="nav-number">3.1.</span> <span class="nav-text">数据转换接口的使用</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#实例-1"><span class="nav-number">3.2.</span> <span class="nav-text">实例</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love" id="heart">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Masimaro</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io" rel="external nofollow">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next" rel="external nofollow">NexT.Mist</a> v5.1.3</div>
+
+
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv">
+      <i class="fa fa-user">本次访客数</i>
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+      人次
+    </span>
+  
+
+  
+    <span class="site-pv">
+      <i class="fa fa-eye">本站总访问量</i>
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+      次
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.3"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.3"></script>
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.3"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.3"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.3"></script>
+
+
+
+  
+
+
+  
+
+    
+      <script id="dsq-count-scr" src="https://masimaroweb.disqus.com/count.js" async></script>
+    
+
+    
+      <script type="text/javascript">
+        var disqus_config = function () {
+          this.page.url = 'http://www.masimaroweb.com/oledb-and-ado-12.html';
+          this.page.identifier = 'oledb-and-ado-12.html';
+          this.page.title = 'OLEDB 静态绑定和数据转化接口';
+        };
+        var d = document, s = d.createElement('script');
+        s.src = 'https://masimaroweb.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', '' + +new Date());
+        (d.head || d.body).appendChild(s);
+      </script>
+    
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+  
+
+
+  
+
+  
+
+</body>
+</html>
+
+<!-- 页面点击小红心 -->
+<script type="text/javascript" src="/js/src/love.js"></script>

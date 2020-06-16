@@ -1,0 +1,1319 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<script src="//cdn.bootcss.com/pace/1.0.2/pace.min.js"></script>
+<link href="//cdn.bootcss.com/pace/1.0.2/themes/pink/pace-theme-flash.css" rel="stylesheet">
+<style>
+    .pace .pace-progress {
+        background: #1E92FB; /*进度条颜色*/
+        height: 3px;
+    }
+    .pace .pace-progress-inner {
+         box-shadow: 0 0 10px #1E92FB, 0 0 5px     #1E92FB; /*阴影颜色*/
+    }
+    .pace .pace-activity {
+        border-top-color: #1E92FB;    /*上边框颜色*/
+        border-left-color: #1E92FB;    /*左边框颜色*/
+    }
+</style>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.3" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.3">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.3">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.3">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.3" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="WinSock 模型, 网络编程, 完成端口" />
+
+
+
+
+  
+
+
+  <link rel="alternate" href="/atom.xml" title="Masimaro's blog" type="application/atom+xml" />
+
+
+
+
+
+
+<meta name="description" content="之前写了关于Winsock的重叠IO模型，按理来说重叠IO模型与之前的模型相比，它的socket即是非阻塞的，也是异步的，它基本上性能非常高，但是它主要的缺点在于，即使我们使用历程来处理完成通知，但是我们知道历程它本身是在对应线程暂停，它借用当前线程的线程环境来执行完成通知，也就是说要执行完成通知就必须暂停当前线程的工作。这对工作线程来说也是一个不必要的性能浪费，这样我们自然就会想到，另外开辟一个">
+<meta property="og:type" content="article">
+<meta property="og:title" content="WinSock 完成端口模型">
+<meta property="og:url" content="http://www.masimaroweb.com/WinSock-IOCP.html">
+<meta property="og:site_name" content="Masimaro&#39;s blog">
+<meta property="og:description" content="之前写了关于Winsock的重叠IO模型，按理来说重叠IO模型与之前的模型相比，它的socket即是非阻塞的，也是异步的，它基本上性能非常高，但是它主要的缺点在于，即使我们使用历程来处理完成通知，但是我们知道历程它本身是在对应线程暂停，它借用当前线程的线程环境来执行完成通知，也就是说要执行完成通知就必须暂停当前线程的工作。这对工作线程来说也是一个不必要的性能浪费，这样我们自然就会想到，另外开辟一个">
+<meta property="article:published_time" content="2018-07-06T12:44:39.000Z">
+<meta property="article:modified_time" content="2018-07-06T13:50:26.483Z">
+<meta property="article:author" content="Masimaro">
+<meta property="article:tag" content="WinSock 模型">
+<meta property="article:tag" content=" 网络编程">
+<meta property="article:tag" content=" 完成端口">
+<meta name="twitter:card" content="summary">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.3',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+
+  <link rel="canonical" href="http://www.masimaroweb.com/WinSock-IOCP.html"/>
+
+
+
+
+
+  <title>WinSock 完成端口模型 | Masimaro's blog</title>
+  
+
+
+
+
+
+
+
+
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Masimaro's blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <h1 class="site-subtitle" itemprop="description"></h1>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="搜索..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://www.masimaroweb.com/WinSock-IOCP.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Masimaro">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Masimaro's blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h2 class="post-title" itemprop="name headline">WinSock 完成端口模型</h2>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-07-06T20:44:39+08:00">
+                2018-07-06
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Windows-%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B/" itemprop="url" rel="index">
+                    <span itemprop="name">Windows 网络编程</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/WinSock-IOCP.html#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="WinSock-IOCP.html" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="page-pv"><i class="fa fa-file-o">本文总阅读量</i>
+            <span class="busuanzi-value" id="busuanzi_value_page_pv" ></span>次
+            </span>
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>之前写了关于Winsock的重叠IO模型，按理来说重叠IO模型与之前的模型相比，它的socket即是非阻塞的，也是异步的，它基本上性能非常高，但是它主要的缺点在于，即使我们使用历程来处理完成通知，但是我们知道历程它本身是在对应线程暂停，它借用当前线程的线程环境来执行完成通知，也就是说要执行完成通知就必须暂停当前线程的工作。这对工作线程来说也是一个不必要的性能浪费，这样我们自然就会想到，另外开辟一个线程来执行完成通知，而本来的线程就不需要暂停，而是一直执行它自身的任务。处于这个思想，WinSock提供了一个新的模型——完成端口模型。</p>
+<a id="more"></a>
+<h2 id="完成端口简介"><a href="#完成端口简介" class="headerlink" title="完成端口简介"></a>完成端口简介</h2><p>完成端口本质上是一个线程池的模型，它需要我们创建对应的线程放在那，当完成通知到来时，他会直接执行线程。在这5中模型中它的性能是最高的。<br>在文件中我们也提到过完成端口，其实我们利用Linux上一切皆文件的思想来考虑这个问题就可以很方便的理解，既然我们需要异步的方式来读写网卡的信息，这与读写文件的方式类似，既然文件中存在完成端口模型，网络上存在也就不足为奇了。<br>对于完成端口Windows没有引入新的API函数，而是仍然采用文件中一堆相关的函数。可以使用CreateIoCompletionPort来创建完成端口的句柄，该函数原型如下:</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">HANDLE WINAPI <span class="title">CreateIoCompletionPort</span><span class="params">(</span></span></span><br><span class="line"><span class="function"><span class="params">  __in      HANDLE FileHandle,</span></span></span><br><span class="line"><span class="function"><span class="params">  __in_opt  HANDLE ExistingCompletionPort,</span></span></span><br><span class="line"><span class="function"><span class="params">  __in      ULONG_PTR CompletionKey,</span></span></span><br><span class="line"><span class="function"><span class="params">  __in      DWORD NumberOfConcurrentThreads</span></span></span><br><span class="line"><span class="function"><span class="params">)</span></span>;</span><br></pre></td></tr></table></figure>
+<p>第一个参数是与完成端口绑定的文件句柄，如果我们要创建完成端口句柄，这个值必须传入INVALID_HANDLE_VALUE。如果是要将文件句柄与完成端口绑定，这个参数必须穿入一个支持完成端口的文件句柄。在Winsock中如果要绑定SOCKET到完成端口只需要将SOCKET强转为HANDLE。<br>第二个参数是一个已知的完成端口句柄，如果是创建完成端口，这个参数填入NULL。<br>第三个参数是一个LONG型的指针，它作为一个标志，由完成通知传入完成线程中，用来标识不同的完成通知。一般我们会定义一个扩展来OVERLAPPED结构来标识不同的完成通知，所以这个参数一般不用传入NULL。<br>第四个参数是同时执行的线程数，如果是绑定文件句柄到完成端口，则这个参数填入0</p>
+<p>我们可以在对应的完成线程中调用GetQueuedCompletionStatus函数来获取完成通知，这个函数只有当有IO操作完成时才会返回，函数原型如下:</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">BOOL WINAPI <span class="title">GetQueuedCompletionStatus</span><span class="params">(</span></span></span><br><span class="line"><span class="function"><span class="params">  __in   HANDLE CompletionPort,</span></span></span><br><span class="line"><span class="function"><span class="params">  __out  LPDWORD lpNumberOfBytes,</span></span></span><br><span class="line"><span class="function"><span class="params">  __out  PULONG_PTR lpCompletionKey,</span></span></span><br><span class="line"><span class="function"><span class="params">  __out  LPOVERLAPPED* lpOverlapped,</span></span></span><br><span class="line"><span class="function"><span class="params">  __in   DWORD dwMilliseconds</span></span></span><br><span class="line"><span class="function"><span class="params">)</span></span>;</span><br></pre></td></tr></table></figure>
+<p>它的第一个参数是一个完成端口的句柄。<br>第二个参数表示当前有多少字节的数据完成IO操作。<br>第三个参数是一个标记值，用来标识不同文件句柄对应的完成通知，它是通过 CreateIoCompletionPort 函数设置的那个标识。<br>第四个参数是OVERLAPPED结构。<br>第五个参数表示等待的时间，如果填入INFINITE则会一直等到有IO操作完成。</p>
+<h2 id="完成端口的示例："><a href="#完成端口的示例：" class="headerlink" title="完成端口的示例："></a>完成端口的示例：</h2><p>下面是一个完成端口的示例</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> _<span class="title">tag_MY_OVERLAPPED</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">	OVERLAPPED m_overlapped;</span><br><span class="line">	SOCKET m_sClient;</span><br><span class="line">	<span class="keyword">long</span> m_lEvent;</span><br><span class="line">	DWORD m_dwNumberOfBytesRecv;</span><br><span class="line">	DWORD m_dwFlags;</span><br><span class="line">	<span class="keyword">char</span> *m_pszBuf;</span><br><span class="line">	LONG m_dwBufSize;</span><br><span class="line">&#125;MY_OVERLAPPED, *LPMY_OVERLAPPED;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">unsigned</span> <span class="keyword">int</span> __stdcall <span class="title">IOCPThread</span><span class="params">(LPVOID lpParameter)</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> BUFFER_SIZE 1024</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> SERVER_PORT 6000</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">int</span> _tmain(<span class="keyword">int</span> argc, TCHAR *argv)</span><br><span class="line">&#123;</span><br><span class="line">	WSADATA wd = &#123;<span class="number">0</span>&#125;;</span><br><span class="line">	WSAStartup(MAKEWORD(<span class="number">2</span>, <span class="number">2</span>), &amp;wd);</span><br><span class="line"></span><br><span class="line">	SYSTEM_INFO si = &#123;<span class="number">0</span>&#125;;</span><br><span class="line">	GetSystemInfo(&amp;si);</span><br><span class="line"></span><br><span class="line">	<span class="comment">//创建完成端口对象</span></span><br><span class="line">	HANDLE hIocp = CreateIoCompletionPort(INVALID_HANDLE_VALUE, <span class="literal">NULL</span>, <span class="literal">NULL</span>, si.dwNumberOfProcessors);</span><br><span class="line"></span><br><span class="line">	<span class="comment">//创建完成端口对应的线程对象</span></span><br><span class="line">	HANDLE *pThreadArray = (HANDLE *)HeapAlloc(GetProcessHeap(), HEAP_ZERO_MEMORY, <span class="number">2</span> * si.dwNumberOfProcessors);</span><br><span class="line">	<span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; <span class="number">2</span> * si.dwNumberOfProcessors; i++)</span><br><span class="line">	&#123;</span><br><span class="line">		pThreadArray[i] = (HANDLE)_beginthreadex(<span class="literal">NULL</span>, <span class="number">0</span>, IOCPThread, &amp;hIocp, <span class="number">0</span>, <span class="literal">NULL</span>);</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	SOCKET SrvSocket = socket(AF_INET, SOCK_STREAM, IPPROTO_IP);</span><br><span class="line">	SOCKADDR_IN SockAddr = &#123;<span class="number">0</span>&#125;;</span><br><span class="line">	SockAddr.sin_family = AF_INET;</span><br><span class="line">	SockAddr.sin_port = htons(SERVER_PORT);</span><br><span class="line">	SockAddr.sin_addr.s_addr = htonl(INADDR_ANY);</span><br><span class="line"></span><br><span class="line">	bind(SrvSocket, (SOCKADDR*)&amp;SockAddr, <span class="keyword">sizeof</span>(SOCKADDR));</span><br><span class="line">	listen(SrvSocket, <span class="number">5</span>);</span><br><span class="line"></span><br><span class="line">	SOCKET sClient = accept(SrvSocket, <span class="literal">NULL</span>, <span class="literal">NULL</span>);</span><br><span class="line">	CreateIoCompletionPort((HANDLE)sClient, hIocp, <span class="literal">NULL</span>, <span class="number">0</span>);</span><br><span class="line"></span><br><span class="line">	WSABUF buf = &#123;<span class="number">0</span>&#125;;</span><br><span class="line">	buf.buf = (<span class="keyword">char</span>*)HeapAlloc(GetProcessHeap(), HEAP_ZERO_MEMORY, BUFFER_SIZE);</span><br><span class="line">	buf.len = BUFFER_SIZE;</span><br><span class="line"></span><br><span class="line">	MY_OVERLAPPED AcceptOverlapped = &#123;<span class="number">0</span>&#125;;</span><br><span class="line">	AcceptOverlapped.m_dwBufSize = BUFFER_SIZE;</span><br><span class="line">	AcceptOverlapped.m_lEvent = FD_READ;</span><br><span class="line">	AcceptOverlapped.m_pszBuf = buf.buf;</span><br><span class="line">	AcceptOverlapped.m_sClient = sClient;</span><br><span class="line"></span><br><span class="line">	WSARecv(sClient, &amp;buf, <span class="number">1</span>, &amp;AcceptOverlapped.m_dwNumberOfBytesRecv, &amp;AcceptOverlapped.m_dwFlags, &amp;AcceptOverlapped.m_overlapped, <span class="literal">NULL</span>);</span><br><span class="line"></span><br><span class="line">	<span class="keyword">while</span> (TRUE)</span><br><span class="line">	&#123;</span><br><span class="line">		<span class="keyword">int</span> nVirtKey = GetAsyncKeyState(VK_ESCAPE); <span class="comment">//用户按下退出键(ESC)</span></span><br><span class="line">		&#123;</span><br><span class="line">			<span class="keyword">break</span>;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; si.dwNumberOfProcessors * <span class="number">2</span>; i++)</span><br><span class="line">	&#123;</span><br><span class="line">		<span class="comment">//向IOCP发送FD_CLOSE消息，以便对应线程退出</span></span><br><span class="line">		AcceptOverlapped.m_lEvent = FD_CLOSE;</span><br><span class="line">		PostQueuedCompletionStatus(hIocp, si.dwNumberOfProcessors * <span class="number">2</span>, <span class="number">0</span>, &amp;AcceptOverlapped.m_overlapped);</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	WaitForMultipleObjects(<span class="number">2</span> * si.dwNumberOfProcessors, pThreadArray, TRUE, INFINITE);</span><br><span class="line"></span><br><span class="line">	<span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; si.dwNumberOfProcessors * <span class="number">2</span>; i++)</span><br><span class="line">	&#123;</span><br><span class="line">		CloseHandle(pThreadArray[i]);</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	HeapFree(GetProcessHeap(), <span class="number">0</span>, buf.buf);</span><br><span class="line"></span><br><span class="line">	shutdown(sClient, SD_BOTH);</span><br><span class="line">	closesocket(sClient);</span><br><span class="line"></span><br><span class="line">	CloseHandle(hIocp);</span><br><span class="line">	WSACleanup();</span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">unsigned</span> <span class="keyword">int</span> __stdcall <span class="title">IOCPThread</span><span class="params">(LPVOID lpParameter)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	HANDLE hIocp = *(HANDLE*)lpParameter;</span><br><span class="line">	DWORD dwNumberOfBytes = <span class="number">0</span>;</span><br><span class="line">	MY_OVERLAPPED *lpOverlapped = <span class="literal">NULL</span>;</span><br><span class="line">	ULONG key = <span class="number">0</span>;</span><br><span class="line">	BOOL bLoop = TRUE;</span><br><span class="line">	<span class="keyword">while</span> (bLoop)</span><br><span class="line">	&#123;</span><br><span class="line">		BOOL bRet = GetQueuedCompletionStatus(hIocp, &amp;dwNumberOfBytes, &amp;key, (LPOVERLAPPED*)&amp;lpOverlapped, INFINITE);</span><br><span class="line">		<span class="keyword">if</span> (!bRet)</span><br><span class="line">		&#123;</span><br><span class="line">			<span class="keyword">continue</span>;</span><br><span class="line">		&#125;</span><br><span class="line"></span><br><span class="line">		<span class="keyword">switch</span> (lpOverlapped-&gt;m_lEvent)</span><br><span class="line">		&#123;</span><br><span class="line">		<span class="keyword">case</span> FD_CLOSE: <span class="comment">//退出</span></span><br><span class="line">			&#123;</span><br><span class="line">				bLoop = FALSE;</span><br><span class="line">				<span class="built_in">printf</span>(<span class="string">"线程[%08x]准备退出......\n"</span>, GetCurrentThreadId());</span><br><span class="line">			&#125;</span><br><span class="line">			<span class="keyword">break</span>;</span><br><span class="line">		<span class="keyword">case</span> FD_WRITE:</span><br><span class="line">			&#123;</span><br><span class="line">				<span class="built_in">printf</span>(<span class="string">"数据发送完成......\n"</span>);</span><br><span class="line">				shutdown(lpOverlapped-&gt;m_sClient, SD_BOTH);</span><br><span class="line">				closesocket(lpOverlapped-&gt;m_sClient);</span><br><span class="line">			&#125;</span><br><span class="line">			<span class="keyword">break</span>;</span><br><span class="line"></span><br><span class="line">		<span class="keyword">case</span> FD_READ:</span><br><span class="line">			&#123;</span><br><span class="line">				<span class="built_in">printf</span>(<span class="string">"client&gt;%s"</span>, lpOverlapped-&gt;m_pszBuf);</span><br><span class="line">				lpOverlapped-&gt;m_lEvent = FD_WRITE;</span><br><span class="line">				WSABUF buf = &#123;<span class="number">0</span>&#125;;</span><br><span class="line">				buf.buf = lpOverlapped-&gt;m_pszBuf;</span><br><span class="line">				buf.len = dwNumberOfBytes;</span><br><span class="line">				lpOverlapped-&gt;m_dwFlags = <span class="number">0</span>;</span><br><span class="line">				WSASend(lpOverlapped-&gt;m_sClient, &amp;buf, <span class="number">1</span>, &amp;lpOverlapped-&gt;m_dwNumberOfBytesRecv, lpOverlapped-&gt;m_dwFlags, &amp;lpOverlapped-&gt;m_overlapped, <span class="literal">NULL</span>);</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>在上述代码中，首先定义了一个结构体用来保存额外的数据。在main函数中首先查询CPU的核数，然后创建这个数目2倍的线程。接着创建一个完成端口对象。然后进行SOCKET的创建、绑定、监听、接收连接的操作。当有连接进来的时候。创建对应的扩展结构并调用WSARecv投递一个接收操作。由于后面的收发操作都在对应的线程中操作，因此在主线程中只需要等待即可。当用户确定退出时。先调用PostQueuedCompletionStatus函数向完成线程中发送完成通知，并将网络事件设置为FD_CLOSE，表示让线程退出。在这里没有使用TerminateThread这种暴力的方式，而选择了一种让线程自动退出的温和的方式。接着进行资源的回收，最后退出。<br>在线程中，我们首先在循环中调用 GetQueuedCompletionStatus函数来获取完成通知，当发生完成事件时，我们在switch中根据不同的额网络事件来处理，针对FD_CLOSE事件，直接退出线程。针对FD_READ事件，先打印客户端发送的信息，然后调用WSASend将信息原样返回，接着设置网络事件为FD_WRITE，以便断开与客户端的链接。</p>
+<h2 id="几种模型的比较"><a href="#几种模型的比较" class="headerlink" title="几种模型的比较"></a>几种模型的比较</h2><p>最后针对5种模型和两种socket工作模式来做一个归纳说明。</p>
+<ol>
+<li>最先学习的是SOCKET的阻塞模式，它的效率最低，它会一直等待有客户端连接或者有数据发送过来才会返回。这就好像我们在等某个人的信，但是不知道这封信什么时候能送到，于是我们在自家门口的收信箱前一直等待，直到有信到来。</li>
+<li>为了解决这个问题，提出了SOCKET的非阻塞模式，它不会等待连接或者收发数据的操作完成，当我们调用对应的accept或者send、recv时会立即返回，但是我们不知道它什么时候有数据要处理，如果针对每个socket都等待直到有数据到来，那么跟之前的阻塞模式相比没有任何改进，于是就有了socket模式，它会等待多个socket，只要其中有一个有数据就返回，并处理。用收信的模型类比的话，现在我们不用在邮箱前等待了。但是我们会每隔一段时间就去邮箱那看看，有没有信，有信就将它收回否则空手而归。</li>
+<li>我们说select模型的最大问题在于不知道什么时候有待决的SOCKET，因此我们需要在循环中不停的等待。为了解决这个时机问题，又提出了WSAAsyncSelect模型和WSAEvent模型，它们主要用来解决调用对应函数的时机。用收信的例子类比就是现在我在邮箱上装了一个报警的按钮，只有有信，警报就会响，这个时候我们就去收信。而不用向之前那样每隔一段时间就去邮箱看看</li>
+<li>我们说解决了时机的问题，但是调用send和recv对网卡进行读写操作仍然是同步的操作，CPU需要傻傻的等着数据从网卡读到内存或者从内存写到网卡上。因此又有了重叠IO的模型和一些列的新的API，向WSARecv和WSASend等等函数。这样就相当于当有信来的警报响起时，我们不需要自己去取信了，另外派了一个人帮我们拿信，这样我们的工作效率又提高了一些。节约了我们的时间</li>
+<li>重叠IO也有它的问题，如果使用重叠IO的事件模型时，也需要在合适的时候等待，就好像我们虽然派了一个人来帮忙拿信，但是我们自己却需要停下手头上的工作，询问拿信的人回来了。而使用完成历程也存在自己的问题，因为它需要使用主线程的资源来执行历程，它需要主线程暂停下来，这样就可能出现两种情况：1）有通知事件到来，但是并没有进入可警告状态；2）进入可警告状态却没有客户端发送请求。这就相当于可能我们不停的等待但是拿信的那个人却没有回来，或者拿信的人回来了，我们却没有时间处理信件。</li>
+<li>针对重叠IO的上述问题，提出了完成端口的解决方案，完成事件由对应的线程处理，而主线程只需要专注于它自己的工作就好了，这就相当于警报响了，我们知道信来了，直接派一个人去拿信，后面的我就不管了，而拿信的人把信拿回来的时候将信放好。当我们忙完之后去处理这封信。没忙完的话信就一直放在那，甚至让拿信的人处理这封信，这样就能更高效的集中注意力来处理眼前的工作。<hr />
+</li>
+</ol>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+      <div>
+        <div style="padding: 10px 0; margin: 20px auto; width: 90%; text-align: center;">
+  <div></div>
+  <button id="rewardButton" disable="enable" onclick="var qr = document.getElementById('QR'); if (qr.style.display === 'none') {qr.style.display='block';} else {qr.style.display='none'}">
+    <span>打赏</span>
+  </button>
+  <div id="QR" style="display: none;">
+
+    
+      <div id="wechat" style="display: inline-block">
+        <img id="wechat_qr" src="/images/wechatreward.png" alt="Masimaro 微信支付"/>
+        <p>微信支付</p>
+      </div>
+    
+
+    
+      <div id="alipay" style="display: inline-block">
+        <img id="alipay_qr" src="/images/alipayreward.png" alt="Masimaro 支付宝"/>
+        <p>支付宝</p>
+      </div>
+    
+
+    
+
+  </div>
+</div>
+
+      </div>
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/WinSock-%E6%A8%A1%E5%9E%8B/" rel="tag"><i class="fa fa-tag"></i> WinSock 模型</a>
+          
+            <a href="/tags/%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B/" rel="tag"><i class="fa fa-tag"></i> 网络编程</a>
+          
+            <a href="/tags/%E5%AE%8C%E6%88%90%E7%AB%AF%E5%8F%A3/" rel="tag"><i class="fa fa-tag"></i> 完成端口</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/brief-history-of-humankind.html" rel="next" title="《人类简史》与《未来简史》 读后感">
+                <i class="fa fa-chevron-left"></i> 《人类简史》与《未来简史》 读后感
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/WinSock2-API.html" rel="prev" title="WinSock2 API">
+                WinSock2 API <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        
+  <div class="bdsharebuttonbox">
+    <a href="#" class="bds_tsina" data-cmd="tsina" title="分享到新浪微博"></a>
+    <a href="#" class="bds_douban" data-cmd="douban" title="分享到豆瓣网"></a>
+    <a href="#" class="bds_sqq" data-cmd="sqq" title="分享到QQ好友"></a>
+    <a href="#" class="bds_qzone" data-cmd="qzone" title="分享到QQ空间"></a>
+    <a href="#" class="bds_weixin" data-cmd="weixin" title="分享到微信"></a>
+    <a href="#" class="bds_tieba" data-cmd="tieba" title="分享到百度贴吧"></a>
+    <a href="#" class="bds_twi" data-cmd="twi" title="分享到Twitter"></a>
+    <a href="#" class="bds_fbook" data-cmd="fbook" title="分享到Facebook"></a>
+    <a href="#" class="bds_more" data-cmd="more"></a>
+    <a class="bds_count" data-cmd="count"></a>
+  </div>
+  <script>
+    window._bd_share_config = {
+      "common": {
+        "bdText": "",
+        "bdMini": "2",
+        "bdMiniList": false,
+        "bdPic": ""
+      },
+      "share": {
+        "bdSize": "16",
+        "bdStyle": "0"
+      },
+      "image": {
+        "viewList": ["tsina", "douban", "sqq", "qzone", "weixin", "twi", "fbook"],
+        "viewText": "分享到：",
+        "viewSize": "16"
+      }
+    }
+  </script>
+
+<script>
+  with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='//bdimg.share.baidu.com/static/api/js/share.js?cdnversion='+~(-new Date()/36e5)];
+</script>
+
+      
+	  
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      <div id="disqus_thread">
+        <noscript>
+          Please enable JavaScript to view the
+          <a href="https://disqus.com/?ref_noscript" target="_blank" rel="noopener">comments powered by Disqus.</a>
+        </noscript>
+      </div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/avatar.jpg"
+                alt="Masimaro" />
+            
+              <p class="site-author-name" itemprop="name">Masimaro</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/%20%7C%7C%20archive">
+              
+                  <span class="site-state-item-count">94</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">18</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">141</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          <div class="links-of-author motion-element">
+            
+              
+                <span class="links-of-author-item">
+                  <a href="https://github.com/aMonst" target="_blank" title="GitHub">
+                    
+                      <i class="fa fa-fw fa-globe"></i>GitHub</a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="http://weibo.com/your-user-name" target="_blank" title="微博">
+                    
+                      <i class="fa fa-fw fa-globe"></i>微博</a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="http://blog.csdn.net/lanuage" target="_blank" title="CSDN博客">
+                    
+                      <i class="fa fa-fw fa-globe"></i>CSDN博客</a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="http://www.jianshu.com/u/7261ff9df286" target="_blank" title="简书">
+                    
+                      <i class="fa fa-fw fa-globe"></i>简书</a>
+                </span>
+              
+            
+          </div>
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#完成端口简介"><span class="nav-number">1.</span> <span class="nav-text">完成端口简介</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#完成端口的示例："><span class="nav-number">2.</span> <span class="nav-text">完成端口的示例：</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#几种模型的比较"><span class="nav-number">3.</span> <span class="nav-text">几种模型的比较</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love" id="heart">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Masimaro</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io" rel="external nofollow">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next" rel="external nofollow">NexT.Mist</a> v5.1.3</div>
+
+
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv">
+      <i class="fa fa-user">本次访客数</i>
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+      人次
+    </span>
+  
+
+  
+    <span class="site-pv">
+      <i class="fa fa-eye">本站总访问量</i>
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+      次
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.3"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.3"></script>
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.3"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.3"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.3"></script>
+
+
+
+  
+
+
+  
+
+    
+      <script id="dsq-count-scr" src="https://masimaroweb.disqus.com/count.js" async></script>
+    
+
+    
+      <script type="text/javascript">
+        var disqus_config = function () {
+          this.page.url = 'http://www.masimaroweb.com/WinSock-IOCP.html';
+          this.page.identifier = 'WinSock-IOCP.html';
+          this.page.title = 'WinSock 完成端口模型';
+        };
+        var d = document, s = d.createElement('script');
+        s.src = 'https://masimaroweb.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', '' + +new Date());
+        (d.head || d.body).appendChild(s);
+      </script>
+    
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+  
+
+
+  
+
+  
+
+</body>
+</html>
+
+<!-- 页面点击小红心 -->
+<script type="text/javascript" src="/js/src/love.js"></script>

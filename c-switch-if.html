@@ -1,0 +1,1327 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<script src="//cdn.bootcss.com/pace/1.0.2/pace.min.js"></script>
+<link href="//cdn.bootcss.com/pace/1.0.2/themes/pink/pace-theme-flash.css" rel="stylesheet">
+<style>
+    .pace .pace-progress {
+        background: #1E92FB; /*进度条颜色*/
+        height: 3px;
+    }
+    .pace .pace-progress-inner {
+         box-shadow: 0 0 10px #1E92FB, 0 0 5px     #1E92FB; /*阴影颜色*/
+    }
+    .pace .pace-activity {
+        border-top-color: #1E92FB;    /*上边框颜色*/
+        border-left-color: #1E92FB;    /*左边框颜色*/
+    }
+</style>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.3" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.3">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.3">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.3">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.3" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="VC++,反汇编,C++实现原理," />
+
+
+
+
+  
+
+
+  <link rel="alternate" href="/atom.xml" title="Masimaro's blog" type="application/atom+xml" />
+
+
+
+
+
+
+<meta name="description" content="条件语句是计算机编程语言中的三大流程之一，而在C语言中，if和switch是条件分支的重要组成部分。因此有必要弄明白它的底层原理">
+<meta property="og:type" content="article">
+<meta property="og:title" content="C语言if、switch原理">
+<meta property="og:url" content="http://www.masimaroweb.com/c-switch-if.html">
+<meta property="og:site_name" content="Masimaro&#39;s blog">
+<meta property="og:description" content="条件语句是计算机编程语言中的三大流程之一，而在C语言中，if和switch是条件分支的重要组成部分。因此有必要弄明白它的底层原理">
+<meta property="og:image" content="http://www.masimaroweb.com/c-switch-if/1.png">
+<meta property="og:image" content="http://www.masimaroweb.com/c-switch-if/2.png">
+<meta property="og:image" content="http://www.masimaroweb.com/c-switch-if/3.png">
+<meta property="article:published_time" content="2018-01-06T02:07:00.000Z">
+<meta property="article:modified_time" content="2018-01-07T04:35:34.047Z">
+<meta property="article:author" content="Masimaro">
+<meta property="article:tag" content="VC++">
+<meta property="article:tag" content="反汇编">
+<meta property="article:tag" content="C++实现原理">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://www.masimaroweb.com/c-switch-if/1.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.3',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+
+  <link rel="canonical" href="http://www.masimaroweb.com/c-switch-if.html"/>
+
+
+
+
+
+  <title>C语言if、switch原理 | Masimaro's blog</title>
+  
+
+
+
+
+
+
+
+
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Masimaro's blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <h1 class="site-subtitle" itemprop="description"></h1>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="搜索..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://www.masimaroweb.com/c-switch-if.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Masimaro">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Masimaro's blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h2 class="post-title" itemprop="name headline">C语言if、switch原理</h2>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-06T10:07:00+08:00">
+                2018-01-06
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/VC-%E5%8F%8D%E6%B1%87%E7%BC%96%E5%88%86%E6%9E%90/" itemprop="url" rel="index">
+                    <span itemprop="name">VC++反汇编分析</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/c-switch-if.html#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="c-switch-if.html" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="page-pv"><i class="fa fa-file-o">本文总阅读量</i>
+            <span class="busuanzi-value" id="busuanzi_value_page_pv" ></span>次
+            </span>
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>条件语句是计算机编程语言中的三大流程之一，而在C语言中，if和switch是条件分支的重要组成部分。因此有必要弄明白它的底层原理</p>
+<a id="more"></a>
+<h1 id="if原理"><a href="#if原理" class="headerlink" title="if原理"></a>if原理</h1><p>if的功能是计算判断条件的值，根据返回的值的不同来决定跳转到哪个部分。值为真则跳转到if语句块中，否则跳过if语句块。下面来分析一个简单的if实例：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span>(argc &gt; <span class="number">0</span>)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">"argc &gt; 0\n"</span>);</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">if</span> (argc &lt;= <span class="number">0</span>)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">"argc &lt;= 0\n"</span>);</span><br><span class="line">&#125;</span><br><span class="line"><span class="built_in">printf</span>(<span class="string">"argc = %d\n"</span>, argc);</span><br></pre></td></tr></table></figure>
+<p>它对应的汇编代码如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">9:        if(argc &gt; 0)</span><br><span class="line">  cmp         dword ptr [ebp+8],0</span><br><span class="line">0040102C   jle         main+2Bh (0040103b) ;argc &lt;&#x3D; 0就跳转到下一个if处</span><br><span class="line">10:       &#123;</span><br><span class="line">11:           printf(&quot;argc &gt; 0\n&quot;);</span><br><span class="line">0040102E   push        offset string &quot;argc &gt; 0\n&quot; (0042003c)</span><br><span class="line">  call        printf (00401090)</span><br><span class="line">  add         esp,4</span><br><span class="line">12:       &#125;</span><br><span class="line">13:       if (argc &lt;&#x3D; 0) ;argc &gt; 0跳转到后面的printf语句输出argc的值</span><br><span class="line">0040103B   cmp         dword ptr [ebp+8],0</span><br><span class="line">0040103F   jg          main+3Eh (0040104e)</span><br><span class="line">14:       &#123;</span><br><span class="line">15:           printf(&quot;argc &lt;&#x3D; 0\n&quot;);</span><br><span class="line">  push        offset string &quot;argc &lt;&#x3D; 0\n&quot; (0042002c)</span><br><span class="line">  call        printf (00401090)</span><br><span class="line">0040104B   add         esp,4</span><br><span class="line">16:       &#125;</span><br><span class="line">17:       printf(&quot;argc &#x3D; %d\n&quot;, argc);</span><br><span class="line">0040104E   mov         eax,dword ptr [ebp+8]</span><br><span class="line">  push        eax</span><br><span class="line">  push        offset string &quot;argc &#x3D; %d\n&quot; (0042001c)</span><br><span class="line">  call        printf (00401090)</span><br><span class="line">0040105C   add         esp,8</span><br></pre></td></tr></table></figure>
+<p>根据汇编代码我们看到，首先执行第一个if中的比较，jle表示当cmp得到的结果≤0时会进行跳转，第二个if在汇编中的跳转条件是＞0，从这个上面可以看出在代码执行过程当中if转换的条件判断语句与if的判断结果时相反的，也就是说cmp比较后不成立则跳转，成立则向下执行。同时每一次跳转都是到当前if语句的下一条语句。</p>
+<p>下面来看看if…else…语句的跳转。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span>(argc &gt; <span class="number">0</span>)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">"argc &gt; 0\n"</span>);</span><br><span class="line">&#125;<span class="keyword">else</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">"argc &lt;= 0\n"</span>);</span><br><span class="line">&#125;</span><br><span class="line"><span class="built_in">printf</span>(<span class="string">"argc = %d\n"</span>, argc);</span><br></pre></td></tr></table></figure>
+<p>它所对应的汇编代码如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">00401028   cmp         dword ptr [ebp+8],0</span><br><span class="line">0040102C   jle         main+2Dh (0040103d) ;条件不满足则跳转到else语句块中</span><br><span class="line">10:       &#123;</span><br><span class="line">11:           printf(&quot;argc &gt; 0\n&quot;);</span><br><span class="line">0040102E   push        offset string &quot;argc &gt; 0\n&quot; (0042003c)</span><br><span class="line">00401033   call        printf (00401090)</span><br><span class="line">00401038   add         esp,4</span><br><span class="line">12:       &#125;else</span><br><span class="line">0040103B   jmp         main+3Ah (0040104a);如果执行if语句块就会执行这条语句跳出else语句块</span><br><span class="line">13:       &#123;</span><br><span class="line">14:           printf(&quot;argc &lt;&#x3D; 0\n&quot;);</span><br><span class="line">0040103D   push        offset string &quot;argc &lt;&#x3D; 0\n&quot; (0042002c)</span><br><span class="line">00401042   call        printf (00401090)</span><br><span class="line">00401047   add         esp,4</span><br><span class="line">15:       &#125;</span><br><span class="line">16:       printf(&quot;argc &#x3D; %d\n&quot;, argc); </span><br><span class="line">0040104A   mov         eax,dword ptr [ebp+8]</span><br></pre></td></tr></table></figure>
+<p>上述的汇编代码指出，对于if…else..语句，首先进行条件判断，if表达式为真，则继续执行if快中的语句，然后利用jmp跳转到else语句块外，否则会利用jmp跳转到else语句块中，然后依次执行其后的每一句代码。<br>最后再来展示if…else if…else这种分支结构：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span>(argc &gt; <span class="number">0</span>)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">"argc &gt; 0\n"</span>);</span><br><span class="line">&#125;<span class="keyword">else</span> <span class="keyword">if</span>(argc &lt; <span class="number">0</span>)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">"argc &lt; 0\n"</span>);</span><br><span class="line">&#125;<span class="keyword">else</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">"argc == 0\n"</span>);</span><br><span class="line">&#125;</span><br><span class="line"><span class="built_in">printf</span>(<span class="string">"argc = %d\n"</span>, argc);</span><br></pre></td></tr></table></figure>
+<p>汇编代码如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">9:        if(argc &gt; 0)</span><br><span class="line">00401028   cmp         dword ptr [ebp+8],0</span><br><span class="line">0040102C   jle         main+2Dh (0040103d);条件不满足则会跳转到下一句else if中</span><br><span class="line">10:       &#123;</span><br><span class="line">11:           printf(&quot;argc &gt; 0\n&quot;);</span><br><span class="line">0040102E   push        offset string &quot;argc &gt; 0\n&quot; (00420f9c)</span><br><span class="line">00401033   call        printf (00401090)</span><br><span class="line">00401038   add         esp,4</span><br><span class="line">12:       &#125;else if(argc &lt; 0)</span><br><span class="line">0040103B   jmp         main+4Fh (0040105f)  ;当上述条件符合则执行这条语句跳出分支外，跳转的地址正是else语句外的printf语句</span><br><span class="line">0040103D   cmp         dword ptr [ebp+8],0</span><br><span class="line">00401041   jge         main+42h (00401052)</span><br><span class="line">13:       &#123;</span><br><span class="line">14:           printf(&quot;argc &lt; 0\n&quot;);</span><br><span class="line">00401043   push        offset string &quot;argc &lt; 0\n&quot; (0042003c)</span><br><span class="line">00401048   call        printf (00401090)</span><br><span class="line">0040104D   add         esp,4</span><br><span class="line">15:       &#125;else</span><br><span class="line">00401050   jmp         main+4Fh (0040105f)</span><br><span class="line">16:       &#123;</span><br><span class="line">17:           printf(&quot;argc &#x3D;&#x3D; 0\n&quot;);</span><br><span class="line">00401052   push        offset string &quot;argc &lt;&#x3D; 0\n&quot; (0042002c)</span><br><span class="line">00401057   call        printf (00401090)</span><br><span class="line">0040105C   add         esp,4</span><br><span class="line">18:       &#125;</span><br><span class="line">19:       printf(&quot;argc &#x3D; %d\n&quot;, argc);</span><br><span class="line">0040105F   mov         eax,dword ptr [ebp+8]</span><br></pre></td></tr></table></figure>
+<p>通过汇编代码可以看到对于这种结构，会依次判断每个if语句中的条件，当有一个满足，执行完对应语句块中的代码后，会直接调转到分支结构外部，当前面的条件都不满足则会执行else语句块中的内容。这个逻辑结构在某些情况下可以利用if  return if return 这种结构来替代。当某一条件满足时执行完对应的语句后直接返回而不执行其后的代码。一条提升效率的做法是将最有可能满足的条件放在前面进行比较，这样可以减少比较次数，提升效率。</p>
+<h1 id="switch原理"><a href="#switch原理" class="headerlink" title="switch原理"></a>switch原理</h1><p>switch是另一种比较常用的多分支结构，在使用上比较简单，效率上也比if…else if…else高，下面将分析switch结构的实现</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">switch</span>(argc)</span><br><span class="line">&#123;</span><br><span class="line">　　<span class="keyword">case</span> <span class="number">1</span>:</span><br><span class="line">　　　　<span class="built_in">printf</span>(<span class="string">"argc = 1\n"</span>);</span><br><span class="line">　　　　<span class="keyword">break</span>;</span><br><span class="line">　　<span class="keyword">case</span> <span class="number">2</span>:</span><br><span class="line">　　　　<span class="built_in">printf</span>(<span class="string">"argc = 2\n"</span>);</span><br><span class="line">　　　　<span class="keyword">break</span>;</span><br><span class="line">　　　<span class="keyword">case</span> <span class="number">3</span>:</span><br><span class="line">　　　　<span class="built_in">printf</span>(<span class="string">"argc = 3\n"</span>);</span><br><span class="line">　　　　<span class="keyword">break</span>;</span><br><span class="line">　　　<span class="keyword">case</span> <span class="number">4</span>:</span><br><span class="line">　　　　<span class="built_in">printf</span>(<span class="string">"argc = 4\n"</span>);</span><br><span class="line">　　　　<span class="keyword">break</span>;</span><br><span class="line">　　　<span class="keyword">case</span> <span class="number">5</span>:</span><br><span class="line">　　　　<span class="built_in">printf</span>(<span class="string">"argc = 5\n"</span>);</span><br><span class="line">　　　　<span class="keyword">break</span>;</span><br><span class="line">　　　<span class="keyword">case</span> <span class="number">6</span>:</span><br><span class="line">　　　　<span class="built_in">printf</span>(<span class="string">"argc = 6\n"</span>);</span><br><span class="line">　　　　<span class="keyword">break</span>;</span><br><span class="line">　　　<span class="keyword">default</span>:</span><br><span class="line">　　　　<span class="built_in">printf</span>(<span class="string">"else\n"</span>);</span><br><span class="line">　　　　<span class="keyword">break</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>对应的汇编代码如下:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br></pre></td><td class="code"><pre><span class="line">0040B798   mov         eax,dword ptr [ebp+8] ;eax &#x3D; argc</span><br><span class="line">0040B79B   mov         dword ptr [ebp-4],eax</span><br><span class="line">0040B79E   mov         ecx,dword ptr [ebp-4]  ;ecx &#x3D; eax</span><br><span class="line">0040B7A1   sub         ecx,1</span><br><span class="line">0040B7A4   mov         dword ptr [ebp-4],ecx</span><br><span class="line">0040B7A7   cmp         dword ptr [ebp-4],5</span><br><span class="line">0040B7AB   ja          $L544+0Fh (0040b811) ;argc 》 5则跳转到default处，至于为什么是5而不是6，看后面的说明</span><br><span class="line">0040B7AD   mov         edx,dword ptr [ebp-4] ;edx &#x3D; argc</span><br><span class="line">0040B7B0   jmp         dword ptr [edx*4+40B831h]</span><br><span class="line">11:       case 1:</span><br><span class="line">12:           printf(&quot;argc &#x3D; 1\n&quot;);</span><br><span class="line">0040B7B7   push        offset string &quot;argc &#x3D; 1\n&quot; (00420fc0)</span><br><span class="line">0040B7BC   call        printf (00401090)</span><br><span class="line">0040B7C1   add         esp,4</span><br><span class="line">13:           break;</span><br><span class="line">0040B7C4   jmp         $L544+1Ch (0040b81e)</span><br><span class="line">14:       case 2:</span><br><span class="line">15:           printf(&quot;argc &#x3D; 2\n&quot;);</span><br><span class="line">0040B7C6   push        offset string &quot;argc &#x3D; 2\n&quot; (00420fb4)</span><br><span class="line">0040B7CB   call        printf (00401090)</span><br><span class="line">0040B7D0   add         esp,4</span><br><span class="line">16:           break;</span><br><span class="line">0040B7D3   jmp         $L544+1Ch (0040b81e)</span><br><span class="line">17:       case 3:</span><br><span class="line">18:           printf(&quot;argc &#x3D; 3\n&quot;);</span><br><span class="line">0040B7D5   push        offset string &quot;argc &#x3D; 3\n&quot; (00420fa8)</span><br><span class="line">0040B7DA   call        printf (00401090)</span><br><span class="line">0040B7DF   add         esp,4</span><br><span class="line">19:           break;</span><br><span class="line">0040B7E2   jmp         $L544+1Ch (0040b81e)</span><br><span class="line">20:       case 4:</span><br><span class="line">21:           printf(&quot;argc &#x3D; 4\n&quot;);</span><br><span class="line">0040B7E4   push        offset string &quot;argc &#x3D; 4\n&quot; (00420f9c)</span><br><span class="line">0040B7E9   call        printf (00401090)</span><br><span class="line">0040B7EE   add         esp,4</span><br><span class="line">22:           break;</span><br><span class="line">0040B7F1   jmp         $L544+1Ch (0040b81e)</span><br><span class="line">23:       case 5:</span><br><span class="line">24:           printf(&quot;argc &#x3D; 5\n&quot;);</span><br><span class="line">0040B7F3   push        offset string &quot;argc &lt; 0\n&quot; (0042003c)</span><br><span class="line">0040B7F8   call        printf (00401090)</span><br><span class="line">0040B7FD   add         esp,4</span><br><span class="line">25:           break;</span><br><span class="line">0040B800   jmp         $L544+1Ch (0040b81e)</span><br><span class="line">26:       case 6:</span><br><span class="line">27:           printf(&quot;argc &#x3D; 6\n&quot;);</span><br><span class="line">0040B802   push        offset string &quot;argc &lt;&#x3D; 0\n&quot; (0042002c)</span><br><span class="line">0040B807   call        printf (00401090)</span><br><span class="line">0040B80C   add         esp,4</span><br><span class="line">28:           break;</span><br><span class="line">0040B80F   jmp         $L544+1Ch (0040b81e)</span><br><span class="line">29:       default:</span><br><span class="line">30:           printf(&quot;else\n&quot;);</span><br><span class="line">0040B811   push        offset string &quot;argc &#x3D; %d\n&quot; (0042001c)</span><br><span class="line">0040B816   call        printf (00401090)</span><br><span class="line">0040B81B   add         esp,4</span><br><span class="line">31:           break;</span><br><span class="line">32:       &#125;</span><br><span class="line">33:</span><br><span class="line">34:       return 0;</span><br><span class="line">0040B81E   xor         eax,eax</span><br></pre></td></tr></table></figure>
+<p>上面的代码中并没有看到像if那样，对每一个条件都进行比较，其中有一句话 “jmp dword ptr [edx*4+40B831h]” 这句话从表面上看应该是取数组中的元素，再根据元素的值来进行跳转,而这个元素在数组中的位置与eax也就是与argc的值有关，下面我们跟踪到数组中查看数组的元素值：<br>0040B831 　　B7 B7 40 00 　　　　　　　　<br>0040B835 　　C6 B7 40 00<br>0040B839 　　D5 B7 40 00<br>0040B83D 　　E4 B7 40 00<br>0040B841 　　F3 B7 40 00<br>0040B845 　　02 B8 40 00<br>通过对比可以发现0x0040b7b7是case 1处的地址，后面的分别是case 2、case 3、case 4、case 5、case 6处的地址，每个case中的break语句都翻译为了同一句话“jmp $L544+1Ch (0040b81e)”，所以从这可以看出，在switch中，编译器多增加了一个数组用于存储每个case对应的地址，根据switch中传入的整数在数组中查到到对应的地址，直接通过这个地址跳转到对应的位置，减少了比较操作，提升了效率。编译器在处理switch时会首先校验不满足所有case的情况，当这种情况发生时代码调转到default或者switch语句块之外。然后将传入的整数值减一（数组元素是从0开始计数）。最后根据参数值找到应该跳转的位置。<br>上述的代码case是从0~6依次递增，这样做确实可行，但是当我们在case中的值并不是依次递增的话会怎样？此时根据不同的情况编译器会做不同的处理。<br>1）一般仍然会建立这样的一个表，将case中出现的值填写对应的跳转地址，没有出现的则将这个地址值填入default对应的地址或者switch语句结束的地址，比如当我们上述的代码去掉case 5， 这个时候填入的地址值如下图所示：<br><img src="c-switch-if/1.png" alt=""><br>2）如果每两个case之间的差距大于6，或者case语句数小于4则不会采取这种做法，如果再采用这种方式，那么会造成较大的资源消耗。这个时候编译器会采用索引表的方式来进行地址的跳转。<br>下面有这样一个例子：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">switch</span>(argc)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">case</span> <span class="number">1</span>:</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">"argc = 1\n"</span>);</span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line">    <span class="keyword">case</span> <span class="number">2</span>:</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">"argc = 2\n"</span>);</span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line">    <span class="keyword">case</span> <span class="number">5</span>:</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">"argc = 5\n"</span>);</span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line">    <span class="keyword">case</span> <span class="number">6</span>:</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">"argc = 6\n"</span>);</span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line">    <span class="keyword">case</span> <span class="number">255</span>:</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">"argc = 255\n"</span>);</span><br><span class="line">    <span class="keyword">default</span>:</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">"else\n"</span>);</span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>它对应的汇编代码如下：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">0040B</span>798   mov         eax,dword ptr [ebp+<span class="number">8</span>]</span><br><span class="line"><span class="number">0040B</span>79B   mov         dword ptr [ebp<span class="number">-4</span>],eax</span><br><span class="line"><span class="number">0040B</span>79E   mov         ecx,dword ptr [ebp<span class="number">-4</span>] ;到此eax = ecx = argc</span><br><span class="line"><span class="number">0040B</span>7A1   sub         ecx,<span class="number">1</span> </span><br><span class="line"><span class="number">0040B</span>7A4   mov         dword ptr [ebp<span class="number">-4</span>],ecx</span><br><span class="line"><span class="number">0040B</span>7A7   cmp         dword ptr [ebp<span class="number">-4</span>],<span class="number">0F</span>Eh</span><br><span class="line"><span class="number">0040B</span>7AE   ja          $L542+<span class="number">0</span>Dh (<span class="number">0040b</span>80b) ;当argc  &gt; <span class="number">255</span>则跳转到<span class="keyword">default</span>处</span><br><span class="line"><span class="number">0040B</span>7B0   mov         eax,dword ptr [ebp<span class="number">-4</span>]</span><br><span class="line"><span class="number">0040B</span>7B3   <span class="keyword">xor</span>         edx,edx</span><br><span class="line">0040B7B5   mov         dl,byte ptr  (0040b843)[eax]</span><br><span class="line"><span class="number">0040B</span>7BB   jmp         dword ptr [edx*<span class="number">4</span>+<span class="number">40B</span>82Bh]</span><br><span class="line"><span class="number">11</span>:       <span class="keyword">case</span> <span class="number">1</span>:</span><br><span class="line"><span class="number">12</span>:           <span class="built_in">printf</span>(<span class="string">"argc = 1\n"</span>);</span><br><span class="line"><span class="number">0040B</span>7C2   push        offset <span class="built_in">string</span> <span class="string">"argc = 1\n"</span> (<span class="number">00420f</span>b4)</span><br><span class="line"><span class="number">0040B</span>7<span class="function">C7   call        <span class="title">printf</span> <span class="params">(<span class="number">00401090</span>)</span></span></span><br><span class="line">0040B7CC   add         esp,4</span><br><span class="line"><span class="number">13</span>:           <span class="keyword">break</span>;</span><br><span class="line"><span class="number">0040B</span>7CF   jmp         $L542+<span class="number">1</span>Ah (<span class="number">0040b</span>818)</span><br><span class="line"><span class="number">14</span>:       <span class="keyword">case</span> <span class="number">2</span>:</span><br><span class="line"><span class="number">15</span>:           <span class="built_in">printf</span>(<span class="string">"argc = 2\n"</span>);</span><br><span class="line"><span class="number">0040B</span>7D1   push        offset <span class="built_in">string</span> <span class="string">"argc = 3\n"</span> (<span class="number">00420f</span>a8)</span><br><span class="line"><span class="number">0040B</span>7<span class="function">D6   call        <span class="title">printf</span> <span class="params">(<span class="number">00401090</span>)</span></span></span><br><span class="line">0040B7DB   add         esp,4</span><br><span class="line"><span class="number">16</span>:           <span class="keyword">break</span>;</span><br><span class="line"><span class="number">0040B</span>7DE   jmp         $L542+<span class="number">1</span>Ah (<span class="number">0040b</span>818)</span><br><span class="line"><span class="number">17</span>:       <span class="keyword">case</span> <span class="number">5</span>:</span><br><span class="line"><span class="number">18</span>:           <span class="built_in">printf</span>(<span class="string">"argc = 5\n"</span>);</span><br><span class="line"><span class="number">0040B</span>7E0   push        offset <span class="built_in">string</span> <span class="string">"argc = 5\n"</span> (<span class="number">00420f</span>9c)</span><br><span class="line"><span class="number">0040B</span>7<span class="function">E5   call        <span class="title">printf</span> <span class="params">(<span class="number">00401090</span>)</span></span></span><br><span class="line">0040B7EA   add         esp,4</span><br><span class="line"><span class="number">19</span>:           <span class="keyword">break</span>;</span><br><span class="line"><span class="number">0040B</span>7ED   jmp         $L542+<span class="number">1</span>Ah (<span class="number">0040b</span>818)</span><br><span class="line"><span class="number">20</span>:       <span class="keyword">case</span> <span class="number">6</span>:</span><br><span class="line"><span class="number">21</span>:           <span class="built_in">printf</span>(<span class="string">"argc = 6\n"</span>);</span><br><span class="line"><span class="number">0040B</span>7EF   push        offset <span class="built_in">string</span> <span class="string">"argc &lt; 0\n"</span> (<span class="number">0042003</span>c)</span><br><span class="line"><span class="number">0040B</span>7<span class="function">F4   call        <span class="title">printf</span> <span class="params">(<span class="number">00401090</span>)</span></span></span><br><span class="line">0040B7F9   add         esp,4</span><br><span class="line"><span class="number">22</span>:           <span class="keyword">break</span>;</span><br><span class="line"><span class="number">0040B</span>7FC   jmp         $L542+<span class="number">1</span>Ah (<span class="number">0040b</span>818)</span><br><span class="line"><span class="number">23</span>:       <span class="keyword">case</span> <span class="number">255</span>:</span><br><span class="line"><span class="number">24</span>:           <span class="built_in">printf</span>(<span class="string">"argc = 255\n"</span>);</span><br><span class="line"><span class="number">0040B</span>7FE   push        offset <span class="built_in">string</span> <span class="string">"argc &lt;= 0\n"</span> (<span class="number">0042002</span>c)</span><br><span class="line"><span class="number">0040B</span>803   <span class="function">call        <span class="title">printf</span> <span class="params">(<span class="number">00401090</span>)</span></span></span><br><span class="line">0040B808   add         esp,4</span><br><span class="line"><span class="number">25</span>:       <span class="keyword">default</span>:</span><br><span class="line"><span class="number">26</span>:           <span class="built_in">printf</span>(<span class="string">"else\n"</span>);</span><br><span class="line"><span class="number">0040B</span>80B   push        offset <span class="built_in">string</span> <span class="string">"argc = %d\n"</span> (<span class="number">0042001</span>c)</span><br><span class="line"><span class="number">0040B</span>810   <span class="function">call        <span class="title">printf</span> <span class="params">(<span class="number">00401090</span>)</span></span></span><br><span class="line">0040B815   add         esp,4</span><br><span class="line"><span class="number">27</span>:           <span class="keyword">break</span>;</span><br><span class="line"><span class="number">28</span>:       &#125;</span><br><span class="line"><span class="number">29</span>:</span><br><span class="line"><span class="number">30</span>:       <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line"><span class="number">0040B</span>818   <span class="keyword">xor</span>         eax,eax</span><br></pre></td></tr></table></figure>
+<p>这段代码与上述的线性表相比较区别并不大，只是多了一句 “mov dl,byte ptr (0040b843)[eax]”  这似乎又是一个数组，通过查看内存可以知道这个数组的值分别为：00 01 05 05 02 03 05 05 … 04，下一句根据这些值在另外一个数组中查找数据，我们列出另外一个数组的值：<br>C2 B7 40 00 　　D1 B7 40 00　　E0 B7 40 00　　EF B7 40 00　　FE B7 40 00　　0B B8 40 00<br>通过对比我们发现，这些值分别是每个case与default入口处的地址，编译器先查找到每个值在数组中对应的元素位置，然后根据这个位置值再在地址表中从、找到地址进行跳转，这个过程可以用下面的图来表示：<br><img src="c-switch-if/2.png" alt=""><br>这样通过一个每个元素占一个字节的表，来表示对应的case在地址表中所对应的位置，从而跳转到对应的地址，这样通过对每个case增加一个字节的内存消耗来达到，减少地址表对应的内存消耗。<br>在上述的汇编代码中，是利用dl寄存器来存储对应case在地址表中项，这样就会产生一个问题，当case 值大于 255，也就是超出了一个字节的，超出了dl寄存器的表示范围时，又该如何来进行跳转这个时候编译器会采用判定树的方式来进行判定，在根节点保存的是所有case值的中位数， 左子树都是大于这个大于这个值的数，右字数是小于这个值的数，通过每次的比较来得到正确的地址。比如下面的这个判定树：<br><img src="c-switch-if/3.png" alt=""><br>首先与10进行比较，根据与10 的大小关系进入左子树或者右子树，再看看左右子树的分支是否不大于3，若不大于3则直接转化为对应的if…else if… else结构，大于3则检测分支是否满足上述的优化条件，满足则进行对应的地址表或者索引表的优化，否则会再次对子树进行优化，以便减少比较次数。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+      <div>
+        <div style="padding: 10px 0; margin: 20px auto; width: 90%; text-align: center;">
+  <div></div>
+  <button id="rewardButton" disable="enable" onclick="var qr = document.getElementById('QR'); if (qr.style.display === 'none') {qr.style.display='block';} else {qr.style.display='none'}">
+    <span>打赏</span>
+  </button>
+  <div id="QR" style="display: none;">
+
+    
+      <div id="wechat" style="display: inline-block">
+        <img id="wechat_qr" src="/images/wechatreward.png" alt="Masimaro 微信支付"/>
+        <p>微信支付</p>
+      </div>
+    
+
+    
+      <div id="alipay" style="display: inline-block">
+        <img id="alipay_qr" src="/images/alipayreward.png" alt="Masimaro 支付宝"/>
+        <p>支付宝</p>
+      </div>
+    
+
+    
+
+  </div>
+</div>
+
+      </div>
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/VC/" rel="tag"><i class="fa fa-tag"></i> VC++</a>
+          
+            <a href="/tags/%E5%8F%8D%E6%B1%87%E7%BC%96/" rel="tag"><i class="fa fa-tag"></i> 反汇编</a>
+          
+            <a href="/tags/C-%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86/" rel="tag"><i class="fa fa-tag"></i> C++实现原理</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018-new-year-plan.html" rel="next" title="2017总结与2018规划">
+                <i class="fa fa-chevron-left"></i> 2017总结与2018规划
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/oledb-and-ado-1.html" rel="prev" title="Windows数据库编程接口简介">
+                Windows数据库编程接口简介 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        
+  <div class="bdsharebuttonbox">
+    <a href="#" class="bds_tsina" data-cmd="tsina" title="分享到新浪微博"></a>
+    <a href="#" class="bds_douban" data-cmd="douban" title="分享到豆瓣网"></a>
+    <a href="#" class="bds_sqq" data-cmd="sqq" title="分享到QQ好友"></a>
+    <a href="#" class="bds_qzone" data-cmd="qzone" title="分享到QQ空间"></a>
+    <a href="#" class="bds_weixin" data-cmd="weixin" title="分享到微信"></a>
+    <a href="#" class="bds_tieba" data-cmd="tieba" title="分享到百度贴吧"></a>
+    <a href="#" class="bds_twi" data-cmd="twi" title="分享到Twitter"></a>
+    <a href="#" class="bds_fbook" data-cmd="fbook" title="分享到Facebook"></a>
+    <a href="#" class="bds_more" data-cmd="more"></a>
+    <a class="bds_count" data-cmd="count"></a>
+  </div>
+  <script>
+    window._bd_share_config = {
+      "common": {
+        "bdText": "",
+        "bdMini": "2",
+        "bdMiniList": false,
+        "bdPic": ""
+      },
+      "share": {
+        "bdSize": "16",
+        "bdStyle": "0"
+      },
+      "image": {
+        "viewList": ["tsina", "douban", "sqq", "qzone", "weixin", "twi", "fbook"],
+        "viewText": "分享到：",
+        "viewSize": "16"
+      }
+    }
+  </script>
+
+<script>
+  with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='//bdimg.share.baidu.com/static/api/js/share.js?cdnversion='+~(-new Date()/36e5)];
+</script>
+
+      
+	  
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      <div id="disqus_thread">
+        <noscript>
+          Please enable JavaScript to view the
+          <a href="https://disqus.com/?ref_noscript" target="_blank" rel="noopener">comments powered by Disqus.</a>
+        </noscript>
+      </div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/avatar.jpg"
+                alt="Masimaro" />
+            
+              <p class="site-author-name" itemprop="name">Masimaro</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/%20%7C%7C%20archive">
+              
+                  <span class="site-state-item-count">94</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">18</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">141</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          <div class="links-of-author motion-element">
+            
+              
+                <span class="links-of-author-item">
+                  <a href="https://github.com/aMonst" target="_blank" title="GitHub">
+                    
+                      <i class="fa fa-fw fa-globe"></i>GitHub</a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="http://weibo.com/your-user-name" target="_blank" title="微博">
+                    
+                      <i class="fa fa-fw fa-globe"></i>微博</a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="http://blog.csdn.net/lanuage" target="_blank" title="CSDN博客">
+                    
+                      <i class="fa fa-fw fa-globe"></i>CSDN博客</a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="http://www.jianshu.com/u/7261ff9df286" target="_blank" title="简书">
+                    
+                      <i class="fa fa-fw fa-globe"></i>简书</a>
+                </span>
+              
+            
+          </div>
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#if原理"><span class="nav-number">1.</span> <span class="nav-text">if原理</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#switch原理"><span class="nav-number">2.</span> <span class="nav-text">switch原理</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love" id="heart">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Masimaro</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io" rel="external nofollow">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next" rel="external nofollow">NexT.Mist</a> v5.1.3</div>
+
+
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv">
+      <i class="fa fa-user">本次访客数</i>
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+      人次
+    </span>
+  
+
+  
+    <span class="site-pv">
+      <i class="fa fa-eye">本站总访问量</i>
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+      次
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.3"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.3"></script>
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.3"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.3"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.3"></script>
+
+
+
+  
+
+
+  
+
+    
+      <script id="dsq-count-scr" src="https://masimaroweb.disqus.com/count.js" async></script>
+    
+
+    
+      <script type="text/javascript">
+        var disqus_config = function () {
+          this.page.url = 'http://www.masimaroweb.com/c-switch-if.html';
+          this.page.identifier = 'c-switch-if.html';
+          this.page.title = 'C语言if、switch原理';
+        };
+        var d = document, s = d.createElement('script');
+        s.src = 'https://masimaroweb.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', '' + +new Date());
+        (d.head || d.body).appendChild(s);
+      </script>
+    
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+  
+
+
+  
+
+  
+
+</body>
+</html>
+
+<!-- 页面点击小红心 -->
+<script type="text/javascript" src="/js/src/love.js"></script>

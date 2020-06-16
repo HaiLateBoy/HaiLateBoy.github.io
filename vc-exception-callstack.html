@@ -1,0 +1,1353 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<script src="//cdn.bootcss.com/pace/1.0.2/pace.min.js"></script>
+<link href="//cdn.bootcss.com/pace/1.0.2/themes/pink/pace-theme-flash.css" rel="stylesheet">
+<style>
+    .pace .pace-progress {
+        background: #1E92FB; /*进度条颜色*/
+        height: 3px;
+    }
+    .pace .pace-progress-inner {
+         box-shadow: 0 0 10px #1E92FB, 0 0 5px     #1E92FB; /*阴影颜色*/
+    }
+    .pace .pace-activity {
+        border-top-color: #1E92FB;    /*上边框颜色*/
+        border-left-color: #1E92FB;    /*左边框颜色*/
+    }
+</style>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.3" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.3">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.3">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.3">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.3" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="VC++, 结构化异常处理SEH, 崩溃日志记录" />
+
+
+
+
+  
+
+
+  <link rel="alternate" href="/atom.xml" title="Masimaro's blog" type="application/atom+xml" />
+
+
+
+
+
+
+<meta name="description" content="我们在程序发布后总会面临崩溃的情况，这个时候一般很难重现或者很难定位到程序崩溃的位置，之前有方法在程序崩溃的时候记录dump文件然后通过windbg来分析。那种方法对开发人员的要求较高，它需要程序员理解内存、寄存器等等一系列概念还需要手动加载对应的符号表。Java、Python等等语言在崩溃的时候都会打印一条异常的堆栈信息并告诉用户那块出错了，根据这个信息程序员可以很容易找到对应的代码位置并进行处">
+<meta property="og:type" content="article">
+<meta property="og:title" content="VC++ 崩溃处理以及打印调用堆栈">
+<meta property="og:url" content="http://www.masimaroweb.com/vc-exception-callstack.html">
+<meta property="og:site_name" content="Masimaro&#39;s blog">
+<meta property="og:description" content="我们在程序发布后总会面临崩溃的情况，这个时候一般很难重现或者很难定位到程序崩溃的位置，之前有方法在程序崩溃的时候记录dump文件然后通过windbg来分析。那种方法对开发人员的要求较高，它需要程序员理解内存、寄存器等等一系列概念还需要手动加载对应的符号表。Java、Python等等语言在崩溃的时候都会打印一条异常的堆栈信息并告诉用户那块出错了，根据这个信息程序员可以很容易找到对应的代码位置并进行处">
+<meta property="article:published_time" content="2018-08-28T12:59:54.000Z">
+<meta property="article:modified_time" content="2018-08-28T15:22:21.634Z">
+<meta property="article:author" content="Masimaro">
+<meta property="article:tag" content="VC++">
+<meta property="article:tag" content=" 结构化异常处理SEH">
+<meta property="article:tag" content=" 崩溃日志记录">
+<meta name="twitter:card" content="summary">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.3',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+
+  <link rel="canonical" href="http://www.masimaroweb.com/vc-exception-callstack.html"/>
+
+
+
+
+
+  <title>VC++ 崩溃处理以及打印调用堆栈 | Masimaro's blog</title>
+  
+
+
+
+
+
+
+
+
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Masimaro's blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <h1 class="site-subtitle" itemprop="description"></h1>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="搜索..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://www.masimaroweb.com/vc-exception-callstack.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Masimaro">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Masimaro's blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h2 class="post-title" itemprop="name headline">VC++ 崩溃处理以及打印调用堆栈</h2>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-08-28T20:59:54+08:00">
+                2018-08-28
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/windows-%E9%AB%98%E7%BA%A7%E7%BC%96%E7%A8%8B/" itemprop="url" rel="index">
+                    <span itemprop="name">windows 高级编程</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/vc-exception-callstack.html#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="vc-exception-callstack.html" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="page-pv"><i class="fa fa-file-o">本文总阅读量</i>
+            <span class="busuanzi-value" id="busuanzi_value_page_pv" ></span>次
+            </span>
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>我们在程序发布后总会面临崩溃的情况，这个时候一般很难重现或者很难定位到程序崩溃的位置，之前有方法在程序崩溃的时候记录dump文件然后通过windbg来分析。那种方法对开发人员的要求较高，它需要程序员理解内存、寄存器等等一系列概念还需要手动加载对应的符号表。Java、Python等等语言在崩溃的时候都会打印一条异常的堆栈信息并告诉用户那块出错了，根据这个信息程序员可以很容易找到对应的代码位置并进行处理，而C/C++则会弹出一个框告诉用户程序崩溃了，二者对比来看，C++似乎对用户太不友好了，而且根据它的弹框很难找到对应的问题，那么有没有可能使c++像Java那样打印异常的堆栈呢？这个自然是可能的，本文就是要讨论如何在Windows上实现类似的功能</p>
+<a id="more"></a>
+
+<h2 id="异常处理"><a href="#异常处理" class="headerlink" title="异常处理"></a>异常处理</h2><p>一般当程序发生异常时，用户代码停止执行，并将CPU的控制权转交给操作系统，操作系统接到控制权后，将当前线程的环境保存到结构体CONTEXT中，然后查找针对此异常的处理函数。系统利用结构EXCEPTION_RECORD保存了异常描述信息，它与CONTEXT一同构成了结构体EXCEPTION_POINTERS，一般在异常处理中经常使用这个结构体。<br>异常信息EXCEPTION_RECORD的定义如下：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> _<span class="title">EXCEPTION_RECORD</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">   DWORD ExceptionCode;  <span class="comment">//异常码</span></span><br><span class="line">   DWORD ExceptionFlags;  <span class="comment">//标志异常是否继续，标志异常处理完成后是否接着之前有问题的代码</span></span><br><span class="line">   <span class="class"><span class="keyword">struct</span> _<span class="title">EXCEPTION_RECORD</span>* <span class="title">ExceptionRecord</span>;</span> <span class="comment">//指向下一个异常节点的指针，这是一个链表结构</span></span><br><span class="line">   PVOID ExceptionAddress; <span class="comment">//异常发生的地址</span></span><br><span class="line">   DWORD NumberParameters; <span class="comment">//异常附加信息</span></span><br><span class="line">   ULONG_PTR ExceptionInformation[EXCEPTION_MAXIMUM_PARAMETERS]; <span class="comment">//异常的字符串</span></span><br><span class="line">&#125; EXCEPTION_RECORD,  *PEXCEPTION_RECORD;</span><br></pre></td></tr></table></figure>
+
+<p>Windows平台提供的这一套异常处理的机制，我们叫它结构化异常处理(SEH)，它的处理过程一般如下:</p>
+<ol>
+<li>如果程序是被调试运行的（比如我们在VS编译器中调试运行程序），当异常发生时，系统首先将异常信息交给调试程序，如果调试程序处理了那么程序继续运行，否则系统便在发生异常的线程栈中查找可能的处理代码。若找到则处理异常，并继续运行程序</li>
+<li>如果在线程栈中没有找到，则再次通知调试程序，如果这个时候仍然不能处理这个异常，那么操作系统会对异常进程默认处理，这个时候一般都是直接弹出一个错误的对话框然后终止程序。</li>
+</ol>
+<p>系统在每个线程的堆栈环境中都维护了一个SEH表，表中是用户注册的异常类型以及它对应的处理函数，每当用户在函数中注册新的异常处理函数，那么这个信息会被保存在链表的头部，也就是说它是采用头插法来插入新的处理函数，从这个角度上来说，我们可以很容易理解为什么在一般的高级语言中一般会先找与try块最近的catch块，然后在找它的上层catch，由里到外依次查找。与try块最近的catch是最后注册的，由于采用的是头插法，自然它会被首先处理。</p>
+<p>在Windows中针对异常处理，扩展了<code>__try</code> 和 <code>__except</code> 两个操作符，这两个操作符与c++中的try和catch非常相似,作用也基本类似，它的一般的语法结构如下:</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">__try</span><br><span class="line">&#123;</span><br><span class="line">  <span class="comment">//do something</span></span><br><span class="line">&#125;</span><br><span class="line">__except(filter)</span><br><span class="line">&#123;</span><br><span class="line">  <span class="comment">//handle</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>使用 <code>__try</code> 和 <code>__except</code> 的时候它主要分为3个部分，分别为:保护代码体、过滤表达式、异常处理块</p>
+<ol>
+<li>保护代码体一般是try中的语句，它值被保护的代码，也就是说我们希望处理那个代码块产生的异常</li>
+<li>过滤表达式是 except后面扩号中的值，它只能是3个值中的一个，EXCEPTION_CONTINUE_SEARCH继续向下查找异常处理，也就是说这里的异常处理块不处理这种异常，EXCEPTION_CONTINUE_EXECUTION表示异常已被处理，这个时候可以继续执行直线产生异常的代码，EXCEPTION_EXECUTE_HANDLER表示异常已被处理，此时直接跳转到except里面的代码块中，这种方式下它的执行流程与一般的异常处理的流程类似.</li>
+<li>异常处理块，指的是except下面的扩号中的代码块.</li>
+</ol>
+<p>注意：我们说过滤表达式只能是这三个值中的一个，但是没有说这里一定得填这三个值，它还支持函数或者其他的表达式类型，只要函数或者表达式的返回值是这三个值中的一个即可。</p>
+<p>上述的方式也有他的局限性，也就是说它只能保护我们指定的代码，如果是在 <code>__try</code> 块之外的代码发生了崩溃，可能还是会造成程序被kill掉，而且每个位置都需要写上这么些代码实在是太麻烦了。其实处理异常还有一种方式，那就是采用 <code>SetUnhandledExceptionFilter</code>来注册一个全局的异常处理函数来处理所有未被处理的异常，其实它的主要工作原理就是往异常处理的链表头上添加一个处理函数，函数的原型如下:</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">LPTOP_LEVEL_EXCEPTION_FILTER WINAPI <span class="title">SetUnhandledExceptionFilter</span><span class="params">(__in  LPTOP_LEVEL_EXCEPTION_FILTER lpTopLevelExceptionFilter)</span></span>;</span><br></pre></td></tr></table></figure>
+
+<p>它需要传入一个函数，以便发生异常的时候调用这个函数，这个回调函数的原型如下:</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">LONG WINAPI <span class="title">UnhandledExceptionFilter</span><span class="params">(</span></span></span><br><span class="line"><span class="function"><span class="params">  __in  struct _EXCEPTION_POINTERS* ExceptionInfo</span></span></span><br><span class="line"><span class="function"><span class="params">)</span></span>;</span><br></pre></td></tr></table></figure>
+
+<p>回调函数会传入一个表示当前堆栈和异常信息的结构体的指针，结构的具体信息请参考MSDN, 函数会返回一个long型的数值，这个数值为上述3个值中的一个，表示当系统调用了这个异常处理函数处理异常之后该如何继续执行用户代码。</p>
+<p><code>SetUnhandledExceptionFilter</code> 函数返回一个函数指针，这个指针指向链表的头部，如果插入处理函数失败那么它将指向原来的链表头，否则指向新的链表头(也就是注册的这个回调函数的地址)</p>
+<p>而这次要实现这么一个能打印异常信息和调用堆栈的功能就是要使用这个方法。</p>
+<h2 id="打印函数调用堆栈"><a href="#打印函数调用堆栈" class="headerlink" title="打印函数调用堆栈"></a>打印函数调用堆栈</h2><p>关于打印堆栈的内容，这里不再多说了，请参考本人之前写的博客<br><a href="https://blog.csdn.net/lanuage/article/details/52203447" target="_blank" rel="noopener">windows平台调用函数堆栈的追踪方法</a><br>这里的主要思路是使用StackWalker来根据当前的堆栈环境来获取对应的函数信息，这个信息需要根据符号表来生成，因此我们需要首先加载符号表，而获取当前线程的环境，我们可以像我博客中写的那样使用GetThreadContext来获取，但是在异常中就简单的多了，还记得异常处理函数的原型吗？异常处理函数本身会带入一个EXCEPTION_POINTERS结构的指针，而这个结构中就包含了异常堆栈的信息。</p>
+<p>还有一些需要注意的问题，我把它放到实现那块了，请小心的往下看^_^</p>
+<h2 id="实现"><a href="#实现" class="headerlink" title="实现"></a>实现</h2><p>实现部分的源码我放到了github上，<a href="https://github.com/aMonst/RptCrash.git" target="_blank" rel="noopener">地址</a></p>
+<p>这个项目中主要分为两个类CBaseException，主要是对异常的一个简单的封装，提供了我们需要的一些功能，比如获取加载的模块的信息，获取调用的堆栈，以及解析发生异常时的相关信息。而这些的基础都在CStackWalker中。<br>使用上，我把CBaseException中的大部分函数都定义成了virtual 允许进行重写。因为具体我还没想好这块后续会需要进行哪些扩展。但是里面最主要的功能是OutputString函数，这个函数是用来进行信息输出的，默认CBaseException是将信息输出到控制台上，后续可以重载这个函数把数据输出到日志中。</p>
+<h3 id="CBaseException-类"><a href="#CBaseException-类" class="headerlink" title="CBaseException 类"></a>CBaseException 类</h3><p>CBaseException 主要是用来处理异常，在代码里面我提供了两种方式来进行异常处理，第一种是通过 <code>SetUnhandledExceptionFilter</code> 来注册一个全局的处理函数，这个函数是类中的静态函数UnhandledExceptionFilter，在这个函数中我主要根据异常的堆栈环境来初始化了一个CBaseException类，然后简单的调用类的方法显示异常与堆栈的相关信息。第二种是通过 <code>_set_se_translator</code> 来注册一个将SEH转化为C++异常的方法，在对应的回调中我简单的抛出了一个CBaseException的异常，在具体的代码中只要简单的用c++的异常处理捕获这么一个异常即可</p>
+<p>CBaseException 类中主要用来解析异常的信息，里面提供这样功能的函数主要有3个</p>
+<ol>
+<li>ShowExceptionResoult: 这个函数主要是根据异常码来获取到异常的具体字符串信息，比如非法内存访问、除0异常等等</li>
+<li>GetLogicalAddress：根据发生异常的代码的地址来获取对应的模块信息，比如它在PE文件中属于第几个节，节的地址范围等等，它在实现上首先使用 VirtualQuery来获取对应的虚拟内存信息，主要是这个模块的首地址信息，然后解析PE文件获取节表的信息，我们循环节表中的每一项，根据节表中的地址范围来判断它属于第几个节，注意这里我们根据它在内存中的偏移计算了它在PE文件中的偏移，具体的计算方式请参考PE文件的相关内容.</li>
+<li>ShowRegistorInformation：获取各个寄存器的值，这个值保存在CONTEXT结构中，我们只需要简单打印它就好</li>
+</ol>
+<h3 id="CStackWalker类"><a href="#CStackWalker类" class="headerlink" title="CStackWalker类"></a>CStackWalker类</h3><p>这个类主要实现一些基础的功能，它主要提供了初始化符号表环境、获取对应的调用堆栈信息、获取加载的模块信息<br>在初始化符号表的时候尽可以多的遍历了常见的几种符号表的位置并将这些位置中的符号表加载进来，以便能更好的获取到堆栈调用的情况。在获取到对应的符号表位置后有这样的代码</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (<span class="literal">NULL</span> != m_lpszSymbolPath)</span><br><span class="line">&#123;</span><br><span class="line">		m_bSymbolLoaded = SymInitialize(m_hProcess, T2A(m_lpszSymbolPath), TRUE); <span class="comment">//这里设置为TRUE，让它在初始化符号表的同时加载符号表</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">DWORD symOptions = SymGetOptions();</span><br><span class="line">symOptions |= SYMOPT_LOAD_LINES;</span><br><span class="line">symOptions |= SYMOPT_FAIL_CRITICAL_ERRORS;</span><br><span class="line">symOptions |= SYMOPT_DEBUG;</span><br><span class="line">SymSetOptions(symOptions);</span><br><span class="line"></span><br><span class="line"><span class="keyword">return</span> m_bSymbolLoaded;</span><br></pre></td></tr></table></figure>
+
+<p>这里将 SymInitialize的最后一个函数置为TRUE，这个参数的意思是是否枚举加载的模块并加载对应的符号表，直接在开始的时候加载上可能会比较浪费内存，这个时候我们可以采用动态加载的方式，在初始化的时候先填入FALSE，然后在需要的时候自己枚举所有的模块，然后手动加载所有模块的符号表，手动加载需要调用SymLoadModuleEx。这里需要提醒各位的是，这里如果填的是FALSE的话，后续一定得自己加载模块的符号表，否则在后续调用SymGetSymFromAddr64的时候会得到一堆的487错误（也就是地址无效）<br>我之前就是这个问题困扰了我很久的时间。</p>
+<p>在获取模块的信息时主要提供了两种方式，一种是使用CreateToolhelp32Snapshot 函数来获取进程中模块信息的快照然后调用Module32Next 和 Module32First来枚举模块信息，还有一种是使用EnumProcessModules来获取所有模块的句柄，然后根据句柄来获取模块的信息，当然还有另外的方式，其他的方式可以参考我的这篇博客 <a href="https://blog.csdn.net/lanuage/article/details/72331277" target="_blank" rel="noopener">枚举进程中的模块</a></p>
+<p>在枚举加载的模块的同时还针对每个模块调用了 <code>GetModuleInformation</code> 函数，这个函数主要有两个功能，获取模块文件的版本号和获取加载的符号表信息。</p>
+<p>接下来就是重头戏了——获取调用堆栈。获取调用堆栈首先得获取当前的环境，在代码中进行了相应的判断，如果当前传入的CONTEXT为NULL，则函数自己获取当前的堆栈信息。在获取堆栈信息的时候首先判断是否为当前线程，如果不是那么为了结果准确，需要先停止目标线程，然后获取，否则直接使用宏来获取，对应的宏定义如下:</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">define</span> GET_CURRENT_THREAD_CONTEXT(c, contextFlags) \</span></span><br><span class="line">	<span class="keyword">do</span>\</span><br><span class="line">	&#123;\</span><br><span class="line">		<span class="built_in">memset</span>(&amp;c, <span class="number">0</span>, <span class="keyword">sizeof</span>(CONTEXT));\</span><br><span class="line">		c.ContextFlags = contextFlags;\</span><br><span class="line">		__asm    call $+<span class="number">5</span>\</span><br><span class="line">		__asm    pop eax\</span><br><span class="line">		__asm    mov c.Eip, eax\</span><br><span class="line">		__asm    mov c.Ebp, ebp\</span><br><span class="line">		__asm    mov c.Esp, esp\</span><br><span class="line">&#125; <span class="keyword">while</span> (<span class="number">0</span>)</span><br></pre></td></tr></table></figure>
+<p>在调用StackWalker时只需要关注esp ebp eip的信息，所以这里我们也只简单的获取这些寄存器的环境，而其他的就不管了。这样有一个问题，就是我们是在CStackWalker类中的函数中获取的这个线程环境，那么这个环境里面会包含CStackWalker::StackWalker，结果自然与我们想要的不太一样（我们想要的是隐藏这个库中的相关信息，而只保留调用者的相关堆栈信息）。这个问题我还没有什么好的解决方案。</p>
+<p>在获取到线程环境后就是简单的调用StackWalker以及那堆Sym开头的函数来获取各种信息了，这里就不再详细说明了。</p>
+<p>至此这个功能已经实现的差不多了。库的具体使用请参考main.cpp这个文件，相信有这篇博文以及源码各位应该很容易就能够使用它。</p>
+<p>据说这些函数不是多线程安全的，我自己没有在多线程环境下进行测试，所以具体它在多线程环境下表现如何还是个未知数，如果后续我有兴趣继续完善它的话，可能会加入多线程的支持。</p>
+<hr />
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+      <div>
+        <div style="padding: 10px 0; margin: 20px auto; width: 90%; text-align: center;">
+  <div></div>
+  <button id="rewardButton" disable="enable" onclick="var qr = document.getElementById('QR'); if (qr.style.display === 'none') {qr.style.display='block';} else {qr.style.display='none'}">
+    <span>打赏</span>
+  </button>
+  <div id="QR" style="display: none;">
+
+    
+      <div id="wechat" style="display: inline-block">
+        <img id="wechat_qr" src="/images/wechatreward.png" alt="Masimaro 微信支付"/>
+        <p>微信支付</p>
+      </div>
+    
+
+    
+      <div id="alipay" style="display: inline-block">
+        <img id="alipay_qr" src="/images/alipayreward.png" alt="Masimaro 支付宝"/>
+        <p>支付宝</p>
+      </div>
+    
+
+    
+
+  </div>
+</div>
+
+      </div>
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/VC/" rel="tag"><i class="fa fa-tag"></i> VC++</a>
+          
+            <a href="/tags/%E7%BB%93%E6%9E%84%E5%8C%96%E5%BC%82%E5%B8%B8%E5%A4%84%E7%90%86/" rel="tag"><i class="fa fa-tag"></i> 结构化异常处理</a>
+          
+            <a href="/tags/%E5%B4%A9%E6%BA%83%E6%97%A5%E5%BF%97%E8%AE%B0%E5%BD%95/" rel="tag"><i class="fa fa-tag"></i> 崩溃日志记录</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/20180819.html" rel="next" title="毕业两年的反思">
+                <i class="fa fa-chevron-left"></i> 毕业两年的反思
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/heap-manage.html" rel="prev" title="C 堆内存管理">
+                C 堆内存管理 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        
+  <div class="bdsharebuttonbox">
+    <a href="#" class="bds_tsina" data-cmd="tsina" title="分享到新浪微博"></a>
+    <a href="#" class="bds_douban" data-cmd="douban" title="分享到豆瓣网"></a>
+    <a href="#" class="bds_sqq" data-cmd="sqq" title="分享到QQ好友"></a>
+    <a href="#" class="bds_qzone" data-cmd="qzone" title="分享到QQ空间"></a>
+    <a href="#" class="bds_weixin" data-cmd="weixin" title="分享到微信"></a>
+    <a href="#" class="bds_tieba" data-cmd="tieba" title="分享到百度贴吧"></a>
+    <a href="#" class="bds_twi" data-cmd="twi" title="分享到Twitter"></a>
+    <a href="#" class="bds_fbook" data-cmd="fbook" title="分享到Facebook"></a>
+    <a href="#" class="bds_more" data-cmd="more"></a>
+    <a class="bds_count" data-cmd="count"></a>
+  </div>
+  <script>
+    window._bd_share_config = {
+      "common": {
+        "bdText": "",
+        "bdMini": "2",
+        "bdMiniList": false,
+        "bdPic": ""
+      },
+      "share": {
+        "bdSize": "16",
+        "bdStyle": "0"
+      },
+      "image": {
+        "viewList": ["tsina", "douban", "sqq", "qzone", "weixin", "twi", "fbook"],
+        "viewText": "分享到：",
+        "viewSize": "16"
+      }
+    }
+  </script>
+
+<script>
+  with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='//bdimg.share.baidu.com/static/api/js/share.js?cdnversion='+~(-new Date()/36e5)];
+</script>
+
+      
+	  
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      <div id="disqus_thread">
+        <noscript>
+          Please enable JavaScript to view the
+          <a href="https://disqus.com/?ref_noscript" target="_blank" rel="noopener">comments powered by Disqus.</a>
+        </noscript>
+      </div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/avatar.jpg"
+                alt="Masimaro" />
+            
+              <p class="site-author-name" itemprop="name">Masimaro</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/%20%7C%7C%20archive">
+              
+                  <span class="site-state-item-count">94</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">18</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">141</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          <div class="links-of-author motion-element">
+            
+              
+                <span class="links-of-author-item">
+                  <a href="https://github.com/aMonst" target="_blank" title="GitHub">
+                    
+                      <i class="fa fa-fw fa-globe"></i>GitHub</a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="http://weibo.com/your-user-name" target="_blank" title="微博">
+                    
+                      <i class="fa fa-fw fa-globe"></i>微博</a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="http://blog.csdn.net/lanuage" target="_blank" title="CSDN博客">
+                    
+                      <i class="fa fa-fw fa-globe"></i>CSDN博客</a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="http://www.jianshu.com/u/7261ff9df286" target="_blank" title="简书">
+                    
+                      <i class="fa fa-fw fa-globe"></i>简书</a>
+                </span>
+              
+            
+          </div>
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#异常处理"><span class="nav-number">1.</span> <span class="nav-text">异常处理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#打印函数调用堆栈"><span class="nav-number">2.</span> <span class="nav-text">打印函数调用堆栈</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#实现"><span class="nav-number">3.</span> <span class="nav-text">实现</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#CBaseException-类"><span class="nav-number">3.1.</span> <span class="nav-text">CBaseException 类</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#CStackWalker类"><span class="nav-number">3.2.</span> <span class="nav-text">CStackWalker类</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love" id="heart">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Masimaro</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io" rel="external nofollow">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next" rel="external nofollow">NexT.Mist</a> v5.1.3</div>
+
+
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv">
+      <i class="fa fa-user">本次访客数</i>
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+      人次
+    </span>
+  
+
+  
+    <span class="site-pv">
+      <i class="fa fa-eye">本站总访问量</i>
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+      次
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.3"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.3"></script>
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.3"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.3"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.3"></script>
+
+
+
+  
+
+
+  
+
+    
+      <script id="dsq-count-scr" src="https://masimaroweb.disqus.com/count.js" async></script>
+    
+
+    
+      <script type="text/javascript">
+        var disqus_config = function () {
+          this.page.url = 'http://www.masimaroweb.com/vc-exception-callstack.html';
+          this.page.identifier = 'vc-exception-callstack.html';
+          this.page.title = 'VC++ 崩溃处理以及打印调用堆栈';
+        };
+        var d = document, s = d.createElement('script');
+        s.src = 'https://masimaroweb.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', '' + +new Date());
+        (d.head || d.body).appendChild(s);
+      </script>
+    
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+  
+
+
+  
+
+  
+
+</body>
+</html>
+
+<!-- 页面点击小红心 -->
+<script type="text/javascript" src="/js/src/love.js"></script>

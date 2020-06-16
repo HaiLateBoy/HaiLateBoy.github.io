@@ -1,0 +1,1332 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<script src="//cdn.bootcss.com/pace/1.0.2/pace.min.js"></script>
+<link href="//cdn.bootcss.com/pace/1.0.2/themes/pink/pace-theme-flash.css" rel="stylesheet">
+<style>
+    .pace .pace-progress {
+        background: #1E92FB; /*进度条颜色*/
+        height: 3px;
+    }
+    .pace .pace-progress-inner {
+         box-shadow: 0 0 10px #1E92FB, 0 0 5px     #1E92FB; /*阴影颜色*/
+    }
+    .pace .pace-activity {
+        border-top-color: #1E92FB;    /*上边框颜色*/
+        border-left-color: #1E92FB;    /*左边框颜色*/
+    }
+</style>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.3" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.3">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.3">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.3">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.3" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Dll 远程注入, Dll远程卸载, 无Dll的代码注入" />
+
+
+
+
+  
+
+
+  <link rel="alternate" href="/atom.xml" title="Masimaro's blog" type="application/atom+xml" />
+
+
+
+
+
+
+<meta name="description" content="木马和病毒的好坏很大程度上取决于它的隐蔽性，木马和病毒本质上也是在执行程序代码，如果采用独立进程的方式需要考虑隐藏进程否则很容易被发现，在编写这类程序的时候可以考虑将代码注入到其他进程中，借用其他进程的环境和资源来执行代码。远程注入技术不仅被木马和病毒广泛使用，防病毒软件和软件调试中也有很大的用途，最近也简单的研究过这些东西，在这里将它发布出来。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Windows下的代码注入">
+<meta property="og:url" content="http://www.masimaroweb.com/code-inject.html">
+<meta property="og:site_name" content="Masimaro&#39;s blog">
+<meta property="og:description" content="木马和病毒的好坏很大程度上取决于它的隐蔽性，木马和病毒本质上也是在执行程序代码，如果采用独立进程的方式需要考虑隐藏进程否则很容易被发现，在编写这类程序的时候可以考虑将代码注入到其他进程中，借用其他进程的环境和资源来执行代码。远程注入技术不仅被木马和病毒广泛使用，防病毒软件和软件调试中也有很大的用途，最近也简单的研究过这些东西，在这里将它发布出来。">
+<meta property="article:published_time" content="2018-09-09T09:39:13.000Z">
+<meta property="article:modified_time" content="2018-09-09T10:50:38.661Z">
+<meta property="article:author" content="Masimaro">
+<meta property="article:tag" content="Dll 远程注入">
+<meta property="article:tag" content=" Dll远程卸载">
+<meta property="article:tag" content=" 无Dll的代码注入">
+<meta name="twitter:card" content="summary">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.3',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+
+  <link rel="canonical" href="http://www.masimaroweb.com/code-inject.html"/>
+
+
+
+
+
+  <title>Windows下的代码注入 | Masimaro's blog</title>
+  
+
+
+
+
+
+
+
+
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Masimaro's blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <h1 class="site-subtitle" itemprop="description"></h1>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="搜索..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://www.masimaroweb.com/code-inject.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Masimaro">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Masimaro's blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h2 class="post-title" itemprop="name headline">Windows下的代码注入</h2>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-09-09T17:39:13+08:00">
+                2018-09-09
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Windows-%E9%AB%98%E7%BA%A7%E7%BC%96%E7%A8%8B/" itemprop="url" rel="index">
+                    <span itemprop="name">Windows 高级编程</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/code-inject.html#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="code-inject.html" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="page-pv"><i class="fa fa-file-o">本文总阅读量</i>
+            <span class="busuanzi-value" id="busuanzi_value_page_pv" ></span>次
+            </span>
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>木马和病毒的好坏很大程度上取决于它的隐蔽性，木马和病毒本质上也是在执行程序代码，如果采用独立进程的方式需要考虑隐藏进程否则很容易被发现，在编写这类程序的时候可以考虑将代码注入到其他进程中，借用其他进程的环境和资源来执行代码。远程注入技术不仅被木马和病毒广泛使用，防病毒软件和软件调试中也有很大的用途，最近也简单的研究过这些东西，在这里将它发布出来。</p>
+<a id="more"></a>
+<p>想要将代码注入到其他进程并能成功执行需要解决两个问题：</p>
+<ol>
+<li>第一个问题是如何让远程进程执行注入的代码。原始进程有它自己的执行逻辑，想要破坏原来的执行流程，使EIP寄存器跳转到注入的代码位置基本是不可能的</li>
+<li>第二个问题是每个进程中地址空间是独立的，比如在调用某个句柄时，即使是同一个内核对象，在不同进程中对应的句柄也是不同的，这就需要进行地址转化。</li>
+</ol>
+<p>要进行远程代码注入的要点和难点主要就是这两个问题，下面给出两种不同的注入方式来说明如何解决这两个问题</p>
+<h2 id="DLL注入"><a href="#DLL注入" class="headerlink" title="DLL注入"></a>DLL注入</h2><p>DLL注入很好的解决了第二个问题，DLL被加载到目标进程之后，它里面的代码中的地址就会自动被转化为对应进程中的地址，这个特性是由于DLL加载的过程决定的，它会自己使用它所在进程中的资源和地址空间，所以只要DLL中不存在硬编码的地址，基本不用担心里面会出现函数或者句柄需要进行地址转化的问题。<br>那么第一个问题改怎么解决呢？</p>
+<p>要执行用户代码，在Windows中最常见的就是使用回调的方式，Windows采用的是事件驱动的方式，只要发生了某些事件就会调用回调，在众多使用回调的场景中，线程的回调是最简单的，它不会干扰到目标进程的正常执行，也就不用考虑最后还原EIP的问题，因此DLL注入采用的最常见的就是创建一个远程线程，让线程加载DLL代码。</p>
+<p>DLL注入中一般的思路是：使用CreateRemoteThread来在目标进程中创建一个远程的线程，这个线程主要是加载DLL到目标进程中，由于DLL在入口函数(DLLMain)中会处理进程加载Dll的事件，所以将注入代码写到这个事件中，这样就能执行注入的代码了。那么如何在远程进程中执行DLL的加载操作呢？我们知道加载DLL主要使用的是函数LoadLibrary,仔细分析线程的回调函数和LoadLibrary函数的原型，会发现，它们同样都是传入一个参数，而CreateRemoteThread函数正好需要一个函数的地址作为回调，并且传入一个参数作为回调函数的参数。这样就有思路了，我们让LoadLibrary作为线程的回调函数，将对应dll的文件名和路径作为参数传入，这样就可以在对应进程中加载dll了，进一步也就可以执行dllmain中的对应代码了。</p>
+<p>还有一个很重要的问题，我们知道不同进程中，地址空间是隔离的，那么我在注入的进程中传入LoadLibrary函数的地址，这算是一个硬编码的地址，它在目标进程中是否是一样的呢？答案是，二者的地址是一样的，这是由于kernel32.dll在32位程序中加载的基地址是一样的，而LoadLibrary在kernel32.dll中的偏移是一定的（只要不同的进程加载的是同一份kernel32.dll）那么不同进程中的LoadLibrary函数的地址是一样的。其实不光是LoadLibrary函数，只要是kernel32.dll中导出的函数，在不同进程中的地址都是一样的。注意这里只是32位，如果想要使用32位程序往64位目标程序中注入，可能需要考虑地址转换的问题，只要知道kernel32.dll在64位中的偏移，就可以计算出对应函数的地址了。</p>
+<p>LoabLibrary函数传入的代表路径的字符串的首地址在不同进程中同样是不同的，而且也没办法利用偏移来计算，这个时候解决的办法就是在远程进程中申请一块虚拟地址空间，并将目标字符串写入对应的地址中，然后将对应的首地址作为参数传入即可。</p>
+<p>最后总结一下DLL注入的步骤：</p>
+<ol>
+<li>获取LoadLibrary函数的地址</li>
+<li>调用VirtualAllocEx 函数在远程进程中申请一段虚拟内存</li>
+<li>调用WriteProcessMemory 函数将参数写入对应的虚拟内存</li>
+<li>调用CreateRemoteThread 函数创建远程线程，线程的回调函数为LoadLibrary，参数为对应的字符串的地址</li>
+</ol>
+<p>按照这个思路可以编写如下的代码:</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">typedef</span> <span class="title">HMODULE</span><span class="params">(WINAPI *pfnLoadLibrary)</span><span class="params">(LPCWSTR)</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> (!DebugPrivilege()) <span class="comment">//提权代码，在Windows Vista 及以上的版本需要将进程的权限提升，否则打开进程会失败</span></span><br><span class="line">&#123;</span><br><span class="line">  <span class="keyword">return</span> FALSE;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//打开目标进程</span></span><br><span class="line">HANDLE hRemoteProcess = OpenProcess(PROCESS_ALL_ACCESS, FALSE, dwPid); <span class="comment">//dwPid是对应的进程ID</span></span><br><span class="line"><span class="keyword">if</span> (<span class="literal">NULL</span> == hRemoteProcess)</span><br><span class="line">&#123;</span><br><span class="line">  AfxMessageBox(_T(<span class="string">"OpenProcess Error"</span>));</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//查找LoadLibrary函数地址</span></span><br><span class="line">pfnLoadLibrary lpLoadLibrary = (pfnLoadLibrary)GetProcAddress(GetModuleHandle(_T(<span class="string">"kernel32.dll"</span>)), <span class="string">"LoadLibraryW"</span>);</span><br><span class="line"><span class="comment">//在远程进程中申请一块内存用于保存对应线程的参数</span></span><br><span class="line">PVOID pBuffer = VirtualAllocEx(hRemoteProcess, <span class="literal">NULL</span>, MAX_PATH, MEM_COMMIT, PAGE_READWRITE);</span><br><span class="line"><span class="comment">//在对应内存位置处写入参数值</span></span><br><span class="line">DWORD dwWritten = <span class="number">0</span>;</span><br><span class="line">WriteProcessMemory(hRemoteProcess, pBuffer, m_csDLLName.GetString(), (m_csDLLName.GetLength() + <span class="number">1</span>) * <span class="keyword">sizeof</span>(TCHAR), &amp;dwWritten);</span><br><span class="line"></span><br><span class="line"><span class="comment">//创建远程线程并传入对应参数</span></span><br><span class="line">HANDLE hRemoteThread = CreateRemoteThread(hRemoteProcess, <span class="literal">NULL</span>, <span class="number">0</span>, (LPTHREAD_START_ROUTINE)lpLoadLibrary, pBuffer, <span class="number">0</span>, <span class="literal">NULL</span>);</span><br><span class="line">WaitForSingleObject(hRemoteThread, INFINITE);</span><br><span class="line">VirtualFreeEx(hRemoteProcess, pBuffer, <span class="number">0</span>, MEM_RELEASE);</span><br><span class="line">CloseHandle(hRemoteThread);</span><br><span class="line">CloseHandle(hRemoteProcess);</span><br></pre></td></tr></table></figure>
+
+<h2 id="卸载远程DLL"><a href="#卸载远程DLL" class="headerlink" title="卸载远程DLL"></a>卸载远程DLL</h2><p>上面进行了代码的注入，作为一个文明的程序，自然得考虑卸载dll，毕竟现在提倡环保，谁使用，谁治理。这里既然注入了，自然得考虑卸载。<br>卸载的思路与注入的类似，只是函数变为了FreeLibrary，传入的参数变成了对应的dll的句柄了。</p>
+<p>如何获取这个模块的句柄呢？我们可以枚举进程中的模块，根据模块的名称来找到对应的模块并获取它的句柄。枚举的方式一般是使用toolhelp32中对应的函数，下面是卸载的例子代码</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line">HANDLE hSnapshot = CreateToolhelp32Snapshot(TH32CS_SNAPMODULE, m_dwPid);</span><br><span class="line"><span class="keyword">if</span> (INVALID_HANDLE_VALUE == hSnapshot)</span><br><span class="line">&#123;</span><br><span class="line">  AfxMessageBox(_T(<span class="string">"CreateToolhelp32Snapshot Error"</span>));</span><br><span class="line">  <span class="keyword">return</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">MODULEENTRY32  me = &#123;<span class="number">0</span>&#125;;</span><br><span class="line">me.dwSize = <span class="keyword">sizeof</span>(MODULEENTRY32);</span><br><span class="line">BOOL bRet = Module32First(hSnapshot, &amp;me);</span><br><span class="line"><span class="keyword">while</span> (bRet)</span><br><span class="line">&#123;</span><br><span class="line">  CString csModuleFile = _tcsupr(me.szExePath);</span><br><span class="line">  <span class="keyword">if</span> (csModuleFile == _tcsupr((LPTSTR)m_csDLLName.GetString()) != <span class="number">-1</span>)</span><br><span class="line">  &#123;</span><br><span class="line">    <span class="keyword">break</span>;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  ZeroMemory(&amp;me, <span class="keyword">sizeof</span>(me));</span><br><span class="line">  me.dwSize = <span class="keyword">sizeof</span>(PROCESSENTRY32);</span><br><span class="line">  bRet = Module32Next(hSnapshot, &amp;me);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">CloseHandle(hSnapshot);</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">typedef</span> <span class="title">BOOL</span> <span class="params">(*pfnFreeLibrary)</span><span class="params">(HMODULE)</span></span>;</span><br><span class="line">pfnFreeLibrary FreeLibrary = (pfnFreeLibrary)GetProcAddress(GetModuleHandle(_T(<span class="string">"kernel32.dll"</span>)), <span class="string">"FreeLibrary"</span>);</span><br><span class="line"></span><br><span class="line">HANDLE hRemoteProcess = OpenProcess(PROCESS_ALL_ACCESS, FALSE, m_dwPid);</span><br><span class="line"><span class="keyword">if</span> (hRemoteProcess == <span class="literal">NULL</span>)</span><br><span class="line">&#123;</span><br><span class="line">    AfxMessageBox(_T(<span class="string">"OpenProcess Error"</span>));</span><br><span class="line">    <span class="keyword">return</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">HANDLE hRemoteThread = CreateRemoteThread(hRemoteProcess, <span class="literal">NULL</span>, <span class="number">0</span>, (LPTHREAD_START_ROUTINE)FreeLibrary, me.modBaseAddr, <span class="number">0</span>, <span class="literal">NULL</span>);</span><br><span class="line">WaitForSingleObject(hRemoteThread, INFINITE);</span><br><span class="line">CloseHandle(hRemoteThread);</span><br><span class="line">CloseHandle(hRemoteProcess);</span><br></pre></td></tr></table></figure>
+
+<h2 id="无DLL的注入"><a href="#无DLL的注入" class="headerlink" title="无DLL的注入"></a>无DLL的注入</h2><p>注入不一定需要使用DLL，虽然使用DLL比较简单一点，无DLL注入在解决上述两个问题的第一个思路是一样的，也是使用CreateRemoteThread来创建一个远程线程来执行目标代码。</p>
+<p>无dll的注入主要麻烦是在进行地址转化上，在调用API的时候，如果无法保证对应的dll的基地址不变的话，就得在目标进程中自行调用LoadLibrary来动态获取函数地址，并调用。</p>
+<p>在动态获取API函数的地址的时候，主要使用的函数是LoadLibrary、GetModuleHandle、GetProcAddress这三个函数，而线程的回调函数只能传入一个参数，所以我们需要将对应的需要传入的参数组成一个结构体，并将结构体对应的数据写入到目标进程的内存中，特别要注意的是，里面不要使用指针或者句柄这种与地址有关的东西。<br>例如我们想在目标进程中注入一段代码，让它弹出一个对话框，以便测试是否注入成功。这种情况除了要传入上述三个函数的地址外，还需要MesageBox，而MessageBox是在user32.dll中，user32.dll在每个进程中的基地址并不相同，因此在注入的代码中需要动态加载，因此可以定义下面一个结构</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">REMOTE_DATA</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">    DWORD dwLoadLibrary;</span><br><span class="line">    DWORD dwGetProcAddress;</span><br><span class="line">    DWORD dwGetModuleHandle;</span><br><span class="line"></span><br><span class="line">    DWORD dwGetModuelFileName; <span class="comment">//辅助函数</span></span><br><span class="line">    <span class="keyword">char</span> szUser32dll[MAX_PATH]; <span class="comment">//存储user32dll的路径，以便调用LoadLibrary加载</span></span><br><span class="line">    <span class="keyword">char</span> szMessageBox[<span class="number">128</span>]; <span class="comment">//存储字符串MessageBoxA 这个字符串，以便使用GetProcAddress加载MesageBox函数</span></span><br><span class="line">    <span class="keyword">char</span> szMessage[<span class="number">512</span>]; <span class="comment">//弹出对话框上显示的字符</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>不使用DLL注入与使用DLL注入的另一个区别是，不使用DLL注入的时候需要自己加载目标代码到对应的进程中，这个操作可以借由WriteProcessMemory 将函数代码写到对应的虚拟内存中。<br>最后注入的代码主要如下:</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">DWORD WINAPI <span class="title">RemoteThreadProc</span><span class="params">(LPVOID lpParam)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	LPREMOTE_DATA lpData = (LPREMOTE_DATA)lpParam;</span><br><span class="line">	<span class="function"><span class="keyword">typedef</span> <span class="title">HMODULE</span> <span class="params">(WINAPI *pfnLoadLibrary)</span><span class="params">(LPCSTR)</span></span>;</span><br><span class="line">	<span class="function"><span class="keyword">typedef</span> <span class="title">FARPROC</span> <span class="params">(WINAPI *pfnGetProcAddress)</span><span class="params">(HMODULE, LPCSTR)</span></span>;</span><br><span class="line">	<span class="function"><span class="keyword">typedef</span> <span class="title">HMODULE</span> <span class="params">(*pfnGetModuleHandle)</span><span class="params">(LPCSTR)</span></span>;</span><br><span class="line">	<span class="function"><span class="keyword">typedef</span> <span class="title">DWORD</span> <span class="params">(WINAPI *pfnGetModuleFileName)</span><span class="params">( HMODULE,LPSTR, DWORD)</span></span>;</span><br><span class="line"></span><br><span class="line">	pfnGetModuleHandle MyGetModuleHandle = (pfnGetModuleHandle)lpData-&gt;dwGetModuleHandle;</span><br><span class="line">	pfnGetModuleFileName MyGetModuleFileName = (pfnGetModuleFileName)lpData-&gt;dwGetModuleFileName;</span><br><span class="line">	pfnGetProcAddress MyGetProcAddress = (pfnGetProcAddress)lpData-&gt;dwGetProcAddress;</span><br><span class="line">	pfnLoadLibrary MyLoadLibrary = (pfnLoadLibrary)lpData-&gt;dwGetProcAddress;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">typedef</span> <span class="title">int</span> <span class="params">(WINAPI *pfnMessageBox)</span><span class="params">(HWND, LPCSTR, LPCSTR, UINT)</span></span>;</span><br><span class="line">	<span class="comment">//加载User32.dll</span></span><br><span class="line">	HMODULE hUser32Dll = MyLoadLibrary(lpData-&gt;szUerDll);</span><br><span class="line">	<span class="comment">//加载MessageBox函数</span></span><br><span class="line">	pfnMessageBox MyMessageBox = (pfnMessageBox)MyGetProcAddress(hUser32Dll, lpData-&gt;szMessageBox);</span><br><span class="line">	<span class="keyword">char</span> szTitlte[MAX_PATH] = <span class="string">""</span>;</span><br><span class="line">	MyGetModuleFileName(<span class="literal">NULL</span>, szTitlte, MAX_PATH);</span><br><span class="line"></span><br><span class="line">	MyMessageBox(<span class="literal">NULL</span>, lpData-&gt;szMessage, szTitlte, MB_OK);</span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">m_dwPid = GetPid(); <span class="comment">//获取目标进程ID</span></span><br><span class="line">DebugPrivilege(); <span class="comment">//进程提权</span></span><br><span class="line">HANDLE hRemoteProcess = OpenProcess(PROCESS_ALL_ACCESS, FALSE,  m_dwPid);</span><br><span class="line"><span class="keyword">if</span> (<span class="literal">NULL</span> == hRemoteProcess)</span><br><span class="line">&#123;</span><br><span class="line">  AfxMessageBox(_T(<span class="string">"OpenProcess Error"</span>));</span><br><span class="line">  <span class="keyword">return</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">LPREMOTE_DATA lpData = <span class="keyword">new</span> REMOTE_DATA;</span><br><span class="line">ZeroMemory(lpData, <span class="keyword">sizeof</span>(REMOTE_DATA));</span><br><span class="line"></span><br><span class="line"><span class="comment">//获取对应函数的地址</span></span><br><span class="line">lpData-&gt;dwGetModuleFileName = (DWORD)GetProcAddress(GetModuleHandle(_T(<span class="string">"kernel32.dll"</span>)), <span class="string">"GetModuleFileNameA"</span>);</span><br><span class="line">lpData-&gt;dwGetModuleHandle = (DWORD)GetProcAddress(GetModuleHandle(_T(<span class="string">"kernel32.dll"</span>)), <span class="string">"GetModuleHandleA"</span>);</span><br><span class="line">lpData-&gt;dwGetProcAddress = (DWORD)GetProcAddress(GetModuleHandle(_T(<span class="string">"kernel32.dll"</span>)), <span class="string">"GetProcAddress"</span>);</span><br><span class="line">lpData-&gt;dwLoadLibrary = (DWORD)GetProcAddress(GetModuleHandle(_T(<span class="string">"kernel32.dll"</span>)), <span class="string">"LoadLibraryA"</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 拷贝对应的字符串</span></span><br><span class="line">StringCchCopyA(lpData-&gt;szMessage, MAX_STRING_LENGTH, <span class="string">"Inject Success!!!"</span>);</span><br><span class="line">StringCchCopyA(lpData-&gt;szUerDll, MAX_PATH, <span class="string">"user32.dll"</span>);</span><br><span class="line">StringCchCopyA(lpData-&gt;szMessageBox, MAX_PROC_NAME_LENGTH, <span class="string">"MessageBoxA"</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">//在远程空间中申请对应的内存，写入参数和函数的代码</span></span><br><span class="line">LPVOID lpRemoteBuf = VirtualAllocEx(hRemoteProcess, <span class="literal">NULL</span>, <span class="keyword">sizeof</span>(REMOTE_DATA), MEM_COMMIT, PAGE_READWRITE); <span class="comment">// 存储data结构的数据</span></span><br><span class="line">LPVOID lpRemoteProc = VirtualAllocEx(hRemoteProcess, <span class="literal">NULL</span>, <span class="number">0x4000</span>, MEM_COMMIT, PAGE_EXECUTE_READWRITE); <span class="comment">// 存储函数的代码</span></span><br><span class="line">DWORD dwWrittenSize = <span class="number">0</span>;</span><br><span class="line">WriteProcessMemory(hRemoteProcess, lpRemoteProc, &amp;RemoteThreadProc, <span class="number">0x4000</span>, &amp;dwWrittenSize);</span><br><span class="line">WriteProcessMemory(hRemoteProcess, lpRemoteBuf, lpData, <span class="keyword">sizeof</span>(REMOTE_DATA), &amp;dwWrittenSize);</span><br><span class="line"></span><br><span class="line">HANDLE hRemoteThread = CreateRemoteThread(hRemoteProcess, <span class="literal">NULL</span>, <span class="number">0</span>, (LPTHREAD_START_ROUTINE)lpRemoteProc, lpRemoteBuf, <span class="number">0</span>, <span class="literal">NULL</span>);</span><br><span class="line">WaitForSingleObject(hRemoteThread, INFINITE);</span><br><span class="line">VirtualFreeEx(hRemoteProcess, lpRemoteBuf, <span class="number">0</span>, MEM_RELEASE);</span><br><span class="line">VirtualFreeEx(hRemoteProcess, lpRemoteProc, <span class="number">0</span>, MEM_RELEASE);</span><br><span class="line">CloseHandle(hRemoteThread);</span><br><span class="line">CloseHandle(hRemoteProcess);</span><br><span class="line"></span><br><span class="line"><span class="keyword">delete</span>[] lpData;</span><br></pre></td></tr></table></figure>
+<hr />
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+      <div>
+        <div style="padding: 10px 0; margin: 20px auto; width: 90%; text-align: center;">
+  <div></div>
+  <button id="rewardButton" disable="enable" onclick="var qr = document.getElementById('QR'); if (qr.style.display === 'none') {qr.style.display='block';} else {qr.style.display='none'}">
+    <span>打赏</span>
+  </button>
+  <div id="QR" style="display: none;">
+
+    
+      <div id="wechat" style="display: inline-block">
+        <img id="wechat_qr" src="/images/wechatreward.png" alt="Masimaro 微信支付"/>
+        <p>微信支付</p>
+      </div>
+    
+
+    
+      <div id="alipay" style="display: inline-block">
+        <img id="alipay_qr" src="/images/alipayreward.png" alt="Masimaro 支付宝"/>
+        <p>支付宝</p>
+      </div>
+    
+
+    
+
+  </div>
+</div>
+
+      </div>
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Dll-%E8%BF%9C%E7%A8%8B%E6%B3%A8%E5%85%A5/" rel="tag"><i class="fa fa-tag"></i> Dll 远程注入</a>
+          
+            <a href="/tags/Dll%E8%BF%9C%E7%A8%8B%E5%8D%B8%E8%BD%BD/" rel="tag"><i class="fa fa-tag"></i> Dll远程卸载</a>
+          
+            <a href="/tags/%E6%97%A0Dll%E7%9A%84%E4%BB%A3%E7%A0%81%E6%B3%A8%E5%85%A5/" rel="tag"><i class="fa fa-tag"></i> 无Dll的代码注入</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/heap-manage.html" rel="next" title="C 堆内存管理">
+                <i class="fa fa-chevron-left"></i> C 堆内存管理
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/post-before-call-main.html" rel="prev" title="VC 在调用main函数之前的操作">
+                VC 在调用main函数之前的操作 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        
+  <div class="bdsharebuttonbox">
+    <a href="#" class="bds_tsina" data-cmd="tsina" title="分享到新浪微博"></a>
+    <a href="#" class="bds_douban" data-cmd="douban" title="分享到豆瓣网"></a>
+    <a href="#" class="bds_sqq" data-cmd="sqq" title="分享到QQ好友"></a>
+    <a href="#" class="bds_qzone" data-cmd="qzone" title="分享到QQ空间"></a>
+    <a href="#" class="bds_weixin" data-cmd="weixin" title="分享到微信"></a>
+    <a href="#" class="bds_tieba" data-cmd="tieba" title="分享到百度贴吧"></a>
+    <a href="#" class="bds_twi" data-cmd="twi" title="分享到Twitter"></a>
+    <a href="#" class="bds_fbook" data-cmd="fbook" title="分享到Facebook"></a>
+    <a href="#" class="bds_more" data-cmd="more"></a>
+    <a class="bds_count" data-cmd="count"></a>
+  </div>
+  <script>
+    window._bd_share_config = {
+      "common": {
+        "bdText": "",
+        "bdMini": "2",
+        "bdMiniList": false,
+        "bdPic": ""
+      },
+      "share": {
+        "bdSize": "16",
+        "bdStyle": "0"
+      },
+      "image": {
+        "viewList": ["tsina", "douban", "sqq", "qzone", "weixin", "twi", "fbook"],
+        "viewText": "分享到：",
+        "viewSize": "16"
+      }
+    }
+  </script>
+
+<script>
+  with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='//bdimg.share.baidu.com/static/api/js/share.js?cdnversion='+~(-new Date()/36e5)];
+</script>
+
+      
+	  
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      <div id="disqus_thread">
+        <noscript>
+          Please enable JavaScript to view the
+          <a href="https://disqus.com/?ref_noscript" target="_blank" rel="noopener">comments powered by Disqus.</a>
+        </noscript>
+      </div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/avatar.jpg"
+                alt="Masimaro" />
+            
+              <p class="site-author-name" itemprop="name">Masimaro</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/%20%7C%7C%20archive">
+              
+                  <span class="site-state-item-count">94</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">18</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">141</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          <div class="links-of-author motion-element">
+            
+              
+                <span class="links-of-author-item">
+                  <a href="https://github.com/aMonst" target="_blank" title="GitHub">
+                    
+                      <i class="fa fa-fw fa-globe"></i>GitHub</a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="http://weibo.com/your-user-name" target="_blank" title="微博">
+                    
+                      <i class="fa fa-fw fa-globe"></i>微博</a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="http://blog.csdn.net/lanuage" target="_blank" title="CSDN博客">
+                    
+                      <i class="fa fa-fw fa-globe"></i>CSDN博客</a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="http://www.jianshu.com/u/7261ff9df286" target="_blank" title="简书">
+                    
+                      <i class="fa fa-fw fa-globe"></i>简书</a>
+                </span>
+              
+            
+          </div>
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#DLL注入"><span class="nav-number">1.</span> <span class="nav-text">DLL注入</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#卸载远程DLL"><span class="nav-number">2.</span> <span class="nav-text">卸载远程DLL</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#无DLL的注入"><span class="nav-number">3.</span> <span class="nav-text">无DLL的注入</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love" id="heart">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Masimaro</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io" rel="external nofollow">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next" rel="external nofollow">NexT.Mist</a> v5.1.3</div>
+
+
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv">
+      <i class="fa fa-user">本次访客数</i>
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+      人次
+    </span>
+  
+
+  
+    <span class="site-pv">
+      <i class="fa fa-eye">本站总访问量</i>
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+      次
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.3"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.3"></script>
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.3"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.3"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.3"></script>
+
+
+
+  
+
+
+  
+
+    
+      <script id="dsq-count-scr" src="https://masimaroweb.disqus.com/count.js" async></script>
+    
+
+    
+      <script type="text/javascript">
+        var disqus_config = function () {
+          this.page.url = 'http://www.masimaroweb.com/code-inject.html';
+          this.page.identifier = 'code-inject.html';
+          this.page.title = 'Windows下的代码注入';
+        };
+        var d = document, s = d.createElement('script');
+        s.src = 'https://masimaroweb.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', '' + +new Date());
+        (d.head || d.body).appendChild(s);
+      </script>
+    
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+  
+
+
+  
+
+  
+
+</body>
+</html>
+
+<!-- 页面点击小红心 -->
+<script type="text/javascript" src="/js/src/love.js"></script>

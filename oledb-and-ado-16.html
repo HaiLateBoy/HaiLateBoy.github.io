@@ -1,0 +1,1375 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<script src="//cdn.bootcss.com/pace/1.0.2/pace.min.js"></script>
+<link href="//cdn.bootcss.com/pace/1.0.2/themes/pink/pace-theme-flash.css" rel="stylesheet">
+<style>
+    .pace .pace-progress {
+        background: #1E92FB; /*进度条颜色*/
+        height: 3px;
+    }
+    .pace .pace-progress-inner {
+         box-shadow: 0 0 10px #1E92FB, 0 0 5px     #1E92FB; /*阴影颜色*/
+    }
+    .pace .pace-activity {
+        border-top-color: #1E92FB;    /*上边框颜色*/
+        border-left-color: #1E92FB;    /*左边框颜色*/
+    }
+</style>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.3" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.3">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.3">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.3">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.3" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="OLEDB, 数据库编程, VC++, 数据库, ATL, ADO" />
+
+
+
+
+  
+
+
+  <link rel="alternate" href="/atom.xml" title="Masimaro's blog" type="application/atom+xml" />
+
+
+
+
+
+
+<meta name="description" content="上次将OLEDB的所有内容基本上都说完了，从之前的示例上来看OLEDB中有许多变量的定义，什么结果集对象、session对象、命令对象，还有各种缓冲等等，总体上来说直接使用OLEDB写程序很麻烦，用很大的代码量带来的仅仅只是简单的功能。还要考虑各种缓冲的释放，各种对象的关闭，程序员的大量精力都浪费在无用的事情上，针对这些情况微软在OLEDB上提供了两种封装方式，一种是将其封装在ATL模板库中，一种">
+<meta property="og:type" content="article">
+<meta property="og:title" content="ATL模板库中的OLEDB与ADO">
+<meta property="og:url" content="http://www.masimaroweb.com/oledb-and-ado-16.html">
+<meta property="og:site_name" content="Masimaro&#39;s blog">
+<meta property="og:description" content="上次将OLEDB的所有内容基本上都说完了，从之前的示例上来看OLEDB中有许多变量的定义，什么结果集对象、session对象、命令对象，还有各种缓冲等等，总体上来说直接使用OLEDB写程序很麻烦，用很大的代码量带来的仅仅只是简单的功能。还要考虑各种缓冲的释放，各种对象的关闭，程序员的大量精力都浪费在无用的事情上，针对这些情况微软在OLEDB上提供了两种封装方式，一种是将其封装在ATL模板库中，一种">
+<meta property="og:image" content="http://www.masimaroweb.com/oledb-and-ado-16/%E9%80%89%E6%8B%A9OLEDB%E7%B1%BB.png">
+<meta property="og:image" content="http://www.masimaroweb.com/oledb-and-ado-16/%E9%80%89%E6%8B%A9%E6%95%B0%E6%8D%AE%E5%BA%93.png">
+<meta property="article:published_time" content="2018-05-27T02:47:42.000Z">
+<meta property="article:modified_time" content="2018-05-27T06:27:40.476Z">
+<meta property="article:author" content="Masimaro">
+<meta property="article:tag" content="OLEDB">
+<meta property="article:tag" content=" 数据库编程">
+<meta property="article:tag" content=" VC++">
+<meta property="article:tag" content=" 数据库">
+<meta property="article:tag" content=" ATL">
+<meta property="article:tag" content=" ADO">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://www.masimaroweb.com/oledb-and-ado-16/%E9%80%89%E6%8B%A9OLEDB%E7%B1%BB.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.3',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+
+  <link rel="canonical" href="http://www.masimaroweb.com/oledb-and-ado-16.html"/>
+
+
+
+
+
+  <title>ATL模板库中的OLEDB与ADO | Masimaro's blog</title>
+  
+
+
+
+
+
+
+
+
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Masimaro's blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <h1 class="site-subtitle" itemprop="description"></h1>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="搜索..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://www.masimaroweb.com/oledb-and-ado-16.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Masimaro">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Masimaro's blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h2 class="post-title" itemprop="name headline">ATL模板库中的OLEDB与ADO</h2>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-05-27T10:47:42+08:00">
+                2018-05-27
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/windows-%E6%95%B0%E6%8D%AE%E5%BA%93%E7%BC%96%E7%A8%8B/" itemprop="url" rel="index">
+                    <span itemprop="name">windows 数据库编程</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/oledb-and-ado-16.html#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="oledb-and-ado-16.html" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="page-pv"><i class="fa fa-file-o">本文总阅读量</i>
+            <span class="busuanzi-value" id="busuanzi_value_page_pv" ></span>次
+            </span>
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>上次将OLEDB的所有内容基本上都说完了，从之前的示例上来看OLEDB中有许多变量的定义，什么结果集对象、session对象、命令对象，还有各种缓冲等等，总体上来说直接使用OLEDB写程序很麻烦，用很大的代码量带来的仅仅只是简单的功能。还要考虑各种缓冲的释放，各种对象的关闭，程序员的大量精力都浪费在无用的事情上，针对这些情况微软在OLEDB上提供了两种封装方式，一种是将其封装在ATL模板库中，一种是使用ActiveX控件来进行封装称之为ADO，这次主要写的是这两种方式</p>
+<a id="more"></a>
+<h2 id="ATL-模板中的OLEDB"><a href="#ATL-模板中的OLEDB" class="headerlink" title="ATL 模板中的OLEDB"></a>ATL 模板中的OLEDB</h2><p>由于ATL模板是开源的，这种方式封装简洁，调试简易（毕竟源代码都给你了），各个模块相对独立，但是它的缺点很明显就是使用门槛相对较高，只有对C++中的模板十分熟悉的开发人员才能使用的得心应手。<br>ATL中的OLEDB主要有两大模块，提供者模块和消费者模块，顾名思义，提供者模块是数据库的开发人员使用的，它主要使用这个模块实现OLEDB中的接口，对外提供相应的数据库服务；消费者模块就是使用OLEDB在程序中操作数据库。这里主要说的是消费者模块</p>
+<h3 id="ATL主要封装的类"><a href="#ATL主要封装的类" class="headerlink" title="ATL主要封装的类"></a>ATL主要封装的类</h3><p>ATL针对OLEDB封装的主要有这么几个重要的类：</p>
+<p>数据库对象</p>
+<ul>
+<li>CDataConnection 数据源连接类主要实现的是数据库的连接相关的功能，根据这个可以猜测出来它实际上封装的是OLEDB中的数据源对象和会话对象</li>
+<li>CDataSource：数据源对象</li>
+<li>CEnumerator: 架构结果集对象，主要用来查询数据库的相关信息，比如数据库中的表结构等信息</li>
+<li>CSession: 会话对象</li>
+</ul>
+<p>访问器对象：</p>
+<ul>
+<li>CAccessor: 常规的访问器对象</li>
+<li>CAccessorBase: 访问器对象的基类</li>
+<li>CDynamicAccessor：动态绑定的访问器</li>
+<li>CDynamicParamterAccessor:参数绑定的访问器,从之前博文的内容来看它应该是进行参数化查询等操作时使用的对象</li>
+<li>CDynamicStringAccessor:这个一般是要将查询结果显示为字符串时使用，它负责将数据库中的数据转化为字符串</li>
+</ul>
+<p>ALT中针对OLEDB的封装在头文件atldbcli.h中，在项目中只要包含它就行了</p>
+<h3 id="模板的使用"><a href="#模板的使用" class="headerlink" title="模板的使用"></a>模板的使用</h3><h4 id="静态绑定"><a href="#静态绑定" class="headerlink" title="静态绑定"></a>静态绑定</h4><p>针对静态绑定，VS提供了很好的向导程序帮助我们生成对应的类，方便了开发，使用的基本步骤如下:</p>
+<ol>
+<li>在项目上右键，选择添加类</li>
+<li>在类选择框中点击ATL并选择其中的ATL OLEDB使用者<br><img src="oledb-and-ado-16/%E9%80%89%E6%8B%A9OLEDB%E7%B1%BB.png" alt="选择OLEDB类"></li>
+<li>选择对应的数据源、数据库表和需要对数据库进行的操作<br><img src="oledb-and-ado-16/%E9%80%89%E6%8B%A9%E6%95%B0%E6%8D%AE%E5%BA%93.png" alt="选择数据源"><br>注意如果要对数据库表进行增删改查等操作，一定要选这里的表选项</li>
+<li>点击数据源配置数据源连接的相关属性，最后点击完成。</li>
+</ol>
+<p>最终会在项目中生成对应的头文件<br>这是最终生成的完整代码</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Caa26Accessor</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">  <span class="comment">//value</span></span><br><span class="line">	LONG m_aac031;</span><br><span class="line">	TCHAR m_aaa146[<span class="number">51</span>];</span><br><span class="line">	LONG m_aaa147;</span><br><span class="line">	LONG m_aaa148;</span><br><span class="line"><span class="comment">//status</span></span><br><span class="line">	DBSTATUS m_dwaac031Status;</span><br><span class="line">	DBSTATUS m_dwaaa146Status;</span><br><span class="line">	DBSTATUS m_dwaaa147Status;</span><br><span class="line">	DBSTATUS m_dwaaa148Status;</span><br><span class="line"><span class="comment">//lenth</span></span><br><span class="line">	DBLENGTH m_dwaac031Length;</span><br><span class="line">	DBLENGTH m_dwaaa146Length;</span><br><span class="line">	DBLENGTH m_dwaaa147Length;</span><br><span class="line">	DBLENGTH m_dwaaa148Length;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">void</span> <span class="title">GetRowsetProperties</span><span class="params">(CDBPropSet* pPropSet)</span></span></span><br><span class="line"><span class="function">	</span>&#123;</span><br><span class="line">		pPropSet-&gt;AddProperty(DBPROP_CANFETCHBACKWARDS, <span class="literal">true</span>, DBPROPOPTIONS_OPTIONAL);</span><br><span class="line">		pPropSet-&gt;AddProperty(DBPROP_CANSCROLLBACKWARDS, <span class="literal">true</span>, DBPROPOPTIONS_OPTIONAL);</span><br><span class="line">		pPropSet-&gt;AddProperty(DBPROP_IRowsetChange, <span class="literal">true</span>, DBPROPOPTIONS_OPTIONAL);</span><br><span class="line">		pPropSet-&gt;AddProperty(DBPROP_UPDATABILITY, DBPROPVAL_UP_CHANGE | DBPROPVAL_UP_INSERT | DBPROPVAL_UP_DELETE);</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="function">HRESULT <span class="title">OpenDataSource</span><span class="params">()</span></span></span><br><span class="line"><span class="function">	</span>&#123;</span><br><span class="line">		CDataSource _db;</span><br><span class="line">		HRESULT hr;</span><br><span class="line">		hr = _db.OpenFromInitializationString(<span class="string">L"Provider=SQLOLEDB.1;Persist Security Info=False;User ID=sa; Password=XXXXXX;Initial Catalog=study;Data Source=XXXX;Use Procedure for Prepare=1;Auto Translate=True;Packet Size=4096;Workstation ID=LIU-PC;Use Encryption for Data=False;Tag with column collation when possible=False"</span>);</span><br><span class="line">		<span class="keyword">if</span> (FAILED(hr))</span><br><span class="line">		&#123;</span><br><span class="line"><span class="meta">#<span class="meta-keyword">ifdef</span> _DEBUG</span></span><br><span class="line">			AtlTraceErrorRecords(hr);</span><br><span class="line"><span class="meta">#<span class="meta-keyword">endif</span></span></span><br><span class="line">			<span class="keyword">return</span> hr;</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">return</span> m_session.Open(_db);</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">void</span> <span class="title">CloseDataSource</span><span class="params">()</span></span></span><br><span class="line"><span class="function">	</span>&#123;</span><br><span class="line">		m_session.Close();</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">operator</span> <span class="keyword">const</span> CSession&amp;()</span><br><span class="line">	&#123;</span><br><span class="line">		<span class="keyword">return</span> m_session;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	CSession m_session;</span><br><span class="line"></span><br><span class="line">	DEFINE_COMMAND_EX(Caa26Accessor, <span class="string">L" \</span></span><br><span class="line"><span class="string">	SELECT \</span></span><br><span class="line"><span class="string">		aac031, \</span></span><br><span class="line"><span class="string">		aaa146, \</span></span><br><span class="line"><span class="string">		aaa147, \</span></span><br><span class="line"><span class="string">		aaa148 \</span></span><br><span class="line"><span class="string">		FROM dbo.aa26"</span>)</span><br><span class="line"></span><br><span class="line">	BEGIN_COLUMN_MAP(Caa26Accessor)</span><br><span class="line">		COLUMN_ENTRY_LENGTH_STATUS(<span class="number">1</span>, m_aac031, m_dwaac031Length, m_dwaac031Status)</span><br><span class="line">		COLUMN_ENTRY_LENGTH_STATUS(<span class="number">2</span>, m_aaa146, m_dwaaa146Length, m_dwaaa146Status)</span><br><span class="line">		COLUMN_ENTRY_LENGTH_STATUS(<span class="number">3</span>, m_aaa147, m_dwaaa147Length, m_dwaaa147Status)</span><br><span class="line">		COLUMN_ENTRY_LENGTH_STATUS(<span class="number">4</span>, m_aaa148, m_dwaaa148Length, m_dwaaa148Status)</span><br><span class="line">	END_COLUMN_MAP()</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Caa26</span> :</span> <span class="keyword">public</span> CCommand&lt;CAccessor&lt;Caa26Accessor&gt; &gt;</span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">	<span class="function">HRESULT <span class="title">OpenAll</span><span class="params">()</span></span></span><br><span class="line"><span class="function">	</span>&#123;</span><br><span class="line">		HRESULT hr;</span><br><span class="line">		hr = OpenDataSource();</span><br><span class="line">		<span class="keyword">if</span> (FAILED(hr))</span><br><span class="line">			<span class="keyword">return</span> hr;</span><br><span class="line">		__if_exists(GetRowsetProperties)</span><br><span class="line">		&#123;</span><br><span class="line">			<span class="function">CDBPropSet <span class="title">propset</span><span class="params">(DBPROPSET_ROWSET)</span></span>;</span><br><span class="line">			__if_exists(HasBookmark)</span><br><span class="line">			&#123;</span><br><span class="line">				<span class="keyword">if</span>( HasBookmark() )</span><br><span class="line">					propset.AddProperty(DBPROP_IRowsetLocate, <span class="literal">true</span>);</span><br><span class="line">			&#125;</span><br><span class="line">			GetRowsetProperties(&amp;propset);</span><br><span class="line">			<span class="keyword">return</span> OpenRowset(&amp;propset);</span><br><span class="line">		&#125;</span><br><span class="line">		__if_not_exists(GetRowsetProperties)</span><br><span class="line">		&#123;</span><br><span class="line">			__if_exists(HasBookmark)</span><br><span class="line">			&#123;</span><br><span class="line">				<span class="keyword">if</span>( HasBookmark() )</span><br><span class="line">				&#123;</span><br><span class="line">					<span class="function">CDBPropSet <span class="title">propset</span><span class="params">(DBPROPSET_ROWSET)</span></span>;</span><br><span class="line">					propset.AddProperty(DBPROP_IRowsetLocate, <span class="literal">true</span>);</span><br><span class="line">					<span class="keyword">return</span> OpenRowset(&amp;propset);</span><br><span class="line">				&#125;</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">return</span> OpenRowset();</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="function">HRESULT <span class="title">OpenRowset</span><span class="params">(DBPROPSET *pPropSet = <span class="literal">NULL</span>)</span></span></span><br><span class="line"><span class="function">	</span>&#123;</span><br><span class="line">		HRESULT hr = Open(m_session, <span class="literal">NULL</span>, pPropSet);</span><br><span class="line"><span class="meta">#<span class="meta-keyword">ifdef</span> _DEBUG</span></span><br><span class="line">		<span class="keyword">if</span>(FAILED(hr))</span><br><span class="line">			AtlTraceErrorRecords(hr);</span><br><span class="line"><span class="meta">#<span class="meta-keyword">endif</span></span></span><br><span class="line">		<span class="keyword">return</span> hr;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">void</span> <span class="title">CloseAll</span><span class="params">()</span></span></span><br><span class="line"><span class="function">	</span>&#123;</span><br><span class="line">		Close();</span><br><span class="line">		ReleaseCommand();</span><br><span class="line">		CloseDataSource();</span><br><span class="line">	&#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p>从名字上来看Caa26Accessor主要是作为一个访问器，其实它的功能也是与访问器相关的，比如创建访问器和数据绑定都在最后这个映射中。而后面的Caa26类主要是用来执行sql语句并根据上面的访问器类来解析数据，其实我们使用上主要使用后面这个类，这些代码都很简单，有之前的OLEDB基础很容易就能理解它们，这里就不再在这块进行展开了</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> _tmain(<span class="keyword">int</span> argc, TCHAR *argv)</span><br><span class="line">&#123;</span><br><span class="line">	CoInitialize(<span class="literal">NULL</span>);</span><br><span class="line">	Caa26 aa26;</span><br><span class="line">	HRESULT hRes = aa26.OpenDataSource();</span><br><span class="line">	<span class="keyword">if</span> (FAILED(hRes))</span><br><span class="line">	&#123;</span><br><span class="line">		aa26.CloseAll();</span><br><span class="line">		CoUninitialize();</span><br><span class="line">		<span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	hRes = aa26.OpenRowset();</span><br><span class="line">	<span class="keyword">if</span> (FAILED(hRes))</span><br><span class="line">	&#123;</span><br><span class="line">		aa26.CloseAll();</span><br><span class="line">		CoUninitialize();</span><br><span class="line">		<span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	hRes = aa26.MoveNext();</span><br><span class="line">	COM_USEPRINTF();</span><br><span class="line">	<span class="keyword">do</span></span><br><span class="line">	&#123;</span><br><span class="line">		COM_PRINTF(_T(<span class="string">"|%-30u|%-30s|%-30u|%-30u|\n"</span>), aa26.m_aac031, aa26.m_aaa146, aa26.m_aaa147, aa26.m_aaa148);</span><br><span class="line">		hRes = aa26.MoveNext();</span><br><span class="line">	&#125; <span class="keyword">while</span> (S_OK == hRes);</span><br><span class="line"></span><br><span class="line">	aa26.CloseAll();</span><br><span class="line">	CoUninitialize();</span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="动态绑定"><a href="#动态绑定" class="headerlink" title="动态绑定"></a>动态绑定</h4><p>动态绑定主要是使用模板对相关的类进行拼装，所以这里需要关于模板的相关知识，只有掌握了这些才能正确的拼接出合适的类。<br>一般需要拼接的是这样几个类</p>
+<ul>
+<li>结果集类，在结果集类的模板中填入对应的访问器类，表示该结果集将使用对应的访问器进行解析。访问器类可以系统预定义的，也向静态绑定那样自定义。</li>
+<li>Command类，在命令对象类的模板位置填入与命令相关的类，也就是执行命令生成的结果集、以及解析结果集所用的访问器，之后就主要使用Command类来进行数据库的相关操作了<br>下面是一个使用的示例</li>
+</ul>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> CCommand&lt;CDynamicAccessor, CRowset, CMultipleResults&gt; CComRowset;</span><br><span class="line"><span class="keyword">typedef</span> CTable&lt;CDynamicAccessor, CRowset&gt; CComTable;</span><br><span class="line"><span class="comment">//将所有绑定的数据类型转化为字符串</span></span><br><span class="line"><span class="keyword">typedef</span> CTable&lt;CDynamicStringAccessor, CRowset&gt; CComTableString;</span><br><span class="line"></span><br><span class="line"><span class="keyword">int</span> _tmain(<span class="keyword">int</span> argc, TCHAR *argv[])</span><br><span class="line">&#123;</span><br><span class="line">	CoInitialize(<span class="literal">NULL</span>);</span><br><span class="line">	COM_USEPRINTF();</span><br><span class="line">	<span class="comment">//连接数据库，创建session对象</span></span><br><span class="line">	CDataSource db;</span><br><span class="line">	db.Open();</span><br><span class="line">	CSession session;</span><br><span class="line">	session.Open(db);</span><br><span class="line"></span><br><span class="line">	<span class="comment">//打开数据库表</span></span><br><span class="line">	CComTableString table;</span><br><span class="line">	table.Open(session, OLESTR(<span class="string">"T_DecimalDemo"</span>));</span><br><span class="line">	HRESULT hRes = table.MoveFirst();</span><br><span class="line">	<span class="keyword">if</span> (FAILED(hRes))</span><br><span class="line">	&#123;</span><br><span class="line">		COM_PRINTF(_T(<span class="string">"表中没有数据,退出程序\n"</span>));</span><br><span class="line">		<span class="keyword">goto</span> __CLEAN_UP;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">do</span></span><br><span class="line">	&#123;</span><br><span class="line">    <span class="comment">//这里传入的参数是列的序号，注意一下，由于有第0列的行需要存在，所以真正的数据是从第一列开始的</span></span><br><span class="line">		COM_PRINTF(_T(<span class="string">"|%-10s|%-20s|%-20s|%-20s|\n"</span>), table.GetString(<span class="number">1</span>), table.GetString(<span class="number">2</span>), table.GetString(<span class="number">3</span>), table.GetString(<span class="number">4</span>));</span><br><span class="line">		hRes = table.MoveNext();</span><br><span class="line">	&#125; <span class="keyword">while</span> (S_OK == hRes);</span><br><span class="line"></span><br><span class="line">__CLEAN_UP:</span><br><span class="line">	CoUninitialize();</span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>在上面的代码中我们定义了两个模板类，Ctable和CCommand类，没有发现需要的访问器类，查看CTable类可以发现它是继承于CAccessorRowset，而CAccessorRowset继承于TAccessor和 TRowset,也就是说它提供了访问器的相关功能<br>而且它还可以使用OpenRowset方法不执行SQL直接打开数据表，因此在这里我们选择使用它<br>在CTable的模板中填入CDynamicStringAccessor表示将会把得到的结果集中的数据转化为字符串。<br>在使用上先使用CDataSource类的Open方法打开数据库连接，然后调用CTable的Open打开数据表，接着调用CTable的MoveFirst的方法将行句柄移动到首行。<br>接着在循环中调用table的GetString方法得到各个字段的字符串值，并调用MoveNext方法移动到下一行<br>其实在代码中并没有使用CCommand类，这是由于这里只是简单的使用直接打开数据表的方式，而并没有执行SQL语句，因此不需要它，在这里定义它只是简单的展示一下</p>
+<h2 id="ADO"><a href="#ADO" class="headerlink" title="ADO"></a>ADO</h2><p>ATL针对OLEDB封装的确是方便了不少，但是对于像我这种将C++简单的作为带对象的C来看的人来说，它使用模板实在是太不友好了，说实话现在我现在对模板的认识实在太少，在代码中我也尽量避免使用模板。所以在我看来使用ATL还不如自己根据项目封装一套。<br>好在微软实在太为开发者着想了，又提供了ADO这种针对ActiveX的封装方式。<br>要使用ADO组件需要先导入，导入的语句如下:</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#import <span class="meta-string">"C:\\Program Files\\Common Files\\System\\ado\\msado15.dll"</span> no_namespace rename(<span class="meta-string">"EOF"</span>, <span class="meta-string">"EndOfFile"</span>)</span></span><br></pre></td></tr></table></figure>
+<p>这个路径一般是不会变化的，而EOF在C++中一般是用在文件中的，所以这里将它rename一下<br>ADO中的主要对象和接口有:</p>
+<ul>
+<li>Connect ：数据库的连接对象，类似于OLEDB中的数据源对象和session对象</li>
+<li>Command：命令对象，用来执行sql语句，类似于OLEDB中的Command对象</li>
+<li>Recordset: 记录集对象，执行SQL语句返回的结果，类似于OLEDB中的结果集对象</li>
+<li>Record: 数据记录对象，一般都是从Recordset中取得，就好像OLEDB中从结果集对象通过访问器获取到具体的数据一样</li>
+<li>Field：记录中的一个字段，可以简单的看做就是一个表字段的值，一般一个记录集中有多条记录，而一条记录中有个Field对象</li>
+<li>Parameter：参数对象，一般用于参数化查询或者调用存储过程</li>
+<li>Property：属性，与之前OLEDB中的属性对应</li>
+<li>在ADO中大量使用智能指针，所谓的智能指针是它的生命周期结束后会自动析构它所指向的对象，同时也封装了一些常见指针操作，虽然它是这个对象但是它的使用上与普通的指针基本上相同。ADO中的智能指针对象一般是在类名后加上Ptr。比如Connect对象的智能指针对象是_ConnectPtr<br>智能指针有利也有弊，有利的地方在于它能够自动管理内存，不需要程序员进行额外的释放操作，而且它在使用上就像普通的指针，相比于使用类的普通指针更为方便，不利的地方在于为了方便它的使用一般都经过了大量的重载，因此很多地方表面上看是一个普通的寻址操作，而实际上却是一个函数调用，这样就降低了性能。所以在特别强调性能的场合要避免使用智能指针。<br>在使用上，一般经过这样几个步骤：</li>
+</ul>
+<ol>
+<li>定义数据库连接的Connect对象</li>
+<li>调用Connect对象的Open方法连接数据库，这里使用的连接字串的方式</li>
+<li>创建Command对象并调用对象Execute方法执行SQL，并获取对应的记录集。这里执行SQL语句也可以使用Recordset对象的Open方法。</li>
+<li>循环调用Recordse对象的MoveNext不断取出对应行的行记录</li>
+</ol>
+<p>下面是一个使用的简单例子</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#import <span class="meta-string">"C:\\Program Files\\Common Files\\System\\ado\\msado15.dll"</span> no_namespace rename(<span class="meta-string">"EOF"</span>, <span class="meta-string">"EndOfFile"</span>)</span></span><br><span class="line"><span class="keyword">int</span> _tmain(<span class="keyword">int</span> argc, TCHAR *argv[])</span><br><span class="line">&#123;</span><br><span class="line">	CoInitialize(<span class="literal">NULL</span>);</span><br><span class="line">	_ConnectionPtr conn;</span><br><span class="line">	_RecordsetPtr rowset;</span><br><span class="line">	<span class="keyword">_bstr_t</span> bstrConn = _T(<span class="string">"Provider=SQLOLEDB.1;Persist Security Info=False;User ID=sa;Password = 123456;Initial Catalog=Study;Data Source=LIU-PC\\SQLEXPRESS;"</span>);</span><br><span class="line">	conn.CreateInstance(_T(<span class="string">"ADODB.Connection"</span>));</span><br><span class="line"></span><br><span class="line">	conn-&gt;Open(bstrConn, _T(<span class="string">"sa"</span>), _T(<span class="string">"123456"</span>), adModeUnknown);</span><br><span class="line">	<span class="keyword">if</span> (conn-&gt;State)</span><br><span class="line">	&#123;</span><br><span class="line">		COM_PRINTF(_T(<span class="string">"连接到数据源成功\n"</span>));</span><br><span class="line">	&#125;<span class="keyword">else</span></span><br><span class="line">	&#123;</span><br><span class="line">		COM_PRINTF(_T(<span class="string">"连接到数据源失败\n"</span>));</span><br><span class="line">		<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	rowset.CreateInstance(__uuidof(Recordset));</span><br><span class="line">	rowset-&gt;Open(_T(<span class="string">"select * from aa26;"</span>), conn.GetInterfacePtr(), adOpenStatic, adLockOptimistic, adCmdText);</span><br><span class="line">	<span class="keyword">while</span> (!rowset-&gt;EndOfFile)</span><br><span class="line">	&#123;</span><br><span class="line">		COM_PRINTF(_T(<span class="string">"|%-30u|%-30s|%-30u|%-30u|\n"</span>),</span><br><span class="line">			rowset-&gt;Fields-&gt;GetItem(_T(<span class="string">"aac031"</span>))-&gt;Value.intVal,</span><br><span class="line">			rowset-&gt;Fields-&gt;GetItem(_T(<span class="string">"aaa146"</span>))-&gt;Value.bstrVal,</span><br><span class="line">			rowset-&gt;Fields-&gt;GetItem(_T(<span class="string">"aaa147"</span>))-&gt;Value.llVal,</span><br><span class="line">			rowset-&gt;Fields-&gt;GetItem(_T(<span class="string">"aaa148"</span>))-&gt;Value.llVal</span><br><span class="line">			);</span><br><span class="line">		rowset-&gt;MoveNext();</span><br><span class="line">	&#125;</span><br><span class="line">	CoUninitialize();</span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="ADO与OLEDB混合编程"><a href="#ADO与OLEDB混合编程" class="headerlink" title="ADO与OLEDB混合编程"></a>ADO与OLEDB混合编程</h2><p>ADO相比较OLEDB来说确实方便了不少，但是它也有它的问题，比如它是封装的ActiveX控件，从效率上肯定比不上OLEDB，而且ADO中记录集是一次性将结果中的所有数据加载到内存中，如果数据表比教大时这种方式很吃内存。而OLEDB是每次调用GetNextRow时加载一条记录到内存（其实根据之前的代码可以知道它加载的时机，加载的大小是可以控制的），它相对来说比教灵活。<br>其实上述问题使用二者的混合编程就可以很好的解决，在处理结果集时使用OLEDB，而在其他操作时使用ADO这样既保留了ADO的简洁性也使用了OLEDB灵活管理结果集内存的能力。<br>在ADO中，可以通过_Recordset查询出ADORecordsetConstruction接口，这个接口提供了将记录集转化为OLEDB中结果集，以及将结果集转化为Recordset对象的能力<br>下面是一个简单的例子</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br></pre></td><td class="code"><pre><span class="line">CoInitialize(<span class="literal">NULL</span>);</span><br><span class="line"> <span class="keyword">try</span></span><br><span class="line"> &#123;        </span><br><span class="line">     <span class="function"><span class="keyword">_bstr_t</span> <span class="title">bsCnct</span><span class="params">(_T(<span class="string">"Provider=SQLOLEDB.1;Persist Security Info=False;User ID=sa;Password = 123456;Initial Catalog=Study;Data Source=LIU-PC\\SQLEXPRESS;"</span>))</span></span>;</span><br><span class="line">     <span class="function">_RecordsetPtr  <span class="title">Rowset</span><span class="params">(__uuidof(Recordset))</span></span>;</span><br><span class="line"></span><br><span class="line">     Rowset-&gt;Open(_T(<span class="string">"select * from aa26;"</span>)</span><br><span class="line">         ,bsCnct,adOpenStatic,adLockOptimistic,adCmdText);</span><br><span class="line"></span><br><span class="line">     <span class="comment">//获取IRowset接口指针</span></span><br><span class="line">     ADORecordsetConstruction* padoRecordsetConstruct = <span class="literal">NULL</span>;</span><br><span class="line">     Rowset-&gt;QueryInterface(__uuidof(ADORecordsetConstruction),</span><br><span class="line">         (<span class="keyword">void</span> **) &amp;padoRecordsetConstruct);</span><br><span class="line">     IRowset * pIRowset = <span class="literal">NULL</span>;</span><br><span class="line">     padoRecordsetConstruct-&gt;get_Rowset((IUnknown **)&amp;pIRowset);</span><br><span class="line">     padoRecordsetConstruct-&gt;Release();</span><br><span class="line"></span><br><span class="line">     DisplayRowSet(pIRowset);</span><br><span class="line"></span><br><span class="line">     pIRowset-&gt;Release();</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">     GRS_PRINTF(_T(<span class="string">"\n\n显示第二个结果集:\n"</span>));</span><br><span class="line"></span><br><span class="line">     <span class="comment">//使用OLEDB方法打开一个结果集</span></span><br><span class="line">     IOpenRowset*			pIOpenRowset				= <span class="literal">NULL</span>;</span><br><span class="line">     TCHAR*					pszTableName				= _T(<span class="string">"T_State"</span>);</span><br><span class="line">     DBID					TableID						= &#123;&#125;;</span><br><span class="line"></span><br><span class="line">     CreateDBSession(pIOpenRowset);</span><br><span class="line"></span><br><span class="line">     TableID.eKind           = DBKIND_NAME;</span><br><span class="line">     TableID.uName.pwszName  = (LPOLESTR)pszTableName;</span><br><span class="line"></span><br><span class="line">     HRESULT hr = pIOpenRowset-&gt;OpenRowset(<span class="literal">NULL</span>,&amp;TableID,<span class="literal">NULL</span>,IID_IRowset,<span class="number">0</span>,<span class="literal">NULL</span>,(IUnknown**)&amp;pIRowset);</span><br><span class="line">     <span class="keyword">if</span>(FAILED(hr))</span><br><span class="line">     &#123;</span><br><span class="line">         _com_raise_error(hr);</span><br><span class="line">     &#125;</span><br><span class="line">     <span class="comment">//创建一个新的ADO记录集对象</span></span><br><span class="line">     <span class="function">_RecordsetPtr  <span class="title">Rowset2</span><span class="params">(__uuidof(Recordset))</span></span>;</span><br><span class="line">     Rowset2-&gt;QueryInterface(__uuidof(ADORecordsetConstruction),</span><br><span class="line">         (<span class="keyword">void</span> **) &amp;padoRecordsetConstruct);</span><br><span class="line">     <span class="comment">//将OLEDB的结果集放置到ADO记录集对象中</span></span><br><span class="line">     padoRecordsetConstruct-&gt;put_Rowset(pIRowset);</span><br><span class="line">     ULONG ulRow = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">     <span class="keyword">while</span>(!Rowset2-&gt;EndOfFile)</span><br><span class="line">     &#123;</span><br><span class="line">         COM_PRINTF(_T(<span class="string">"|%10u|%10s|%-40s|\n"</span>)</span><br><span class="line">             ,++ulRow</span><br><span class="line">             ,Rowset2-&gt;Fields-&gt;GetItem(<span class="string">"K_StateCode"</span>)-&gt;Value.bstrVal</span><br><span class="line">             ,Rowset2-&gt;Fields-&gt;GetItem(<span class="string">"F_StateName"</span>)-&gt;Value.bstrVal);</span><br><span class="line"></span><br><span class="line">         Rowset2-&gt;MoveNext();</span><br><span class="line">     &#125;</span><br><span class="line"> &#125;</span><br><span class="line"> <span class="keyword">catch</span>(_com_error &amp; e)</span><br><span class="line"> &#123;</span><br><span class="line">     COM_PRINTF(_T(<span class="string">"发生错误:\n Source : %s \n Description : %s \n"</span>)</span><br><span class="line">         ,(LPCTSTR)e.Source(),(LPCTSTR)e.Description());</span><br><span class="line"> &#125;</span><br><span class="line"></span><br><span class="line"> _tsystem(_T(<span class="string">"PAUSE"</span>));</span><br><span class="line"> CoUninitialize();</span><br><span class="line"> <span class="keyword">return</span> <span class="number">0</span>;</span><br></pre></td></tr></table></figure>
+<p>这次就不再放上整体例子的链接了，有之前的基础应该很容易看懂这些，而且这次代码比较短，基本上将所有代码全粘贴了过来。</p>
+<hr />
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+      <div>
+        <div style="padding: 10px 0; margin: 20px auto; width: 90%; text-align: center;">
+  <div></div>
+  <button id="rewardButton" disable="enable" onclick="var qr = document.getElementById('QR'); if (qr.style.display === 'none') {qr.style.display='block';} else {qr.style.display='none'}">
+    <span>打赏</span>
+  </button>
+  <div id="QR" style="display: none;">
+
+    
+      <div id="wechat" style="display: inline-block">
+        <img id="wechat_qr" src="/images/wechatreward.png" alt="Masimaro 微信支付"/>
+        <p>微信支付</p>
+      </div>
+    
+
+    
+      <div id="alipay" style="display: inline-block">
+        <img id="alipay_qr" src="/images/alipayreward.png" alt="Masimaro 支付宝"/>
+        <p>支付宝</p>
+      </div>
+    
+
+    
+
+  </div>
+</div>
+
+      </div>
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/VC/" rel="tag"><i class="fa fa-tag"></i> VC++</a>
+          
+            <a href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93/" rel="tag"><i class="fa fa-tag"></i> 数据库</a>
+          
+            <a href="/tags/OLEDB/" rel="tag"><i class="fa fa-tag"></i> OLEDB</a>
+          
+            <a href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93%E7%BC%96%E7%A8%8B/" rel="tag"><i class="fa fa-tag"></i> 数据库编程</a>
+          
+            <a href="/tags/ATL/" rel="tag"><i class="fa fa-tag"></i> ATL</a>
+          
+            <a href="/tags/ADO/" rel="tag"><i class="fa fa-tag"></i> ADO</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/oledb-and-ado-15.html" rel="next" title="OLEDB事务">
+                <i class="fa fa-chevron-left"></i> OLEDB事务
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/fbspider.html" rel="prev" title="Facebook 爬虫">
+                Facebook 爬虫 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        
+  <div class="bdsharebuttonbox">
+    <a href="#" class="bds_tsina" data-cmd="tsina" title="分享到新浪微博"></a>
+    <a href="#" class="bds_douban" data-cmd="douban" title="分享到豆瓣网"></a>
+    <a href="#" class="bds_sqq" data-cmd="sqq" title="分享到QQ好友"></a>
+    <a href="#" class="bds_qzone" data-cmd="qzone" title="分享到QQ空间"></a>
+    <a href="#" class="bds_weixin" data-cmd="weixin" title="分享到微信"></a>
+    <a href="#" class="bds_tieba" data-cmd="tieba" title="分享到百度贴吧"></a>
+    <a href="#" class="bds_twi" data-cmd="twi" title="分享到Twitter"></a>
+    <a href="#" class="bds_fbook" data-cmd="fbook" title="分享到Facebook"></a>
+    <a href="#" class="bds_more" data-cmd="more"></a>
+    <a class="bds_count" data-cmd="count"></a>
+  </div>
+  <script>
+    window._bd_share_config = {
+      "common": {
+        "bdText": "",
+        "bdMini": "2",
+        "bdMiniList": false,
+        "bdPic": ""
+      },
+      "share": {
+        "bdSize": "16",
+        "bdStyle": "0"
+      },
+      "image": {
+        "viewList": ["tsina", "douban", "sqq", "qzone", "weixin", "twi", "fbook"],
+        "viewText": "分享到：",
+        "viewSize": "16"
+      }
+    }
+  </script>
+
+<script>
+  with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='//bdimg.share.baidu.com/static/api/js/share.js?cdnversion='+~(-new Date()/36e5)];
+</script>
+
+      
+	  
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      <div id="disqus_thread">
+        <noscript>
+          Please enable JavaScript to view the
+          <a href="https://disqus.com/?ref_noscript" target="_blank" rel="noopener">comments powered by Disqus.</a>
+        </noscript>
+      </div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/avatar.jpg"
+                alt="Masimaro" />
+            
+              <p class="site-author-name" itemprop="name">Masimaro</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/%20%7C%7C%20archive">
+              
+                  <span class="site-state-item-count">94</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">18</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">141</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          <div class="links-of-author motion-element">
+            
+              
+                <span class="links-of-author-item">
+                  <a href="https://github.com/aMonst" target="_blank" title="GitHub">
+                    
+                      <i class="fa fa-fw fa-globe"></i>GitHub</a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="http://weibo.com/your-user-name" target="_blank" title="微博">
+                    
+                      <i class="fa fa-fw fa-globe"></i>微博</a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="http://blog.csdn.net/lanuage" target="_blank" title="CSDN博客">
+                    
+                      <i class="fa fa-fw fa-globe"></i>CSDN博客</a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="http://www.jianshu.com/u/7261ff9df286" target="_blank" title="简书">
+                    
+                      <i class="fa fa-fw fa-globe"></i>简书</a>
+                </span>
+              
+            
+          </div>
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#ATL-模板中的OLEDB"><span class="nav-number">1.</span> <span class="nav-text">ATL 模板中的OLEDB</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#ATL主要封装的类"><span class="nav-number">1.1.</span> <span class="nav-text">ATL主要封装的类</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#模板的使用"><span class="nav-number">1.2.</span> <span class="nav-text">模板的使用</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#静态绑定"><span class="nav-number">1.2.1.</span> <span class="nav-text">静态绑定</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#动态绑定"><span class="nav-number">1.2.2.</span> <span class="nav-text">动态绑定</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ADO"><span class="nav-number">2.</span> <span class="nav-text">ADO</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ADO与OLEDB混合编程"><span class="nav-number">3.</span> <span class="nav-text">ADO与OLEDB混合编程</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love" id="heart">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Masimaro</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io" rel="external nofollow">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next" rel="external nofollow">NexT.Mist</a> v5.1.3</div>
+
+
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv">
+      <i class="fa fa-user">本次访客数</i>
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+      人次
+    </span>
+  
+
+  
+    <span class="site-pv">
+      <i class="fa fa-eye">本站总访问量</i>
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+      次
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.3"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.3"></script>
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.3"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.3"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.3"></script>
+
+
+
+  
+
+
+  
+
+    
+      <script id="dsq-count-scr" src="https://masimaroweb.disqus.com/count.js" async></script>
+    
+
+    
+      <script type="text/javascript">
+        var disqus_config = function () {
+          this.page.url = 'http://www.masimaroweb.com/oledb-and-ado-16.html';
+          this.page.identifier = 'oledb-and-ado-16.html';
+          this.page.title = 'ATL模板库中的OLEDB与ADO';
+        };
+        var d = document, s = d.createElement('script');
+        s.src = 'https://masimaroweb.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', '' + +new Date());
+        (d.head || d.body).appendChild(s);
+      </script>
+    
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+  
+
+
+  
+
+  
+
+</body>
+</html>
+
+<!-- 页面点击小红心 -->
+<script type="text/javascript" src="/js/src/love.js"></script>

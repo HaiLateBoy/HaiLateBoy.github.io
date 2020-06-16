@@ -1,0 +1,1366 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<script src="//cdn.bootcss.com/pace/1.0.2/pace.min.js"></script>
+<link href="//cdn.bootcss.com/pace/1.0.2/themes/pink/pace-theme-flash.css" rel="stylesheet">
+<style>
+    .pace .pace-progress {
+        background: #1E92FB; /*进度条颜色*/
+        height: 3px;
+    }
+    .pace .pace-progress-inner {
+         box-shadow: 0 0 10px #1E92FB, 0 0 5px     #1E92FB; /*阴影颜色*/
+    }
+    .pace .pace-activity {
+        border-top-color: #1E92FB;    /*上边框颜色*/
+        border-left-color: #1E92FB;    /*左边框颜色*/
+    }
+</style>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.3" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.3">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.3">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.3">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.3" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="C++ 调用Python3" />
+
+
+
+
+  
+
+
+  <link rel="alternate" href="/atom.xml" title="Masimaro's blog" type="application/atom+xml" />
+
+
+
+
+
+
+<meta name="description" content="作为一种胶水语言，Python 能够很容易地调用 C 、 C++ 等语言，也能够通过其他语言调用 Python 的模块。 Python 提供了 C++ 库，使得开发者能很方便地从 C++ 程序中调用 Python 模块。 具体操作可以参考: 官方文档">
+<meta property="og:type" content="article">
+<meta property="og:title" content="C++ 调用Python3">
+<meta property="og:url" content="http://www.masimaroweb.com/c-call-python.html">
+<meta property="og:site_name" content="Masimaro&#39;s blog">
+<meta property="og:description" content="作为一种胶水语言，Python 能够很容易地调用 C 、 C++ 等语言，也能够通过其他语言调用 Python 的模块。 Python 提供了 C++ 库，使得开发者能很方便地从 C++ 程序中调用 Python 模块。 具体操作可以参考: 官方文档">
+<meta property="article:published_time" content="2018-07-29T11:11:55.000Z">
+<meta property="article:modified_time" content="2018-08-04T05:37:26.424Z">
+<meta property="article:author" content="Masimaro">
+<meta property="article:tag" content="C++ 调用Python3">
+<meta name="twitter:card" content="summary">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.3',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+
+  <link rel="canonical" href="http://www.masimaroweb.com/c-call-python.html"/>
+
+
+
+
+
+  <title>C++ 调用Python3 | Masimaro's blog</title>
+  
+
+
+
+
+
+
+
+
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Masimaro's blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <h1 class="site-subtitle" itemprop="description"></h1>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="搜索..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://www.masimaroweb.com/c-call-python.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Masimaro">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Masimaro's blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h2 class="post-title" itemprop="name headline">C++ 调用Python3</h2>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-07-29T19:11:55+08:00">
+                2018-07-29
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/C-%E8%AF%AD%E8%A8%80/" itemprop="url" rel="index">
+                    <span itemprop="name">C 语言</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/c-call-python.html#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="c-call-python.html" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="page-pv"><i class="fa fa-file-o">本文总阅读量</i>
+            <span class="busuanzi-value" id="busuanzi_value_page_pv" ></span>次
+            </span>
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>作为一种胶水语言，Python 能够很容易地调用 C 、 C++ 等语言，也能够通过其他语言调用 Python 的模块。</p>
+<p>Python 提供了 C++ 库，使得开发者能很方便地从 C++ 程序中调用 Python 模块。</p>
+<p>具体操作可以参考: <a href="https://docs.python.org/2/extending/embedding.html" target="_blank" rel="noopener">官方文档</a></p>
+<a id="more"></a>
+<p>在调用Python模块时需要如下步骤:</p>
+<ol>
+<li>初始化Python调用环境</li>
+<li>加载对应的Python模块</li>
+<li>加载对应的Python函数</li>
+<li>将参数转化为Python元组类型</li>
+<li>调用Python函数并传入参数元组</li>
+<li>获取返回值</li>
+<li>根据Python函数的定义解析返回值</li>
+</ol>
+<h2 id="初始化"><a href="#初始化" class="headerlink" title="初始化"></a>初始化</h2><p>在调用Python模块时需要首先包含Python.h头文件，这个头文件一般在安装的Python目录中的 include文件中，所在VS中首先需要将这个路径加入到项目中</p>
+<p>包含完成之后可能会抱一个错误：找不到 inttypes.h文件，在个错误在Windows平台上很常见，如果报这个错误，需要去网上下载对应的inttypes.h文件然后放入到对应的目录中即可，我这放到VC的include目录中</p>
+<p>在包含这些文件完成之后可能还会抱一个错误，未找到Python36_d.lib 在Python环境中确实找不到这个文件，这个时候可以修改pyconfig.h文件，将这个lib改为python36.lib，具体操作请参考这个链接: <a href="https://blog.csdn.net/Chris_zhangrx/article/details/78947526" target="_blank" rel="noopener">https://blog.csdn.net/Chris_zhangrx/article/details/78947526</a></p>
+<p>还有一点要注意，下载的Python环境必须的与目标程序的类型相同，比如你在VS 中新建一个Win32项目，在引用Python环境的时候就需要引用32位版本的Python</p>
+<p>这些准备工作做完后在调用Python前先调用Py_Initialize 函数来初始化Python环境，之后我们可以调用Py_IsInitialized来检测Python环境是否初始化成功<br>下面是一个初始化Python环境的例子</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">BOOL <span class="title">Init</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	Py_Initialize();</span><br><span class="line"></span><br><span class="line">	<span class="keyword">return</span> Py_IsInitialized();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="调用Python模块"><a href="#调用Python模块" class="headerlink" title="调用Python模块"></a>调用Python模块</h2><p>调用Python模块可以简单的调用Python语句也可以调用Python模块中的函数。</p>
+<h3 id="简单调用Python语句"><a href="#简单调用Python语句" class="headerlink" title="简单调用Python语句"></a>简单调用Python语句</h3><p>针对简单的Python语句（就好像我们在Python的交互式环境中输入的一条语句那样），可以直接调用 <code>PyRun_SimpleString</code> 函数来执行， 这个函数需要一个Python语句的ANSI字符串作为参数，返回int型的值。如果为0表示执行成功否则为失败</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">ChangePyWorkPath</span><span class="params">(LPCTSTR lpWorkPath)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	TCHAR szWorkPath[MAX_PATH + <span class="number">64</span>] = _T(<span class="string">""</span>);</span><br><span class="line">	StringCchCopy(szWorkPath, MAX_PATH + <span class="number">64</span>, _T(<span class="string">"sys.path.append(\""</span>));</span><br><span class="line">	StringCchCat(szWorkPath, MAX_PATH + <span class="number">64</span>, lpWorkPath);</span><br><span class="line">	StringCchCat(szWorkPath, MAX_PATH + <span class="number">64</span>, _T(<span class="string">"\")"</span>));</span><br><span class="line"></span><br><span class="line">	PyRun_SimpleString(<span class="string">"import sys"</span>);</span><br><span class="line">	USES_CONVERSION;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">int</span> nRet = PyRun_SimpleString(T2A(szWorkPath));</span><br><span class="line">	<span class="keyword">if</span> (nRet != <span class="number">0</span>)</span><br><span class="line">	&#123;</span><br><span class="line">		<span class="keyword">return</span>;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这个函数主要用来将传入的路径加入到当前Python的执行环境中，以便可以很方便的导入我们的自定义模块<br>函数首先通过字符串拼接的方式组织了一个 “sys.path.append(‘path’)” 这样的字符串，其中path是我们传进来的参数，然后调用PyRun_SimpleString执行Python的”import sys”语句来导入sys模块，接着执行之前拼接的语句，将对应路径加入到Python环境中</p>
+<h3 id="调用Python模块中的函数"><a href="#调用Python模块中的函数" class="headerlink" title="调用Python模块中的函数"></a>调用Python模块中的函数</h3><p>调用Python模块中的函数需要执行之前说的2~7的步骤</p>
+<ol>
+<li><p>加载Python模块(自定义模块)</p>
+<p>加载Python的模块需要调用 <code>PyImport_ImportModule</code> 这个函数需要传入一个模块的名称作为参数，注意：这里需要传入的是模块的名称也就是py文件的名称，不能带.py后缀。</p>
+<p>这个函数会返回一个Python对象的指针，在C++中表示为PyObject。这里返回模块的对象指针</p>
+</li>
+<li><p>然后调用 <code>PyObject_GetAttrString</code> 函数来加载对应的Python模块中的方法，这个函数需要两个参数，第一个是之前获取到的对应模块的指针，第二个参数是函数名称的ANSI字符串。这个函数会返回一个对应Python函数的对象指针。后面需要利用这个指针来调用Python函数</p>
+<p>获取到函数的指针之后我们可以调用 <code>PyCallable_Check</code> 来检测一下对应的对象是否可以被调用，如果能被调用这个函数会返回true否则返回false</p>
+</li>
+<li><p>接着就是传入参数了，Python中函数的参数以元组的方式传入的，所以这里需要先将要传入的参数转化为元组，然后调用 <code>PyObject_CallObject</code> 函数来执行对应的Python函数。这个函数需要两个参数第一个是上面Python函数对象的指针，第二个参数是需要传入Python函数中的参数组成的元组。函数会返回Python的元组对象，这个元组就是Python函数的返回值</p>
+</li>
+<li><p>获取到返回值之后就是解析参数了，我们可以使用对应的函数将Python元组转化为C++中的变量</p>
+</li>
+<li><p>最后需要调用 <code>Py_DECREF</code> 来解除Python对象的引用，以便Python的垃圾回收器能正常的回收这些对象的内存</p>
+</li>
+</ol>
+<p>下面是一个传入空参数的例子</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">GetModuleInformation</span><span class="params">(IN LPCTSTR lpPyFileName, OUT LPTSTR lpVulName, OUT <span class="keyword">long</span>&amp; level)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	USES_CONVERSION;</span><br><span class="line"></span><br><span class="line">	PyObject *pModule = PyImport_ImportModule(T2A(lpPyFileName)); <span class="comment">//加载模块</span></span><br><span class="line">	<span class="keyword">if</span> (<span class="literal">NULL</span> == pModule)</span><br><span class="line">	&#123;</span><br><span class="line">		g_OutputString(_T(<span class="string">"加载模块[%s]失败"</span>), lpPyFileName);</span><br><span class="line">		<span class="keyword">goto</span> __CLEAN_UP;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	PyObject *pGetInformationFunc = PyObject_GetAttrString(pModule, <span class="string">"getInformation"</span>); <span class="comment">// 加载模块中的函数</span></span><br><span class="line">	<span class="keyword">if</span> (<span class="literal">NULL</span> == pGetInformationFunc || !PyCallable_Check(pGetInformationFunc))</span><br><span class="line">	&#123;</span><br><span class="line">		g_OutputString(_T(<span class="string">"加载函数[%s]失败"</span>), _T(<span class="string">"getInformation"</span>));</span><br><span class="line">		<span class="keyword">goto</span> __CLEAN_UP;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	PyObject *PyResult = PyObject_CallObject(pGetInformationFunc, <span class="literal">NULL</span>);</span><br><span class="line">	<span class="keyword">if</span> (<span class="literal">NULL</span> != PyResult)</span><br><span class="line">	&#123;</span><br><span class="line">		PyObject *pVulNameObj = PyTuple_GetItem(PyResult, <span class="number">0</span>);</span><br><span class="line">		PyObject *pVulLevelObj = PyTuple_GetItem(PyResult, <span class="number">1</span>);</span><br><span class="line"></span><br><span class="line">		<span class="comment">//获取漏洞的名称信息</span></span><br><span class="line">		<span class="keyword">int</span> nStrSize = <span class="number">0</span>;</span><br><span class="line">		LPTSTR pVulName = PyUnicode_AsWideCharString(pVulNameObj, &amp;nStrSize);</span><br><span class="line">		StringCchCopy(lpVulName, MAX_PATH, pVulName);</span><br><span class="line">		PyMem_Free(pVulName);</span><br><span class="line"></span><br><span class="line">		<span class="comment">//获取漏洞的危险等级</span></span><br><span class="line">		level = PyLong_AsLong(pVulLevelObj);</span><br><span class="line"></span><br><span class="line">		Py_DECREF(pVulNameObj);</span><br><span class="line">		Py_DECREF(pVulLevelObj);</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="comment">//解除Python对象的引用, 以便Python进行垃圾回收</span></span><br><span class="line">__CLEAN_UP:</span><br><span class="line">	Py_DECREF(pModule);</span><br><span class="line">	Py_DECREF(pGetInformationFunc);</span><br><span class="line">	Py_DECREF(PyResult);</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在示例中调用了一个叫 getInformation 的函数，这个函数的定义如下:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">getInformation</span><span class="params">()</span>:</span></span><br><span class="line">    <span class="keyword">return</span> <span class="string">"测试脚本"</span>, <span class="number">1</span></span><br></pre></td></tr></table></figure>
+
+<p>下面是一个需要传入参数的函数调用</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">BOOL <span class="title">CallScanMethod</span><span class="params">(IN LPPYTHON_MODULES_DATA pPyModule, IN LPCTSTR lpUrl, IN LPCTSTR lpRequestMethod, OUT LPTSTR lpHasVulUrl, <span class="keyword">int</span> BuffSize)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	USES_CONVERSION;</span><br><span class="line">	<span class="comment">//加载模块</span></span><br><span class="line">	PyObject* pModule = PyImport_ImportModule(T2A(pPyModule-&gt;szModuleName));</span><br><span class="line">	<span class="keyword">if</span> (<span class="literal">NULL</span> == pModule)</span><br><span class="line">	&#123;</span><br><span class="line">		g_OutputString(_T(<span class="string">"加载模块[%s]失败!!!"</span>), pPyModule-&gt;szModuleName);</span><br><span class="line">		<span class="keyword">return</span> FALSE;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="comment">//加载模块</span></span><br><span class="line">	PyObject *pyScanMethod = PyObject_GetAttrString(pModule, <span class="string">"startScan"</span>);</span><br><span class="line">	<span class="keyword">if</span> (<span class="literal">NULL</span> == pyScanMethod || !PyCallable_Check(pyScanMethod))</span><br><span class="line">	&#123;</span><br><span class="line">		Py_DECREF(pModule);</span><br><span class="line">		g_OutputString(_T(<span class="string">"加载函数[%s]失败!!!"</span>), _T(<span class="string">"startScan"</span>));</span><br><span class="line">		<span class="keyword">return</span> FALSE;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="comment">//加载参数</span></span><br><span class="line">	PyObject* pArgs = Py_BuildValue(<span class="string">"ss"</span>, T2A(lpUrl), T2A(lpRequestMethod));</span><br><span class="line"></span><br><span class="line">	PyObject *pRes = PyObject_CallObject(pyScanMethod, pArgs);</span><br><span class="line">	Py_DECREF(pArgs);</span><br><span class="line"></span><br><span class="line">	<span class="keyword">if</span> (<span class="literal">NULL</span> == pRes)</span><br><span class="line">	&#123;</span><br><span class="line">		g_OutputString(_T(<span class="string">"调用函数[%s]失败!!!!"</span>), _T(<span class="string">"startScan"</span>));</span><br><span class="line">		<span class="keyword">return</span> FALSE;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="comment">//如果是元组，那么Python脚本返回的是两个参数，证明发现漏洞</span></span><br><span class="line">	<span class="keyword">if</span> (PyTuple_Check(pRes))</span><br><span class="line">	&#123;</span><br><span class="line">		PyObject* pHasVul = PyTuple_GetItem(pRes, <span class="number">0</span>);</span><br><span class="line">		<span class="keyword">long</span> bHasVul = PyLong_AsLong(pHasVul);</span><br><span class="line">		Py_DECREF(pHasVul);</span><br><span class="line"></span><br><span class="line">		<span class="keyword">if</span> (bHasVul != <span class="number">0</span>)</span><br><span class="line">		&#123;</span><br><span class="line">			PyObject* pyUrl = PyTuple_GetItem(pRes, <span class="number">1</span>);</span><br><span class="line">			<span class="keyword">int</span> nSize = <span class="number">0</span>;</span><br><span class="line">			LPWSTR pszUrl = PyUnicode_AsWideCharString(pyUrl, &amp;nSize);</span><br><span class="line">			Py_DECREF(pyUrl);</span><br><span class="line"></span><br><span class="line">			StringCchCopy(lpHasVulUrl, BuffSize, pszUrl);</span><br><span class="line">			PyMem_Free(pszUrl);</span><br><span class="line"></span><br><span class="line">			<span class="keyword">return</span> TRUE;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	Py_DECREF(pRes);</span><br><span class="line">	<span class="keyword">return</span> FALSE;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>对应的Python函数如下:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">startScan</span><span class="params">(url, method)</span>:</span></span><br><span class="line">    <span class="keyword">if</span>(method == <span class="string">"GET"</span>):</span><br><span class="line">	    response = requests.get(url)</span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        response = requests.post(url)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> response.status_code == <span class="number">200</span>:</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">True</span>, url</span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">False</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="C-数据类型与Python对象的相互转化"><a href="#C-数据类型与Python对象的相互转化" class="headerlink" title="C++数据类型与Python对象的相互转化"></a>C++数据类型与Python对象的相互转化</h2><p>Python与C++结合的一个关键的内容就是C++与Python数据类型的相互转化，针对这个问题Python提供了一系列的函数。</p>
+<p>这些函数的格式为PyXXX_AsXXX 或者PyXXX_FromXXX,一般带有As的是将Python对象转化为C++数据类型的，而带有From的是将C++对象转化为Python，Py前面的XXX表示的是Python中的数据类型。比如 <code>PyUnicode_AsWideCharString</code> 是将Python中的字符串转化为C++中宽字符，而 <code>Pyunicode_FromWideChar</code> 是将C++的字符串转化为Python中的字符串。这里需要注意一个问题就是Python3废除了在2中的普通的字符串，它将所有字符串都当做Unicode了，所以在调用3的时候需要将所有字符串转化为Unicode的形式而不是像之前那样转化为String。具体的转化类型请参考Python官方的说明。</p>
+<p>上面介绍了基本数据类型的转化，除了这些Python中也有一些容器类型的数据，比如元组，字典等等。下面主要说说元组的操作。元组算是比较重要的操作，因为在调用函数的时候需要元组传参并且需要解析以便获取元组中的值。</p>
+<ol>
+<li><p>创建Python的元组对象</p>
+<p>创建元组对象可以使用 <code>PyTuple_New</code> 来创建一个元组的对象，这个函数需要一个参数用来表示元组中对象的个数。</p>
+<p>之后需要创建对应的Python对象，可以使用前面说的那些转化函数来创建普通Python对象，然后调用 <code>PyTuple_SetItem</code> 来设置元组中数据的内容，函数需要三个参数，分别是元组对象的指针，元组中的索引和对应的数据</p>
+<p>示例:</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">PyObject* args = PyTuple_New(<span class="number">2</span>);   <span class="comment">// 2个参数</span></span><br><span class="line">PyObject* arg1 = PyInt_FromLong(<span class="number">4</span>);    <span class="comment">// 参数一设为4</span></span><br><span class="line">PyObject* arg2 = PyInt_FromLong(<span class="number">3</span>);    <span class="comment">// 参数二设为3</span></span><br><span class="line">PyTuple_SetItem(args, <span class="number">0</span>, arg1);</span><br><span class="line">PyTuple_SetItem(args, <span class="number">1</span>, arg2);</span><br></pre></td></tr></table></figure>
+
+</li>
+</ol>
+<p>或者如果元组中都是简单数据类型，可以直接使用 <code>PyObject* args = Py_BuildValue(4, 3);</code> 这种方式来创建元组</p>
+<ol start="2">
+<li><p>解析元组</p>
+<p>Python 函数返回的是元组，在C++中需要进行对应的解析，我们可以使用 <code>PyTuple_GetItem</code> 来获取元组中的数据成员，这个函数返回PyObject 的指针，之后再使用对应的转化函数将Python对象转化成C++数据类型即可</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">PyObject *pVulNameObj = PyTuple_GetItem(PyResult, <span class="number">0</span>);</span><br><span class="line">PyObject *pVulLevelObj = PyTuple_GetItem(PyResult, <span class="number">1</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">//获取漏洞的名称信息</span></span><br><span class="line"><span class="keyword">int</span> nStrSize = <span class="number">0</span>;</span><br><span class="line">LPTSTR pVulName = PyUnicode_AsWideCharString(pVulNameObj, &amp;nStrSize);</span><br><span class="line">StringCchCopy(lpVulName, MAX_PATH, pVulName);</span><br><span class="line">PyMem_Free(pVulName); <span class="comment">//释放由PyUnicode_AsWideCharString分配出来的内存</span></span><br><span class="line"></span><br><span class="line"><span class="comment">//获取漏洞的危险等级</span></span><br><span class="line">level = PyLong_AsLong(pVulLevelObj);</span><br><span class="line"></span><br><span class="line"><span class="comment">//最后别忘了将Python对象解引用</span></span><br><span class="line">Py_DECREF(pVulNameObj);</span><br><span class="line">Py_DECREF(pVulLevelObj);</span><br><span class="line">Py_DECREF(PyResult);</span><br></pre></td></tr></table></figure>
+<p>Python中针对具体数据类型操作的函数一般是以Py开头，后面跟上具体的数据类型的名称，比如操作元组的PyTuple系列函数和操作列表的PyList系列函数，后面如果想操作对应的数据类型只需要去官网搜索对应的名称即可。</p>
+</li>
+</ol>
+<p>这些代码实例都是我之前写的一个Demo中的代码，Demo放到了Github上: <a href="https://github.com/aMonst/PyScanner" target="_blank" rel="noopener">PyScanner</a></p>
+<hr />
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+      <div>
+        <div style="padding: 10px 0; margin: 20px auto; width: 90%; text-align: center;">
+  <div></div>
+  <button id="rewardButton" disable="enable" onclick="var qr = document.getElementById('QR'); if (qr.style.display === 'none') {qr.style.display='block';} else {qr.style.display='none'}">
+    <span>打赏</span>
+  </button>
+  <div id="QR" style="display: none;">
+
+    
+      <div id="wechat" style="display: inline-block">
+        <img id="wechat_qr" src="/images/wechatreward.png" alt="Masimaro 微信支付"/>
+        <p>微信支付</p>
+      </div>
+    
+
+    
+      <div id="alipay" style="display: inline-block">
+        <img id="alipay_qr" src="/images/alipayreward.png" alt="Masimaro 支付宝"/>
+        <p>支付宝</p>
+      </div>
+    
+
+    
+
+  </div>
+</div>
+
+      </div>
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/C-%E8%B0%83%E7%94%A8Python3/" rel="tag"><i class="fa fa-tag"></i> C++ 调用Python3</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/WinSock2-API.html" rel="next" title="WinSock2 API">
+                <i class="fa fa-chevron-left"></i> WinSock2 API
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/socket-pool.html" rel="prev" title="WinSock Socket 池">
+                WinSock Socket 池 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        
+  <div class="bdsharebuttonbox">
+    <a href="#" class="bds_tsina" data-cmd="tsina" title="分享到新浪微博"></a>
+    <a href="#" class="bds_douban" data-cmd="douban" title="分享到豆瓣网"></a>
+    <a href="#" class="bds_sqq" data-cmd="sqq" title="分享到QQ好友"></a>
+    <a href="#" class="bds_qzone" data-cmd="qzone" title="分享到QQ空间"></a>
+    <a href="#" class="bds_weixin" data-cmd="weixin" title="分享到微信"></a>
+    <a href="#" class="bds_tieba" data-cmd="tieba" title="分享到百度贴吧"></a>
+    <a href="#" class="bds_twi" data-cmd="twi" title="分享到Twitter"></a>
+    <a href="#" class="bds_fbook" data-cmd="fbook" title="分享到Facebook"></a>
+    <a href="#" class="bds_more" data-cmd="more"></a>
+    <a class="bds_count" data-cmd="count"></a>
+  </div>
+  <script>
+    window._bd_share_config = {
+      "common": {
+        "bdText": "",
+        "bdMini": "2",
+        "bdMiniList": false,
+        "bdPic": ""
+      },
+      "share": {
+        "bdSize": "16",
+        "bdStyle": "0"
+      },
+      "image": {
+        "viewList": ["tsina", "douban", "sqq", "qzone", "weixin", "twi", "fbook"],
+        "viewText": "分享到：",
+        "viewSize": "16"
+      }
+    }
+  </script>
+
+<script>
+  with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='//bdimg.share.baidu.com/static/api/js/share.js?cdnversion='+~(-new Date()/36e5)];
+</script>
+
+      
+	  
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      <div id="disqus_thread">
+        <noscript>
+          Please enable JavaScript to view the
+          <a href="https://disqus.com/?ref_noscript" target="_blank" rel="noopener">comments powered by Disqus.</a>
+        </noscript>
+      </div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/avatar.jpg"
+                alt="Masimaro" />
+            
+              <p class="site-author-name" itemprop="name">Masimaro</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/%20%7C%7C%20archive">
+              
+                  <span class="site-state-item-count">94</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">18</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">141</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          <div class="links-of-author motion-element">
+            
+              
+                <span class="links-of-author-item">
+                  <a href="https://github.com/aMonst" target="_blank" title="GitHub">
+                    
+                      <i class="fa fa-fw fa-globe"></i>GitHub</a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="http://weibo.com/your-user-name" target="_blank" title="微博">
+                    
+                      <i class="fa fa-fw fa-globe"></i>微博</a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="http://blog.csdn.net/lanuage" target="_blank" title="CSDN博客">
+                    
+                      <i class="fa fa-fw fa-globe"></i>CSDN博客</a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="http://www.jianshu.com/u/7261ff9df286" target="_blank" title="简书">
+                    
+                      <i class="fa fa-fw fa-globe"></i>简书</a>
+                </span>
+              
+            
+          </div>
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#初始化"><span class="nav-number">1.</span> <span class="nav-text">初始化</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#调用Python模块"><span class="nav-number">2.</span> <span class="nav-text">调用Python模块</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#简单调用Python语句"><span class="nav-number">2.1.</span> <span class="nav-text">简单调用Python语句</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#调用Python模块中的函数"><span class="nav-number">2.2.</span> <span class="nav-text">调用Python模块中的函数</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#C-数据类型与Python对象的相互转化"><span class="nav-number">3.</span> <span class="nav-text">C++数据类型与Python对象的相互转化</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love" id="heart">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Masimaro</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io" rel="external nofollow">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next" rel="external nofollow">NexT.Mist</a> v5.1.3</div>
+
+
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv">
+      <i class="fa fa-user">本次访客数</i>
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+      人次
+    </span>
+  
+
+  
+    <span class="site-pv">
+      <i class="fa fa-eye">本站总访问量</i>
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+      次
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.3"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.3"></script>
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.3"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.3"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.3"></script>
+
+
+
+  
+
+
+  
+
+    
+      <script id="dsq-count-scr" src="https://masimaroweb.disqus.com/count.js" async></script>
+    
+
+    
+      <script type="text/javascript">
+        var disqus_config = function () {
+          this.page.url = 'http://www.masimaroweb.com/c-call-python.html';
+          this.page.identifier = 'c-call-python.html';
+          this.page.title = 'C++ 调用Python3';
+        };
+        var d = document, s = d.createElement('script');
+        s.src = 'https://masimaroweb.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', '' + +new Date());
+        (d.head || d.body).appendChild(s);
+      </script>
+    
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+  
+
+
+  
+
+  
+
+</body>
+</html>
+
+<!-- 页面点击小红心 -->
+<script type="text/javascript" src="/js/src/love.js"></script>

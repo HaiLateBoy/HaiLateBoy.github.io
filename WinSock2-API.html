@@ -1,0 +1,1500 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<script src="//cdn.bootcss.com/pace/1.0.2/pace.min.js"></script>
+<link href="//cdn.bootcss.com/pace/1.0.2/themes/pink/pace-theme-flash.css" rel="stylesheet">
+<style>
+    .pace .pace-progress {
+        background: #1E92FB; /*进度条颜色*/
+        height: 3px;
+    }
+    .pace .pace-progress-inner {
+         box-shadow: 0 0 10px #1E92FB, 0 0 5px     #1E92FB; /*阴影颜色*/
+    }
+    .pace .pace-activity {
+        border-top-color: #1E92FB;    /*上边框颜色*/
+        border-left-color: #1E92FB;    /*左边框颜色*/
+    }
+</style>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.3" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.3">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.3">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.3">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.3" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="WinSock, 网络编程, WinSock2.0 API, 动态加载, WinSock 异步函数" />
+
+
+
+
+  
+
+
+  <link rel="alternate" href="/atom.xml" title="Masimaro's blog" type="application/atom+xml" />
+
+
+
+
+
+
+<meta name="description" content="WinSock中提供的5种网络模型已经可以做到很高效了，特别是完成端口，它的高效的原因在于它不仅另外开启了线程来处理完成通知而不是占用主程序的时间，同时也在于我们在完成端口中运用了大量异步IO处理函数。比如WSASend、WSARecv等等。为了高效的处理网络IO，WinSock提供了大量这样的异步函数。这篇博文主要探讨这些函数的用法和他们与传统的巴克利套接字相比更加高效的秘密">
+<meta property="og:type" content="article">
+<meta property="og:title" content="WinSock2 API">
+<meta property="og:url" content="http://www.masimaroweb.com/WinSock2-API.html">
+<meta property="og:site_name" content="Masimaro&#39;s blog">
+<meta property="og:description" content="WinSock中提供的5种网络模型已经可以做到很高效了，特别是完成端口，它的高效的原因在于它不仅另外开启了线程来处理完成通知而不是占用主程序的时间，同时也在于我们在完成端口中运用了大量异步IO处理函数。比如WSASend、WSARecv等等。为了高效的处理网络IO，WinSock提供了大量这样的异步函数。这篇博文主要探讨这些函数的用法和他们与传统的巴克利套接字相比更加高效的秘密">
+<meta property="og:image" content="http://www.masimaroweb.com/WinSock2-API/1.png">
+<meta property="article:published_time" content="2018-07-21T02:36:09.000Z">
+<meta property="article:modified_time" content="2018-07-21T08:56:37.199Z">
+<meta property="article:author" content="Masimaro">
+<meta property="article:tag" content="WinSock">
+<meta property="article:tag" content=" 网络编程">
+<meta property="article:tag" content=" WinSock2.0 API">
+<meta property="article:tag" content=" 动态加载">
+<meta property="article:tag" content=" WinSock 异步函数">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://www.masimaroweb.com/WinSock2-API/1.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.3',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+
+  <link rel="canonical" href="http://www.masimaroweb.com/WinSock2-API.html"/>
+
+
+
+
+
+  <title>WinSock2 API | Masimaro's blog</title>
+  
+
+
+
+
+
+
+
+
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Masimaro's blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <h1 class="site-subtitle" itemprop="description"></h1>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="搜索..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://www.masimaroweb.com/WinSock2-API.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Masimaro">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Masimaro's blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h2 class="post-title" itemprop="name headline">WinSock2 API</h2>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-07-21T10:36:09+08:00">
+                2018-07-21
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Windows-%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B/" itemprop="url" rel="index">
+                    <span itemprop="name">Windows 网络编程</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/WinSock2-API.html#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="WinSock2-API.html" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="page-pv"><i class="fa fa-file-o">本文总阅读量</i>
+            <span class="busuanzi-value" id="busuanzi_value_page_pv" ></span>次
+            </span>
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>WinSock中提供的5种网络模型已经可以做到很高效了，特别是完成端口，它的高效的原因在于它不仅另外开启了线程来处理完成通知而不是占用主程序的时间，同时也在于我们在完成端口中运用了大量异步IO处理函数。比如<code>WSASend</code>、<code>WSARecv</code>等等。为了高效的处理网络IO，WinSock提供了大量这样的异步函数。这篇博文主要探讨这些函数的用法和他们与传统的巴克利套接字相比更加高效的秘密</p>
+<a id="more"></a>
+<h2 id="AcceptEx"><a href="#AcceptEx" class="headerlink" title="AcceptEx"></a>AcceptEx</h2><p>其实在使用TCP协议编程时，接受连接的过程也是需要进行收发包操作的，具体的过程请参考TCP的三次握手。针对这种特性WinSock提供了对应的异步操作函数<code>AcceptEx</code>。函数原型如下:</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">BOOL <span class="title">AcceptEx</span><span class="params">(</span></span></span><br><span class="line"><span class="function"><span class="params">  SOCKET sListenSocket,</span></span></span><br><span class="line"><span class="function"><span class="params">	SOCKET sAcceptSocket,</span></span></span><br><span class="line"><span class="function"><span class="params">	PVOID lpOutputBuffer,</span></span></span><br><span class="line"><span class="function"><span class="params">	DWORD dwReceiveDataLength,</span></span></span><br><span class="line"><span class="function"><span class="params">	DWORD dwLocalAddressLength,</span></span></span><br><span class="line"><span class="function"><span class="params">	DWORD dwRemoteAddressLength,</span></span></span><br><span class="line"><span class="function"><span class="params">	LPDWORD lpdwBytesReceived,</span></span></span><br><span class="line"><span class="function"><span class="params">	LPOVERLAPPED lpOverlapped</span></span></span><br><span class="line"><span class="function"><span class="params">)</span></span>;</span><br></pre></td></tr></table></figure>
+<p>sListenSocket: 监听套接字</p>
+<p>sAcceptSocket：该参数是一个SOCKET的句柄，一旦连接成功建立，那么会使用该SOCKET作为通信的SOCKET</p>
+<p>lpOutputBuffer：是三个数据一体化的缓冲区的指针，这三个数据分别是接收连接时顺带接收客户端发过来的数据的缓冲，之后是本地地址结构的缓冲，最后是远程客户端地址结构的指针</p>
+<p>dwReceiveDataLength：是<code>lpOutputBuffe</code>r的缓冲长度</p>
+<p>dwLocalAddressLength：是本地地址结构长度,其值等于<code>sizeof(SOCKADDR)+16</code></p>
+<p>dwRemoteAddressLength：是远程客户端地址结构长度,其值也等于<code>sizeof(SOCKADDR)+16</code></p>
+<p>lpdwBytesReceived：该参数用于返回接受连接请求时接收的数据的长度</p>
+<p>lpOverlapped：就是重叠I/O需要的结构</p>
+<p>第一个参数是一个十分重要的参数，这个参数是<code>AcceptEx</code>比较高效的一个重要的原因。从功能上来看它与传统的<code>accept</code>函数并没有什么区别，都是接受客户端连接的。它与<code>accpet</code>相比比较高效的原因如下：</p>
+<ol>
+<li>从内部机理来说<code>accpet</code>在内部其实有一个创建SOCKET的操作，当函数成功后会返回这个SOCKET，所以<code>AcceptEx</code>与<code>accept</code>相比少了一个创建SOCKET的操作，它的功能更加纯粹，这就给了我们一个启示：我们可以在初始化的时候创建大量的SOCKET，并投递到<code>AcceptEx</code>中，这样在接受连接时省去了创建SOCKET的时间，能够更快速的响应客户端的连接。</li>
+<li>由于<code>AcceptEx</code>不用创建SOCKET，所以它也将<code>accept</code>内部对socket设置的操作给省去了，也少了一些其他的附带操作，比如地址的解析，其实这里我们可以简单的理解为<code>lpOutputBuffer</code>中保存的信息就是TCP三次握手中的SYN包和ACK包，这些包的信息需要在函数返回后由用户通过其他方法来解析，而<code>accpet</code>帮我们解析了，所以<code>AcceptEx</code>比<code>accept</code>更加高效</li>
+</ol>
+<p>因为<code>AcceptEx</code>的设计目标纯粹就是为了性能,所以监听套接字的属性不会被代表客户端通讯的套接字自动继承。要继承属性(包括socket内部接受/发送缓存大小等等)就必须调用<code>setsockopt</code>使用选项<code>SO_UPDATE_ACCEPT_CONTEXT</code>,如下:</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> nRet = ::setsockopt(skClient, SOL_SOCKET ,SO_UPDATE_ACCEPT_CONTEXT ,(<span class="keyword">char</span> *)&amp;skListen, <span class="keyword">sizeof</span>(skListen));</span><br></pre></td></tr></table></figure>
+
+<p><code>AcceptEx</code>函数除了能够接受客户端的连接之外，它也可以在接受连接的同时接收客户端随着连接请求一块发过来的数据，只要我们设置<code>dwReceiveDataLength</code> 参数大于0，并在<code>lpOutputBuffer</code>中分配相应的缓冲即可，但是这里会存在一个安全问题，当我们设置了这些之后，如果客户端只发送连接请求，但是不发送数据，<code>AcceptEx</code>会一直等待，如果有大量这样的客户端，那么可能会给服务器造成大量的资源浪费从而不能及时的服务其他正常客户端。要防止这样的情况，可以采用下列措施：</p>
+<ol>
+<li>设置<code>dwReceiveDataLength</code>为0，并且不分配对应的缓冲，也就是关闭这个接收数据的功能。</li>
+<li>启动一个监视线程对用于连接的SOCKET轮询调用：<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> iSecs;</span><br><span class="line"><span class="keyword">int</span> iBytes = <span class="keyword">sizeof</span>( <span class="keyword">int</span> );</span><br><span class="line">getsockopt( hAcceptSocket, SOL_SOCKET, SO_CONNECT_TIME, (<span class="keyword">char</span> *)&amp;iSecs, &amp;iBytes ); <span class="comment">//获取SOCKET连接时间</span></span><br></pre></td></tr></table></figure>
+iSecs 为 -1 表示还未建立连接, 否则就是已经连接的时间.<br>当iSecs超过某个筏值时,就果断断开这个连接</li>
+</ol>
+<h2 id="GetAcceptExSockAddr"><a href="#GetAcceptExSockAddr" class="headerlink" title="GetAcceptExSockAddr"></a>GetAcceptExSockAddr</h2><p>前面说AcceptEx不会对地址进行解析，而是返回一个经过编码的地址信息，可以将它理解为原始的三次握手包。而函数<code>GetAcceptExSockAddr</code>的主要作用就是通过原始的二进制数据得到对应的地址结构。函数原型如下:</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">GetAcceptExSockaddrs</span><span class="params">(</span></span></span><br><span class="line"><span class="function"><span class="params">		PVOID lpOutputBuffer,</span></span></span><br><span class="line"><span class="function"><span class="params">		DWORD dwReceiveDataLength,</span></span></span><br><span class="line"><span class="function"><span class="params">		DWORD dwLocalAddressLength,</span></span></span><br><span class="line"><span class="function"><span class="params">		DWORD dwRemoteAddressLength,</span></span></span><br><span class="line"><span class="function"><span class="params">		LPSOCKADDR* LocalSockaddr,</span></span></span><br><span class="line"><span class="function"><span class="params">		LPINT LocalSockaddrLength,</span></span></span><br><span class="line"><span class="function"><span class="params">		LPSOCKADDR* RemoteSockaddr,</span></span></span><br><span class="line"><span class="function"><span class="params">		LPINT RemoteSockaddrLength)</span></span>;</span><br></pre></td></tr></table></figure>
+
+<p>lpOutputBuffer:之前提供给AcceptEx函数的缓冲，如果<code>AcceptEx</code>调用成功，会在这个缓冲中写入地址信息，<code>GetAcceptExSockaddrs</code>通过这个缓冲中保存的地址信息来解析出地址结构</p>
+<p>dwReceiveDataLength：接收到的数据长度，注意这个长度不是<code>lpOutputBuffer</code>，而是客户端随着连接请求一起发送过来的其他数据的长度，其实这里应该理解为地址信息在缓冲中的偏移</p>
+<p>dwLocalAddressLength：本地地址信息的长度，这个长度为<code>sizeof(SOCKADDR)+16</code></p>
+<p>dwRemoteAddressLength：远程客户端的地址信息的长度，长度为<code>sizeof(SOCKADDR)+16</code></p>
+<p>LocalSockaddr：解析出来的本地地址结构</p>
+<p>LocalSockaddrLength:本地地址结构的长度，这个参数是一个输出参数</p>
+<p>RemoteSockaddr: 解析出来的远程客户端的地址结构</p>
+<p>RemoteSockaddrLength：解析出来的远程客户端的地址长度，这个参数是一个输出参数</p>
+<p>这里为什么要返回本地的地址结构呢，主要有两个原因：</p>
+<ol>
+<li>一般的服务器可能有多块网卡，返回本地地址我们就可以知道服务器用哪块网卡与客户端通信</li>
+<li>服务器用来监听的端口与用来进行通信的端口不是同一个，返回本地地址我们就能够知道服务器在使用哪个端口与客户端通信</li>
+</ol>
+<h2 id="TransmitFile"><a href="#TransmitFile" class="headerlink" title="TransmitFile"></a>TransmitFile</h2><p>对于一些网络应用来说,发送文件有时是一个基本的功能,比如:web服务,FTP服务等。在Winsock中为此而专门提供了一个高效传输文件的API——TransmitFile。函数原型如下:</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">BOOL <span class="title">TransmitFile</span><span class="params">(</span></span></span><br><span class="line"><span class="function"><span class="params">  SOCKET hSocket,</span></span></span><br><span class="line"><span class="function"><span class="params">  HANDLE hFile,</span></span></span><br><span class="line"><span class="function"><span class="params">  DWORD nNumberOfBytesToWrite,</span></span></span><br><span class="line"><span class="function"><span class="params">  DWORD nNumberOfBytesPerSend,</span></span></span><br><span class="line"><span class="function"><span class="params">  LPOVERLAPPED lpOverlapped,</span></span></span><br><span class="line"><span class="function"><span class="params">  LPTRANSMIT_FILE_BUFFERS lpTransmitBuffers,</span></span></span><br><span class="line"><span class="function"><span class="params">  DWORD dwFlags)</span></span>;</span><br></pre></td></tr></table></figure>
+<p>这个函数主要工作在TCP协议上</p>
+<p>hSocket：与客户端进行通信的SOCKET</p>
+<p>hFile：是对应文件的句柄</p>
+<p>nNumberOfBytesToWrite：表示发送文件的长度，这个长度可以小于文件长度</p>
+<p>nNumberOfBytesPerSend：当文件较大时，可以进行拆包发送，这个参数表示每个数据包的大小，如果这个参数为0，将采用系统默认的包大小，NT内核中默认大小为64K</p>
+<p>lpOverlapped：重叠I/O需要的结构</p>
+<p>lpTransmitBuffers：是一个TRANSMIT_FILE_BUFFERS结构体,利用它可以指定在文件开始发送前需要发送的额外数据以及文件发送结束后需要发送的额外数据,这个参数也可以置为NULL,仅表示发送文件数据。它的结构如下所示:</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> _<span class="title">TRANSMIT_FILE_BUFFERS</span></span></span><br><span class="line"><span class="class">&#123;</span>  </span><br><span class="line">  PVOID Head;  </span><br><span class="line">  DWORD HeadLength;  </span><br><span class="line">  PVOID Tail;  </span><br><span class="line">  DWORD TailLength;</span><br><span class="line">&#125; TRANSMIT_FILE_BUFFERS;</span><br></pre></td></tr></table></figure>
+
+<p>dwFlags：它是一个按位组合的标识。它的各个标识的含义如下</p>
+<table>
+<thead>
+<tr>
+<th align="left">标识</th>
+<th align="left">含义</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">TF_DISCONNECT</td>
+<td align="left">在传输文件结束后,开始一个传输层断开动作</td>
+</tr>
+<tr>
+<td align="left">TF_REUSE_SOCKET</td>
+<td align="left">重置套接字,使其可以被AcceptEx等函数重用,这个标志需要与TF_DISCONNECT标志合用</td>
+</tr>
+<tr>
+<td align="left">TF_USE_DEFAULT_WORKER</td>
+<td align="left">指定发送文件使用系统默认线程,这对传输大型文件很有利</td>
+</tr>
+<tr>
+<td align="left">TF_USE_SYSTEM_THREAD</td>
+<td align="left">使用系统线程发送文件，它与TF_USE_DEFAULT_WORKER作用相同</td>
+</tr>
+<tr>
+<td align="left">TF_USE_KERNEL_APC</td>
+<td align="left">指定利用内核APC队列来代替工作线程来处理文件传输. 需要注意的是系统内核APC队列只在应用程序进入等待状态时才工作. 但不一定非要一个可警告状态的等待</td>
+</tr>
+<tr>
+<td align="left">TF_WRITE_BEHIND</td>
+<td align="left">指定TransmitFile函数尽可能立即返回,而不管远端是否确认已收到数据.这个标志不能与TF_DISCONNECT和TF_REUSE_SOCKET一起使用</td>
+</tr>
+</tbody></table>
+<p>可以使用<code>TF_DISCONNECT</code>加上<code>TF_REUSE_SOCKET</code> 来回收SOCKET，以便像AcceptEx这样的函数可以重新利用。此时应该指定hFile为NULL，但这不是这个函数的主业(我觉得应该让专门的函数干专门的事，自己在封装函数的时候也应该要注意，不要向Win32 API这样使用各种标志来控制函数的功能)</p>
+<p>同时TransmitFile函数只有在服务器版Windows上才能发挥其全部功能。而在专业版或家庭版等Windows上它被限定为最多同时有两个调用在传输,而其他的调用都被置为排队等待状态。</p>
+<p>发送文件这个功能，是一个十分简单的功能，无非是应用层不断从磁盘文件中读取文件并使用WSASend这样的异步函数来发送，另一端不断用WSARecv接收并写入到文件中，为了性能在读写文件时也可以用IOCP的方式，那么为什么微软为了这么一个简单的功能还要独自封装一个函数，难道它封装的函数就一定比我们自己实现的性能高？</p>
+<p><img src="WinSock2-API/1.png" alt=""></p>
+<p>上图揭示了<code>TransmitFile</code>能够高效工作的秘密，一般我们来封装这个功能的时候会调用ReadFile，此时由内核层读取文件并将文件文件内容保存在内核的内存空间中，然后通过系统调用们将内容拷贝到R3层，在调用WSASend的时候会将文件内容再从R3层拷贝到R0层，这个过程经过系统调用们，需要调用各种函数，并且进行各种验证。这个操作是十分耗时的。</p>
+<p>而<code>TransmitFile</code>则相对要高效的多，既然最终是要发送文件，那么它将内容从文件中读取出来后直接将R0层中保存的文件内容通过SOCKET发送出去，有的时候直接采用文件映射的方式将磁盘地址映射到网卡中，直接由网卡读取并发送，这样又省去了从内核中读取文件并拷贝到网卡缓存中的操作。所以它比我们自己封装来的更加高效。</p>
+<h2 id="TransmitPackets"><a href="#TransmitPackets" class="headerlink" title="TransmitPackets"></a>TransmitPackets</h2><p>有的时候需要发送超大型数据(有时是几十G)到客户端,有时甚至需要发送多个文件到客户端。这个时候<code>TransmitFile</code>就不再有效了。请注意<code>TransmitFile</code>的第三个参数 <code>nNumberOfBytesToWrite</code> 是一个DWORD类型，这也就标明这个函数最大只能发送4GB的文件，而对于更大的文件它就无能为力了，为了发送更大的文件WinSock专门封装了一个函数——<code>TransmitPackets</code></p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">BOOL PASCAL <span class="title">TransmitPackets</span><span class="params">(</span></span></span><br><span class="line"><span class="function"><span class="params">    SOCKET hSocket,</span></span></span><br><span class="line"><span class="function"><span class="params">    LPTRANSMIT_PACKETS_ELEMENT lpPacketArray,</span></span></span><br><span class="line"><span class="function"><span class="params">    DWORD nElementCount,</span></span></span><br><span class="line"><span class="function"><span class="params">    DWORD nSendSize,</span></span></span><br><span class="line"><span class="function"><span class="params">    LPOVERLAPPED lpOverlapped,</span></span></span><br><span class="line"><span class="function"><span class="params">    DWORD dwFlags</span></span></span><br><span class="line"><span class="function"><span class="params">)</span></span>;</span><br></pre></td></tr></table></figure>
+<p>这个函数不但可以在面向连接(面向流)式的协议(TCP)上工作,还可以在无连接式的数据报协议(UDP)上工作,而TransmitFile函数只能工作在TCP上</p>
+<p>hSocket：表示发送所用的SOCKET</p>
+<p>lpPacketArray：它是一个结构体数组的指针，这个结构体表示发送文件的相关信息，结构体的定义如下:</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> _<span class="title">TRANSMIT_PACKETS_ELEMENT</span> &#123;</span></span><br><span class="line">  ULONG dwElFlags;</span><br><span class="line">  ULONG cLength;  </span><br><span class="line">  <span class="keyword">union</span> &#123;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> &#123;</span></span><br><span class="line">      LARGE_INTEGER nFileOffset;</span><br><span class="line">      HANDLE hFile;</span><br><span class="line">    &#125;;</span><br><span class="line">    PVOID pBuffer;</span><br><span class="line">  &#125;;</span><br><span class="line">&#125; TRANSMIT_PACKETS_ELEMENT;</span><br></pre></td></tr></table></figure>
+
+<p>这个结构体主要包含3个部分，第一个部分是一个标志，表示该如何解释后面的部分，这个标志有如下几个值</p>
+<table>
+<thead>
+<tr>
+<th align="left">标志</th>
+<th align="left">含义</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">TP_ELEMENT_FILE</td>
+<td align="left">标明它将发送一个文件，此时会使用共用体中的结构体部分</td>
+</tr>
+<tr>
+<td align="left">TP_ELEMENT_MEMORY</td>
+<td align="left">标明它将要将发送内存中的一段空间的数据，此时会使用共用体中pBuffer部分</td>
+</tr>
+<tr>
+<td align="left">TP_ELEMENT_EOP</td>
+<td align="left">而最后一个标志用于辅助说明前两个标志,说明当前结构表示的数据应当作为一个结束包来发送,也就说之前所有的数据到当前这个结构描述的数据应当视为一个包</td>
+</tr>
+</tbody></table>
+<p>第二部分是cLength用以说明当前结构描述的数据长度/发送文件内容的长度</p>
+<p>第三个部分联合定义根据第一个部分的实际标志值,用于说明是一个文件还是一个内存块,当是一个文件时还可以指定一个64位长整数型的文件内偏移,这为应用利用TransmitPackets发送大于4GB的文件创造了可能.当偏移为-1时,表示从文件当前指针位置开始发送</p>
+<p>需要注意的是因为TransmitPackets能够很快的处理数据发送,因此可能会造成大量待发送数据堆积在下层协议的协议栈上.而对于无连接的面向数据报的协议来说,有时协议驱动会选择将它们简单丢弃.</p>
+<p>另外对于TransmitPackets来说也只有服务器版的Windows能够发挥它全部的性能,而对于家庭版和专业版来说,最多能够同时处理两个TransmitPackets调用,其它的调用都会被排队处理</p>
+<p>最后TransmitPackets在发送文件时工作机理与TransmitFile是类似的,而TransmitPackets可以发送多个文件,并且可以发送超大文件(大于4GB),在发送内存块上,TransmitPackets也有很多优化,调用者可以放心的将超大的缓冲块传递给TransmitPackets而不必过多的担心</p>
+<h2 id="ConnectEx"><a href="#ConnectEx" class="headerlink" title="ConnectEx"></a>ConnectEx</h2><p>作为客户端应用来说,或者说一些需要反连接工作的应用来说(如:Active FTP方式的服务器),使用传统的connect进行阻塞式或非阻塞式的编程都无法得到很好的性能响应</p>
+<p>它的定义如下:</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">BOOL PASCAL <span class="title">ConnectEx</span><span class="params">(</span></span></span><br><span class="line"><span class="function"><span class="params">  SOCKET s,</span></span></span><br><span class="line"><span class="function"><span class="params">  <span class="keyword">const</span> struct sockaddr* name,</span></span></span><br><span class="line"><span class="function"><span class="params">  <span class="keyword">int</span> namelen,</span></span></span><br><span class="line"><span class="function"><span class="params">  PVOID lpSendBuffer,</span></span></span><br><span class="line"><span class="function"><span class="params">  DWORD dwSendDataLength,</span></span></span><br><span class="line"><span class="function"><span class="params">  LPDWORD lpdwBytesSent,</span></span></span><br><span class="line"><span class="function"><span class="params">  LPOVERLAPPED lpOverlapped</span></span></span><br><span class="line"><span class="function"><span class="params">)</span></span>;</span><br></pre></td></tr></table></figure>
+<p>s: 进行连接操作的SOCKET句柄,这个SOCKET句柄需要事先绑定，这里与调用普通的connect函数不同，<strong>它需要先调用bind函数将本地地址与SOCKET绑定</strong></p>
+<p>name：要连接的远端服务器的地址结构</p>
+<p>namelen：就是远端地址结构的长度</p>
+<p>lpSendBuffer,dwSendDataLength,lpdwBytesSent三个参数共同用于描述在连接到服务器成功之后向服务器直接发送的数据缓冲,长度以及实际发送的数据长度</p>
+<p>lpOverlapped就是重叠I/O操作需要的结构体</p>
+<p>与AcceptEx类似，在连接成功后，需要调用 <code>setsocketopt</code> 来设置SOCKET的属性。</p>
+<p>与传统的<code>connect</code>函数不同,<code>ConnectEx</code>函数要求一个已经绑定过的SOCKET句柄参数,其实这也是将connect内部的绑定操作排除在真正connect操作之外的一种策略。最终连接的操作也会很快的就被完成,而绑定可以提前甚至在初始化的时候就完成。这样做也是为了能够快速的处理网络事件。</p>
+<h2 id="DisConnectEx"><a href="#DisConnectEx" class="headerlink" title="DisConnectEx"></a>DisConnectEx</h2><p>前面在TransmitFile中说它可以使用<code>TF_DISCONNECT</code>加上<code>TF_REUSE_SOCKET</code> 来回收SOCKET，也提到应该用专门的函数来干专门的事，这里ConnectEx就是专门的函数。它主要的作用与普通的<code>closesocket</code>函数类似。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">BOOL <span class="title">DisconnectEx</span><span class="params">(</span></span></span><br><span class="line"><span class="function"><span class="params">SOCKET hSocket,</span></span></span><br><span class="line"><span class="function"><span class="params">LPOVERLAPPED lpOverlapped,</span></span></span><br><span class="line"><span class="function"><span class="params">DWORD dwFlags,</span></span></span><br><span class="line"><span class="function"><span class="params">DWORD reserved</span></span></span><br><span class="line"><span class="function"><span class="params">)</span></span>;</span><br></pre></td></tr></table></figure>
+<p>hSocket ：表示将要被回收的SOCKET</p>
+<p>lpOverlapped：重叠IO所使用的结构</p>
+<p>dwFlags：它是一个标志值，表示是否需要回收SOCKET，如果为0则表示不需要回收，此时它的作用与<code>closesocket</code>类似。如果为<code>TF_REUSE_SOCKET</code>表示将回收SOCKET</p>
+<p>reserved：是一个保留值直接传0即可</p>
+<p>当以重叠I/O的方式调用<code>DisconnectEx</code>时,若该SOCKET还有未完成的传输调用时,该函数会返回<code>FALSE</code>,并且最终错误码是<code>WSA_IO_PENDING</code>,即断开/回收操作将在传输完成后执行。如果使用了重叠IO，同样在完成之后会调用完成处理函数。<br>如果未采用重叠IO操作，那么函数会阻塞，直到数据发送完成并断开连接。</p>
+<h2 id="扩展函数的动态加载"><a href="#扩展函数的动态加载" class="headerlink" title="扩展函数的动态加载"></a>扩展函数的动态加载</h2><p>之前介绍的这一系列Winsock2.0的扩展API,最好都动态加载之后再行调用,因为它们具体的导出位置在不同平台上变动太大,如果静态联编的话,会给开发编译工作带来巨大的麻烦,所以使用运行时动态加载来调用这些API。</p>
+<p>但是这些函数的加载与加载普通的dll函数不同，为了方便操作，WinSock提供了一套完整的支持。这表示我们不需要知道它们所在的dll，我们可以直接使用WinSock提供的方法，即使以后它们所在的dll文件变化了，也不会影响我们的使用。</p>
+<p>加载它们需要使用到函数WSAIoctl,函数原型如下:</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">WSAIoctl</span><span class="params">(</span></span></span><br><span class="line"><span class="function"><span class="params">    SOCKET s,</span></span></span><br><span class="line"><span class="function"><span class="params">    DWORD dwIoControlCode,</span></span></span><br><span class="line"><span class="function"><span class="params">    LPVOID lpvInBuffer,</span></span></span><br><span class="line"><span class="function"><span class="params">    DWORD cbInBuffer,</span></span></span><br><span class="line"><span class="function"><span class="params">    LPVOID lpvOutBuffer,</span></span></span><br><span class="line"><span class="function"><span class="params">    DWORD cbOutBuffer,</span></span></span><br><span class="line"><span class="function"><span class="params">    LPDWORD lpcbBytesReturned,</span></span></span><br><span class="line"><span class="function"><span class="params">    LPWSAOVERLAPPED lpOverlapped,</span></span></span><br><span class="line"><span class="function"><span class="params">    LPWSAOVERLAPPED_COMPLETION_ROUTINE lpCompletionRoutine</span></span></span><br><span class="line"><span class="function"><span class="params">)</span></span>;</span><br></pre></td></tr></table></figure>
+
+<p>这个函数的使用方法与<code>ioctlsocket</code> 相似。这里不对它的详细用法进行讨论。这里就简单的说说该怎么用它加载这些函数。</p>
+<p>要加载WinSock API，首先需要将第二个控制码参数设置为SIO_GET_EXTENSION_FUNCTION_POINTER，表示获取扩展API的指针。设置了这个参数后，lpvInBuffer参数需要设置成相应函数的GUID，下面列举了各个函数的GUID值</p>
+<table>
+<thead>
+<tr>
+<th align="left">GDUI</th>
+<th align="left">函数</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">WSAID_ACCEPTEX</td>
+<td align="left">AcceptEx</td>
+</tr>
+<tr>
+<td align="left">WSAID_CONNECTEX</td>
+<td align="left">ConnectEx</td>
+</tr>
+<tr>
+<td align="left">WSAID_DISCONNECTEX</td>
+<td align="left">DisconnectEx</td>
+</tr>
+<tr>
+<td align="left">WSAID_GETACCEPTEXSOCKADDRS</td>
+<td align="left">GetAcceptExSockaddrs</td>
+</tr>
+<tr>
+<td align="left">WSAID_TRANSMITFILE</td>
+<td align="left">TransmitFile</td>
+</tr>
+<tr>
+<td align="left">WSAID_TRANSMITPACKETS</td>
+<td align="left">TransmitPackets</td>
+</tr>
+<tr>
+<td align="left">WSAID_WSARECVMSG</td>
+<td align="left">WSARecvMsg</td>
+</tr>
+<tr>
+<td align="left">WSAID_WSASENDMSG</td>
+<td align="left">WSASendMsg</td>
+</tr>
+</tbody></table>
+<p>函数的指针通过 lpvOutBuffer 参数返回，而cbOutBuffer表示接受缓冲的长度，lpcbBytesReturned表示返回数据的长度。后面两个参数都与完成IO有关，所以这里可以直接给NULL。<br>下面是一个加载AcceptEx函数的例子</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span></span><br><span class="line">BOOL</span><br><span class="line">(PASCAL FAR * LPFN_ACCEPTEX)(</span><br><span class="line">    IN SOCKET sListenSocket,</span><br><span class="line">    IN SOCKET sAcceptSocket,</span><br><span class="line">    IN PVOID lpOutputBuffer,</span><br><span class="line">    IN DWORD dwReceiveDataLength,</span><br><span class="line">    IN DWORD dwLocalAddressLength,</span><br><span class="line">    IN DWORD dwRemoteAddressLength,</span><br><span class="line">    OUT LPDWORD lpdwBytesReceived,</span><br><span class="line">    IN LPOVERLAPPED lpOverlapped</span><br><span class="line">    );</span><br><span class="line">LPFN_ACCEPTEX pFun = <span class="literal">NULL</span>;</span><br><span class="line">SOCKET sTemp = WSASocket(af, type, protocol, <span class="literal">NULL</span>, <span class="literal">NULL</span>, <span class="number">0</span>);</span><br><span class="line">GUID funGuid = WSAID_ACCEPTEX;</span><br><span class="line"><span class="keyword">if</span> (INVALID_SOCKET != skTemp)</span><br><span class="line">&#123;</span><br><span class="line">  DWORD dwOutBufferSize = <span class="number">0</span>;</span><br><span class="line">  <span class="keyword">int</span> Ret = ::WSAIoctl(skTemp, SIO_GET_EXTENSION_FUNCTION_POINTER, &amp;funGuid, <span class="keyword">sizeof</span>(funGuid), &amp;pFun, <span class="keyword">sizeof</span>(pFun), &amp;dwOutBufferSize, <span class="literal">NULL</span>, <span class="literal">NULL</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这里调用WSAIoctl加载扩展函数时需要传入SOCKET句柄，它其实是利用传入的SOCKET的相关信息来导出对应版本的扩展函数，比如这里我们传入的是一个用在TCP协议之上的SOCKET，所以它会返回一个使用TCP协议的API，利用这个SOCKET，这个函数以及它返回的API真正做到了与协议无关。</p>
+<hr />
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+      <div>
+        <div style="padding: 10px 0; margin: 20px auto; width: 90%; text-align: center;">
+  <div></div>
+  <button id="rewardButton" disable="enable" onclick="var qr = document.getElementById('QR'); if (qr.style.display === 'none') {qr.style.display='block';} else {qr.style.display='none'}">
+    <span>打赏</span>
+  </button>
+  <div id="QR" style="display: none;">
+
+    
+      <div id="wechat" style="display: inline-block">
+        <img id="wechat_qr" src="/images/wechatreward.png" alt="Masimaro 微信支付"/>
+        <p>微信支付</p>
+      </div>
+    
+
+    
+      <div id="alipay" style="display: inline-block">
+        <img id="alipay_qr" src="/images/alipayreward.png" alt="Masimaro 支付宝"/>
+        <p>支付宝</p>
+      </div>
+    
+
+    
+
+  </div>
+</div>
+
+      </div>
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B/" rel="tag"><i class="fa fa-tag"></i> 网络编程</a>
+          
+            <a href="/tags/WinSock/" rel="tag"><i class="fa fa-tag"></i> WinSock</a>
+          
+            <a href="/tags/WinSock2-0-API/" rel="tag"><i class="fa fa-tag"></i> WinSock2.0 API</a>
+          
+            <a href="/tags/%E5%8A%A8%E6%80%81%E5%8A%A0%E8%BD%BD/" rel="tag"><i class="fa fa-tag"></i> 动态加载</a>
+          
+            <a href="/tags/WinSock-%E5%BC%82%E6%AD%A5%E5%87%BD%E6%95%B0/" rel="tag"><i class="fa fa-tag"></i> WinSock 异步函数</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/WinSock-IOCP.html" rel="next" title="WinSock 完成端口模型">
+                <i class="fa fa-chevron-left"></i> WinSock 完成端口模型
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/c-call-python.html" rel="prev" title="C++ 调用Python3">
+                C++ 调用Python3 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        
+  <div class="bdsharebuttonbox">
+    <a href="#" class="bds_tsina" data-cmd="tsina" title="分享到新浪微博"></a>
+    <a href="#" class="bds_douban" data-cmd="douban" title="分享到豆瓣网"></a>
+    <a href="#" class="bds_sqq" data-cmd="sqq" title="分享到QQ好友"></a>
+    <a href="#" class="bds_qzone" data-cmd="qzone" title="分享到QQ空间"></a>
+    <a href="#" class="bds_weixin" data-cmd="weixin" title="分享到微信"></a>
+    <a href="#" class="bds_tieba" data-cmd="tieba" title="分享到百度贴吧"></a>
+    <a href="#" class="bds_twi" data-cmd="twi" title="分享到Twitter"></a>
+    <a href="#" class="bds_fbook" data-cmd="fbook" title="分享到Facebook"></a>
+    <a href="#" class="bds_more" data-cmd="more"></a>
+    <a class="bds_count" data-cmd="count"></a>
+  </div>
+  <script>
+    window._bd_share_config = {
+      "common": {
+        "bdText": "",
+        "bdMini": "2",
+        "bdMiniList": false,
+        "bdPic": ""
+      },
+      "share": {
+        "bdSize": "16",
+        "bdStyle": "0"
+      },
+      "image": {
+        "viewList": ["tsina", "douban", "sqq", "qzone", "weixin", "twi", "fbook"],
+        "viewText": "分享到：",
+        "viewSize": "16"
+      }
+    }
+  </script>
+
+<script>
+  with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='//bdimg.share.baidu.com/static/api/js/share.js?cdnversion='+~(-new Date()/36e5)];
+</script>
+
+      
+	  
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      <div id="disqus_thread">
+        <noscript>
+          Please enable JavaScript to view the
+          <a href="https://disqus.com/?ref_noscript" target="_blank" rel="noopener">comments powered by Disqus.</a>
+        </noscript>
+      </div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/avatar.jpg"
+                alt="Masimaro" />
+            
+              <p class="site-author-name" itemprop="name">Masimaro</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/%20%7C%7C%20archive">
+              
+                  <span class="site-state-item-count">94</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">18</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">141</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          <div class="links-of-author motion-element">
+            
+              
+                <span class="links-of-author-item">
+                  <a href="https://github.com/aMonst" target="_blank" title="GitHub">
+                    
+                      <i class="fa fa-fw fa-globe"></i>GitHub</a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="http://weibo.com/your-user-name" target="_blank" title="微博">
+                    
+                      <i class="fa fa-fw fa-globe"></i>微博</a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="http://blog.csdn.net/lanuage" target="_blank" title="CSDN博客">
+                    
+                      <i class="fa fa-fw fa-globe"></i>CSDN博客</a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="http://www.jianshu.com/u/7261ff9df286" target="_blank" title="简书">
+                    
+                      <i class="fa fa-fw fa-globe"></i>简书</a>
+                </span>
+              
+            
+          </div>
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#AcceptEx"><span class="nav-number">1.</span> <span class="nav-text">AcceptEx</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#GetAcceptExSockAddr"><span class="nav-number">2.</span> <span class="nav-text">GetAcceptExSockAddr</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#TransmitFile"><span class="nav-number">3.</span> <span class="nav-text">TransmitFile</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#TransmitPackets"><span class="nav-number">4.</span> <span class="nav-text">TransmitPackets</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ConnectEx"><span class="nav-number">5.</span> <span class="nav-text">ConnectEx</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#DisConnectEx"><span class="nav-number">6.</span> <span class="nav-text">DisConnectEx</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#扩展函数的动态加载"><span class="nav-number">7.</span> <span class="nav-text">扩展函数的动态加载</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love" id="heart">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Masimaro</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io" rel="external nofollow">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next" rel="external nofollow">NexT.Mist</a> v5.1.3</div>
+
+
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv">
+      <i class="fa fa-user">本次访客数</i>
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+      人次
+    </span>
+  
+
+  
+    <span class="site-pv">
+      <i class="fa fa-eye">本站总访问量</i>
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+      次
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.3"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.3"></script>
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.3"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.3"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.3"></script>
+
+
+
+  
+
+
+  
+
+    
+      <script id="dsq-count-scr" src="https://masimaroweb.disqus.com/count.js" async></script>
+    
+
+    
+      <script type="text/javascript">
+        var disqus_config = function () {
+          this.page.url = 'http://www.masimaroweb.com/WinSock2-API.html';
+          this.page.identifier = 'WinSock2-API.html';
+          this.page.title = 'WinSock2 API';
+        };
+        var d = document, s = d.createElement('script');
+        s.src = 'https://masimaroweb.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', '' + +new Date());
+        (d.head || d.body).appendChild(s);
+      </script>
+    
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+  
+
+
+  
+
+  
+
+</body>
+</html>
+
+<!-- 页面点击小红心 -->
+<script type="text/javascript" src="/js/src/love.js"></script>

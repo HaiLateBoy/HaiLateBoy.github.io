@@ -1,0 +1,1490 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<script src="//cdn.bootcss.com/pace/1.0.2/pace.min.js"></script>
+<link href="//cdn.bootcss.com/pace/1.0.2/themes/pink/pace-theme-flash.css" rel="stylesheet">
+<style>
+    .pace .pace-progress {
+        background: #1E92FB; /*进度条颜色*/
+        height: 3px;
+    }
+    .pace .pace-progress-inner {
+         box-shadow: 0 0 10px #1E92FB, 0 0 5px     #1E92FB; /*阴影颜色*/
+    }
+    .pace .pace-activity {
+        border-top-color: #1E92FB;    /*上边框颜色*/
+        border-left-color: #1E92FB;    /*左边框颜色*/
+    }
+</style>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.3" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.3">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.3">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.3">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.3" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="VC++反汇编分析, C语言, 面向对象" />
+
+
+
+
+  
+
+
+  <link rel="alternate" href="/atom.xml" title="Masimaro's blog" type="application/atom+xml" />
+
+
+
+
+
+
+<meta name="description" content="面向对象的三大特性之一就是继承，继承运行我么重用基类中已经存在的内容，这样就简化了代码的编写工作。继承中有三种继承方式即:public protected private，这三种方式规定了不同的访问权限，这些权限的检查由编译器在语法检查阶段进行，不参与生成最终的机器码，所以在这里不对这三中权限进行讨论，以下的内容都是采用的共有继承。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="C++ 继承分析">
+<meta property="og:url" content="http://www.masimaroweb.com/CPP-Inherit.html">
+<meta property="og:site_name" content="Masimaro&#39;s blog">
+<meta property="og:description" content="面向对象的三大特性之一就是继承，继承运行我么重用基类中已经存在的内容，这样就简化了代码的编写工作。继承中有三种继承方式即:public protected private，这三种方式规定了不同的访问权限，这些权限的检查由编译器在语法检查阶段进行，不参与生成最终的机器码，所以在这里不对这三中权限进行讨论，以下的内容都是采用的共有继承。">
+<meta property="og:image" content="http://img.blog.csdn.net/20160706225137823">
+<meta property="og:image" content="http://img.blog.csdn.net/20171012224220685?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvbGFudWFnZQ==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:image" content="http://img.blog.csdn.net/20160709204624054">
+<meta property="article:published_time" content="2018-04-14T02:16:34.000Z">
+<meta property="article:modified_time" content="2018-04-14T02:22:16.671Z">
+<meta property="article:author" content="Masimaro">
+<meta property="article:tag" content="VC++反汇编分析">
+<meta property="article:tag" content=" C语言">
+<meta property="article:tag" content=" 面向对象">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://img.blog.csdn.net/20160706225137823">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.3',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+
+  <link rel="canonical" href="http://www.masimaroweb.com/CPP-Inherit.html"/>
+
+
+
+
+
+  <title>C++ 继承分析 | Masimaro's blog</title>
+  
+
+
+
+
+
+
+
+
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Masimaro's blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <h1 class="site-subtitle" itemprop="description"></h1>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="搜索..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://www.masimaroweb.com/CPP-Inherit.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Masimaro">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Masimaro's blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h2 class="post-title" itemprop="name headline">C++ 继承分析</h2>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-04-14T10:16:34+08:00">
+                2018-04-14
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/VC-%E5%8F%8D%E6%B1%87%E7%BC%96%E5%88%86%E6%9E%90/" itemprop="url" rel="index">
+                    <span itemprop="name">VC++反汇编分析</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/CPP-Inherit.html#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="CPP-Inherit.html" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="page-pv"><i class="fa fa-file-o">本文总阅读量</i>
+            <span class="busuanzi-value" id="busuanzi_value_page_pv" ></span>次
+            </span>
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>面向对象的三大特性之一就是继承，继承运行我么重用基类中已经存在的内容，这样就简化了代码的编写工作。继承中有三种继承方式即:public protected private，这三种方式规定了不同的访问权限，这些权限的检查由编译器在语法检查阶段进行，不参与生成最终的机器码，所以在这里不对这三中权限进行讨论，以下的内容都是采用的共有继承。</p>
+<a id="more"></a>
+<h1 id="单继承"><a href="#单继承" class="headerlink" title="单继承"></a>单继承</h1><p>首先看下面的代码：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">CParent</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">	CParent()&#123;</span><br><span class="line">		<span class="built_in">printf</span>(<span class="string">"CParent()\n"</span>);</span><br><span class="line">	&#125;</span><br><span class="line">	~CParent()&#123;</span><br><span class="line">		<span class="built_in">printf</span>(<span class="string">"~CParent()\n"</span>);</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">void</span> <span class="title">setNumber</span><span class="params">(<span class="keyword">int</span> n)</span></span>&#123;</span><br><span class="line">		m_nParent = n;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">int</span> <span class="title">getNumber</span><span class="params">()</span></span>&#123;</span><br><span class="line">		<span class="keyword">return</span> m_nParent;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">protected</span>:</span><br><span class="line">	<span class="keyword">int</span> m_nParent;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">CChild</span> :</span> <span class="keyword">public</span> CParent</span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">	<span class="function"><span class="keyword">void</span> <span class="title">ShowNumber</span><span class="params">(<span class="keyword">int</span> n)</span></span>&#123;</span><br><span class="line">		setNumber(n);</span><br><span class="line">		m_nChild = <span class="number">2</span> *m_nParent;</span><br><span class="line">		<span class="built_in">printf</span>(<span class="string">"child:%d\n"</span>, m_nChild);</span><br><span class="line">		<span class="built_in">printf</span>(<span class="string">"parent:%d\n"</span>, m_nParent);</span><br><span class="line">	&#125;</span><br><span class="line"><span class="keyword">protected</span>:</span><br><span class="line">	<span class="keyword">int</span> m_nChild;</span><br><span class="line">&#125;;</span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	CChild cc;</span><br><span class="line">	cc.ShowNumber(<span class="number">2</span>);</span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>上面的代码中定义了一个基类，以及一个对应的派生类，在派生类的函数中，调用和成员m_nParent，我们没有在派生类中定义这个变量，很明显这个变量来自于基类，子类会继承基类中的函数成员和数据成员，下面的汇编代码展示了它是如何存储以及如何调用函数的:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br></pre></td><td class="code"><pre><span class="line">41:       CChild cc;</span><br><span class="line">004012AD   lea         ecx,[ebp-14h];将类对象的首地址this放入ecx中</span><br><span class="line">004012B0   call        @ILT+5(CChild::CChild) (0040100a);调用构造函数</span><br><span class="line">004012B5   mov         dword ptr [ebp-4],0</span><br><span class="line">42:       cc.ShowNumber(2);</span><br><span class="line">004012BC   push        2</span><br><span class="line">004012BE   lea         ecx,[ebp-14h]</span><br><span class="line">004012C1   call        @ILT+10(CChild::ShowNumber) (0040100f);调用自身的函数</span><br><span class="line">43:       return 0;</span><br><span class="line">004012C6   mov         dword ptr [ebp-18h],0</span><br><span class="line">004012CD   mov         dword ptr [ebp-4],0FFFFFFFFh</span><br><span class="line">004012D4   lea         ecx,[ebp-14h]</span><br><span class="line">004012D7   call        @ILT+25(CChild::~CChild) (0040101e);调用析构函数</span><br><span class="line">004012DC   mov         eax,dword ptr [ebp-18h]</span><br><span class="line">;构造函数</span><br><span class="line">0040140A   mov         dword ptr [ebp-4],ecx</span><br><span class="line">0040140D   mov         ecx,dword ptr [ebp-4];到此ecx和ebp - 4位置的值都是对象的首地址</span><br><span class="line">00401410   call        @ILT+35(CParent::CParent) (00401028);调用父类的构造</span><br><span class="line">00401415   mov         eax,dword ptr [ebp-4]</span><br><span class="line">;ShowNumber函数</span><br><span class="line">00401339   pop         ecx;还原this指针</span><br><span class="line">0040133A   mov         dword ptr [ebp-4],ecx;ebp - 4存储的是this指针</span><br><span class="line">31:           setNumber(n);</span><br><span class="line">0040133D   mov         eax,dword ptr [ebp+8];ebp + 8是showNumber参数</span><br><span class="line">00401340   push        eax</span><br><span class="line">00401341   mov         ecx,dword ptr [ebp-4]</span><br><span class="line">00401344   call        @ILT+0(CParent::setNumber) (00401005)</span><br><span class="line">32:           m_nChild &#x3D; 2 *m_nParent;</span><br><span class="line">00401349   mov         ecx,dword ptr [ebp-4]</span><br><span class="line">0040134C   mov         edx,dword ptr [ecx];取this对象的头4个字节的值到edx中</span><br><span class="line">0040134E   shl         edx,1;edx左移1位，相当于edx &#x3D; edx * 2</span><br><span class="line">00401350   mov         eax,dword ptr [ebp-4]</span><br><span class="line">00401353   mov         dword ptr [eax+4],edx ;将edx的值放入到对象的第4个字节处</span><br><span class="line">33:           printf(&quot;child:%d\n&quot;, m_nChild);</span><br><span class="line">00401356   mov         ecx,dword ptr [ebp-4]</span><br><span class="line">00401359   mov         edx,dword ptr [ecx+4]</span><br><span class="line">0040135C   push        edx</span><br><span class="line">0040135D   push        offset string &quot;child:%d\n&quot; (0042f02c)</span><br><span class="line">00401362   call        printf (00401c70)</span><br><span class="line">00401367   add         esp,8</span><br><span class="line">34:           printf(&quot;parent:%d\n&quot;, m_nParent);</span><br><span class="line">0040136A   mov         eax,dword ptr [ebp-4]</span><br><span class="line">0040136D   mov         ecx,dword ptr [eax]</span><br><span class="line">0040136F   push        ecx</span><br><span class="line">00401370   push        offset string &quot;parent:%d\n&quot; (0042f01c)</span><br><span class="line">00401375   call        printf (00401c70)</span><br><span class="line">0040137A   add         esp,8</span><br><span class="line">;setNumber函数</span><br><span class="line">16:           m_nParent &#x3D; n;</span><br><span class="line">004013CD   mov         eax,dword ptr [ebp-4]</span><br><span class="line">004013D0   mov         ecx,dword ptr [ebp+8]</span><br><span class="line">004013D3   mov         dword ptr [eax],ecx;给对象的头四个字节赋值</span><br></pre></td></tr></table></figure>
+<p>从上面的汇编代码可以看到大致的执行流程，首先调用编译器提供的默认构造函数，在这个构造函数中调用父类的构造函数，然后在showNumber中调用setNumber为父类的m_nParent赋值，然后为m_nChild赋值，最后执行输出语句。<br>上面的汇编代码在执行为m_nParent赋值时操作的内存地址是this，而为m_nChild赋值时操作的是this + 4通过这一点可以看出，类CChild在内存中的分布，首先在低地址位分步的是基类的成员，高地址为分步的是派生类的成员，我们随着代码的执行，查看寄存器和内存的值也发现，m_nParent在低地址位m_nChild在高地址位：<br><img src="http://img.blog.csdn.net/20160706225137823" alt="这里写图片描述"><br>当父类中含有构造函数，而子类中没有时，编译器会提供默认构造函数，这个构造只调用父类的构造，而不做其他多余的操作，但是如果子类中构造，而父类中没有构造，则不会为父类提供默认构造。但是当父类中有虚函数时又例外，这个时候会为父类提供默认构造，以便初始化虚函数表指针。<br>在析构时，为了可以析构父类会首先调用子类的析构，当析构到父类的部分时，调用父类的构造，也就是说析构的调用顺序与构造正好相反。<br>子类在内存中的排列顺序为先依次摆放父类的成员，后安排子类的成员。<br>C++中的函数符号名称与C中的有很大的不同，编译器根据这个符号名称可以知道这个函数的形参列表，和作用范围，所以在继承的情况下，父类的成员函数的作用范围在父类中，而派生类则包含了父类的成员，所以自然包含了父类的作用范围，在进行函数调用时，会首先在其自身的范围中查找，然后再在其父类中查找，因此子类可以调用父类的函数。在子类中将父类的成员放到内存的前段是为了方便子类调用父类中的成员。但是当子类中有对应的函数，这个时候会直接调用子类中的函数，这个时候发生了覆盖。<br>当类中定义了其他类成员，并定义了初始化列表时，构造的顺序又是怎样的呢？</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">CParent</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">	CParent()&#123;</span><br><span class="line">		m_nParent = <span class="number">0</span>;</span><br><span class="line">	&#125;</span><br><span class="line"><span class="keyword">protected</span>:</span><br><span class="line">	<span class="keyword">int</span> m_nParent;</span><br><span class="line">&#125;;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">CInit</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">	CInit()&#123;</span><br><span class="line">		m_nNumber = <span class="number">0</span>;</span><br><span class="line">	&#125;</span><br><span class="line"><span class="keyword">protected</span>:</span><br><span class="line">	<span class="keyword">int</span> m_nNumber;</span><br><span class="line">&#125;;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">CChild</span> :</span> <span class="keyword">public</span> CParent</span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">	CChild(): m_nChild(<span class="number">1</span>)&#123;&#125;</span><br><span class="line"><span class="keyword">protected</span>:</span><br><span class="line">	CInit m_Init;</span><br><span class="line">	<span class="keyword">int</span> m_nChild;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">34:       CChild cc;</span><br><span class="line">00401288   lea         ecx,[ebp-0Ch]</span><br><span class="line">0040128B   call        @ILT+5(CChild::CChild) (0040100a)</span><br><span class="line">;构造函数</span><br><span class="line">004012C9   pop         ecx</span><br><span class="line">004012CA   mov         dword ptr [ebp-4],ecx</span><br><span class="line">004012CD   mov         ecx,dword ptr [ebp-4]</span><br><span class="line">004012D0   call        @ILT+25(CParent::CParent) (0040101e);先调用父类的构造</span><br><span class="line">004012D5   mov         ecx,dword ptr [ebp-4]</span><br><span class="line">004012D8   add         ecx,4</span><br><span class="line">004012DB   call        @ILT+0(CInit::CInit) (00401005);然后调用类成员的构造</span><br><span class="line">004012E0   mov         eax,dword ptr [ebp-4]</span><br><span class="line">004012E3   mov         dword ptr [eax+8],1;最后调用初始化列表中的操作</span><br><span class="line">004012EA   mov         eax,dword ptr [ebp-4]</span><br></pre></td></tr></table></figure>
+<p>综上分析，编译器在对对象进行初始化时是根据各个部分在内存中的排放顺序来进行初始化的，就上面的例子来说，最上面的是基类的所以它首先调用的是基类的构造，然后是类的成员，所以接着调用成员对象的构造函数，最后是自身定义的变量，所以最后初始化自身的变量，但是初始化列表中的操作是先于类自身构造函数中的代码的。<br>由于父类的成员在内存中的分步是先于派生类自身的成员，所以通过派生类的指针可以很容易寻址到父类的成员，而且可以将派生类的指针转化为父类进行操作，并且不会出错，但是反过来将父类的指针转化为派生类来使用则会造成越界访问。<br>下面我们来看一下对于虚表指针的初始化问题，如果在基类中存在虚函数，而且在派生类中重写这个虚函数的话，编译器会如何初始化虚表指针。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">CParent</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">	<span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">print</span><span class="params">()</span></span>&#123;</span><br><span class="line">		<span class="built_in">printf</span>(<span class="string">"CParent()\n"</span>);</span><br><span class="line">	&#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">CChild</span> :</span> <span class="keyword">public</span> CParent</span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">	<span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">print</span><span class="params">()</span></span>&#123;</span><br><span class="line">		<span class="built_in">printf</span>(<span class="string">"CChild()\n"</span>);</span><br><span class="line">	&#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	CChild cc;</span><br><span class="line"> 	<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">;函数地址</span><br><span class="line">@ILT+0(?print@CParent@@UAEXXZ):</span><br><span class="line">00401005   jmp         CParent::print</span><br><span class="line">@ILT+10(?print@CChild@@UAEXXZ):</span><br><span class="line">0040100F   jmp         CChild::print</span><br><span class="line">;派生类构造函数</span><br><span class="line">004012C9   pop         ecx</span><br><span class="line">004012CA   mov         dword ptr [ebp-4],ecx</span><br><span class="line">004012CD   mov         ecx,dword ptr [ebp-4]</span><br><span class="line">004012D0   call        @ILT+30(CParent::CParent) (00401023)</span><br><span class="line">004012D5   mov         eax,dword ptr [ebp-4]</span><br><span class="line">004012D8   mov         dword ptr [eax],offset CChild::&#96;vftable&#39; (0042f01c)</span><br><span class="line">004012DE   mov         eax,dword ptr [ebp-4]</span><br><span class="line">;基类构造函数</span><br><span class="line">00401379   pop         ecx</span><br><span class="line">0040137A   mov         dword ptr [ebp-4],ecx</span><br><span class="line">0040137D   mov         eax,dword ptr [ebp-4]</span><br><span class="line">00401380   mov         dword ptr [eax],offset CParent::&#96;vftable&#39; (0042f02c)</span><br></pre></td></tr></table></figure>
+
+<p>上述代码的基本流程是首先执行基类的构造函数，在基类中首先初始化虚函数指针，从上面的汇编代码中可以看到，这个虚函数指针的值为0x0042f02c查看这块内存可以看到，它保存的值为0x00401005上面我们列出的虚函数地址可以看到，这个值正是基类中虚函数的地址。当基类的构造函数调用完成后，接着执行派生类的虚表指针的初始化，将它自身虚函数的地址存入到虚表中。<br>通过上面的分析可以知道，在派生类中如果重写了基类中的虚函数，那么在创建新的类对象时会有两次虚表指针的初始化操作，第一次是将基类的虚表指针赋值给对象，然后再将自身的虚表指针赋值给对象，将前一次的覆盖，如果是在基类的构造中调用虚函数，这个时候由于还没有生成派生类，所以会直接寻址，找到基类中的虚函数，这个时候不会构成多态，但是如果在派生类的构造函数中调用，这个时候已经初始化了虚表指针，会进行虚表的间接寻址调用派生类的虚函数构成多态。<br>析构函数与构造函数相反，在执行析构时，会首先将虚表指针赋值为当前类的虚表地址，调用当前类的虚函数，然后再将虚表指针赋值为其基类的虚表地址，执行基类的虚函数。</p>
+<h1 id="多重继承"><a href="#多重继承" class="headerlink" title="多重继承"></a>多重继承</h1><p>多重继承的情况与单继承的情况类似，只是其父类变为多个，首先来分析多重继承的内存分布情况</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">CParent1</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">	<span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">fnc1</span><span class="params">()</span></span>&#123;</span><br><span class="line">		<span class="built_in">printf</span>(<span class="string">"CParent1 fnc1\n"</span>);</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">protected</span>:</span><br><span class="line">	<span class="keyword">int</span> m_n1;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">CParent2</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">	<span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">fnc2</span><span class="params">()</span></span>&#123;</span><br><span class="line">		<span class="built_in">printf</span>(<span class="string">"CParent2 fnc2\n"</span>);</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">protected</span>:</span><br><span class="line">	<span class="keyword">int</span> m_n2;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">CChild</span> :</span> <span class="keyword">public</span> CParent1, <span class="keyword">public</span> CParent2</span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">	<span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">fnc1</span><span class="params">()</span></span>&#123;</span><br><span class="line">		<span class="built_in">printf</span>(<span class="string">"CChild fnc1()\n"</span>);</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">fnc2</span><span class="params">()</span></span>&#123;</span><br><span class="line">		<span class="built_in">printf</span>(<span class="string">"CChild fnc2()\n"</span>);</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">protected</span>:</span><br><span class="line">	<span class="keyword">int</span> m_n3;</span><br><span class="line">&#125;;</span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	CChild cc;</span><br><span class="line">	CParent1 *p = &amp;cc;</span><br><span class="line">	p-&gt;fnc1();</span><br><span class="line">	CParent2 *p1 = &amp;cc;</span><br><span class="line">	p1-&gt;fnc2();</span><br><span class="line">	p = <span class="literal">NULL</span>;</span><br><span class="line">	p1 = <span class="literal">NULL</span>;</span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>上述代码中，CChild类有两个基类，CParent1 CParent2 ，并且重写了这两个类中的函数：fnc1 fnc2，然后在主函数中分别将cc对象转化为它的两个基类的指针，通过指针调用虚函数，实现多态。下面是它的反汇编代码</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br></pre></td><td class="code"><pre><span class="line">43:       CChild cc;</span><br><span class="line">004012A8   lea         ecx,[ebp-14h];对象的this指针</span><br><span class="line">004012AB   call        @ILT+15(CChild::CChild) (00401014)</span><br><span class="line">44:       CParent1 *p &#x3D; &amp;cc;</span><br><span class="line">004012B0   lea         eax,[ebp-14h]</span><br><span class="line">004012B3   mov         dword ptr [ebp-18h],eax;[ebp - 18h]是p的值</span><br><span class="line">45:       p-&gt;fnc1();</span><br><span class="line">004012B6   mov         ecx,dword ptr [ebp-18h]</span><br><span class="line">004012B9   mov         edx,dword ptr [ecx];对象的头四个字节是虚函数表指针</span><br><span class="line">004012BB   mov         esi,esp</span><br><span class="line">004012BD   mov         ecx,dword ptr [ebp-18h]</span><br><span class="line">004012C0   call        dword ptr [edx];通过虚函数地址调用虚函数</span><br><span class="line">;部分代码略</span><br><span class="line">46:       CParent2 *p1 &#x3D; &amp;cc;</span><br><span class="line">004012C9   lea         eax,[ebp-14h];eax &#x3D; this</span><br><span class="line">004012CC   test        eax,eax</span><br><span class="line">004012CE   je          main+48h (004012d8);校验this是否为空</span><br><span class="line">004012D0   lea         ecx,[ebp-0Ch];this指针向下偏移8个字节</span><br><span class="line">004012D3   mov         dword ptr [ebp-20h],ecx</span><br><span class="line">004012D6   jmp         main+4Fh (004012df)</span><br><span class="line">004012D8   mov         dword ptr [ebp-20h],0;如果this为null会将edx赋值为0</span><br><span class="line">004012DF   mov         edx,dword ptr [ebp-20h];edx &#x3D; this + 8</span><br><span class="line">004012E2   mov         dword ptr [ebp-1Ch],edx;[ebp - 1CH]是p1的值</span><br><span class="line">47:       p1-&gt;fnc2();</span><br><span class="line">004012E5   mov         eax,dword ptr [ebp-1Ch]</span><br><span class="line">004012E8   mov         edx,dword ptr [eax]</span><br><span class="line">004012EA   mov         esi,esp</span><br><span class="line">004012EC   mov         ecx,dword ptr [ebp-1Ch]</span><br><span class="line">004012EF   call        dword ptr [edx]</span><br><span class="line">004012F1   cmp         esi,esp</span><br><span class="line">004012F3   call        __chkesp (00401680)</span><br><span class="line">;CChild构造函数</span><br><span class="line">0040135A   mov         dword ptr [ebp-4],ecx</span><br><span class="line">0040135D   mov         ecx,dword ptr [ebp-4]</span><br><span class="line">00401360   call        @ILT+40(CParent1::CParent1) (0040102d)</span><br><span class="line">00401365   mov         ecx,dword ptr [ebp-4]</span><br><span class="line">00401368   add         ecx,8;将指向对象首地址的指针向下偏移了8个字节</span><br><span class="line">0040136B   call        @ILT+45(CParent2::CParent2) (00401032)</span><br><span class="line">00401370   mov         eax,dword ptr [ebp-4]</span><br><span class="line">00401373   mov         dword ptr [eax],offset CChild::&#96;vftable&#39; (0042f020)</span><br><span class="line">00401379   mov         ecx,dword ptr [ebp-4]</span><br><span class="line">0040137C   mov         dword ptr [ecx+8],offset CChild::&#96;vftable&#39; (0042f01c)</span><br><span class="line">00401383   mov         eax,dword ptr [ebp-4]</span><br><span class="line">;CParent1构造函数</span><br><span class="line">00401469   pop         ecx</span><br><span class="line">0040146A   mov         dword ptr [ebp-4],ecx</span><br><span class="line">0040146D   mov         eax,dword ptr [ebp-4]</span><br><span class="line">00401470   mov         dword ptr [eax],offset CParent1::&#96;vftable&#39; (0042f04c);初始化虚表指针</span><br><span class="line">00401476   mov         eax,dword ptr [ebp-4]</span><br><span class="line">;CParent2构造函数</span><br><span class="line">004014F9   pop         ecx</span><br><span class="line">004014FA   mov         dword ptr [ebp-4],ecx</span><br><span class="line">004014FD   mov         eax,dword ptr [ebp-4]</span><br><span class="line">00401500   mov         dword ptr [eax],offset CParent2::&#96;vftable&#39; (0042f064);初始化虚表指针</span><br><span class="line">00401506   mov         eax,dword ptr [ebp-4]</span><br><span class="line">;虚函数地址</span><br><span class="line">@ILT+0(?fnc2@CChild@@UAEXXZ):</span><br><span class="line">00401005   jmp         CChild::fnc2 (00401400)</span><br><span class="line">@ILT+5(?fnc1@CParent1@@UAEXXZ):</span><br><span class="line">0040100A   jmp         CParent1::fnc1 (00401490)</span><br><span class="line">@ILT+10(?fnc1@CChild@@UAEXXZ):</span><br><span class="line">0040100F   jmp         CChild::fnc1 (004013b0)</span><br><span class="line">@ILT+20(?fnc2@CParent2@@UAEXXZ):</span><br><span class="line">00401019   jmp         CParent2::fnc2 (00401520)</span><br></pre></td></tr></table></figure>
+<table>
+<thead>
+<tr>
+<th align="left">内存地址</th>
+<th align="left">存储的值</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">0012FF6C</td>
+<td align="left">20 F0 42 00</td>
+</tr>
+<tr>
+<td align="left">0012FF70</td>
+<td align="left">CC CC CC CC</td>
+</tr>
+<tr>
+<td align="left">0012FF74</td>
+<td align="left">1C F0 42 00</td>
+</tr>
+<tr>
+<td align="left">0012FF78</td>
+<td align="left">CC CC CC CC</td>
+</tr>
+<tr>
+<td align="left">0012FF7C</td>
+<td align="left">CC CC CC CC</td>
+</tr>
+<tr>
+<td align="left">从上面的汇编代码中可以看到，在为该类对象分配内存时，会根据继承的顺序，依次调用基类的构造函数，在构造函数中，与单继承类似，在各个基类的构造中，先将虚表指针初始化为各个基类的虚表地址，然后在调用完各个基类的构造函数后将虚表指针覆盖为对象自身的虚表地址，唯一不同的是，派生类有多个虚表指针，有几个派生类就有几个虚表指针。另外派生类的内存分布与单继承的分布情况相似，根据继承顺序从低地址到高地址依次摆放，最后是派生类自己定义的部分，每个基类都会在其自身所在位置的首地址处构建一个虚表。</td>
+<td align="left"></td>
+</tr>
+<tr>
+<td align="left">在调用各自基类的构造函数时，并不是笼统的将对象的首地址传递给基类的构造函数，而是经过相应的地址偏移之后，将偏移后的地址传递给对应的构造。在转化为父类的指针时也是经过了相应的地址偏移。</td>
+<td align="left"></td>
+</tr>
+<tr>
+<td align="left">在析构时首先析构自身，然后按照与构造相反的顺序调用基类的析构函数。</td>
+<td align="left"></td>
+</tr>
+<tr>
+<td align="left">## dynamic_cast强制类型转化与static_cast类型转化</td>
+<td align="left"></td>
+</tr>
+<tr>
+<td align="left">根据上面的说明我们可以简单的画一张图：</td>
+<td align="left"></td>
+</tr>
+<tr>
+<td align="left"><img src="http://img.blog.csdn.net/20171012224220685?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvbGFudWFnZQ==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></td>
+<td align="left"></td>
+</tr>
+<tr>
+<td align="left">这个对象中有三个虚表，分别位于各个基类所在内存的首地址处，如果我们利用多态的特性进行类型转化的话如果采用static_cast的方式会进行静态转化，也就是说它只是简单的将对象的首地址进行类型转化，这个时候如果调用CParent2的函数，在编译的时候不会报错，但是在运行时可能在虚表中（注意如果是这种情况它找到的虚表其实是CParent1的虚表）找不到想要的虚函数，这个时候调用会引起非法内存访问，造成程序崩溃。但是用dynamic_cast可以进行偏移地址的计算，自动偏移到CParent2内存部分的首地址，这个时候调用虚函数不会产生崩溃的问题。所以在有多重继承和多继承的时候尽量使用dynamic_cast进行类型转化。</td>
+<td align="left"></td>
+</tr>
+<tr>
+<td align="left"># 抽象类</td>
+<td align="left"></td>
+</tr>
+<tr>
+<td align="left">抽象类是不能实例化的类，只要有纯虚函数就是一个抽象类。纯虚函数是只有定义而没有实现的函数，由于虚函数的地址需要填入虚表，所以必须提供虚函数的定义，以便编译器能够将虚函数的地址放入虚表，所以虚函数必须定义，但是纯虚函数不一样，它不能定义。</td>
+<td align="left"></td>
+</tr>
+<tr>
+<td align="left"><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">CParent</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">	<span class="function"><span class="keyword">virtual</span> <span class="title">show</span><span class="params">()</span> </span>= <span class="number">0</span>;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">CChild</span> :</span> <span class="keyword">public</span> CParent</span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">	<span class="function"><span class="keyword">virtual</span> <span class="title">show</span><span class="params">()</span></span>&#123;</span><br><span class="line">		<span class="built_in">printf</span>(<span class="string">"CChild()\n"</span>);</span><br><span class="line">	&#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	CChild cc;</span><br><span class="line">	CParent *p = &amp;cc;</span><br><span class="line">	p-&gt;show();</span><br><span class="line"> 	<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></td>
+<td align="left"></td>
+</tr>
+<tr>
+<td align="left">上面的代码定义了一个抽象类CParent，而CChild继承这个抽象类并实现了其中的纯虚函数，在主函数中通过基类的指针掉用虚函数，形成多态。</td>
+<td align="left"></td>
+</tr>
+<tr>
+<td align="left"><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">22:       CChild cc;</span><br><span class="line">00401288   lea         ecx,[ebp-4]</span><br><span class="line">0040128B   call        @ILT+0(CChild::CChild) (00401005)</span><br><span class="line">23:       CParent *p &#x3D; &amp;cc;</span><br><span class="line">00401290   lea         eax,[ebp-4]</span><br><span class="line">00401293   mov         dword ptr [ebp-8],eax</span><br><span class="line">24:       p-&gt;show();</span><br><span class="line">00401296   mov         ecx,dword ptr [ebp-8]</span><br><span class="line">00401299   mov         edx,dword ptr [ecx]</span><br><span class="line">0040129B   mov         esi,esp</span><br><span class="line">0040129D   mov         ecx,dword ptr [ebp-8]</span><br><span class="line">004012A0   call        dword ptr [edx]</span><br><span class="line">;CChild构造函数</span><br><span class="line">004012F0   call        @ILT+25(CParent::CParent) (0040101e)</span><br><span class="line">004012F5   mov         eax,dword ptr [ebp-4]</span><br><span class="line">004012F8   mov         dword ptr [eax],offset CChild::&#96;vftable&#39; (0042f01c)</span><br><span class="line">CParent构造函数</span><br><span class="line">00401399   pop         ecx</span><br><span class="line">0040139A   mov         dword ptr [ebp-4],ecx</span><br><span class="line">0040139D   mov         eax,dword ptr [ebp-4]</span><br><span class="line">004013A0   mov         dword ptr [eax],offset CParent::&#96;vftable&#39; (0042f02c)</span><br><span class="line">004013A6   mov         eax,dword ptr [ebp-4]</span><br></pre></td></tr></table></figure></td>
+<td align="left"></td>
+</tr>
+<tr>
+<td align="left">构造函数中仍然是调用了基类的构造函数，并在基类的构造中对虚表指针进行了赋值，但是基类中并没有定义show函数，而是将它作为纯虚函数，那么虚表中存储的的是什么东西呢，这个位置存储的是一个_purecall函数，主要是为了防止误调纯虚函数。</td>
+<td align="left"></td>
+</tr>
+<tr>
+<td align="left"># 菱形继承</td>
+<td align="left"></td>
+</tr>
+<tr>
+<td align="left">菱形继承是最为复杂的一种继承方式，它结合了单继承和多继承</td>
+<td align="left"></td>
+</tr>
+<tr>
+<td align="left"><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">CGrand</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">	<span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">func1</span><span class="params">()</span></span>&#123;</span><br><span class="line">		<span class="built_in">printf</span>(<span class="string">"CGrand func1()\n"</span>);</span><br><span class="line">	&#125;</span><br><span class="line"><span class="keyword">protected</span>:</span><br><span class="line">	<span class="keyword">int</span> m_nNum1;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">CParent1</span> :</span> <span class="keyword">public</span> CGrand</span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">	<span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">func2</span><span class="params">()</span></span>&#123;</span><br><span class="line">		<span class="built_in">printf</span>(<span class="string">"CParent1 func2()\n"</span>);</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">func3</span><span class="params">()</span></span>&#123;</span><br><span class="line">		<span class="built_in">printf</span>(<span class="string">"CParent1 func3()\n"</span>);</span><br><span class="line">	&#125;</span><br><span class="line"><span class="keyword">protected</span>:</span><br><span class="line">	<span class="keyword">int</span> m_nNum2;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">CParent2</span> :</span> <span class="keyword">public</span> CGrand</span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">	<span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">func4</span><span class="params">()</span></span>&#123;</span><br><span class="line">		<span class="built_in">printf</span>(<span class="string">"CParent2 func4()\n"</span>);</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">func5</span><span class="params">()</span></span>&#123;</span><br><span class="line">		<span class="built_in">printf</span>(<span class="string">"CParent2 func5()\n"</span>);</span><br><span class="line">	&#125;</span><br><span class="line"><span class="keyword">protected</span>:</span><br><span class="line">	<span class="keyword">int</span> m_nNum3;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">CChild</span> :</span> <span class="keyword">public</span> CParent1, <span class="keyword">public</span> CParent2</span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">	<span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">func2</span><span class="params">()</span></span>&#123;</span><br><span class="line">		<span class="built_in">printf</span>(<span class="string">"CChild func2()\n"</span>);</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">func4</span><span class="params">()</span></span>&#123;</span><br><span class="line">		<span class="built_in">printf</span>(<span class="string">"CChild func4()\n"</span>);</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">protected</span>:</span><br><span class="line">	<span class="keyword">int</span> m_nNum4;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	CChild cc;</span><br><span class="line">	CParent1 *p1 = &amp;cc;</span><br><span class="line">	CParent2 *p2 = &amp;cc;</span><br><span class="line"> 	<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></td>
+<td align="left"></td>
+</tr>
+<tr>
+<td align="left">上面的代码中有4个类，其中CGrand类为祖父类，而CParent1 CParent2为父类，他们都派生自组父类，而子类继承与CParent1 CParent2，根据前面的经验可以知道sizeof(CGrand) = 4(vt) + 4(int) = 8，而sizeof(CParent1) = sizeof(CParent2) = sizeof(CGrand) + 4(int) = 12， sizeof(CChild) = sizeof(CParent1) + sizeof(CParent2) + 4(int) = 28;</td>
+<td align="left"></td>
+</tr>
+<tr>
+<td align="left">大致可以知道CChild对象的内存分布是CParent1 CParent2 int这种情况，通过反汇编的方式我们可以看出对象的内存分布如下：</td>
+<td align="left"></td>
+</tr>
+<tr>
+<td align="left"><img src="http://img.blog.csdn.net/20160709204624054" alt="这里写图片描述"></td>
+<td align="left"></td>
+</tr>
+<tr>
+<td align="left">内存的分步来看，CParent1 CParent2都继承自CGrand类，所以他们都有CGrand类的成员，而CChild类继承自两个类，所以CGrand类的成员在CChild类中有两份，所以在调用m_nNum1成员时会产生二义性，编译器不知道你准备调用那个m_nNum1成员，所以一般这个时候需要指定调用的是哪个部分的m_nNum1成员。同时在转化为祖父类的时候也会产生二义性。而虚继承可以有效的解决这个问题。一般来说虚继承可以有效的避免二义性是因为重复的内容在对象中只有一份。下面对上述例子进行相应的修改，为每个类添加构造函数构造初始化这些成员变量：m_nNum1 = 1；m_nNum2 = 2； m_nNum3 = 3； m_nNum4 = 4；</td>
+<td align="left"></td>
+</tr>
+<tr>
+<td align="left">另外再为CParent1 CParent2类添加虚继承。这个时候我们运行程序输入类CChild的大小：sizeof(CChild) = 36；按照之前所说的同样的内容只保留的一份，那内存大小应该会减少才对，为何突然增大了8个字节呢，下面来看看对象在内存中的分步：</td>
+<td align="left"></td>
+</tr>
+<tr>
+<td align="left">0012FF5C  30 F0 42 00</td>
+<td align="left"></td>
+</tr>
+<tr>
+<td align="left">0012FF60  48 F0 42 00</td>
+<td align="left"></td>
+</tr>
+<tr>
+<td align="left">0012FF64  02 00 00 00</td>
+<td align="left"></td>
+</tr>
+<tr>
+<td align="left">0012FF68  24 F0 42 00</td>
+<td align="left"></td>
+</tr>
+<tr>
+<td align="left">0012FF6C  3C F0 42 00</td>
+<td align="left"></td>
+</tr>
+<tr>
+<td align="left">0012FF70  03 00 00 00</td>
+<td align="left"></td>
+</tr>
+<tr>
+<td align="left">0012FF74  04 00 00 00</td>
+<td align="left"></td>
+</tr>
+<tr>
+<td align="left">0012FF78  20 F0 42 00</td>
+<td align="left"></td>
+</tr>
+<tr>
+<td align="left">0012FF7C  01 00 00 00</td>
+<td align="left"></td>
+</tr>
+<tr>
+<td align="left">上述内存的分步与我们之前想象的有很大的不同，所有变量的确只有一份，但是总内存大小还是变大了，同时它的存储顺序也不是按照我们之前所说的父类的排在子类的前面，而且还多了一些我们并不了解的数据</td>
+<td align="left"></td>
+</tr>
+<tr>
+<td align="left">下面通过反汇编代码来说明这些数值的作用：</td>
+<td align="left"></td>
+</tr>
+<tr>
+<td align="left"><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br></pre></td><td class="code"><pre><span class="line">;主函数部分</span><br><span class="line">73:       CChild cc;</span><br><span class="line">004012D8   push        1;是否构造祖父类1表示构造，0表示不构造</span><br><span class="line">004012DA   lea         ecx,[ebp-24h]</span><br><span class="line">004012DD   call        @ILT+5(CChild::CChild) (0040100a)</span><br><span class="line">74:       printf(&quot;%d\n&quot;, sizeof(cc));</span><br><span class="line">004012E2   push        24h</span><br><span class="line">004012E4   push        offset string &quot;%d\n&quot; (0042f01c)</span><br><span class="line">004012E9   call        printf (00401a70)</span><br><span class="line">004012EE   add         esp,8</span><br><span class="line">75:       CParent1 *p1 &#x3D; &amp;cc;</span><br><span class="line">004012F1   lea         eax,[ebp-24h]</span><br><span class="line">004012F4   mov         dword ptr [ebp-28h],eax</span><br><span class="line">76:       CParent2 *p2 &#x3D; &amp;cc;</span><br><span class="line">004012F7   lea         ecx,[ebp-24h]</span><br><span class="line">004012FA   test        ecx,ecx</span><br><span class="line">004012FC   je          main+46h (00401306)</span><br><span class="line">004012FE   lea         edx,[ebp-18h]</span><br><span class="line">00401301   mov         dword ptr [ebp-34h],edx</span><br><span class="line">00401304   jmp         main+4Dh (0040130d)</span><br><span class="line">00401306   mov         dword ptr [ebp-34h],0</span><br><span class="line">0040130D   mov         eax,dword ptr [ebp-34h]</span><br><span class="line">00401310   mov         dword ptr [ebp-2Ch],eax</span><br><span class="line">77:       CGrand *p3 &#x3D; &amp;cc;</span><br><span class="line">00401313   lea         ecx,[ebp-24h]</span><br><span class="line">00401316   test        ecx,ecx;this指针不为空</span><br><span class="line">00401318   jne         main+63h (00401323);不为空则跳转</span><br><span class="line">0040131A   mov         dword ptr [ebp-38h],0</span><br><span class="line">00401321   jmp         main+70h (00401330)</span><br><span class="line">00401323   mov         edx,dword ptr [ebp-20h];edx &#x3D; 0x0040f048</span><br><span class="line">00401326   mov         eax,dword ptr [edx+4];eax &#x3D; 0x18这个可以通过查看内存获得</span><br><span class="line">00401329   lea         ecx,[ebp+eax-20h]; ebp + eax - 20h &#x3D; 0x0012ff78, ecx &#x3D; 0x0012FF78</span><br><span class="line">0040132D   mov         dword ptr [ebp-38h],ecx;经过偏移后获得这个地址</span><br><span class="line">00401330   mov         edx,dword ptr [ebp-38h]</span><br><span class="line">00401333   mov         dword ptr [ebp-30h],edx</span><br><span class="line">;CChild构造</span><br><span class="line">0040135A   mov         dword ptr [ebp-4],ecx</span><br><span class="line">0040135D   cmp         dword ptr [ebp+8],0</span><br><span class="line">00401361   je          CChild::CChild+42h (00401382)</span><br><span class="line">00401363   mov         eax,dword ptr [ebp-4]</span><br><span class="line">00401366   mov         dword ptr [eax+4],offset CChild::&#96;vbtable&#39; (0042f048)</span><br><span class="line">0040136D   mov         ecx,dword ptr [ebp-4]</span><br><span class="line">00401370   mov         dword ptr [ecx+10h],offset CChild::&#96;vbtable&#39; (0042f03c)</span><br><span class="line">00401377   mov         ecx,dword ptr [ebp-4]</span><br><span class="line">0040137A   add         ecx,1Ch</span><br><span class="line">0040137D   call        @ILT+0(CGrand::CGrand) (00401005);this 指针向下偏移1ch，开始构造父类</span><br><span class="line">00401382   push        0;保证父类只构造一次</span><br><span class="line">00401384   mov         ecx,dword ptr [ebp-4]</span><br><span class="line">00401387   call        @ILT+60(CParent1::CParent1) (00401041)</span><br><span class="line">0040138C   push        0</span><br><span class="line">0040138E   mov         ecx,dword ptr [ebp-4]</span><br><span class="line">00401391   add         ecx,0Ch</span><br><span class="line">00401394   call        @ILT+65(CParent2::CParent2) (00401046)</span><br><span class="line">00401399   mov         edx,dword ptr [ebp-4]</span><br><span class="line">0040139C   mov         dword ptr [edx],offset CChild::&#96;vftable&#39; (0042f030)</span><br><span class="line">004013A2   mov         eax,dword ptr [ebp-4]</span><br><span class="line">004013A5   mov         dword ptr [eax+0Ch],offset CChild::&#96;vftable&#39; (0042f024)</span><br><span class="line">004013AC   mov         ecx,dword ptr [ebp-4]</span><br><span class="line">004013AF   mov         edx,dword ptr [ecx+4]</span><br><span class="line">004013B2   mov         eax,dword ptr [edx+4]</span><br><span class="line">004013B5   mov         ecx,dword ptr [ebp-4]</span><br><span class="line">004013B8   mov         dword ptr [ecx+eax+4],offset CChild::&#96;vftable&#39; (0042f020)</span><br><span class="line">57:           m_nNum4 &#x3D; 4;</span><br><span class="line">004013C0   mov         edx,dword ptr [ebp-4]</span><br><span class="line">004013C3   mov         dword ptr [edx+18h],4</span><br><span class="line">58:       &#125;</span><br><span class="line">;CGrand构造</span><br><span class="line">00401429   pop         ecx</span><br><span class="line">0040142A   mov         dword ptr [ebp-4],ecx</span><br><span class="line">0040142D   mov         eax,dword ptr [ebp-4]</span><br><span class="line">00401430   mov         dword ptr [eax],offset CGrand::&#96;vftable&#39; (0042f054);虚表指针后期会被替代</span><br><span class="line">10:           m_nNum1 &#x3D; 1;</span><br><span class="line">00401436   mov         ecx,dword ptr [ebp-4]</span><br><span class="line">00401439   mov         dword ptr [ecx+4],1</span><br><span class="line">11:       &#125;</span><br><span class="line">;CParent1构造</span><br><span class="line">04014C9   pop         ecx</span><br><span class="line">004014CA   mov         dword ptr [ebp-4],ecx</span><br><span class="line">004014CD   cmp         dword ptr [ebp+8],0;不再调用祖父类构造</span><br><span class="line">004014D1   je          CParent1::CParent1+38h (004014e8)</span><br><span class="line">004014D3   mov         eax,dword ptr [ebp-4]</span><br><span class="line">004014D6   mov         dword ptr [eax+4],offset CParent1::&#96;vbtable&#39; (0042f07c)</span><br><span class="line">004014DD   mov         ecx,dword ptr [ebp-4]</span><br><span class="line">004014E0   add         ecx,0Ch</span><br><span class="line">004014E3   call        @ILT+0(CGrand::CGrand) (00401005);这个时候会跳过这个构造函数的调用</span><br></pre></td></tr></table></figure></td>
+<td align="left"></td>
+</tr>
+<tr>
+<td align="left">通过上面的代码可以看出，为了使得相同的内容只有一份，在程序中额外传入一个参数作为标记，用于表示是否调用祖父类构造函数，当初始化完祖父类后将此标记置0以后不再初始化，另外程序在每个父类中都多添加了一个四字节的成员用来存储一个一个偏移地址，以便能正确的将派生类转化为父类。所以每当多出一个虚继承就多了一个记录偏移量的4字节内存，所以这个类总共多出了8个字节。所以这时候的类所占内存大小为28 + 4 * 2 = 36字节。</td>
+<td align="left"></td>
+</tr>
+<tr>
+<td align="left"><hr /></td>
+<td align="left"></td>
+</tr>
+</tbody></table>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+      <div>
+        <div style="padding: 10px 0; margin: 20px auto; width: 90%; text-align: center;">
+  <div></div>
+  <button id="rewardButton" disable="enable" onclick="var qr = document.getElementById('QR'); if (qr.style.display === 'none') {qr.style.display='block';} else {qr.style.display='none'}">
+    <span>打赏</span>
+  </button>
+  <div id="QR" style="display: none;">
+
+    
+      <div id="wechat" style="display: inline-block">
+        <img id="wechat_qr" src="/images/wechatreward.png" alt="Masimaro 微信支付"/>
+        <p>微信支付</p>
+      </div>
+    
+
+    
+      <div id="alipay" style="display: inline-block">
+        <img id="alipay_qr" src="/images/alipayreward.png" alt="Masimaro 支付宝"/>
+        <p>支付宝</p>
+      </div>
+    
+
+    
+
+  </div>
+</div>
+
+      </div>
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/VC/" rel="tag"><i class="fa fa-tag"></i> VC++</a>
+          
+            <a href="/tags/%E5%8F%8D%E6%B1%87%E7%BC%96/" rel="tag"><i class="fa fa-tag"></i> 反汇编</a>
+          
+            <a href="/tags/C-%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86/" rel="tag"><i class="fa fa-tag"></i> C++实现原理</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/oledb-and-ado-9.html" rel="next" title="OLEDB 枚举数据源">
+                <i class="fa fa-chevron-left"></i> OLEDB 枚举数据源
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/oledb-and-ado-10.html" rel="prev" title="OLEDB不使用SQL语句直接打开数据表">
+                OLEDB不使用SQL语句直接打开数据表 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        
+  <div class="bdsharebuttonbox">
+    <a href="#" class="bds_tsina" data-cmd="tsina" title="分享到新浪微博"></a>
+    <a href="#" class="bds_douban" data-cmd="douban" title="分享到豆瓣网"></a>
+    <a href="#" class="bds_sqq" data-cmd="sqq" title="分享到QQ好友"></a>
+    <a href="#" class="bds_qzone" data-cmd="qzone" title="分享到QQ空间"></a>
+    <a href="#" class="bds_weixin" data-cmd="weixin" title="分享到微信"></a>
+    <a href="#" class="bds_tieba" data-cmd="tieba" title="分享到百度贴吧"></a>
+    <a href="#" class="bds_twi" data-cmd="twi" title="分享到Twitter"></a>
+    <a href="#" class="bds_fbook" data-cmd="fbook" title="分享到Facebook"></a>
+    <a href="#" class="bds_more" data-cmd="more"></a>
+    <a class="bds_count" data-cmd="count"></a>
+  </div>
+  <script>
+    window._bd_share_config = {
+      "common": {
+        "bdText": "",
+        "bdMini": "2",
+        "bdMiniList": false,
+        "bdPic": ""
+      },
+      "share": {
+        "bdSize": "16",
+        "bdStyle": "0"
+      },
+      "image": {
+        "viewList": ["tsina", "douban", "sqq", "qzone", "weixin", "twi", "fbook"],
+        "viewText": "分享到：",
+        "viewSize": "16"
+      }
+    }
+  </script>
+
+<script>
+  with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='//bdimg.share.baidu.com/static/api/js/share.js?cdnversion='+~(-new Date()/36e5)];
+</script>
+
+      
+	  
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      <div id="disqus_thread">
+        <noscript>
+          Please enable JavaScript to view the
+          <a href="https://disqus.com/?ref_noscript" target="_blank" rel="noopener">comments powered by Disqus.</a>
+        </noscript>
+      </div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/avatar.jpg"
+                alt="Masimaro" />
+            
+              <p class="site-author-name" itemprop="name">Masimaro</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/%20%7C%7C%20archive">
+              
+                  <span class="site-state-item-count">94</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">18</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">141</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          <div class="links-of-author motion-element">
+            
+              
+                <span class="links-of-author-item">
+                  <a href="https://github.com/aMonst" target="_blank" title="GitHub">
+                    
+                      <i class="fa fa-fw fa-globe"></i>GitHub</a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="http://weibo.com/your-user-name" target="_blank" title="微博">
+                    
+                      <i class="fa fa-fw fa-globe"></i>微博</a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="http://blog.csdn.net/lanuage" target="_blank" title="CSDN博客">
+                    
+                      <i class="fa fa-fw fa-globe"></i>CSDN博客</a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="http://www.jianshu.com/u/7261ff9df286" target="_blank" title="简书">
+                    
+                      <i class="fa fa-fw fa-globe"></i>简书</a>
+                </span>
+              
+            
+          </div>
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#单继承"><span class="nav-number">1.</span> <span class="nav-text">单继承</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#多重继承"><span class="nav-number">2.</span> <span class="nav-text">多重继承</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love" id="heart">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Masimaro</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io" rel="external nofollow">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next" rel="external nofollow">NexT.Mist</a> v5.1.3</div>
+
+
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv">
+      <i class="fa fa-user">本次访客数</i>
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+      人次
+    </span>
+  
+
+  
+    <span class="site-pv">
+      <i class="fa fa-eye">本站总访问量</i>
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+      次
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.3"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.3"></script>
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.3"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.3"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.3"></script>
+
+
+
+  
+
+
+  
+
+    
+      <script id="dsq-count-scr" src="https://masimaroweb.disqus.com/count.js" async></script>
+    
+
+    
+      <script type="text/javascript">
+        var disqus_config = function () {
+          this.page.url = 'http://www.masimaroweb.com/CPP-Inherit.html';
+          this.page.identifier = 'CPP-Inherit.html';
+          this.page.title = 'C++ 继承分析';
+        };
+        var d = document, s = d.createElement('script');
+        s.src = 'https://masimaroweb.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', '' + +new Date());
+        (d.head || d.body).appendChild(s);
+      </script>
+    
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+  
+
+
+  
+
+  
+
+</body>
+</html>
+
+<!-- 页面点击小红心 -->
+<script type="text/javascript" src="/js/src/love.js"></script>

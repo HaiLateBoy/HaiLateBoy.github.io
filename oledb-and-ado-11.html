@@ -1,0 +1,1336 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<script src="//cdn.bootcss.com/pace/1.0.2/pace.min.js"></script>
+<link href="//cdn.bootcss.com/pace/1.0.2/themes/pink/pace-theme-flash.css" rel="stylesheet">
+<style>
+    .pace .pace-progress {
+        background: #1E92FB; /*进度条颜色*/
+        height: 3px;
+    }
+    .pace .pace-progress-inner {
+         box-shadow: 0 0 10px #1E92FB, 0 0 5px     #1E92FB; /*阴影颜色*/
+    }
+    .pace .pace-activity {
+        border-top-color: #1E92FB;    /*上边框颜色*/
+        border-left-color: #1E92FB;    /*左边框颜色*/
+    }
+</style>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.3" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.3">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.3">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.3">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.3" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="OLEDB, 数据库编程, VC++, 数据库, BLOB数据操作" />
+
+
+
+
+  
+
+
+  <link rel="alternate" href="/atom.xml" title="Masimaro's blog" type="application/atom+xml" />
+
+
+
+
+
+
+<meta name="description" content="现代数据库系统除了支持一些标准的通用数据类型以外，大多数还支持一种称之为BLOB型的数据。BLOB全称为big large object bytes, 大二进制对象类型，这种类型的数据通常用于存储文档、图片、音频等文件，这些文件一般体积较大，保存这些文件可以很方便的管理和检索这类信息。在MS SQLSERVER中常见的BLOB数据类型有text、ntext(n表示unicode)、image、nv">
+<meta property="og:type" content="article">
+<meta property="og:title" content="OLEDB存取BLOB型数据">
+<meta property="og:url" content="http://www.masimaroweb.com/oledb-and-ado-11.html">
+<meta property="og:site_name" content="Masimaro&#39;s blog">
+<meta property="og:description" content="现代数据库系统除了支持一些标准的通用数据类型以外，大多数还支持一种称之为BLOB型的数据。BLOB全称为big large object bytes, 大二进制对象类型，这种类型的数据通常用于存储文档、图片、音频等文件，这些文件一般体积较大，保存这些文件可以很方便的管理和检索这类信息。在MS SQLSERVER中常见的BLOB数据类型有text、ntext(n表示unicode)、image、nv">
+<meta property="og:image" content="http://www.masimaroweb.com/oledb-and-ado-11/1.png">
+<meta property="article:published_time" content="2018-04-20T12:49:37.000Z">
+<meta property="article:modified_time" content="2018-04-27T13:22:59.979Z">
+<meta property="article:author" content="Masimaro">
+<meta property="article:tag" content="OLEDB">
+<meta property="article:tag" content=" 数据库编程">
+<meta property="article:tag" content=" VC++">
+<meta property="article:tag" content=" 数据库">
+<meta property="article:tag" content=" BLOB数据操作">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://www.masimaroweb.com/oledb-and-ado-11/1.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.3',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+
+  <link rel="canonical" href="http://www.masimaroweb.com/oledb-and-ado-11.html"/>
+
+
+
+
+
+  <title>OLEDB存取BLOB型数据 | Masimaro's blog</title>
+  
+
+
+
+
+
+
+
+
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Masimaro's blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <h1 class="site-subtitle" itemprop="description"></h1>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="搜索..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://www.masimaroweb.com/oledb-and-ado-11.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Masimaro">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Masimaro's blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h2 class="post-title" itemprop="name headline">OLEDB存取BLOB型数据</h2>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-04-20T20:49:37+08:00">
+                2018-04-20
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/windows-%E6%95%B0%E6%8D%AE%E5%BA%93%E7%BC%96%E7%A8%8B/" itemprop="url" rel="index">
+                    <span itemprop="name">windows 数据库编程</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/oledb-and-ado-11.html#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="oledb-and-ado-11.html" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="page-pv"><i class="fa fa-file-o">本文总阅读量</i>
+            <span class="busuanzi-value" id="busuanzi_value_page_pv" ></span>次
+            </span>
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>现代数据库系统除了支持一些标准的通用数据类型以外，大多数还支持一种称之为BLOB型的数据。<br>BLOB全称为big large object bytes, 大二进制对象类型，这种类型的数据通常用于存储文档、图片、音频等文件，这些文件一般体积较大，保存这些文件可以很方便的管理和检索这类信息。在MS SQLSERVER中常见的BLOB数据类型有text、ntext(n表示unicode)、image、nvarchar、varchar、varbinary等。其中image基本可以用来保存一切二进制文件，比如word、Excel、音频、视频等等类型。<br>针对BLOB型数据，OLEDB也提供了对它的支持</p>
+<a id="more"></a>
+<h2 id="使用BLOB型数据的利弊"><a href="#使用BLOB型数据的利弊" class="headerlink" title="使用BLOB型数据的利弊"></a>使用BLOB型数据的利弊</h2><p>一般数据库对BLOB型数据有特殊的处理方式，比如压缩等等，在数据库中存储BLOB数据可以方便的进行检索，展示，备份等操作。但是由于BLOB型数据本身比较大，存储量太大时数据量太大容易拖慢数据库性能，所以一般的说法都是尽量不要在数据库中存储这类信息。特别是图片，音视频。针对这类文件一般的做法是将其保存在系统的某个路径钟中，而在数据库中存储对应的路径</p>
+<h2 id="操作BLOB型数据的一般方法"><a href="#操作BLOB型数据的一般方法" class="headerlink" title="操作BLOB型数据的一般方法"></a>操作BLOB型数据的一般方法</h2><p>一般针对BLOB不能像普通数据那样操作，而需要一些特殊的操作，在OLEDB中通过设置绑定结构中的一些特殊值最终指定获取BLOB型数据的一个ISequentialStream接口指针,最终会通过这个接口来进行BLOB型数据的读写操作</p>
+<h3 id="判断一个列是否是BLOB型数据"><a href="#判断一个列是否是BLOB型数据" class="headerlink" title="判断一个列是否是BLOB型数据"></a>判断一个列是否是BLOB型数据</h3><p>判断某个列是否是BLOB型数据一般通过如下两个条件：</p>
+<ol>
+<li>pColumnInfo[i].wType == DBTYPE_IUNKNOW ： 包含当列信息的DBCOLUMNSINFO 结构体对象的wType值为DBTYPE_IUNKNOW，该列的类型为DBTYPE_IUNKNOW，该条件也被称为列类型判定</li>
+<li>pColumnInfo[i].dwFlags &amp; DBCOLUMNFLAGS_ISLONG ：当列信息中的dwFlag值为DBCOLUMNFLAGS_ISLONG,也就是说该列的标识中包含DBCOLUMNFLAGS_ISLONG属性，该判定条件也被称之为列标识判定<br>当这两个条件之一成立之时，我们就可以断定这列为BLOB型数据</li>
+</ol>
+<h3 id="BLOG型数据的绑定"><a href="#BLOG型数据的绑定" class="headerlink" title="BLOG型数据的绑定"></a>BLOG型数据的绑定</h3><p>在进行BLOB型数据的绑定也有特殊要求，主要体现在下面几点：</p>
+<ol>
+<li>绑定结构的cbMaxLength 需要设置为0</li>
+<li>绑定结构的wType设置为DBTYPE_IUNKNOW</li>
+<li>为结构的pObject指针分配内存，大小等于DBOBJECT结构的大小</li>
+<li>指定pObject的成员<br>pObject-&gt;iid = IID_ISequentialStream<br>pObject-&gt;dwFlags = STGM_READ</li>
+<li>为行缓冲长度加上一个IStream指针的长度，此时数据源不再提供查询到的数据而提供一个接口指针，后续对BLOB数据的操作都使用该指针进行<br>最后使用完后记得释放pObject所指向的内存空间</li>
+</ol>
+<h2 id="读取BLOB数据"><a href="#读取BLOB数据" class="headerlink" title="读取BLOB数据"></a>读取BLOB数据</h2><p>根据前面所说的创建绑定结构，并为绑定结构赋值，最终可以从结果集中获取到一个ISequentialStream接口指针。调用接口的Read方法可以读取到BLOB列中的数据，而BLOB数据的长度存储在绑定时指定的数据长度内存偏移处,这与普通列的长度存放返回方式是一样的，一般BLOB数据都比较长，这个时候就需要分段读取。<br>在使用ISequentialStream接口操作BLOB型数据时需要注意的一个问题是，有的数据库不支持在一个访问器中访问多个BLOB数据列。一般BLOB数据列及其的消耗资源，并且数据库鼓励我们在设计数据库表结构的时候做到一行只有一列BLOB数据，因此很多数据库并不支持在一个访问器中读取多个BLOB数据。<br>要判断数据库是否支持在一个访问器中读取多个BLOB数据，可以获取DBPROP_MULTIPLESTORAGEOBJECTS属性，该属性属于属性集DBPROPSET_ROWSET，它是一个只读属性，如果该属性的值为TRUE表示支持，为FALSE表示不支持。<br>下面是一个读取BLOB型数据的例子,数据库中的表结构为：id(int)、text(image)、png(image)、jpg(image)</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">ReadBLOB</span><span class="params">(IRowset *pIRowset)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	COM_DECLARE_INTERFACE(IColumnsInfo);</span><br><span class="line">	COM_DECLARE_INTERFACE(IAccessor);</span><br><span class="line"></span><br><span class="line">	DBORDINAL cColumns = <span class="number">0</span>;</span><br><span class="line">	DBCOLUMNINFO* rgColumnsInfo = <span class="literal">NULL</span>;</span><br><span class="line">	LPOLESTR lpszColumnsName = <span class="literal">NULL</span>;</span><br><span class="line">	DBBINDING* rgBindings = <span class="literal">NULL</span>;</span><br><span class="line">	DBBINDING** ppBindings = <span class="literal">NULL</span>; <span class="comment">//绑定结构数组</span></span><br><span class="line">	DWORD *puDataLen = <span class="literal">NULL</span>; <span class="comment">//当前访问器所需内存大小</span></span><br><span class="line">	DWORD *pulColCnt = <span class="literal">NULL</span>; <span class="comment">//当前访问器中包含的项</span></span><br><span class="line">	ULONG ulBindCnt = <span class="number">0</span>; <span class="comment">//访问器的数量</span></span><br><span class="line">	ULONG uBlob = <span class="number">0</span>; <span class="comment">//当前有多少blob数据</span></span><br><span class="line">	HACCESSOR* phAccessor = <span class="literal">NULL</span>;</span><br><span class="line">	HROW* hRow = <span class="literal">NULL</span>;</span><br><span class="line">	DBCOUNTITEM ulGetRows = <span class="number">0</span>;</span><br><span class="line">	ULONG uCols = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">	PVOID pData1 = <span class="literal">NULL</span>; <span class="comment">//第1个访问器中数据的缓冲</span></span><br><span class="line">	PVOID pData2 = <span class="literal">NULL</span>; <span class="comment">//第2个访问器中数据的缓冲</span></span><br><span class="line">	PVOID pData3 = <span class="literal">NULL</span>; <span class="comment">//第3个访问器中数据的缓冲</span></span><br><span class="line"></span><br><span class="line">	HRESULT hRes = pIRowset-&gt;QueryInterface(IID_IColumnsInfo, (<span class="keyword">void</span>**)&amp;pIColumnsInfo);</span><br><span class="line">	COM_SUCCESS(hRes, _T(<span class="string">"查询接口pIColumnsInfo失败，错误码为:%08x\n"</span>), hRes);</span><br><span class="line">	hRes = pIColumnsInfo-&gt;GetColumnInfo(&amp;cColumns, &amp;rgColumnsInfo, &amp;lpszColumnsName);</span><br><span class="line">	COM_SUCCESS(hRes, _T(<span class="string">"获取结果集列信息失败，错误码为:%08x\n"</span>), hRes);</span><br><span class="line"></span><br><span class="line">	ppBindings = (DBBINDING**)COM_ALLOC(<span class="keyword">sizeof</span>(DBBINDING*));</span><br><span class="line">	rgBindings = (DBBINDING*)COM_ALLOC(<span class="keyword">sizeof</span>(DBBINDING) * cColumns);</span><br><span class="line">	pulColCnt = (DWORD*)COM_ALLOC(<span class="keyword">sizeof</span>(DWORD));</span><br><span class="line">	puDataLen =  (DWORD*)COM_ALLOC(<span class="keyword">sizeof</span>(DWORD));</span><br><span class="line">	<span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; cColumns; i++)</span><br><span class="line">	&#123;</span><br><span class="line">    <span class="comment">//如果当前访问器对应的绑定结构的数组的首地址为空，将当前绑定结构指针作为绑定结构数组的首地址</span></span><br><span class="line">		<span class="keyword">if</span> (<span class="literal">NULL</span> == ppBindings[ulBindCnt])</span><br><span class="line">		&#123;</span><br><span class="line">			ppBindings[ulBindCnt] = &amp;rgBindings[i];</span><br><span class="line">		&#125;</span><br><span class="line"></span><br><span class="line">		++pulColCnt[ulBindCnt];</span><br><span class="line">		rgBindings[i].bPrecision = rgColumnsInfo[i].bPrecision;</span><br><span class="line">		rgBindings[i].bScale = rgBindings[i].bScale;</span><br><span class="line">		rgBindings[i].cbMaxLen = <span class="number">10</span> * <span class="keyword">sizeof</span>(WCHAR);</span><br><span class="line">		rgBindings[i].dwMemOwner = DBMEMOWNER_CLIENTOWNED;</span><br><span class="line">		rgBindings[i].dwPart = DBPART_LENGTH | DBPART_STATUS | DBPART_VALUE;</span><br><span class="line">		rgBindings[i].eParamIO = DBPARAMIO_NOTPARAM;</span><br><span class="line">		rgBindings[i].iOrdinal = rgColumnsInfo[i].iOrdinal;</span><br><span class="line">		rgBindings[i].obStatus = puDataLen[ulBindCnt];</span><br><span class="line">		rgBindings[i].obLength = puDataLen[ulBindCnt] + <span class="keyword">sizeof</span>(DBSTATUS);</span><br><span class="line">		rgBindings[i].obValue = rgBindings[i].obLength + <span class="keyword">sizeof</span>(ULONG);</span><br><span class="line">		rgBindings[i].wType = DBTYPE_WSTR;</span><br><span class="line"></span><br><span class="line">		<span class="keyword">if</span> (rgColumnsInfo[i].wType == DBTYPE_IUNKNOWN ||</span><br><span class="line">			rgColumnsInfo[i].dwFlags &amp; DBCOLUMNFLAGS_ISLONG)</span><br><span class="line">		&#123;</span><br><span class="line">			rgBindings[i].cbMaxLen = <span class="number">0</span>;</span><br><span class="line">			rgBindings[i].wType = DBTYPE_IUNKNOWN;</span><br><span class="line">			rgBindings[i].pObject = (DBOBJECT*)COM_ALLOC(<span class="keyword">sizeof</span>(DBOBJECT));</span><br><span class="line">			rgBindings[i].pObject-&gt;iid = IID_ISequentialStream;</span><br><span class="line">			rgBindings[i].pObject-&gt;dwFlags = STGM_READ;</span><br><span class="line">			uBlob++;</span><br><span class="line">		&#125;</span><br><span class="line"></span><br><span class="line">		<span class="comment">//记录下每个访问器所需内存的大小</span></span><br><span class="line">		puDataLen[ulBindCnt] = rgBindings[i].obValue + rgBindings[i].cbMaxLen;</span><br><span class="line">		<span class="keyword">if</span> (rgBindings[i].wType == DBTYPE_IUNKNOWN)</span><br><span class="line">		&#123;</span><br><span class="line">			puDataLen[ulBindCnt] = rgBindings[i].obValue + <span class="keyword">sizeof</span>(ISequentialStream*);</span><br><span class="line">		&#125;</span><br><span class="line"></span><br><span class="line">		puDataLen[ulBindCnt] = UPGROUND(puDataLen[ulBindCnt]);</span><br><span class="line">		<span class="comment">//判断当前是否需要创建单独的访问器</span></span><br><span class="line">		<span class="keyword">if</span> ((uBlob || rgBindings[i].iOrdinal == <span class="number">0</span>))</span><br><span class="line">		&#123;</span><br><span class="line">			ulBindCnt++;</span><br><span class="line">			ppBindings = (DBBINDING**)COM_REALLOC(ppBindings, <span class="keyword">sizeof</span>(DBBINDING*) * (ulBindCnt + <span class="number">1</span>));</span><br><span class="line">			puDataLen = (DWORD*)COM_REALLOC(puDataLen, <span class="keyword">sizeof</span>(DWORD) * (ulBindCnt + <span class="number">1</span>));</span><br><span class="line">			pulColCnt = (DWORD*)COM_REALLOC(pulColCnt, <span class="keyword">sizeof</span>(DWORD) * (ulBindCnt + <span class="number">1</span>));</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="comment">//创建访问器</span></span><br><span class="line">	phAccessor = (HACCESSOR*)COM_ALLOC( (ulBindCnt + <span class="number">1</span>) * <span class="keyword">sizeof</span>(HACCESSOR));</span><br><span class="line">	hRes = pIRowset-&gt;QueryInterface(IID_IAccessor, (<span class="keyword">void</span>**)&amp;pIAccessor);</span><br><span class="line">	COM_SUCCESS(hRes, _T(<span class="string">"查询IAccessor接口失败，错误码为:%08x\n"</span>), hRes);</span><br><span class="line">	<span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; ulBindCnt; i++)</span><br><span class="line">	&#123;</span><br><span class="line">		hRes = pIAccessor-&gt;CreateAccessor(DBACCESSOR_ROWDATA, pulColCnt[i], ppBindings[i], <span class="number">0</span>, &amp;phAccessor[i], <span class="literal">NULL</span>);</span><br><span class="line">		COM_SUCCESS(hRes, _T(<span class="string">"创建访问器失败，错误码为:%08x\n"</span>), hRes);</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="comment">//读取其中的一行数据</span></span><br><span class="line">	hRes = pIRowset-&gt;GetNextRows(DB_NULL_HCHAPTER, <span class="number">0</span>, <span class="number">1</span>, &amp;ulGetRows, &amp;hRow);</span><br><span class="line">	COM_SUCCESS(hRes, _T(<span class="string">"读取行数据失败，错误码为:%08x\n"</span>), hRes);</span><br><span class="line"></span><br><span class="line">	<span class="comment">//读取第一个绑定结构中的信息</span></span><br><span class="line">	pData1 = COM_ALLOC(puDataLen[<span class="number">0</span>]);</span><br><span class="line">	hRes = pIRowset-&gt;GetData(hRow[<span class="number">0</span>], phAccessor[<span class="number">0</span>], pData1);</span><br><span class="line">	<span class="keyword">for</span>(<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; pulColCnt[<span class="number">0</span>]; i++)</span><br><span class="line">	&#123;</span><br><span class="line">		<span class="keyword">if</span> (ppBindings[<span class="number">0</span>][i].wType == DBTYPE_IUNKNOWN)</span><br><span class="line">		&#123;</span><br><span class="line">			DBSTATUS dbStatus = *(DBSTATUS*)((BYTE*)pData1 + ppBindings[<span class="number">0</span>][i].obStatus);</span><br><span class="line">			<span class="keyword">if</span> (dbStatus == DBSTATUS_S_OK)</span><br><span class="line">			&#123;</span><br><span class="line">				ULONG uFileLen = *(ULONG*)((BYTE*)pData1 + ppBindings[<span class="number">0</span>][i].obLength);</span><br><span class="line">				<span class="keyword">if</span> (uFileLen &gt; <span class="number">0</span>)</span><br><span class="line">				&#123;</span><br><span class="line">					DWORD dwReaded = <span class="number">0</span>;</span><br><span class="line">					PVOID pFileData = COM_ALLOC(uFileLen);</span><br><span class="line">					ZeroMemory(pFileData, uFileLen);</span><br><span class="line">					ISequentialStream  *pSeqStream = *(ISequentialStream**)((BYTE*)pData1 + ppBindings[<span class="number">0</span>][i].obValue);</span><br><span class="line">					pSeqStream-&gt;Read(pFileData, uFileLen, &amp;dwReaded);</span><br><span class="line"></span><br><span class="line">					WriteFileData(_T(<span class="string">"1.txt"</span>), pFileData, dwReaded);</span><br><span class="line">				&#125;</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="comment">//后续的部分就不再写出来了,写法与上面的代码类似</span></span><br><span class="line">	pIRowset-&gt;ReleaseRows(<span class="number">1</span>, hRow, <span class="literal">NULL</span>, <span class="literal">NULL</span>, <span class="literal">NULL</span>);</span><br><span class="line">__CLEAR_UP:</span><br><span class="line">  <span class="comment">//后面是清理的代码</span></span><br></pre></td></tr></table></figure>
+<p>由于我们事先知道数据表的结构，它有3个BLOB型数据，所以这里直接定义了3个缓冲用来接收3个BLOB型数据。为了方便检测，我们另外写了一个的函数，将读取出来的BLOB数据写入到文件中，事后以文件显示是否正确来测试这段代码<br>首先还是与以前一样，获取数据表的结构，然后进行绑定，注意这里由于使用的是SQL Server，它不支持一个访问器中访问多个BLOB，所以这里没有判断直接绑定不同的访问器。<br>在绑定的时候使用ulBindCnt作为当前访问器的数量，在循环里面有一个判断当(uBlob || rgBindings[i].iOrdinal == 0) &amp;&amp; (ulBindCnt != cColumns - 1)条件成立时将访问器的数量加1，该条件表示之前已经有blob型数据（之前SQL不支持一个访问器访问多个BLOB，如果之前已经有BLOB数据了，就需要另外创建访问器）或者当前是第0行（因为第0行只允许读，所以将其作为与BLOB型数据一样处理），当这些条件成立时会新增一个访问器，而随着访问器的增加，需要改变ppBindings数组中的元素，该数组存储的是访问器对应的绑定结构开始的指针。数组puDataLen表示的是当前访问器所需内存的大小，pulColCnt表示当前访问器中共有多少列，针对这个表最终这些结构的内容大致如下图：<br><img src="oledb-and-ado-11/1.png" alt="各个数组元素图"><br>绑定完成之后，后面就是根据数组中的内容创建对应的访问器，然后绑定、读取数据，针对BLOB数据，我们还是一样从对应缓冲的obValue偏移处得到接口指针，然后调用接口的Read方法读取，最后写入文件</p>
+<h2 id="BLOB数据的写入"><a href="#BLOB数据的写入" class="headerlink" title="BLOB数据的写入:"></a>BLOB数据的写入:</h2><p>要写入BLOB型数据也需要使用ISequentialStream接口,但是它不像之前可以直接使用接口的Write方法，写入的对象必须要自己从ISequentialStream接口派生，并指定一段内存作为缓冲，以便供OLEDB组件调用写方法时作为数据缓冲。这段缓冲必须要保证分配在COM堆上，也就是要使用CoTaskMemory分配内存。<br>这里涉及到的对象主要有IStream、ISequentialStream、IStorage、ILockBytes，同样，并不是所有数据源都支持这4类对象，具体支持哪些可以查询DBPROPSET_DATASOURCEINFO属性集中的DBPROP_STRUCTUREDSTORAGE属性来判定，目前SQL Server中支持ISequentialStream接口。<br>虽然我们可以使用这种方式来实现读写BLOB，但是每种数据源支持的程度不同，而且有的数据源甚至不支持这种方式，为了查询对读写BLOB数据支持到何种程度，可以查询DBPROPSET_DATASOURCEINFO属性集合的DBPROP_OLEOBJECTS属性来判定<br>通常有以下几种支持方式(DBPROP_OLEOBJECTS属性的值,按位设置):</p>
+<ol>
+<li>DBPROPVAL_OO_BLOB: 就是之前介绍的接口方式，使用接口的方式来读写BLOB数据<br>DBPROPVAL_OO_DIRECTBIND: 可以直接绑定在行中,通过行访问器像普通列一样访问，也就是说它不需要获取专门的指针来操作，他可以就像操作普通数据那样，分配对应内存就可以访问，但是要注意分配内存的大小，每行中对应列中BLOB的数据长度差别可能会很明显，比如有的可能是一部长达2小时的电影文件，而有的可能是一部短视频，它们之间的差距可能会达到上G，而按照最小的来可能会发生截断，按最大的分配可能会发生多达好几个G的内存浪费<br>DBPROPVAL_OO_IPERSIST:通过IPersistStream, IPersistStreamInit, or IPersistStorage三个接口的Persist对象访问<br>DBPROPVAL_OO_ROWOBJECT: 支持整行作为一个对象来访问,通过结果集对象的IGetRow接口来获得行对象，但是这种模式会破坏第三范式，所以一般数据库都不支持<br>DBPROPVAL_OO_SCOPED: 通过IScopedOperations接口来暴露行对象,通过这个接口可以暴露一个树形的结果集对象<br>DBPROPVAL_OO_SINGLETON: 直接通过ICommand::Execute和IOpenRowset::OpenRowset来打开行对象<br>下面是插入BLOB数据的一个实例<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//自定义一个</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">CSeqStream</span> :</span> <span class="keyword">public</span> ISequentialStream</span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">	<span class="comment">// Constructors</span></span><br><span class="line">	CSeqStream();</span><br><span class="line">	<span class="keyword">virtual</span> ~CSeqStream();</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">	<span class="function"><span class="keyword">virtual</span> BOOL <span class="title">Seek</span><span class="params">(ULONG iPos)</span></span>; <span class="comment">//将当前内存指针偏移到指定位置</span></span><br><span class="line">	<span class="function"><span class="keyword">virtual</span> BOOL <span class="title">CompareData</span><span class="params">(<span class="keyword">void</span>* pBuffer)</span></span>; <span class="comment">//比较两段内存中的值</span></span><br><span class="line">	<span class="function"><span class="keyword">virtual</span> ULONG <span class="title">Length</span><span class="params">()</span></span></span><br><span class="line"><span class="function">	</span>&#123;</span><br><span class="line">		<span class="keyword">return</span> m_cBufSize;</span><br><span class="line">	&#125;;</span><br><span class="line">	<span class="function"><span class="keyword">virtual</span> <span class="keyword">operator</span> <span class="keyword">void</span>* <span class="title">const</span><span class="params">()</span></span></span><br><span class="line"><span class="function">	</span>&#123;</span><br><span class="line">		<span class="keyword">return</span> m_pBuffer;</span><br><span class="line">	&#125;;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">	STDMETHODIMP_(ULONG) AddRef(<span class="keyword">void</span>);</span><br><span class="line">	STDMETHODIMP_(ULONG) Release(<span class="keyword">void</span>);</span><br><span class="line">	<span class="function">STDMETHODIMP <span class="title">QueryInterface</span><span class="params">(REFIID riid, LPVOID *ppv)</span></span>;</span><br><span class="line"></span><br><span class="line">  <span class="comment">//读写内存的操作，这些是必须实现的函数</span></span><br><span class="line">	<span class="function">STDMETHODIMP <span class="title">Read</span><span class="params">(</span></span></span><br><span class="line"><span class="function"><span class="params">		<span class="comment">/* [out] */</span> <span class="keyword">void</span> __RPC_FAR *pv,</span></span></span><br><span class="line"><span class="function"><span class="params">		<span class="comment">/* [in]  */</span> ULONG cb,</span></span></span><br><span class="line"><span class="function"><span class="params">		<span class="comment">/* [out] */</span> ULONG __RPC_FAR *pcbRead)</span></span>;</span><br><span class="line"></span><br><span class="line">	<span class="function">STDMETHODIMP <span class="title">Write</span><span class="params">(</span></span></span><br><span class="line"><span class="function"><span class="params">		<span class="comment">/* [in] */</span> <span class="keyword">const</span> <span class="keyword">void</span> __RPC_FAR *pv,</span></span></span><br><span class="line"><span class="function"><span class="params">		<span class="comment">/* [in] */</span> ULONG cb,</span></span></span><br><span class="line"><span class="function"><span class="params">		<span class="comment">/* [out]*/</span> ULONG __RPC_FAR *pcbWritten)</span></span>;</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">	ULONG m_cRef;       <span class="comment">// reference count</span></span><br><span class="line">	<span class="keyword">void</span>* m_pBuffer;    <span class="comment">// buffer</span></span><br><span class="line">	ULONG m_cBufSize;   <span class="comment">// buffer size</span></span><br><span class="line">	ULONG m_iPos;       <span class="comment">// current index position in the buffer</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+</li>
+</ol>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//插入数据第一列BLOB数据</span></span><br><span class="line">	<span class="comment">//这里由于已经事先知道每列的数据结构，因此采用偷懒的方法，一行行的插入</span></span><br><span class="line">	pData1 = HeapAlloc(GetProcessHeap(), HEAP_ZERO_MEMORY, pdwDataLen[nCol]);</span><br><span class="line">	<span class="keyword">for</span>(<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; pulColCnt[nCol]; i++)</span><br><span class="line">	&#123;</span><br><span class="line">		<span class="keyword">if</span> (DBTYPE_IUNKNOWN == ppBindings[nCol][i].wType)</span><br><span class="line">		&#123;</span><br><span class="line">			*(DBSTATUS*)((BYTE*)pData1 + ppBindings[nCol][i].obStatus) = DBSTATUS_S_OK;</span><br><span class="line">			CSeqStream *pSeqStream = <span class="keyword">new</span> CSeqStream();</span><br><span class="line">			GetFileData(_T(<span class="string">"test.txt"</span>), dwFileLen, pFileData);</span><br><span class="line">			pSeqStream-&gt;Write(pFileData, dwFileLen, &amp;dwWritten);</span><br><span class="line">			pSeqStream-&gt;Seek(<span class="number">0</span>); <span class="comment">//写这个操作将缓存的指针偏移到了最后，需要调整一下，以便OLEDB组件在插入BLOB数据时从缓存中读取</span></span><br><span class="line">			HeapFree(GetProcessHeap(), <span class="number">0</span>, pFileData);</span><br><span class="line">			*(ULONG*)((BYTE*)pData1 + ppBindings[nCol][i].obLength) = dwFileLen;</span><br><span class="line">			*(ISequentialStream**)((BYTE*)pData1 + ppBindings[nCol][i].obValue) = pSeqStream;</span><br><span class="line">			<span class="comment">//此处不用release pSeqStream，COM组件会自动释放</span></span><br><span class="line">		&#125;<span class="keyword">else</span></span><br><span class="line">		&#123;</span><br><span class="line">			<span class="comment">//根据数据库定义，此处应该为ID</span></span><br><span class="line">			*(ULONG*)((BYTE*)pData1 + ppBindings[nCol][i].obLength) = <span class="number">10</span>;</span><br><span class="line">			<span class="keyword">if</span> (DBTYPE_WSTR == ppBindings[nCol][i].wType)</span><br><span class="line">			&#123;</span><br><span class="line">				StringCchCopy((LPOLESTR)((BYTE*)pData1 + ppBindings[nCol][i].obValue), <span class="number">10</span>, SysAllocString(OLESTR(<span class="string">"1"</span>)));</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	hRes = pIRowsetChange-&gt;InsertRow(DB_NULL_HCHAPTER, phAccessor[nCol], pData1, &amp;hNewRow);</span><br><span class="line">	COM_SUCCESS(hRes, _T(<span class="string">"插入第1列BLOB数据失败，错误码为:%08x\n"</span>), hRes);</span><br></pre></td></tr></table></figure>
+
+<p>在上面的代码中首先定义一个派生类，用来进行BLOB数据的读写，然后在后面的代码中演示了如何使用它<br>在后面的一段代码中，基本步骤和之前一样，经过连接数据源、创建回话对象，打开表，然后绑定，获取行访问器，这里由于代码基本不变，为了节约篇幅所以省略它们，只贴出最重要的部分。<br>在插入的代码中，首先查找访问器中的各个列的属性，如果是BLOB数据就采用BLOB数据的插入办法，否则用一般数据的插入办法。插入BLOB数据时，首先创建一个派生类的对象，注意此处由于后续要交给OLEDB组件调用，所以不能用栈内存。我们先调用类的Write方法将内存写入对应的缓冲中，然后调用Seek函数将内存指针偏移到缓冲的首地址，这个指针的作用就相当于文件的文件指针，COM组件在调用对应函数将它插入数据库时会采用这个内存的指针，所以必须将其置到首地址处。让后将对象的指针放入到对应的obvalues偏移中，设置对应的数据大小为BLOB数据的大小，最后只要像普通数据类型那样调用对应的更新方法即可实现BLOB数据的插入</p>
+<p>最后贴上两个例子的详细代码地址<br><a href="https://gitee.com/masimaro/codes/tcesnrul0g2yi76bam5dj19#Read-BLOB" target="_blank" rel="noopener">示例1:BLOB数据的读取</a><br><a href="https://gitee.com/masimaro/codes/tcesnrul0g2yi76bam5dj19#InsertBlob" target="_blank" rel="noopener">示例2:BLOB数据的插入</a></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+      <div>
+        <div style="padding: 10px 0; margin: 20px auto; width: 90%; text-align: center;">
+  <div></div>
+  <button id="rewardButton" disable="enable" onclick="var qr = document.getElementById('QR'); if (qr.style.display === 'none') {qr.style.display='block';} else {qr.style.display='none'}">
+    <span>打赏</span>
+  </button>
+  <div id="QR" style="display: none;">
+
+    
+      <div id="wechat" style="display: inline-block">
+        <img id="wechat_qr" src="/images/wechatreward.png" alt="Masimaro 微信支付"/>
+        <p>微信支付</p>
+      </div>
+    
+
+    
+      <div id="alipay" style="display: inline-block">
+        <img id="alipay_qr" src="/images/alipayreward.png" alt="Masimaro 支付宝"/>
+        <p>支付宝</p>
+      </div>
+    
+
+    
+
+  </div>
+</div>
+
+      </div>
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/VC/" rel="tag"><i class="fa fa-tag"></i> VC++</a>
+          
+            <a href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93/" rel="tag"><i class="fa fa-tag"></i> 数据库</a>
+          
+            <a href="/tags/OLEDB/" rel="tag"><i class="fa fa-tag"></i> OLEDB</a>
+          
+            <a href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93%E7%BC%96%E7%A8%8B/" rel="tag"><i class="fa fa-tag"></i> 数据库编程</a>
+          
+            <a href="/tags/BLOB%E5%9E%8B%E6%95%B0%E6%8D%AE/" rel="tag"><i class="fa fa-tag"></i> BLOB型数据</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/oledb-and-ado-10.html" rel="next" title="OLEDB不使用SQL语句直接打开数据表">
+                <i class="fa fa-chevron-left"></i> OLEDB不使用SQL语句直接打开数据表
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/oledb-and-ado-12.html" rel="prev" title="OLEDB 静态绑定和数据转化接口">
+                OLEDB 静态绑定和数据转化接口 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        
+  <div class="bdsharebuttonbox">
+    <a href="#" class="bds_tsina" data-cmd="tsina" title="分享到新浪微博"></a>
+    <a href="#" class="bds_douban" data-cmd="douban" title="分享到豆瓣网"></a>
+    <a href="#" class="bds_sqq" data-cmd="sqq" title="分享到QQ好友"></a>
+    <a href="#" class="bds_qzone" data-cmd="qzone" title="分享到QQ空间"></a>
+    <a href="#" class="bds_weixin" data-cmd="weixin" title="分享到微信"></a>
+    <a href="#" class="bds_tieba" data-cmd="tieba" title="分享到百度贴吧"></a>
+    <a href="#" class="bds_twi" data-cmd="twi" title="分享到Twitter"></a>
+    <a href="#" class="bds_fbook" data-cmd="fbook" title="分享到Facebook"></a>
+    <a href="#" class="bds_more" data-cmd="more"></a>
+    <a class="bds_count" data-cmd="count"></a>
+  </div>
+  <script>
+    window._bd_share_config = {
+      "common": {
+        "bdText": "",
+        "bdMini": "2",
+        "bdMiniList": false,
+        "bdPic": ""
+      },
+      "share": {
+        "bdSize": "16",
+        "bdStyle": "0"
+      },
+      "image": {
+        "viewList": ["tsina", "douban", "sqq", "qzone", "weixin", "twi", "fbook"],
+        "viewText": "分享到：",
+        "viewSize": "16"
+      }
+    }
+  </script>
+
+<script>
+  with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='//bdimg.share.baidu.com/static/api/js/share.js?cdnversion='+~(-new Date()/36e5)];
+</script>
+
+      
+	  
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      <div id="disqus_thread">
+        <noscript>
+          Please enable JavaScript to view the
+          <a href="https://disqus.com/?ref_noscript" target="_blank" rel="noopener">comments powered by Disqus.</a>
+        </noscript>
+      </div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/avatar.jpg"
+                alt="Masimaro" />
+            
+              <p class="site-author-name" itemprop="name">Masimaro</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/%20%7C%7C%20archive">
+              
+                  <span class="site-state-item-count">94</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">18</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">141</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          <div class="links-of-author motion-element">
+            
+              
+                <span class="links-of-author-item">
+                  <a href="https://github.com/aMonst" target="_blank" title="GitHub">
+                    
+                      <i class="fa fa-fw fa-globe"></i>GitHub</a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="http://weibo.com/your-user-name" target="_blank" title="微博">
+                    
+                      <i class="fa fa-fw fa-globe"></i>微博</a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="http://blog.csdn.net/lanuage" target="_blank" title="CSDN博客">
+                    
+                      <i class="fa fa-fw fa-globe"></i>CSDN博客</a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="http://www.jianshu.com/u/7261ff9df286" target="_blank" title="简书">
+                    
+                      <i class="fa fa-fw fa-globe"></i>简书</a>
+                </span>
+              
+            
+          </div>
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#使用BLOB型数据的利弊"><span class="nav-number">1.</span> <span class="nav-text">使用BLOB型数据的利弊</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#操作BLOB型数据的一般方法"><span class="nav-number">2.</span> <span class="nav-text">操作BLOB型数据的一般方法</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#判断一个列是否是BLOB型数据"><span class="nav-number">2.1.</span> <span class="nav-text">判断一个列是否是BLOB型数据</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#BLOG型数据的绑定"><span class="nav-number">2.2.</span> <span class="nav-text">BLOG型数据的绑定</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#读取BLOB数据"><span class="nav-number">3.</span> <span class="nav-text">读取BLOB数据</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#BLOB数据的写入"><span class="nav-number">4.</span> <span class="nav-text">BLOB数据的写入:</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love" id="heart">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Masimaro</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io" rel="external nofollow">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next" rel="external nofollow">NexT.Mist</a> v5.1.3</div>
+
+
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv">
+      <i class="fa fa-user">本次访客数</i>
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+      人次
+    </span>
+  
+
+  
+    <span class="site-pv">
+      <i class="fa fa-eye">本站总访问量</i>
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+      次
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.3"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.3"></script>
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.3"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.3"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.3"></script>
+
+
+
+  
+
+
+  
+
+    
+      <script id="dsq-count-scr" src="https://masimaroweb.disqus.com/count.js" async></script>
+    
+
+    
+      <script type="text/javascript">
+        var disqus_config = function () {
+          this.page.url = 'http://www.masimaroweb.com/oledb-and-ado-11.html';
+          this.page.identifier = 'oledb-and-ado-11.html';
+          this.page.title = 'OLEDB存取BLOB型数据';
+        };
+        var d = document, s = d.createElement('script');
+        s.src = 'https://masimaroweb.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', '' + +new Date());
+        (d.head || d.body).appendChild(s);
+      </script>
+    
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+  
+
+
+  
+
+  
+
+</body>
+</html>
+
+<!-- 页面点击小红心 -->
+<script type="text/javascript" src="/js/src/love.js"></script>

@@ -1,0 +1,1365 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<script src="//cdn.bootcss.com/pace/1.0.2/pace.min.js"></script>
+<link href="//cdn.bootcss.com/pace/1.0.2/themes/pink/pace-theme-flash.css" rel="stylesheet">
+<style>
+    .pace .pace-progress {
+        background: #1E92FB; /*进度条颜色*/
+        height: 3px;
+    }
+    .pace .pace-progress-inner {
+         box-shadow: 0 0 10px #1E92FB, 0 0 5px     #1E92FB; /*阴影颜色*/
+    }
+    .pace .pace-activity {
+        border-top-color: #1E92FB;    /*上边框颜色*/
+        border-left-color: #1E92FB;    /*左边框颜色*/
+    }
+</style>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.3" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.3">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.3">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.3">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.3" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="VC, word, 组件" />
+
+
+
+
+  
+
+
+  <link rel="alternate" href="/atom.xml" title="Masimaro's blog" type="application/atom+xml" />
+
+
+
+
+
+
+<meta name="description" content="最近完成了一个使用VC++ 操作word生成扫描报告的功能，在这里将过程记录下来，开发环境为visual studio 2008">
+<meta property="og:type" content="article">
+<meta property="og:title" content="VC+++  操作word">
+<meta property="og:url" content="http://www.masimaroweb.com/VC-Word.html">
+<meta property="og:site_name" content="Masimaro&#39;s blog">
+<meta property="og:description" content="最近完成了一个使用VC++ 操作word生成扫描报告的功能，在这里将过程记录下来，开发环境为visual studio 2008">
+<meta property="og:image" content="http://www.masimaroweb.com/VC-Word/1.jpg">
+<meta property="og:image" content="http://www.masimaroweb.com/VC-Word/2.jpg">
+<meta property="og:image" content="http://www.masimaroweb.com/VC-Word/3.jpg">
+<meta property="article:published_time" content="2019-04-14T03:42:10.000Z">
+<meta property="article:modified_time" content="2019-04-14T07:10:49.773Z">
+<meta property="article:author" content="Masimaro">
+<meta property="article:tag" content="VC">
+<meta property="article:tag" content=" word">
+<meta property="article:tag" content=" 组件">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://www.masimaroweb.com/VC-Word/1.jpg">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.3',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+
+  <link rel="canonical" href="http://www.masimaroweb.com/VC-Word.html"/>
+
+
+
+
+
+  <title>VC+++  操作word | Masimaro's blog</title>
+  
+
+
+
+
+
+
+
+
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Masimaro's blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <h1 class="site-subtitle" itemprop="description"></h1>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="搜索..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://www.masimaroweb.com/VC-Word.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Masimaro">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Masimaro's blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h2 class="post-title" itemprop="name headline">VC+++  操作word</h2>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-04-14T11:42:10+08:00">
+                2019-04-14
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Windows-%E9%AB%98%E7%BA%A7%E7%BC%96%E7%A8%8B/" itemprop="url" rel="index">
+                    <span itemprop="name">Windows 高级编程</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/VC-Word.html#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="VC-Word.html" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="page-pv"><i class="fa fa-file-o">本文总阅读量</i>
+            <span class="busuanzi-value" id="busuanzi_value_page_pv" ></span>次
+            </span>
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>最近完成了一个使用VC++ 操作word生成扫描报告的功能，在这里将过程记录下来，开发环境为visual studio 2008</p>
+<a id="more"></a>
+<h2 id="导入接口"><a href="#导入接口" class="headerlink" title="导入接口"></a>导入接口</h2><p>首先在创建的MFC项目中引入word相关组件<br>右键点击 项目 –&gt; 添加 –&gt; 新类,在弹出的对话框中选择Typelib中的MFC类。<br><img src="./VC-Word/1.jpg" alt=""><br>然后在弹出的对话框中选择文件，从文件中导入MSWORD.OLB组件。<br><img src="./VC-Word/2.jpg" alt=""></p>
+<p>这个文件的路径一般在C:\Program Files (x86)\Microsoft Office\Office14 中，注意：最后一层可能不一定是Office14，这个看机器中安装的office 版本。<br>选择之后会要求我们决定导入那些接口，为了方便我们导入所有接口。<br><img src="./VC-Word/3.jpg" alt=""></p>
+<p>导入之后可以看到项目中省成本了很多代码文件，这些就是系统生成的操作Word的相关类。</p>
+<p>这里编译可能会报错，error C2786: “BOOL (HDC,int,int,int,int)”: __uuidof 的操作数无效<br>解决方法：<br>修改对应头文件</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#import <span class="meta-string">"C:\\Program Files\\Microsoft Office\\Office14\\MSWORD.OLB"</span> no_namespace</span></span><br></pre></td></tr></table></figure>
+<p>为：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#import <span class="meta-string">"C:\\Program Files\\Microsoft Office\\Office14\\MSWORD.OLB"</span> no_namespace raw_interfaces_only \</span></span><br><span class="line">	rename(<span class="string">"FindText"</span>,<span class="string">"_FindText"</span>) \</span><br><span class="line">	rename(<span class="string">"Rectangle"</span>,<span class="string">"_Rectangle"</span>) \</span><br><span class="line">	rename(<span class="string">"ExitWindows"</span>,<span class="string">"_ExitWindows"</span>)</span><br></pre></td></tr></table></figure>
+<p>再次编译，错误消失</p>
+<h2 id="常见接口介绍"><a href="#常见接口介绍" class="headerlink" title="常见接口介绍"></a>常见接口介绍</h2><p>要了解一些常见的类，我们首先需要明白这些接口的层次结构：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">Application(WORD 为例，只列出一部分）</span><br><span class="line">　　Documents（所有的文档）</span><br><span class="line">        Document（一个文档）</span><br><span class="line">            ......</span><br><span class="line">　　Templates（所有模板）</span><br><span class="line">        Template（一个模板）</span><br><span class="line">            ......</span><br><span class="line">　　Windows（所有窗口）</span><br><span class="line">        Window</span><br><span class="line">        Selection</span><br><span class="line">        View</span><br><span class="line">　　Selection（编辑对象）</span><br><span class="line">        Font</span><br><span class="line">        Style</span><br><span class="line">        Range</span><br></pre></td></tr></table></figure>
+
+<p>这些组件其实是采用远程调用的方式调用word进程来完成相关操作。</p>
+<ul>
+<li>Application：相当于一个word进程，每次操作之前都需要一个application对象，这个对象用于创建一个word进程。</li>
+<li>Documents：相当于word中打开的所有文档，如果用过word编辑多个文件，那么这个概念应该很好理解</li>
+<li>Templates：是一个模板对象，至于word模板，不了解的请自行百度</li>
+<li>Windows：word进程中的窗口</li>
+<li>Selection：编辑对象。也就是我们要写入word文档中的内容。一般包括文本、样式、图形等等对象。</li>
+</ul>
+<p>回忆一下我们手动编写word的情景，其实使用这些接口是很简单的。我们在使用word编辑的时候首先会打开word程序，这里对应在代码里面就是创建一个Application对象。然后我们会用word程序打开一个文档或者新建一个文档。这里对应着创建Documents对象并从中引用一个Document对象表示一个具体的文档。当然这个Document对象可以是新建的也可以是打开一个现有的。接着就是进行相关操作了，比如插入图片、插入表格、编写段落文本等等了。这些都对应着创建类似于Font、Style、TypeText对象，然后将这些对象进行添加的操作了。<br>说了这么多。这些接口这么多，我怎么知道哪个接口对应哪个对象呢，而且这些参数怎么传递呢？其实这个问题很好解决。我们可以手工进行相关操作，然后用宏记录下来，最后我们再将宏中的VB代码转化为VC代码即可。</p>
+<h2 id="相关操作"><a href="#相关操作" class="headerlink" title="相关操作"></a>相关操作</h2><p>为了方便在项目中使用，这里创建一个类用于封装Word的相关操作</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">CCreateWordReport</span>  </span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    CApplication m_wdApp;</span><br><span class="line">    CDocuments m_wdDocs;</span><br><span class="line">    CDocument0 m_wdDoc;</span><br><span class="line">    CSelection m_wdSel; </span><br><span class="line">    CRange     m_wdRange;</span><br><span class="line">    CnlineShapes m_wdInlineShapes;</span><br><span class="line">    CnlineShape m_wdInlineShape;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    CCreateWordReport();</span><br><span class="line">    <span class="keyword">virtual</span> ~CCreateWordReport();</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="comment">//操作</span></span><br><span class="line">    <span class="comment">//**********************创建新文档*******************************************</span></span><br><span class="line">    <span class="function">BOOL <span class="title">CreateApp</span><span class="params">()</span></span>;                    <span class="comment">//创建一个新的WORD应用程序</span></span><br><span class="line">    <span class="function">BOOL <span class="title">CreateDocuments</span><span class="params">()</span></span>;                <span class="comment">//创建一个新的Word文档集合</span></span><br><span class="line">    <span class="function">BOOL <span class="title">CreateDocument</span><span class="params">()</span></span>;                <span class="comment">//创建一个新的Word文档</span></span><br><span class="line">    <span class="function">BOOL <span class="title">Create</span><span class="params">()</span></span>;                        <span class="comment">//创建新的WORD应用程序并创建一个新的文档</span></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">ShowApp</span><span class="params">()</span></span>;                        <span class="comment">//显示WORD文档</span></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">HideApp</span><span class="params">()</span></span>;                        <span class="comment">//隐藏word文档</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">//**********************打开文档*********************************************</span></span><br><span class="line">    <span class="function">BOOL <span class="title">OpenDocument</span><span class="params">(CString fileName)</span></span>;<span class="comment">//打开已经存在的文档。</span></span><br><span class="line">    <span class="function">BOOL <span class="title">Open</span><span class="params">(CString fileName)</span></span>;        <span class="comment">//创建新的WORD应用程序并打开一个已经存在的文档。</span></span><br><span class="line">    <span class="function">BOOL <span class="title">SetActiveDocument</span><span class="params">(short i)</span></span>;    <span class="comment">//设置当前激活的文档。</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">//**********************保存文档*********************************************</span></span><br><span class="line">    <span class="function">BOOL <span class="title">SaveDocument</span><span class="params">()</span></span>;                <span class="comment">//文档是以打开形式，保存。</span></span><br><span class="line">    <span class="function">BOOL <span class="title">SaveDocumentAs</span><span class="params">(CString fileName)</span></span>;<span class="comment">//文档以创建形式，保存。</span></span><br><span class="line">    <span class="function">BOOL <span class="title">CloseDocument</span><span class="params">()</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">CloseApp</span><span class="params">()</span></span>; </span><br><span class="line"></span><br><span class="line">    <span class="comment">//**********************文本书写操作*****************************************</span></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">WriteText</span><span class="params">(CString szText)</span></span>;        <span class="comment">//当前光标处写文本</span></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">WriteNewLineText</span><span class="params">(CString szText, <span class="keyword">int</span> nLineCount = <span class="number">1</span>)</span></span>; <span class="comment">//换N行写字</span></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">WriteEndLine</span><span class="params">(CString szText)</span></span>;    <span class="comment">//文档结尾处写文本</span></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">WholeStory</span><span class="params">()</span></span>;                    <span class="comment">//全选文档内容</span></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">Copy</span><span class="params">()</span></span>;                        <span class="comment">//复制文本内容到剪贴板</span></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">InsertFile</span><span class="params">(CString fileName)</span></span>;    <span class="comment">//将本地的文件全部内容写入到当前文档的光标处。</span></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">InsertTable</span><span class="params">(<span class="keyword">int</span> nRow, <span class="keyword">int</span> nColumn, CTable0&amp; wdTable)</span></span>;</span><br><span class="line">    <span class="comment">//**********************图片插入操作*****************************************</span></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">InsertShapes</span><span class="params">(CString fileName)</span></span>;<span class="comment">//在当前光标的位置插入图片</span></span><br><span class="line">    </span><br><span class="line">    <span class="comment">//**********************超链接插入操作*****************************************</span></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">InsertHyperlink</span><span class="params">(CString fileLink)</span></span>;<span class="comment">//超级链接地址，可以是相对路径。</span></span><br><span class="line"></span><br><span class="line">	<span class="comment">//***********************表格操作表格操作**********************************</span></span><br><span class="line">	<span class="function">BOOL <span class="title">InsertTableToMarkBook</span><span class="params">(<span class="keyword">const</span> CString csMarkName, <span class="keyword">int</span> nRow, <span class="keyword">int</span> nColumn, CTable0&amp; wdTable)</span></span>; <span class="comment">//表格行数与列数</span></span><br><span class="line">	<span class="function">BOOL <span class="title">WriteDataToTable</span><span class="params">(CTable0&amp; wdTable, <span class="keyword">int</span> nRow, <span class="keyword">int</span> nColumn, <span class="keyword">const</span> CString &amp;csData)</span></span>; <span class="comment">//往表格中写入输入</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br><span class="line">185</span><br><span class="line">186</span><br><span class="line">187</span><br><span class="line">188</span><br><span class="line">189</span><br><span class="line">190</span><br><span class="line">191</span><br><span class="line">192</span><br><span class="line">193</span><br><span class="line">194</span><br><span class="line">195</span><br><span class="line">196</span><br><span class="line">197</span><br><span class="line">198</span><br><span class="line">199</span><br><span class="line">200</span><br><span class="line">201</span><br><span class="line">202</span><br><span class="line">203</span><br><span class="line">204</span><br><span class="line">205</span><br><span class="line">206</span><br><span class="line">207</span><br><span class="line">208</span><br><span class="line">209</span><br><span class="line">210</span><br><span class="line">211</span><br><span class="line">212</span><br><span class="line">213</span><br><span class="line">214</span><br><span class="line">215</span><br><span class="line">216</span><br><span class="line">217</span><br><span class="line">218</span><br><span class="line">219</span><br><span class="line">220</span><br><span class="line">221</span><br><span class="line">222</span><br><span class="line">223</span><br><span class="line">224</span><br><span class="line">225</span><br><span class="line">226</span><br><span class="line">227</span><br><span class="line">228</span><br><span class="line">229</span><br><span class="line">230</span><br><span class="line">231</span><br><span class="line">232</span><br><span class="line">233</span><br><span class="line">234</span><br><span class="line">235</span><br><span class="line">236</span><br><span class="line">237</span><br><span class="line">238</span><br><span class="line">239</span><br><span class="line">240</span><br><span class="line">241</span><br><span class="line">242</span><br><span class="line">243</span><br><span class="line">244</span><br><span class="line">245</span><br><span class="line">246</span><br><span class="line">247</span><br><span class="line">248</span><br><span class="line">249</span><br><span class="line">250</span><br><span class="line">251</span><br><span class="line">252</span><br><span class="line">253</span><br><span class="line">254</span><br><span class="line">255</span><br><span class="line">256</span><br><span class="line">257</span><br><span class="line">258</span><br><span class="line">259</span><br><span class="line">260</span><br><span class="line">261</span><br><span class="line">262</span><br><span class="line">263</span><br><span class="line">264</span><br><span class="line">265</span><br><span class="line">266</span><br><span class="line">267</span><br><span class="line">268</span><br><span class="line">269</span><br><span class="line">270</span><br><span class="line">271</span><br><span class="line">272</span><br><span class="line">273</span><br><span class="line">274</span><br><span class="line">275</span><br><span class="line">276</span><br><span class="line">277</span><br><span class="line">278</span><br><span class="line">279</span><br><span class="line">280</span><br><span class="line">281</span><br><span class="line">282</span><br><span class="line">283</span><br><span class="line">284</span><br><span class="line">285</span><br><span class="line">286</span><br><span class="line">287</span><br><span class="line">288</span><br><span class="line">289</span><br><span class="line">290</span><br><span class="line">291</span><br><span class="line">292</span><br><span class="line">293</span><br><span class="line">294</span><br><span class="line">295</span><br><span class="line">296</span><br><span class="line">297</span><br><span class="line">298</span><br><span class="line">299</span><br><span class="line">300</span><br><span class="line">301</span><br><span class="line">302</span><br><span class="line">303</span><br><span class="line">304</span><br><span class="line">305</span><br><span class="line">306</span><br><span class="line">307</span><br><span class="line">308</span><br><span class="line">309</span><br><span class="line">310</span><br><span class="line">311</span><br><span class="line">312</span><br><span class="line">313</span><br><span class="line">314</span><br><span class="line">315</span><br><span class="line">316</span><br><span class="line">317</span><br><span class="line">318</span><br><span class="line">319</span><br><span class="line">320</span><br><span class="line">321</span><br><span class="line">322</span><br><span class="line">323</span><br><span class="line">324</span><br><span class="line">325</span><br><span class="line">326</span><br><span class="line">327</span><br><span class="line">328</span><br><span class="line">329</span><br><span class="line">330</span><br><span class="line">331</span><br><span class="line">332</span><br><span class="line">333</span><br><span class="line">334</span><br><span class="line">335</span><br><span class="line">336</span><br><span class="line">337</span><br><span class="line">338</span><br><span class="line">339</span><br><span class="line">340</span><br><span class="line">341</span><br><span class="line">342</span><br><span class="line">343</span><br><span class="line">344</span><br><span class="line">345</span><br><span class="line">346</span><br><span class="line">347</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">BOOL <span class="title">CCreateWordReport::CreateApp</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (FALSE == m_wdApp.CreateDispatch(<span class="string">"word.application"</span>))</span><br><span class="line">    &#123;</span><br><span class="line">        AfxMessageBox(<span class="string">"Application创建失败，请确保安装了word 2000或以上版本!"</span>, MB_OK|MB_ICONWARNING);</span><br><span class="line">        <span class="keyword">return</span> FALSE;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> TRUE;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function">BOOL <span class="title">CCreateWordReport::CreateDocuments</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (FALSE == CreateApp()) </span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">return</span> FALSE;</span><br><span class="line">    &#125;</span><br><span class="line">    m_wdDocs = m_wdApp.get_Documents();</span><br><span class="line">    <span class="keyword">if</span> (!m_wdDocs.m_lpDispatch) </span><br><span class="line">    &#123;</span><br><span class="line">        AfxMessageBox(<span class="string">"Documents创建失败!"</span>, MB_OK|MB_ICONWARNING);</span><br><span class="line">        <span class="keyword">return</span> FALSE;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> TRUE;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function">BOOL <span class="title">CCreateWordReport::CreateDocument</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (!m_wdDocs.m_lpDispatch) </span><br><span class="line">    &#123;</span><br><span class="line">        AfxMessageBox(<span class="string">"Documents为空!"</span>, MB_OK|MB_ICONWARNING);</span><br><span class="line">        <span class="keyword">return</span> FALSE;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    COleVariant varTrue(short(1),VT_BOOL),vOptional((long)DISP_E_PARAMNOTFOUND, VT_ERROR);</span><br><span class="line">    <span class="function">CComVariant <span class="title">Template</span><span class="params">(_T(<span class="string">""</span>))</span></span>;    <span class="comment">//没有使用WORD的文档模板</span></span><br><span class="line">    CComVariant NewTemplate(false),DocumentType(0),Visible;</span><br><span class="line"></span><br><span class="line">    m_wdDocs.Add(&amp;Template,&amp;NewTemplate,&amp;DocumentType,&amp;Visible);    </span><br><span class="line"></span><br><span class="line">    <span class="comment">//得到document变量</span></span><br><span class="line">    m_wdDoc = m_wdApp.get_ActiveDocument();</span><br><span class="line">    <span class="keyword">if</span> (!m_wdDoc.m_lpDispatch) </span><br><span class="line">    &#123;</span><br><span class="line">        AfxMessageBox(<span class="string">"Document获取失败!"</span>, MB_OK|MB_ICONWARNING);</span><br><span class="line">        <span class="keyword">return</span> FALSE;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">//得到selection变量</span></span><br><span class="line">    m_wdSel = m_wdApp.get_Selection();</span><br><span class="line">    <span class="keyword">if</span> (!m_wdSel.m_lpDispatch) </span><br><span class="line">    &#123;</span><br><span class="line">        AfxMessageBox(<span class="string">"Select获取失败!"</span>, MB_OK|MB_ICONWARNING);</span><br><span class="line">        <span class="keyword">return</span> FALSE;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">//得到Range变量</span></span><br><span class="line">    m_wdRange = m_wdDoc.Range(vOptional,vOptional);</span><br><span class="line">    <span class="keyword">if</span>(!m_wdRange.m_lpDispatch)</span><br><span class="line">    &#123;</span><br><span class="line">        AfxMessageBox(<span class="string">"Range获取失败!"</span>, MB_OK|MB_ICONWARNING);</span><br><span class="line">        <span class="keyword">return</span> FALSE;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> TRUE;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function">BOOL <span class="title">CCreateWordReport::Create</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (FALSE == CreateDocuments()) </span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">return</span> FALSE;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> CreateDocument();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function">BOOL <span class="title">CCreateWordReport::OpenDocument</span><span class="params">(CString fileName)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (!m_wdDocs.m_lpDispatch) </span><br><span class="line">    &#123;</span><br><span class="line">        AfxMessageBox(<span class="string">"Documents为空!"</span>, MB_OK|MB_ICONWARNING);</span><br><span class="line">        <span class="keyword">return</span> FALSE;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    COleVariant vTrue((short)TRUE),    </span><br><span class="line">                vFalse((short)FALSE),</span><br><span class="line">                vOptional((<span class="keyword">long</span>)DISP_E_PARAMNOTFOUND, VT_ERROR),</span><br><span class="line">                vZ((short)<span class="number">0</span>);</span><br><span class="line">    <span class="function">COleVariant     <span class="title">vFileName</span><span class="params">(_T(fileName))</span></span>;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">//得到document变量</span></span><br><span class="line">    m_wdDoc = m_wdDocs.Open(</span><br><span class="line">                                vFileName,        <span class="comment">// FileName</span></span><br><span class="line">                                vTrue,            <span class="comment">// Confirm Conversion.</span></span><br><span class="line">                                vFalse,            <span class="comment">// ReadOnly.</span></span><br><span class="line">                                vFalse,            <span class="comment">// AddToRecentFiles.</span></span><br><span class="line">                                vOptional,        <span class="comment">// PasswordDocument.</span></span><br><span class="line">                                vOptional,        <span class="comment">// PasswordTemplate.</span></span><br><span class="line">                                vOptional,        <span class="comment">// Revert.</span></span><br><span class="line">                                vOptional,        <span class="comment">// WritePasswordDocument.</span></span><br><span class="line">                                vOptional,        <span class="comment">// WritePasswordTemplate.</span></span><br><span class="line">                                vOptional,        <span class="comment">// Format. // Last argument for Word 97</span></span><br><span class="line">                                vOptional,        <span class="comment">// Encoding // New for Word 2000/2002</span></span><br><span class="line">                                vOptional,        <span class="comment">// Visible</span></span><br><span class="line">                                <span class="comment">/*如下4个是word2003需要的参数。本版本是word2000。*/</span></span><br><span class="line">                                vOptional,    <span class="comment">// OpenAndRepair</span></span><br><span class="line">                                vZ,            <span class="comment">// DocumentDirection wdDocumentDirection LeftToRight</span></span><br><span class="line">                                vOptional,    <span class="comment">// NoEncodingDialog</span></span><br><span class="line">                                vOptional</span><br><span class="line">    );</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">if</span> (!m_wdDoc.m_lpDispatch)</span><br><span class="line">    &#123;</span><br><span class="line">        AfxMessageBox(<span class="string">"Document获取失败!"</span>, MB_OK|MB_ICONWARNING);</span><br><span class="line">        <span class="keyword">return</span> FALSE;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">//得到selection变量</span></span><br><span class="line">    m_wdSel = m_wdApp.get_Selection();</span><br><span class="line">    <span class="keyword">if</span> (!m_wdSel.m_lpDispatch) </span><br><span class="line">    &#123;</span><br><span class="line">        AfxMessageBox(<span class="string">"Select获取失败!"</span>, MB_OK|MB_ICONWARNING);</span><br><span class="line">        <span class="keyword">return</span> FALSE;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">//得到全部DOC的Range变量</span></span><br><span class="line">    m_wdRange = m_wdDoc.Range(vOptional,vOptional);</span><br><span class="line">    <span class="keyword">if</span>(!m_wdRange.m_lpDispatch)</span><br><span class="line">    &#123;</span><br><span class="line">        AfxMessageBox(<span class="string">"Range获取失败!"</span>, MB_OK|MB_ICONWARNING);</span><br><span class="line">        <span class="keyword">return</span> FALSE;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> TRUE;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function">BOOL <span class="title">CCreateWordReport::Open</span><span class="params">(CString fileName)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (FALSE == CreateDocuments()) </span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">return</span> FALSE;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> OpenDocument(fileName);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function">BOOL <span class="title">CCreateWordReport::SetActiveDocument</span><span class="params">(short i)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    COleVariant     vIndex(_T(i)),vOptional((long)DISP_E_PARAMNOTFOUND, VT_ERROR);</span><br><span class="line"></span><br><span class="line">    m_wdDoc.AttachDispatch(m_wdDocs.Item(vIndex));</span><br><span class="line">    m_wdDoc.Activate();</span><br><span class="line">    <span class="keyword">if</span> (!m_wdDoc.m_lpDispatch) </span><br><span class="line">    &#123;</span><br><span class="line">        AfxMessageBox(<span class="string">"Document获取失败!"</span>, MB_OK|MB_ICONWARNING);</span><br><span class="line">        <span class="keyword">return</span> FALSE;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">//得到selection变量</span></span><br><span class="line">    m_wdSel = m_wdApp.get_Selection();</span><br><span class="line">    <span class="keyword">if</span> (!m_wdSel.m_lpDispatch) </span><br><span class="line">    &#123;</span><br><span class="line">        AfxMessageBox(<span class="string">"Select获取失败!"</span>, MB_OK|MB_ICONWARNING);</span><br><span class="line">        <span class="keyword">return</span> FALSE;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">//得到全部DOC的Range变量</span></span><br><span class="line">    m_wdRange = m_wdDoc.Range(vOptional,vOptional);</span><br><span class="line">    <span class="keyword">if</span>(!m_wdRange.m_lpDispatch)</span><br><span class="line">    &#123;</span><br><span class="line">        AfxMessageBox(<span class="string">"Range获取失败!"</span>, MB_OK|MB_ICONWARNING);</span><br><span class="line">        <span class="keyword">return</span> FALSE;</span><br><span class="line">    &#125;</span><br><span class="line"><span class="comment">//	HideApp();</span></span><br><span class="line">    <span class="keyword">return</span> TRUE;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function">BOOL <span class="title">CCreateWordReport::SaveDocument</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (!m_wdDoc.m_lpDispatch) </span><br><span class="line">    &#123;</span><br><span class="line">        AfxMessageBox(<span class="string">"Document获取失败!"</span>, MB_OK|MB_ICONWARNING);</span><br><span class="line">        <span class="keyword">return</span> FALSE;</span><br><span class="line">    &#125;</span><br><span class="line">    m_wdDoc.Save();</span><br><span class="line">    <span class="keyword">return</span> TRUE;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function">BOOL <span class="title">CCreateWordReport::SaveDocumentAs</span><span class="params">(CString fileName)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (!m_wdDoc.m_lpDispatch) </span><br><span class="line">    &#123;</span><br><span class="line">        AfxMessageBox(<span class="string">"Document获取失败!"</span>, MB_OK|MB_ICONWARNING);</span><br><span class="line">        <span class="keyword">return</span> FALSE;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">	<span class="function">COleVariant <span class="title">covOptional</span><span class="params">((<span class="keyword">long</span>)DISP_E_PARAMNOTFOUND,VT_ERROR)</span></span>;</span><br><span class="line">	<span class="function">COleVariant <span class="title">varZero</span><span class="params">((short)<span class="number">0</span>)</span></span>; </span><br><span class="line">	<span class="function">COleVariant <span class="title">varTrue</span><span class="params">(short(<span class="number">1</span>),VT_BOOL)</span></span>; </span><br><span class="line">	<span class="function">COleVariant <span class="title">varFalse</span><span class="params">(short(<span class="number">0</span>),VT_BOOL)</span></span>; </span><br><span class="line">    <span class="function">COleVariant <span class="title">vFileName</span><span class="params">(_T(fileName))</span></span>;</span><br><span class="line"></span><br><span class="line">	m_wdDoc.SaveAs(</span><br><span class="line">		vFileName,</span><br><span class="line">		covOptional, </span><br><span class="line">		covOptional, </span><br><span class="line">		covOptional, </span><br><span class="line">		covOptional,</span><br><span class="line">		covOptional, </span><br><span class="line">		covOptional, </span><br><span class="line">		covOptional, </span><br><span class="line">		covOptional, </span><br><span class="line">		covOptional, </span><br><span class="line">		covOptional, </span><br><span class="line">		covOptional, </span><br><span class="line">		covOptional, </span><br><span class="line">		covOptional, </span><br><span class="line">		covOptional,</span><br><span class="line">		covOptional</span><br><span class="line">	);</span><br><span class="line">    <span class="keyword">return</span>    TRUE;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function">BOOL <span class="title">CCreateWordReport::CloseDocument</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    COleVariant vTrue((short)TRUE),    </span><br><span class="line">                vFalse((short)FALSE),</span><br><span class="line">                vOptional((<span class="keyword">long</span>)DISP_E_PARAMNOTFOUND, VT_ERROR);</span><br><span class="line">    m_wdDoc.Close(vFalse,    <span class="comment">// SaveChanges.</span></span><br><span class="line">             vTrue,            <span class="comment">// OriginalFormat.</span></span><br><span class="line">             vFalse            <span class="comment">// RouteDocument.</span></span><br><span class="line">             );</span><br><span class="line">    m_wdDoc.AttachDispatch(m_wdApp.get_ActiveDocument());</span><br><span class="line">    <span class="keyword">if</span> (!m_wdDoc.m_lpDispatch) </span><br><span class="line">    &#123;</span><br><span class="line">        AfxMessageBox(<span class="string">"Document获取失败!"</span>, MB_OK|MB_ICONWARNING);</span><br><span class="line">        <span class="keyword">return</span> FALSE;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">//得到selection变量</span></span><br><span class="line">    m_wdSel = m_wdApp.get_Selection();</span><br><span class="line">    <span class="keyword">if</span> (!m_wdSel.m_lpDispatch) </span><br><span class="line">    &#123;</span><br><span class="line">        AfxMessageBox(<span class="string">"Select获取失败!"</span>, MB_OK|MB_ICONWARNING);</span><br><span class="line">        <span class="keyword">return</span> FALSE;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">//得到全部DOC的Range变量</span></span><br><span class="line">    m_wdRange = m_wdDoc.Range(vOptional,vOptional);</span><br><span class="line">    <span class="keyword">if</span>(!m_wdRange.m_lpDispatch)</span><br><span class="line">    &#123;</span><br><span class="line">        AfxMessageBox(<span class="string">"Range获取失败!"</span>, MB_OK|MB_ICONWARNING);</span><br><span class="line">        <span class="keyword">return</span> FALSE;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> TRUE;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">CCreateWordReport::CloseApp</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    COleVariant vTrue((short)TRUE),    </span><br><span class="line">                vFalse((short)FALSE),</span><br><span class="line">                vOptional((<span class="keyword">long</span>)DISP_E_PARAMNOTFOUND, VT_ERROR);</span><br><span class="line">    m_wdDoc.Save();</span><br><span class="line">    m_wdApp.Quit(vFalse,    <span class="comment">// SaveChanges.</span></span><br><span class="line">             vTrue,            <span class="comment">// OriginalFormat.</span></span><br><span class="line">             vFalse            <span class="comment">// RouteDocument.</span></span><br><span class="line">             );</span><br><span class="line">    <span class="comment">//释放内存申请资源</span></span><br><span class="line">    m_wdInlineShape.ReleaseDispatch();</span><br><span class="line">    m_wdInlineShapes.ReleaseDispatch();</span><br><span class="line">    <span class="comment">//m_wdTb.ReleaseDispatch();</span></span><br><span class="line">    m_wdRange.ReleaseDispatch();</span><br><span class="line">    m_wdSel.ReleaseDispatch();</span><br><span class="line">    <span class="comment">//m_wdFt.ReleaseDispatch();</span></span><br><span class="line">    m_wdDoc.ReleaseDispatch();</span><br><span class="line">    m_wdDocs.ReleaseDispatch();</span><br><span class="line">    m_wdApp.ReleaseDispatch();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">CCreateWordReport::WriteText</span><span class="params">(CString szText)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    m_wdSel.TypeText(szText);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">CCreateWordReport::WriteNewLineText</span><span class="params">(CString szText, <span class="keyword">int</span> nLineCount <span class="comment">/* = 1 */</span>)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">int</span> i;</span><br><span class="line">    <span class="keyword">if</span> (nLineCount &lt;= <span class="number">0</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        nLineCount = <span class="number">0</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">for</span> (i = <span class="number">0</span>; i &lt; nLineCount; i++)</span><br><span class="line">    &#123;</span><br><span class="line">        m_wdSel.TypeParagraph();</span><br><span class="line">    &#125;</span><br><span class="line">    WriteText(szText);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">CCreateWordReport::WriteEndLine</span><span class="params">(CString szText)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    m_wdRange.InsertAfter(szText);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">CCreateWordReport::WholeStory</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    m_wdRange.WholeStory();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">CCreateWordReport::Copy</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    m_wdRange.CopyAsPicture();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">CCreateWordReport::InsertFile</span><span class="params">(CString fileName)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    COleVariant     vFileName(fileName),</span><br><span class="line">                 vTrue((short)TRUE),</span><br><span class="line">                 vFalse((short)FALSE),</span><br><span class="line">                 vOptional((<span class="keyword">long</span>)DISP_E_PARAMNOTFOUND, VT_ERROR),</span><br><span class="line">                 vNull(_T(<span class="string">""</span>));</span><br><span class="line">    <span class="comment">/*</span></span><br><span class="line"><span class="comment">    void InsertFile(LPCTSTR FileName, VARIANT* Range, VARIANT* ConfirmConversions, VARIANT* Link, VARIANT* Attachment);</span></span><br><span class="line"><span class="comment">    */</span></span><br><span class="line">    m_wdSel.InsertFile(</span><br><span class="line">                    fileName,</span><br><span class="line">                    vNull,</span><br><span class="line">                    vFalse,</span><br><span class="line">                    vFalse,</span><br><span class="line">                    vFalse</span><br><span class="line">                    );</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">CCreateWordReport::InsertShapes</span><span class="params">(CString fileName)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    COleVariant vTrue((short)TRUE),    </span><br><span class="line">                vFalse((short)FALSE),</span><br><span class="line">                vOptional((<span class="keyword">long</span>)DISP_E_PARAMNOTFOUND, VT_ERROR);</span><br><span class="line">    m_wdInlineShapes=m_wdSel.get_InlineShapes();</span><br><span class="line">    m_wdInlineShape=m_wdInlineShapes.AddPicture(fileName,vFalse,vTrue,vOptional);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">CCreateWordReport::InsertHyperlink</span><span class="params">(CString fileLink)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    COleVariant     vAddress(_T(fileLink)),vSubAddress(_T(""));</span><br><span class="line">    CRange aRange = m_wdSel.get_Range();</span><br><span class="line">    <span class="function">CHyperlinks <span class="title">vHyperlinks</span><span class="params">(aRange.get_Hyperlinks())</span></span>;</span><br><span class="line"></span><br><span class="line">    vHyperlinks.Add(</span><br><span class="line">                    aRange,            <span class="comment">//Object，必需。转换为超链接的文本或图形。</span></span><br><span class="line">                    vAddress,         <span class="comment">//Variant 类型，可选。指定的链接的地址。此地址可以是电子邮件地址、Internet 地址或文件名。请注意，Microsoft Word 不检查该地址的正确性。</span></span><br><span class="line">                    vSubAddress,     <span class="comment">//Variant 类型，可选。目标文件内的位置名，如书签、已命名的区域或幻灯片编号。</span></span><br><span class="line">                    vAddress,         <span class="comment">//Variant 类型，可选。当鼠标指针放在指定的超链接上时显示的可用作“屏幕提示”的文本。默认值为 Address。</span></span><br><span class="line">                    vAddress,         <span class="comment">//Variant 类型，可选。指定的超链接的显示文本。此参数的值将取代由 Anchor 指定的文本或图形。</span></span><br><span class="line">                    vSubAddress        <span class="comment">//Variant 类型，可选。要在其中打开指定的超链接的框架或窗口的名字。</span></span><br><span class="line">                    ); </span><br><span class="line">	aRange.ReleaseDispatch();</span><br><span class="line">    vHyperlinks.ReleaseDispatch();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这样我们就封装好了一些基本的操作，其实这些操作都是我自己根据网上的资料以及VB宏转化而来得到的代码。</p>
+<h2 id="特殊操作"><a href="#特殊操作" class="headerlink" title="特殊操作"></a>特殊操作</h2><p>在这里主要介绍一些比较骚的操作，这也是这篇文章主要有用的内容，前面基本操作网上都有源代码直接拿来用就OK了，这里的骚操作是我在项目中使用的主要操作，应该有应用价值。先请各位仔细想想，如果我们要根据前面的代码，从0开始完全用代码生成一个完整的报表是不是很累，而且一般报表都会包含一些通用的废话，这些话基本不会变化。如果将这些写到代码里面，如果后面这些话变了，我们就要修改并重新编译，是不是很麻烦。所以这里介绍的第一个操作就是利用模板和书签在合适的位置插入内容。</p>
+<h3 id="书签的使用"><a href="#书签的使用" class="headerlink" title="书签的使用"></a>书签的使用</h3><p>首先我们在Word中的适当位置创建一个标签，至于如何创建标签，请自行百度。然后在代码中的思路就是在文档中查找我们的标签，再获取光标的位置，最后就是在该位置处添加相应的内容了，这里我们举一个在光标位置插入文本的例子:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">void CCreateWordReport::WriteTextToBookMark(const CString&amp; csMarkName, const CString&amp; szText)</span><br><span class="line">&#123;</span><br><span class="line">	CBookmarks bks &#x3D; m_wdDoc.get_Bookmarks(); &#x2F;&#x2F;获取文档中的所有书签</span><br><span class="line">	CBookmark0 bk;</span><br><span class="line">	COleVariant bk_name(csMarkName); </span><br><span class="line">	</span><br><span class="line">	bk &#x3D; bks.Item(&amp;bk_name); &#x2F;&#x2F;查询对应名称的书签</span><br><span class="line">	CRange  hRange &#x3D; bk.get_Range(); &#x2F;&#x2F;获取书签位置</span><br><span class="line">	</span><br><span class="line">	if (hRange !&#x3D; NULL)</span><br><span class="line">	&#123;</span><br><span class="line">		hRange.put_Text(szText); &#x2F;&#x2F;在该位置处插入文本</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">    &#x2F;&#x2F;最后不要忘记清理相关资源</span><br><span class="line">	hRange.ReleaseDispatch();</span><br><span class="line">	bk.ReleaseDispatch();</span><br><span class="line">	bks.ReleaseDispatch();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="表格的使用"><a href="#表格的使用" class="headerlink" title="表格的使用"></a>表格的使用</h3><p>在word报表中表格应该是一个重头戏，表格中常用的接口如下:</p>
+<ul>
+<li>CTables0: 表格集合</li>
+<li>CTable0: 某个具体的表格，一般通过CTables来创建CTable</li>
+<li>CColumn: 表格列对象</li>
+<li>CRow：表格行对象</li>
+<li>CCel：表格单元格对象</li>
+</ul>
+<p>创建表格一般的操作如下:</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">CCreateWordReport::InsertTable</span><span class="params">(<span class="keyword">int</span> nRow, <span class="keyword">int</span> nColumn, CTable0&amp; wdTable)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	VARIANT vtDefault;</span><br><span class="line">	COleVariant vtAuto;</span><br><span class="line">	vtDefault.vt = VT_INT;</span><br><span class="line">	vtDefault.intVal = <span class="number">1</span>;</span><br><span class="line">	vtAuto.vt = VT_INT;</span><br><span class="line">	vtAuto.intVal = <span class="number">0</span>;</span><br><span class="line">    </span><br><span class="line">	CTables0 wordtables = m_wdDoc.get_Tables();</span><br><span class="line">	wdTable = 	wordtables.Add(m_wdSel.get_Range(), nRow, nColumn, &amp;vtDefault, &amp;vtAuto);</span><br><span class="line">	wordtables.ReleaseDispatch();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>往表格中写入内容的操作如下:</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">BOOL <span class="title">CCreateWordReport::WriteDataToTable</span><span class="params">(CTable0&amp; wdTable, <span class="keyword">int</span> nRow, <span class="keyword">int</span> nColumn, <span class="keyword">const</span> CString &amp;csData)</span></span></span><br><span class="line"><span class="function"></span>&#123; </span><br><span class="line">	CCell cell = wdTable.Cell(nRow, nColumn);</span><br><span class="line">	cell.Select(); <span class="comment">//将光标移动到单元格</span></span><br><span class="line">	m_wdSel.TypeText(csData);</span><br><span class="line">	</span><br><span class="line">	cell.ReleaseDispatch();</span><br><span class="line">	<span class="keyword">return</span> TRUE;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>合并单元格的操作如下:</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">CTable0 wdTable;</span><br><span class="line">InsertTable(<span class="number">5</span>, <span class="number">3</span>, wdTable); <span class="comment">//创建一个5行3列的表格</span></span><br><span class="line">CCell cell = wdTable.Cell(<span class="number">1</span>, <span class="number">1</span>); <span class="comment">//获得第一行第一列的单元格</span></span><br><span class="line"><span class="comment">//设置第二列列宽</span></span><br><span class="line">CColumns0 columns = wdTable.get_Columns();</span><br><span class="line">CColumn col;</span><br><span class="line">col.AttachDispatch(columns.Item(<span class="number">2</span>));</span><br><span class="line">col.SetWidth(<span class="number">40</span>, <span class="number">1</span>);</span><br><span class="line"></span><br><span class="line">cell.Merge(wdTable.Cell(<span class="number">5</span>, <span class="number">1</span>)); <span class="comment">//合并单元格，一直合并到第5行的第1列。</span></span><br><span class="line">cell.SetWidth(<span class="number">30</span>, <span class="number">1</span>);</span><br><span class="line">cell.ReleaseDispatch();</span><br></pre></td></tr></table></figure>
+
+<p>合并单元格用的是Merge函数，该函数的参数是一个单元格对象，表示合并结束的单元格。这里合并类似于我们画矩形时提供的左上角坐标和右下角坐标</p>
+<h3 id="移动光标跳出表格"><a href="#移动光标跳出表格" class="headerlink" title="移动光标跳出表格"></a>移动光标跳出表格</h3><p>当时由于需要连续的生成多个表格，当时我将前一个表格的数据填完，光标位于最后一个单元格里面，这个时候如果再插入的时候会在这个单元格里面插入表格，这个时候需要我手动向下移动光标，让光标移除到表格外。移动光标的代码如下:</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">m_wdSel.MoveDown(&amp;COleVariant((short)wdLine), &amp;COleVariant((short)<span class="number">1</span>), &amp;COleVariant((short)wdNULL));</span><br></pre></td></tr></table></figure>
+<p>这里wdLine 是word相关接口定义的，表示希望以何种单位来移动，这里我是以行为单位。后面的1表示移动1行。</p>
+<p>但是我发现在面临换页的时候一次移动根本移动不出来，这个时候我又添加了一行这样的代码移动两行。但是问题又出现了，这一系列表格后面跟着另一个大标题，多移动几次之后可能会造成它移动到大标题的位置，而破坏我原来定义的模板，这个时候该怎么办呢？我采取的办法是，判断当前光标是否在表格中，如果是则移动一行，知道出了表格。这里的代码如下:</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//移动光标，直到跳出表格外</span></span><br><span class="line"><span class="keyword">while</span> (TRUE)</span><br><span class="line">&#123;</span><br><span class="line">    m_wdSel.MoveDown(&amp;COleVariant((short)wdLine), &amp;COleVariant((short)<span class="number">1</span>), &amp;COleVariant((short)wdNULL));</span><br><span class="line">    m_wdSel.Collapse(&amp;COleVariant((short)wdCollapseStart));</span><br><span class="line">    <span class="keyword">if</span> (!m_wdSel.get_Information((<span class="keyword">long</span>)wdWithInTable).boolVal)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="样式的使用"><a href="#样式的使用" class="headerlink" title="样式的使用"></a>样式的使用</h3><p>在使用样式的时候当然也可以用代码来定义，但是我们可以采取另一种方式，我们可以事先在模板文件中创建一系列样式，然后在需要的时候直接定义段落或者文本的样式即可</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">m_wdSel.put_Style(COleVariant(<span class="string">"二级标题"</span>)); <span class="comment">//在当前光标处的样式定义为二级标题样式，这里的二级标题样式是我们在word中事先定义好的</span></span><br><span class="line">m_wdSel.TypeText(csTitle); <span class="comment">//在当前位置输出文本</span></span><br><span class="line">m_wdSel.TypeParagraph(); <span class="comment">//插入段落，这里主要为了换行，这个时候光标也会跟着动</span></span><br><span class="line">m_wdSel.put_Style(COleVariant(<span class="string">"正文"</span>)); <span class="comment">//定义此处样式为正文样式</span></span><br><span class="line">m_wdSel.TypeText(csText;</span><br></pre></td></tr></table></figure>
+
+<h2 id="插入图表"><a href="#插入图表" class="headerlink" title="插入图表"></a>插入图表</h2><p>我自己尝试用word生成的图表样式还可以，但是用代码插入的时候，样式就特别丑，这里没有办法，我采用GDI+绘制了一个饼图，然后将图片插入word中。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">BOOL <span class="title">CCreateWordReport::DrawVulInforPic</span><span class="params">(<span class="keyword">const</span> CString&amp; csMarkName, <span class="keyword">int</span> nVulCnt, <span class="keyword">int</span> nVulCris, <span class="keyword">int</span> nHigh, <span class="keyword">int</span> nMid, <span class="keyword">int</span> nLow, <span class="keyword">int</span> nPossible)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	CBookmarks bks = m_wdDoc.get_Bookmarks();</span><br><span class="line">	<span class="function">COleVariant <span class="title">bk_name</span><span class="params">(csMarkName)</span></span>;</span><br><span class="line">	CBookmark0 bk = bks.Item(&amp;bk_name);</span><br><span class="line">	bk.Select();</span><br><span class="line">	</span><br><span class="line">	CnlineShapes isps = m_wdSel.get_InlineShapes();</span><br><span class="line">	<span class="function">COleVariant <span class="title">vFalse</span><span class="params">((short)FALSE)</span></span>;</span><br><span class="line">	<span class="function">COleVariant <span class="title">vNull</span><span class="params">(<span class="string">""</span>)</span></span>;</span><br><span class="line">	<span class="function">COleVariant <span class="title">vOptional</span><span class="params">((<span class="keyword">long</span>)DISP_E_PARAMNOTFOUND,VT_ERROR)</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//创建一个与桌面环境兼容的内存DC</span></span><br><span class="line">	HWND hWnd = GetDesktopWindow();</span><br><span class="line">	HDC hDc = GetDC(hWnd);</span><br><span class="line">	HDC hMemDc = CreateCompatibleDC(hDc);</span><br><span class="line">	HBITMAP hMemBmp = CreateCompatibleBitmap(hDc, PICTURE_WIDTH + GLOBAL_MARGIN, PICTURE_LENGTH + <span class="number">2</span> * GLOBAL_MARGIN + LENGED_BORDER_LENGTH);</span><br><span class="line">	SelectObject(hMemDc, hMemBmp);</span><br><span class="line"></span><br><span class="line">    <span class="comment">//绘制并保存图表</span></span><br><span class="line">	DrawPie(hMemDc, nVulCnt, nVulCris, nHigh, nMid, nLow, nPossible);</span><br><span class="line">	</span><br><span class="line">	<span class="function">COleVariant <span class="title">vTrue</span><span class="params">((short)TRUE)</span></span>;</span><br><span class="line">	CnlineShape isp=isps.AddPicture(<span class="string">"D:\\Program\\WordReport\\WordReport\\test.png"</span>,vFalse,vTrue,vOptional);  <span class="comment">//以图片的方式插入图表</span></span><br><span class="line">	</span><br><span class="line">    <span class="comment">//设置图片的大小</span></span><br><span class="line">    isp.put_Height(<span class="number">141</span>);</span><br><span class="line">	isp.put_Width(<span class="number">423</span>);</span><br><span class="line">	</span><br><span class="line">    bks.ReleaseDispatch();</span><br><span class="line">	bk.ReleaseDispatch();</span><br><span class="line">	isps.ReleaseDispatch();</span><br><span class="line">	isp.ReleaseDispatch();</span><br><span class="line">	DeleteObject(hMemDc);</span><br><span class="line">	DeleteDC(hMemDc);</span><br><span class="line">	ReleaseDC(hWnd, hDc);</span><br><span class="line">	</span><br><span class="line">	<span class="keyword">return</span> TRUE;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>最后，各个接口的参数可以参考下面的链接:<br><a href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.office.interop.word?view=word-pia" target="_blank" rel="noopener">.net Word office组件接口文档</a></p>
+<hr />
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+      <div>
+        <div style="padding: 10px 0; margin: 20px auto; width: 90%; text-align: center;">
+  <div></div>
+  <button id="rewardButton" disable="enable" onclick="var qr = document.getElementById('QR'); if (qr.style.display === 'none') {qr.style.display='block';} else {qr.style.display='none'}">
+    <span>打赏</span>
+  </button>
+  <div id="QR" style="display: none;">
+
+    
+      <div id="wechat" style="display: inline-block">
+        <img id="wechat_qr" src="/images/wechatreward.png" alt="Masimaro 微信支付"/>
+        <p>微信支付</p>
+      </div>
+    
+
+    
+      <div id="alipay" style="display: inline-block">
+        <img id="alipay_qr" src="/images/alipayreward.png" alt="Masimaro 支付宝"/>
+        <p>支付宝</p>
+      </div>
+    
+
+    
+
+  </div>
+</div>
+
+      </div>
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/VC/" rel="tag"><i class="fa fa-tag"></i> VC</a>
+          
+            <a href="/tags/word/" rel="tag"><i class="fa fa-tag"></i> word</a>
+          
+            <a href="/tags/%E7%BB%84%E4%BB%B6/" rel="tag"><i class="fa fa-tag"></i> 组件</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/quick-sort.html" rel="next" title="算法与数据结构(七)：快速排序">
+                <i class="fa fa-chevron-left"></i> 算法与数据结构(七)：快速排序
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/java-base1.html" rel="prev" title="Java 学习笔记(1)——java基础语法">
+                Java 学习笔记(1)——java基础语法 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        
+  <div class="bdsharebuttonbox">
+    <a href="#" class="bds_tsina" data-cmd="tsina" title="分享到新浪微博"></a>
+    <a href="#" class="bds_douban" data-cmd="douban" title="分享到豆瓣网"></a>
+    <a href="#" class="bds_sqq" data-cmd="sqq" title="分享到QQ好友"></a>
+    <a href="#" class="bds_qzone" data-cmd="qzone" title="分享到QQ空间"></a>
+    <a href="#" class="bds_weixin" data-cmd="weixin" title="分享到微信"></a>
+    <a href="#" class="bds_tieba" data-cmd="tieba" title="分享到百度贴吧"></a>
+    <a href="#" class="bds_twi" data-cmd="twi" title="分享到Twitter"></a>
+    <a href="#" class="bds_fbook" data-cmd="fbook" title="分享到Facebook"></a>
+    <a href="#" class="bds_more" data-cmd="more"></a>
+    <a class="bds_count" data-cmd="count"></a>
+  </div>
+  <script>
+    window._bd_share_config = {
+      "common": {
+        "bdText": "",
+        "bdMini": "2",
+        "bdMiniList": false,
+        "bdPic": ""
+      },
+      "share": {
+        "bdSize": "16",
+        "bdStyle": "0"
+      },
+      "image": {
+        "viewList": ["tsina", "douban", "sqq", "qzone", "weixin", "twi", "fbook"],
+        "viewText": "分享到：",
+        "viewSize": "16"
+      }
+    }
+  </script>
+
+<script>
+  with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='//bdimg.share.baidu.com/static/api/js/share.js?cdnversion='+~(-new Date()/36e5)];
+</script>
+
+      
+	  
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      <div id="disqus_thread">
+        <noscript>
+          Please enable JavaScript to view the
+          <a href="https://disqus.com/?ref_noscript" target="_blank" rel="noopener">comments powered by Disqus.</a>
+        </noscript>
+      </div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/avatar.jpg"
+                alt="Masimaro" />
+            
+              <p class="site-author-name" itemprop="name">Masimaro</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/%20%7C%7C%20archive">
+              
+                  <span class="site-state-item-count">94</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">18</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">141</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          <div class="links-of-author motion-element">
+            
+              
+                <span class="links-of-author-item">
+                  <a href="https://github.com/aMonst" target="_blank" title="GitHub">
+                    
+                      <i class="fa fa-fw fa-globe"></i>GitHub</a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="http://weibo.com/your-user-name" target="_blank" title="微博">
+                    
+                      <i class="fa fa-fw fa-globe"></i>微博</a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="http://blog.csdn.net/lanuage" target="_blank" title="CSDN博客">
+                    
+                      <i class="fa fa-fw fa-globe"></i>CSDN博客</a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="http://www.jianshu.com/u/7261ff9df286" target="_blank" title="简书">
+                    
+                      <i class="fa fa-fw fa-globe"></i>简书</a>
+                </span>
+              
+            
+          </div>
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#导入接口"><span class="nav-number">1.</span> <span class="nav-text">导入接口</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#常见接口介绍"><span class="nav-number">2.</span> <span class="nav-text">常见接口介绍</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#相关操作"><span class="nav-number">3.</span> <span class="nav-text">相关操作</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#特殊操作"><span class="nav-number">4.</span> <span class="nav-text">特殊操作</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#书签的使用"><span class="nav-number">4.1.</span> <span class="nav-text">书签的使用</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#表格的使用"><span class="nav-number">4.2.</span> <span class="nav-text">表格的使用</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#移动光标跳出表格"><span class="nav-number">4.3.</span> <span class="nav-text">移动光标跳出表格</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#样式的使用"><span class="nav-number">4.4.</span> <span class="nav-text">样式的使用</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#插入图表"><span class="nav-number">5.</span> <span class="nav-text">插入图表</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love" id="heart">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Masimaro</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io" rel="external nofollow">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next" rel="external nofollow">NexT.Mist</a> v5.1.3</div>
+
+
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv">
+      <i class="fa fa-user">本次访客数</i>
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+      人次
+    </span>
+  
+
+  
+    <span class="site-pv">
+      <i class="fa fa-eye">本站总访问量</i>
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+      次
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.3"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.3"></script>
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.3"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.3"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.3"></script>
+
+
+
+  
+
+
+  
+
+    
+      <script id="dsq-count-scr" src="https://masimaroweb.disqus.com/count.js" async></script>
+    
+
+    
+      <script type="text/javascript">
+        var disqus_config = function () {
+          this.page.url = 'http://www.masimaroweb.com/VC-Word.html';
+          this.page.identifier = 'VC-Word.html';
+          this.page.title = 'VC+++  操作word';
+        };
+        var d = document, s = d.createElement('script');
+        s.src = 'https://masimaroweb.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', '' + +new Date());
+        (d.head || d.body).appendChild(s);
+      </script>
+    
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+  
+
+
+  
+
+  
+
+</body>
+</html>
+
+<!-- 页面点击小红心 -->
+<script type="text/javascript" src="/js/src/love.js"></script>

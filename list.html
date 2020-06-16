@@ -1,0 +1,1377 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<script src="//cdn.bootcss.com/pace/1.0.2/pace.min.js"></script>
+<link href="//cdn.bootcss.com/pace/1.0.2/themes/pink/pace-theme-flash.css" rel="stylesheet">
+<style>
+    .pace .pace-progress {
+        background: #1E92FB; /*进度条颜色*/
+        height: 3px;
+    }
+    .pace .pace-progress-inner {
+         box-shadow: 0 0 10px #1E92FB, 0 0 5px     #1E92FB; /*阴影颜色*/
+    }
+    .pace .pace-activity {
+        border-top-color: #1E92FB;    /*上边框颜色*/
+        border-left-color: #1E92FB;    /*左边框颜色*/
+    }
+</style>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.3" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.3">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.3">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.3">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.3" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="算法与数据结构, C语言, 链表" />
+
+
+
+
+  
+
+
+  <link rel="alternate" href="/atom.xml" title="Masimaro's blog" type="application/atom+xml" />
+
+
+
+
+
+
+<meta name="description" content="上一篇简单的开了一个头，简单介绍了一下所谓的时间复杂度与空间复杂度，从这篇开始将陆陆续续写一下常用的数据结构：链表、队列、栈、树等等。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="算法与数据结构(二)：链表">
+<meta property="og:url" content="http://www.masimaroweb.com/list.html">
+<meta property="og:site_name" content="Masimaro&#39;s blog">
+<meta property="og:description" content="上一篇简单的开了一个头，简单介绍了一下所谓的时间复杂度与空间复杂度，从这篇开始将陆陆续续写一下常用的数据结构：链表、队列、栈、树等等。">
+<meta property="og:image" content="http://www.masimaroweb.com/list/list1.png">
+<meta property="og:image" content="http://www.masimaroweb.com/list/CreateListHead.png">
+<meta property="og:image" content="http://www.masimaroweb.com/list/DeleteNode.png">
+<meta property="og:image" content="http://www.masimaroweb.com/list/InsertNode.png">
+<meta property="og:image" content="http://www.masimaroweb.com/list/double_list.png">
+<meta property="og:image" content="http://www.masimaroweb.com/list/DeletDNode.png">
+<meta property="og:image" content="http://www.masimaroweb.com/list/InsertDNode.png">
+<meta property="article:published_time" content="2019-01-19T09:22:53.000Z">
+<meta property="article:modified_time" content="2019-01-19T13:53:24.468Z">
+<meta property="article:author" content="Masimaro">
+<meta property="article:tag" content="算法与数据结构">
+<meta property="article:tag" content=" C语言">
+<meta property="article:tag" content=" 链表">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://www.masimaroweb.com/list/list1.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.3',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+
+  <link rel="canonical" href="http://www.masimaroweb.com/list.html"/>
+
+
+
+
+
+  <title>算法与数据结构(二)：链表 | Masimaro's blog</title>
+  
+
+
+
+
+
+
+
+
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Masimaro's blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <h1 class="site-subtitle" itemprop="description"></h1>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="搜索..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://www.masimaroweb.com/list.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Masimaro">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Masimaro's blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h2 class="post-title" itemprop="name headline">算法与数据结构(二)：链表</h2>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-01-19T17:22:53+08:00">
+                2019-01-19
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E7%AE%97%E6%B3%95%E4%B8%8E%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/" itemprop="url" rel="index">
+                    <span itemprop="name">算法与数据结构</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/list.html#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="list.html" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="page-pv"><i class="fa fa-file-o">本文总阅读量</i>
+            <span class="busuanzi-value" id="busuanzi_value_page_pv" ></span>次
+            </span>
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>上一篇简单的开了一个头，简单介绍了一下所谓的时间复杂度与空间复杂度，从这篇开始将陆陆续续写一下常用的数据结构：链表、队列、栈、树等等。</p>
+<a id="more"></a>
+<p>链表当初是我在学校时唯一死磕过的数据结构，那个时候自己还算是一个好学生，虽然上课没怎么听懂，但是课后还是根据仔细调试过老师给的代码，硬是自己给弄懂了，它是我离校时唯一能够写出实现的数据结构，现在回想起来应该是它比较简单，算法也比较直来直去吧。虽然它比较简单，很多朋友也都会链表。但是作为一个系列，如果仅仅因为它比较简单而不去理会，总觉得少了点什么，所以再这仍然将其列举出来。</p>
+<h2 id="单向链表"><a href="#单向链表" class="headerlink" title="单向链表"></a>单向链表</h2><p>单向链表是链表中的一种，它的特点是只有一个指向下一个节点的指针域，对单向链表的访问需要从头部开始，根据指针域依次访问下一个节点，单向链表的结构如下图所示<br><img src="./list/list1.png" alt="单向链表"></p>
+<h3 id="单向链表的创建"><a href="#单向链表的创建" class="headerlink" title="单向链表的创建"></a>单向链表的创建</h3><p>单向链表的结构只需要一个数据域与指针域，这个数据域可以是一个结构体，也可以是多个基本数据类型；指针域是一个指向节点类型的指针，简单的定义如下:</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> _<span class="title">LIST_NODE</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">	<span class="keyword">int</span> nVal;</span><br><span class="line">	<span class="class"><span class="keyword">struct</span> _<span class="title">LIST_NODE</span> *<span class="title">pNext</span>;</span></span><br><span class="line">&#125;LIST_NODE, *LPLIST_NODE;</span><br></pre></td></tr></table></figure>
+
+<p>创建链表可以采用头插法或者尾插法来初始化一个有多个节点的链表</p>
+<p>头插法的示意图如下:<br><img src="./list/CreateListHead.png" alt="头插法"></p>
+<p>它的过程就像示意图中展现的，首先使用新节点p的next指针指向当前的头节点把新节点加入到链表头，然后变更链表头指针，这样就在头部插入了一个节点，用代码来展示就是</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">p-&gt;next = head;</span><br><span class="line">head = p;</span><br></pre></td></tr></table></figure>
+
+<p>我们使用一个函数来封装就是</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">LPLIST_NODE <span class="title">CreateListHead</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	  LPLIST_NODE pHead = <span class="literal">NULL</span>;</span><br><span class="line">  	<span class="keyword">while</span> (TRUE)</span><br><span class="line">	  &#123;</span><br><span class="line">		    LPLIST_NODE p = (LPLIST_NODE)<span class="built_in">malloc</span>(<span class="keyword">sizeof</span>(LIST_NODE));</span><br><span class="line">		    <span class="keyword">if</span> (<span class="literal">NULL</span> == p)</span><br><span class="line">		    &#123;</span><br><span class="line">			      <span class="keyword">break</span>;</span><br><span class="line">	    	&#125;</span><br><span class="line"></span><br><span class="line">		    <span class="built_in">memset</span>(p, <span class="number">0x00</span>, <span class="keyword">sizeof</span>(LIST_NODE));</span><br><span class="line">		    <span class="built_in">printf</span>(<span class="string">"请输入节点值(为0时将退出创建节点):"</span>);</span><br><span class="line">		    scanf_s(<span class="string">"%d"</span>, &amp;p-&gt;nVal);</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">        <span class="comment">//这里不需要对链表为空单独讨论</span></span><br><span class="line">        <span class="comment">//当链表为空时pHead 的值为NULL, 这两句代码就变为</span></span><br><span class="line">        <span class="comment">//p-&gt;pNext = NULL;</span></span><br><span class="line">        <span class="comment">//pHead = p;</span></span><br><span class="line"></span><br><span class="line">		    p-&gt;pNext = pHead;</span><br><span class="line">			  pHead = p;</span><br><span class="line"></span><br><span class="line">		    <span class="keyword">if</span> (p-&gt;nVal == <span class="number">0</span>)</span><br><span class="line">		    &#123;</span><br><span class="line">		      	<span class="keyword">break</span>;</span><br><span class="line">		    &#125;</span><br><span class="line">	  &#125;</span><br><span class="line"></span><br><span class="line">	  <span class="keyword">return</span> pHead;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>采用尾插法的话，首先得获得链表的尾部 pTail, 然后使尾节点的next指针指向新节点，然后更新尾节点，用代码来表示就是</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">pTail-&gt;next = p;</span><br><span class="line">pTail = p;</span><br></pre></td></tr></table></figure>
+
+<p>下面的函数是采用尾插法来构建链表的例子</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//这个函数多定义了一个变量用来保存</span></span><br><span class="line"><span class="comment">// 可以不需要这个变量，这样在插入之前需要遍历一遍链表，以便找到尾节点</span></span><br><span class="line"><span class="comment">// 但是每次插入之前都需要遍历一遍，没有定义一个变量保存尾节点这种方式来的高效</span></span><br><span class="line"><span class="function">LPLIST_NODE <span class="title">CreateListTail</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  	LPLIST_NODE pHead = <span class="literal">NULL</span>;</span><br><span class="line">  	LPLIST_NODE pTail = pHead;</span><br><span class="line">  	<span class="keyword">while</span> (<span class="literal">NULL</span> != pTail &amp;&amp; <span class="literal">NULL</span> != pTail-&gt;pNext)</span><br><span class="line">  	&#123;</span><br><span class="line">  		  pTail = pTail-&gt;pNext;</span><br><span class="line">  	&#125;</span><br><span class="line"></span><br><span class="line">  	<span class="keyword">while</span> (TRUE)</span><br><span class="line">  	&#123;</span><br><span class="line">    		LPLIST_NODE p = (LPLIST_NODE)<span class="built_in">malloc</span>(<span class="keyword">sizeof</span>(LIST_NODE));</span><br><span class="line">    		<span class="keyword">if</span> (<span class="literal">NULL</span> == p)</span><br><span class="line">    		&#123;</span><br><span class="line">    			  <span class="keyword">break</span>;</span><br><span class="line">    		&#125;</span><br><span class="line"></span><br><span class="line">    		<span class="built_in">memset</span>(p, <span class="number">0x00</span>, <span class="keyword">sizeof</span>(LIST_NODE));</span><br><span class="line">    		<span class="built_in">printf</span>(<span class="string">"请输入节点值(为0时将退出创建节点):"</span>);</span><br><span class="line">    		scanf_s(<span class="string">"%d"</span>, &amp;p-&gt;nVal);</span><br><span class="line"></span><br><span class="line">        <span class="comment">//由于这种方法需要对尾节点的next域赋值，所以需要考虑链表为空的情况</span></span><br><span class="line">    		<span class="keyword">if</span> (<span class="literal">NULL</span> == pTail)</span><br><span class="line">    		&#123;</span><br><span class="line">      			pHead = p;</span><br><span class="line">      			pTail = pHead;</span><br><span class="line">    		&#125;<span class="keyword">else</span></span><br><span class="line">    		&#123;</span><br><span class="line">      			pTail-&gt;pNext = p;</span><br><span class="line">      			pTail = p;</span><br><span class="line">    		&#125;</span><br><span class="line"></span><br><span class="line">    		<span class="keyword">if</span> (p-&gt;nVal == <span class="number">0</span>)</span><br><span class="line">    		&#123;</span><br><span class="line">    			  <span class="keyword">break</span>;</span><br><span class="line">    		&#125;</span><br><span class="line">  	&#125;</span><br><span class="line"></span><br><span class="line">  	<span class="keyword">return</span> pHead;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="链表的遍历"><a href="#链表的遍历" class="headerlink" title="链表的遍历"></a>链表的遍历</h3><p>链表的每个节点在内存中不是连续的，所以它不能像数组那样根据下标来访问（当然可以利用C++中的运算符重载来实现使用下标访问），链表中的每一个节点都保存了下一个节点的地址，所以我们根据每个节点指向的下一个节点来依次访问每个节点，访问的代码如下:</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">TraverseList</span><span class="params">(LPLIST_NODE pHead)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  	<span class="keyword">while</span> (<span class="literal">NULL</span> != pHead)</span><br><span class="line">  	&#123;</span><br><span class="line">    		<span class="built_in">printf</span>(<span class="string">"%d\n"</span>, pHead-&gt;nVal);</span><br><span class="line">    		pHead = pHead-&gt;pNext;</span><br><span class="line">  	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="链表的删除"><a href="#链表的删除" class="headerlink" title="链表的删除"></a>链表的删除</h3><p>链表的每个节点都是在堆上分配的，在不再使用的时候需要手工清除每个节点。清除时需要使用遍历的方法，一个个的删除，只是需要在遍历的指针移动到下一个节点前保存当前节点，以便能够删除当前节点，删除的函数如下</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">DestroyList</span><span class="params">(LPLIST_NODE pHead)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	LPLIST_NODE pTmp = pHead;</span><br><span class="line">	<span class="keyword">while</span> (<span class="literal">NULL</span> != pTmp)</span><br><span class="line">	&#123;</span><br><span class="line">		pTmp = pHead-&gt;pNext;</span><br><span class="line">		<span class="keyword">delete</span> pHead;</span><br><span class="line">		pHead = pTmp;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="删除单个节点"><a href="#删除单个节点" class="headerlink" title="删除单个节点"></a>删除单个节点</h3><p><img src="./list/DeleteNode.png" alt="删除单个节点"></p>
+<p>如上图所示，假设我们要删除q节点，那么首先需要遍历找到q的上一个节点p，将p的next指针指向q的下一个节点，也就是赋值为q的next指针的值,用代码表示就是</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">p-&gt;next = q-&gt;next;</span><br></pre></td></tr></table></figure>
+
+<p>删除节点的函数如下:</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">DeleteNode</span><span class="params">(LPLIST_NODE* ppHead, <span class="keyword">int</span> nValue)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	<span class="keyword">if</span> (<span class="literal">NULL</span> == ppHead || <span class="literal">NULL</span> == *ppHead)</span><br><span class="line">	&#123;</span><br><span class="line">		<span class="keyword">return</span>;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	LPLIST_NODE p, q;</span><br><span class="line">	p = *ppHead;</span><br><span class="line">	<span class="keyword">while</span> (<span class="literal">NULL</span> != p)</span><br><span class="line">	&#123;</span><br><span class="line">		<span class="keyword">if</span> (nValue == p-&gt;nVal)</span><br><span class="line">		&#123;</span><br><span class="line">			<span class="keyword">if</span> (*ppHead == p)</span><br><span class="line">			&#123;</span><br><span class="line">				*ppHead = p-&gt;pNext;</span><br><span class="line">				<span class="built_in">free</span>(p);</span><br><span class="line">			&#125;<span class="keyword">else</span></span><br><span class="line">			&#123;</span><br><span class="line">				q-&gt;pNext = p-&gt;pNext;</span><br><span class="line">				<span class="built_in">free</span>(p);</span><br><span class="line">			&#125;</span><br><span class="line"></span><br><span class="line">			p = <span class="literal">NULL</span>;</span><br><span class="line">			q = <span class="literal">NULL</span>;</span><br><span class="line">			<span class="keyword">break</span>;</span><br><span class="line">		&#125;</span><br><span class="line"></span><br><span class="line">		q = p;</span><br><span class="line">		p = p-&gt;pNext;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>在上述代码中首先来遍历链表，找到要删除的节点p和它的上一个节点q，由于头节点没有上一个节点，所以需要特别判断一下需要删除的是否为头节点，如果为头结点，则直接将头指针指向它的下一个节点，然后删除头结点即可，如果不是则采用之前的方法来删除。</p>
+<h3 id="任意位置插入节点"><a href="#任意位置插入节点" class="headerlink" title="任意位置插入节点"></a>任意位置插入节点</h3><p><img src="./list/InsertNode.png" alt="任意位置插入节点"><br>如上图所示，如果需要在q节点之后插入p节点的话，需要两步，将q的next节点指向q，然后将q指向之前p的下一个节点，这个时候需要注意一下顺序，如果我们先执行q-&gt;next = p 的话，那么之前q的下一个节点的地址就被覆盖掉了，这个时候后面的节点都丢掉了，所以这里我们要先执行p-&gt;next = q-&gt;next 这条语句，然后在执行q-&gt;next = p</p>
+<p>下面是一个创建有序链表的例子，这个例子演示了在任意位置插入节点</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">LPLIST_NODE <span class="title">CreateSortedList</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	LPLIST_NODE pHead = <span class="literal">NULL</span>;</span><br><span class="line">	<span class="keyword">while</span> (TRUE)</span><br><span class="line">	&#123;</span><br><span class="line">		LPLIST_NODE p = (LPLIST_NODE)<span class="built_in">malloc</span>(<span class="keyword">sizeof</span>(LIST_NODE));</span><br><span class="line">		<span class="keyword">if</span> (<span class="literal">NULL</span> == p)</span><br><span class="line">		&#123;</span><br><span class="line">			<span class="keyword">break</span>;</span><br><span class="line">		&#125;</span><br><span class="line"></span><br><span class="line">		<span class="built_in">memset</span>(p, <span class="number">0x00</span>, <span class="keyword">sizeof</span>(LIST_NODE));</span><br><span class="line">		<span class="built_in">printf</span>(<span class="string">"请输入节点值(为0时将退出创建节点):"</span>);</span><br><span class="line">		scanf_s(<span class="string">"%d"</span>, &amp;p-&gt;nVal);</span><br><span class="line"></span><br><span class="line">		<span class="keyword">if</span> (<span class="literal">NULL</span> == pHead)</span><br><span class="line">		&#123;</span><br><span class="line">			pHead = p;</span><br><span class="line">		&#125;<span class="keyword">else</span></span><br><span class="line">		&#123;</span><br><span class="line">			<span class="keyword">if</span> (pHead-&gt;nVal &gt; p-&gt;nVal)</span><br><span class="line">			&#123;</span><br><span class="line">				p-&gt;pNext = pHead;</span><br><span class="line">				pHead = p;</span><br><span class="line">			&#125;<span class="keyword">else</span></span><br><span class="line">			&#123;</span><br><span class="line">				LPLIST_NODE q = pHead;</span><br><span class="line">				LPLIST_NODE r = q;</span><br><span class="line">				q = q-&gt;pNext;</span><br><span class="line"></span><br><span class="line">				<span class="keyword">while</span> (<span class="literal">NULL</span> != q &amp;&amp; q-&gt;nVal &lt; p-&gt;nVal)</span><br><span class="line">				&#123;</span><br><span class="line">					r = q;</span><br><span class="line">					q = q-&gt;pNext;</span><br><span class="line">				&#125;</span><br><span class="line"></span><br><span class="line">				p-&gt;pNext = r-&gt;pNext;</span><br><span class="line">				r-&gt;pNext = p;</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line"></span><br><span class="line">		<span class="keyword">if</span> (p-&gt;nVal == <span class="number">0</span>)</span><br><span class="line">		&#123;</span><br><span class="line">			<span class="keyword">break</span>;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">return</span> pHead;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>当确定新节点的值之后，首先遍历链表，直到找到比新节点中数值大的节点，那么这个新节点就是需要插入到该节点之前。在遍历的时候使用r来保存之前的节点。这里需要注意这些情况:</p>
+<ul>
+<li>链表为空：这种情况下，直接让头指针指向当前节点</li>
+<li>如果头节点本身就是大于新节点的值，这种情况下采用头插法，将新节点插入到头部</li>
+<li>如果链表中未找到比新节点的值更大的值，这种情况下直接采用尾插发</li>
+<li>在链表中找到比新节点值更大的节点，这种情况下，在链表中插入</li>
+</ul>
+<p>但是在代码中并没有考虑到尾部插入的情况，由于在尾部插入时，r等于尾节点，r-&gt;pNext 的值为NULL， 所以 <code>p-&gt;pNext = r-&gt;pNext;r-&gt;pNext = p;</code> 可以看成 <code>p-&gt;pNext = NULL; r-&gt;pNext = p;</code> 也就是将p的next指针指向空，让其作为尾节点，将之前的尾节点的next指针指向新节点。</p>
+<h2 id="循环链表"><a href="#循环链表" class="headerlink" title="循环链表"></a>循环链表</h2><p>循环链表是建立在单向链表的基础之上的，循环链表的尾节点并不指向空，而是指向其他的节点，可以是头结点，可以是自身，也可以是链表中的其他节点，为了方便操作，一般将循环链表的尾节点的next指针指向头节点，它的操作与单链表的操作类似，只需要将之前判断尾节点的条件变为 <code>pTail-&gt;pNext == pHead</code> 即可。这里就不再详细分析每种操作了，直接给出代码</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">LPLIST_NODE <span class="title">CreateLoopList</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	LPLIST_NODE pHead = <span class="literal">NULL</span>;</span><br><span class="line">	LPLIST_NODE pTail = pHead;</span><br><span class="line">	<span class="keyword">while</span>(<span class="number">1</span>)</span><br><span class="line">	&#123;</span><br><span class="line">		LPLIST_NODE p = (LPLIST_NODE)<span class="built_in">malloc</span>(<span class="keyword">sizeof</span>(LIST_NODE));</span><br><span class="line">		<span class="keyword">if</span> (<span class="literal">NULL</span> == p)</span><br><span class="line">		&#123;</span><br><span class="line">			<span class="keyword">break</span>;</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="built_in">memset</span>(p, <span class="number">0x00</span>, <span class="keyword">sizeof</span>(LIST_NODE));</span><br><span class="line">		<span class="built_in">printf</span>(<span class="string">"请输入一个值:"</span>);</span><br><span class="line">		scanf_s(<span class="string">"%d"</span>, &amp;p-&gt;nVal);</span><br><span class="line">		<span class="keyword">if</span> (<span class="literal">NULL</span> == pHead)</span><br><span class="line">		&#123;</span><br><span class="line">			pHead = p;</span><br><span class="line">			p-&gt;pNext = pHead;</span><br><span class="line">			pTail = pHead;</span><br><span class="line">		&#125;<span class="keyword">else</span></span><br><span class="line">		&#123;</span><br><span class="line">			pTail-&gt;pNext = p;</span><br><span class="line">			p-&gt;pNext = pHead;</span><br><span class="line">			pTail = p;</span><br><span class="line">		&#125;</span><br><span class="line"></span><br><span class="line">		<span class="keyword">if</span> (<span class="number">0</span> == p-&gt;nVal)</span><br><span class="line">		&#123;</span><br><span class="line">			<span class="keyword">break</span>;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">return</span> pHead;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">TraverseLoopList</span><span class="params">(LPLIST_NODE pHead)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	LPLIST_NODE pTmp = pHead;</span><br><span class="line">	<span class="keyword">if</span> (<span class="literal">NULL</span> == pTmp)</span><br><span class="line">	&#123;</span><br><span class="line">		<span class="keyword">return</span>;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">do</span></span><br><span class="line">	&#123;</span><br><span class="line">		<span class="built_in">printf</span>(<span class="string">"%d, "</span>, pTmp-&gt;nVal);</span><br><span class="line">		pTmp = pTmp-&gt;pNext;</span><br><span class="line">	&#125; <span class="keyword">while</span> (pTmp != pHead);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">DestroyLoopList</span><span class="params">(LPLIST_NODE pHead)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	LPLIST_NODE pTmp = pHead;</span><br><span class="line">	LPLIST_NODE pDestroy = pTmp;</span><br><span class="line">	<span class="keyword">if</span> (<span class="literal">NULL</span> == pTmp)</span><br><span class="line">	&#123;</span><br><span class="line">		<span class="keyword">return</span>;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">do</span></span><br><span class="line">	&#123;</span><br><span class="line">		pTmp = pDestroy-&gt;pNext;</span><br><span class="line">		<span class="built_in">free</span>(pDestroy);</span><br><span class="line">		pDestroy = pTmp;</span><br><span class="line">	&#125;<span class="keyword">while</span> (pHead != pTmp);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="判断链表是否为循环链表"><a href="#判断链表是否为循环链表" class="headerlink" title="判断链表是否为循环链表"></a>判断链表是否为循环链表</h3><p>在上面说过，循环链表的尾指针不一定指向头节点，它可以指向任何节点，那么该怎么判断一个节点是否为循环链表呢？既然它可以指向任意的节点，那么肯定是找不到尾节点的，而且堆内存的分配是随机的，我们也不可能按照指针变量的大小来判断哪个节点在前哪个在后。</p>
+<p>回想一下在学校跑一千米的时候是不是回出现这样的情况，跑的块的会领先跑的慢的一周？根据这种情形我们可以考虑使用这样一种办法：定义两个指针，一个一次走两步也是就是p = p-&gt;next-&gt;next， 一个慢指针一次走一步，也就是q = q-&gt;next，如果是循环链表，那么快指针在某个时候一定会领先慢指针一周，也就是达到 p == q 这个条件，否则就是非循环链表。根据这个思路，可以考虑写下如下代码:</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">bool</span> <span class="title">IsLoopList</span><span class="params">(LPLIST_NODE pHead)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	<span class="keyword">if</span> (<span class="literal">NULL</span> == pHead)</span><br><span class="line">	&#123;</span><br><span class="line">		<span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	LPLIST_NODE p = pHead;</span><br><span class="line">	LPLIST_NODE q = pHead-&gt;pNext;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">while</span> (<span class="literal">NULL</span> != p &amp;&amp; <span class="literal">NULL</span> != q &amp;&amp; <span class="literal">NULL</span> != q-&gt;pNext &amp;&amp; p != q)</span><br><span class="line">	&#123;</span><br><span class="line">		p = p-&gt;pNext;</span><br><span class="line">		q = q-&gt;pNext-&gt;pNext;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">if</span> (q == <span class="literal">NULL</span> || <span class="literal">NULL</span> == p || <span class="literal">NULL</span> == q-&gt;pNext)</span><br><span class="line">	&#123;</span><br><span class="line">		<span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="双向链表"><a href="#双向链表" class="headerlink" title="双向链表"></a>双向链表</h2><p>之前在插入或者删除的时候，需要定义两个指针变量，让其中一个一直更在另一个的后面，单向链表有一个很大的问题，不能很方便的找到它的上一个节点，为了解决这一个问题，提出了双向链表，双向链表与单向相比，多了一个指针域，用来指向它的上一个节点，也就是如下图所示:</p>
+<p><img src="./list/double_list.png" alt="双向链表"></p>
+<p>双向链表的操作与单向链表的类似，只是多了一个指向前一个节点的指针域，它要考虑的情况与单向链表相似</p>
+<h3 id="删除节点"><a href="#删除节点" class="headerlink" title="删除节点"></a>删除节点</h3><p>删除节点的示意图如下:</p>
+<p><img src="./list/DeletDNode.png" alt="删除节点"><br>假设删除的节点p，那么首先根据p的pre指针域，找到它的上一个节点q，采用与单向链表类似的操作:</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">q-&gt;next = p-&gt;next;</span><br><span class="line">p-&gt;next-&gt;pre = q;</span><br></pre></td></tr></table></figure>
+
+<p>下面是删除节点的例子:</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">DeleteDNode</span><span class="params">(LPDLIST_NODE* ppHead, <span class="keyword">int</span> nValue)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	<span class="keyword">if</span> (<span class="literal">NULL</span> == ppHead || <span class="literal">NULL</span> == *ppHead)</span><br><span class="line">	&#123;</span><br><span class="line">		<span class="keyword">return</span>;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	LPDLIST_NODE p = *ppHead;</span><br><span class="line">	<span class="keyword">while</span> (<span class="literal">NULL</span> != p &amp;&amp; p-&gt;nVal != nValue)</span><br><span class="line">	&#123;</span><br><span class="line">		p = p-&gt;pNext;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">if</span> (<span class="literal">NULL</span> == p)</span><br><span class="line">	&#123;</span><br><span class="line">		<span class="keyword">return</span>;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">if</span> (*ppHead == p)</span><br><span class="line">	&#123;</span><br><span class="line">		*ppHead = (*ppHead)-&gt;pNext;</span><br><span class="line">		p-&gt;pPre = <span class="literal">NULL</span>;</span><br><span class="line">		<span class="built_in">free</span>(p);</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">else</span> <span class="keyword">if</span> (p-&gt;pNext == <span class="literal">NULL</span>)</span><br><span class="line">	&#123;</span><br><span class="line">		p-&gt;pPre-&gt;pNext = <span class="literal">NULL</span>;</span><br><span class="line">		<span class="built_in">free</span>(p);</span><br><span class="line">	&#125;<span class="keyword">else</span></span><br><span class="line">	&#123;</span><br><span class="line">		p-&gt;pPre-&gt;pNext = p-&gt;pNext;</span><br><span class="line">		p-&gt;pNext-&gt;pPre = p-&gt;pPre;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="插入节点"><a href="#插入节点" class="headerlink" title="插入节点"></a>插入节点</h3><p>插入节点的示意图如下:<br><img src="./list/InsertDNode.png" alt="插入节点"><br>假设新节点为p，插入的位置为q，则插入操作可以进行如下操作</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">p-&gt;next = q-&gt;next;</span><br><span class="line">p-&gt;pre = q;</span><br><span class="line">q-&gt;next-&gt;pre = p;</span><br><span class="line">q-&gt;next = p;</span><br></pre></td></tr></table></figure>
+
+<p>也是一样要考虑不能覆盖q的next指针域否则可能存在找不到原来链表中q的下一个节点的情况。所以这里先对p的next指针域进行操作<br>下面也是采用创建有序列表的例子</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">LPDLIST_NODE <span class="title">CreateSortedDList</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	LPDLIST_NODE pHead = <span class="literal">NULL</span>;</span><br><span class="line">	<span class="keyword">while</span> (<span class="number">1</span>)</span><br><span class="line">	&#123;</span><br><span class="line">		LPDLIST_NODE pNode = (LPDLIST_NODE)<span class="built_in">malloc</span>(<span class="keyword">sizeof</span>(DLIST_NODE));</span><br><span class="line">		<span class="keyword">if</span> (<span class="literal">NULL</span> == pNode)</span><br><span class="line">		&#123;</span><br><span class="line">			<span class="keyword">return</span> pHead;</span><br><span class="line">		&#125;</span><br><span class="line"></span><br><span class="line">		<span class="built_in">memset</span>(pNode, <span class="number">0x00</span>, <span class="keyword">sizeof</span>(DLIST_NODE));</span><br><span class="line">		<span class="built_in">printf</span>(<span class="string">"请输入一个整数:"</span>);</span><br><span class="line">		scanf_s(<span class="string">"%d"</span>, &amp;pNode-&gt;nVal);</span><br><span class="line"></span><br><span class="line">		<span class="keyword">if</span>(<span class="literal">NULL</span> == pHead)</span><br><span class="line">		&#123;</span><br><span class="line">			pHead = pNode;</span><br><span class="line">		&#125;<span class="keyword">else</span></span><br><span class="line">		&#123;</span><br><span class="line">			LPDLIST_NODE q = pHead;</span><br><span class="line">			LPDLIST_NODE r = q;</span><br><span class="line">			<span class="keyword">while</span> (<span class="literal">NULL</span> != q &amp;&amp; q-&gt;nVal &lt; pNode-&gt;nVal)</span><br><span class="line">			&#123;</span><br><span class="line">				r = q;</span><br><span class="line">				q = q-&gt;pNext;</span><br><span class="line">			&#125;</span><br><span class="line"></span><br><span class="line">			<span class="keyword">if</span> (q == pHead)</span><br><span class="line">			&#123;</span><br><span class="line">				pNode-&gt;pNext = pHead;</span><br><span class="line">				pHead-&gt;pPre = pNode;</span><br><span class="line">				pHead = pNode;</span><br><span class="line">			&#125;<span class="keyword">else</span> <span class="keyword">if</span> (<span class="literal">NULL</span> == q)</span><br><span class="line">			&#123;</span><br><span class="line">				r-&gt;pNext = pNode;</span><br><span class="line">				pNode-&gt;pPre = r;</span><br><span class="line">			&#125;<span class="keyword">else</span></span><br><span class="line">			&#123;</span><br><span class="line">				pNode-&gt;pPre = r;</span><br><span class="line">				pNode-&gt;pNext = q;</span><br><span class="line">				r-&gt;pNext = pNode;</span><br><span class="line">				q-&gt;pPre = pNode;</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">		LPDLIST_NODE q = pHead;</span><br><span class="line">		LPDLIST_NODE r = q;</span><br><span class="line"></span><br><span class="line">		<span class="keyword">if</span> (<span class="number">0</span> == pNode-&gt;nVal)</span><br><span class="line">		&#123;</span><br><span class="line">			<span class="keyword">break</span>;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">return</span> pHead;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>链表还有一种是双向循环链表，对于这种链表主要是在双向链表的基础上，将头结点的pre指针指向某个节点，将尾节点的next节点指向某个节点，而且这两个指针可以指向同一个节点也可以指向不同的节点，一般在使用中都是head的pre节点指向尾节点，而tail的next节点指向头节点。这里就不再详细说明，这些链表只要掌握其中一种，剩下的很好掌握的。</p>
+<hr />
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+      <div>
+        <div style="padding: 10px 0; margin: 20px auto; width: 90%; text-align: center;">
+  <div></div>
+  <button id="rewardButton" disable="enable" onclick="var qr = document.getElementById('QR'); if (qr.style.display === 'none') {qr.style.display='block';} else {qr.style.display='none'}">
+    <span>打赏</span>
+  </button>
+  <div id="QR" style="display: none;">
+
+    
+      <div id="wechat" style="display: inline-block">
+        <img id="wechat_qr" src="/images/wechatreward.png" alt="Masimaro 微信支付"/>
+        <p>微信支付</p>
+      </div>
+    
+
+    
+      <div id="alipay" style="display: inline-block">
+        <img id="alipay_qr" src="/images/alipayreward.png" alt="Masimaro 支付宝"/>
+        <p>支付宝</p>
+      </div>
+    
+
+    
+
+  </div>
+</div>
+
+      </div>
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/%E7%AE%97%E6%B3%95%E4%B8%8E%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/" rel="tag"><i class="fa fa-tag"></i> 算法与数据结构</a>
+          
+            <a href="/tags/C%E8%AF%AD%E8%A8%80/" rel="tag"><i class="fa fa-tag"></i> C语言</a>
+          
+            <a href="/tags/%E9%93%BE%E8%A1%A8/" rel="tag"><i class="fa fa-tag"></i> 链表</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/data-structure.html" rel="next" title="算法与数据结构(一)：时间复杂度与空间复杂度">
+                <i class="fa fa-chevron-left"></i> 算法与数据结构(一)：时间复杂度与空间复杂度
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/queue.html" rel="prev" title="算法与数据结构(二)：队列">
+                算法与数据结构(二)：队列 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        
+  <div class="bdsharebuttonbox">
+    <a href="#" class="bds_tsina" data-cmd="tsina" title="分享到新浪微博"></a>
+    <a href="#" class="bds_douban" data-cmd="douban" title="分享到豆瓣网"></a>
+    <a href="#" class="bds_sqq" data-cmd="sqq" title="分享到QQ好友"></a>
+    <a href="#" class="bds_qzone" data-cmd="qzone" title="分享到QQ空间"></a>
+    <a href="#" class="bds_weixin" data-cmd="weixin" title="分享到微信"></a>
+    <a href="#" class="bds_tieba" data-cmd="tieba" title="分享到百度贴吧"></a>
+    <a href="#" class="bds_twi" data-cmd="twi" title="分享到Twitter"></a>
+    <a href="#" class="bds_fbook" data-cmd="fbook" title="分享到Facebook"></a>
+    <a href="#" class="bds_more" data-cmd="more"></a>
+    <a class="bds_count" data-cmd="count"></a>
+  </div>
+  <script>
+    window._bd_share_config = {
+      "common": {
+        "bdText": "",
+        "bdMini": "2",
+        "bdMiniList": false,
+        "bdPic": ""
+      },
+      "share": {
+        "bdSize": "16",
+        "bdStyle": "0"
+      },
+      "image": {
+        "viewList": ["tsina", "douban", "sqq", "qzone", "weixin", "twi", "fbook"],
+        "viewText": "分享到：",
+        "viewSize": "16"
+      }
+    }
+  </script>
+
+<script>
+  with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='//bdimg.share.baidu.com/static/api/js/share.js?cdnversion='+~(-new Date()/36e5)];
+</script>
+
+      
+	  
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      <div id="disqus_thread">
+        <noscript>
+          Please enable JavaScript to view the
+          <a href="https://disqus.com/?ref_noscript" target="_blank" rel="noopener">comments powered by Disqus.</a>
+        </noscript>
+      </div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/avatar.jpg"
+                alt="Masimaro" />
+            
+              <p class="site-author-name" itemprop="name">Masimaro</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/%20%7C%7C%20archive">
+              
+                  <span class="site-state-item-count">94</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">18</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">141</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          <div class="links-of-author motion-element">
+            
+              
+                <span class="links-of-author-item">
+                  <a href="https://github.com/aMonst" target="_blank" title="GitHub">
+                    
+                      <i class="fa fa-fw fa-globe"></i>GitHub</a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="http://weibo.com/your-user-name" target="_blank" title="微博">
+                    
+                      <i class="fa fa-fw fa-globe"></i>微博</a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="http://blog.csdn.net/lanuage" target="_blank" title="CSDN博客">
+                    
+                      <i class="fa fa-fw fa-globe"></i>CSDN博客</a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="http://www.jianshu.com/u/7261ff9df286" target="_blank" title="简书">
+                    
+                      <i class="fa fa-fw fa-globe"></i>简书</a>
+                </span>
+              
+            
+          </div>
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#单向链表"><span class="nav-number">1.</span> <span class="nav-text">单向链表</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#单向链表的创建"><span class="nav-number">1.1.</span> <span class="nav-text">单向链表的创建</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#链表的遍历"><span class="nav-number">1.2.</span> <span class="nav-text">链表的遍历</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#链表的删除"><span class="nav-number">1.3.</span> <span class="nav-text">链表的删除</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#删除单个节点"><span class="nav-number">1.4.</span> <span class="nav-text">删除单个节点</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#任意位置插入节点"><span class="nav-number">1.5.</span> <span class="nav-text">任意位置插入节点</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#循环链表"><span class="nav-number">2.</span> <span class="nav-text">循环链表</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#判断链表是否为循环链表"><span class="nav-number">2.1.</span> <span class="nav-text">判断链表是否为循环链表</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#双向链表"><span class="nav-number">3.</span> <span class="nav-text">双向链表</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#删除节点"><span class="nav-number">3.1.</span> <span class="nav-text">删除节点</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#插入节点"><span class="nav-number">3.2.</span> <span class="nav-text">插入节点</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love" id="heart">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Masimaro</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io" rel="external nofollow">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next" rel="external nofollow">NexT.Mist</a> v5.1.3</div>
+
+
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv">
+      <i class="fa fa-user">本次访客数</i>
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+      人次
+    </span>
+  
+
+  
+    <span class="site-pv">
+      <i class="fa fa-eye">本站总访问量</i>
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+      次
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.3"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.3"></script>
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.3"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.3"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.3"></script>
+
+
+
+  
+
+
+  
+
+    
+      <script id="dsq-count-scr" src="https://masimaroweb.disqus.com/count.js" async></script>
+    
+
+    
+      <script type="text/javascript">
+        var disqus_config = function () {
+          this.page.url = 'http://www.masimaroweb.com/list.html';
+          this.page.identifier = 'list.html';
+          this.page.title = '算法与数据结构(二)：链表';
+        };
+        var d = document, s = d.createElement('script');
+        s.src = 'https://masimaroweb.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', '' + +new Date());
+        (d.head || d.body).appendChild(s);
+      </script>
+    
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+  
+
+
+  
+
+  
+
+</body>
+</html>
+
+<!-- 页面点击小红心 -->
+<script type="text/javascript" src="/js/src/love.js"></script>
