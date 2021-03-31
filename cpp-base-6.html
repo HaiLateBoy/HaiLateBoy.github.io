@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>类 | Masimaro&#39;s blog</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="最近好像很久没有更新过关于c++ primer 的读书笔记了，一来自己最近遇到了烦心事，中断了一段时间的读书。第二个是因为我有点想写点随笔之类的东西了，中间更新了两篇随笔《关于读书》、《我的五年计划》。第三个是因为关于类这部分的内容确实有点多了，要读完也需要花费一定时间。因此更新就慢了起来。我发现我已经忘记了如何给这类文章取名字了，还是看着以前的项目想起来的。既然我定下来了未来5年的发展计划，那么">
+<meta property="og:type" content="article">
+<meta property="og:title" content="类">
+<meta property="og:url" content="http://www.masimaroweb.com/cpp-base-6.html">
+<meta property="og:site_name" content="Masimaro&#39;s blog">
+<meta property="og:description" content="最近好像很久没有更新过关于c++ primer 的读书笔记了，一来自己最近遇到了烦心事，中断了一段时间的读书。第二个是因为我有点想写点随笔之类的东西了，中间更新了两篇随笔《关于读书》、《我的五年计划》。第三个是因为关于类这部分的内容确实有点多了，要读完也需要花费一定时间。因此更新就慢了起来。我发现我已经忘记了如何给这类文章取名字了，还是看着以前的项目想起来的。既然我定下来了未来5年的发展计划，那么">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2021-03-31T12:16:10.000Z">
+<meta property="article:modified_time" content="2021-03-31T13:03:52.102Z">
+<meta property="article:author" content="Masimaro">
+<meta property="article:tag" content="C++">
+<meta property="article:tag" content=" 语法">
+<meta property="article:tag" content=" 基础">
+<meta property="article:tag" content=" c++11">
+<meta name="twitter:card" content="summary">
+  
+    <link rel="alternate" href="/atom.xml" title="Masimaro&#39;s blog" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+<link rel="stylesheet" href="/plugin/bganimation/bg.css">
+
+  
+
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css" rel="stylesheet" type="text/css">
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <div class="outer">
+        <div class="widget-wrap mobile-header">
+  <h3 class="widget-title"></h3>
+  <div class="widget">
+    <img class="avatar" src="https://avatars0.githubusercontent.com/u/20333903?v=3&amp;s=460">
+    <h2 class="author">Masimaro</h2>
+    <h3 class="description"></h3>
+    <div class="count-box">
+      <a href="/archives"><div><strong>105</strong><br>文章</div></a>
+      <a href="/categories"><div><strong>20</strong><br>分类</div></a>
+      <a href="/tags"><div><strong>152</strong><br>标签</div></a>
+    </div>
+    <ul class="blog-link">
+     
+          <a href="/" title="Home">
+            <li>主页</li>
+          </a>
+        
+          <a href="/archives" title="Archives">
+            <li>归档</li>
+          </a>
+        
+          <a href="/categories" title="Categories">
+            <li>分类</li>
+          </a>
+        
+          <a href="/tags" title="Tags">
+            <li>标签</li>
+          </a>
+        
+          <a href="/about" title="About">
+            <li>关于</li>
+          </a>
+        
+    </ul>
+  </div>
+</div>
+
+        <section id="main"><article id="post-cpp-base-6" class="wow slideInRight article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/cpp-base-6.html" class="article-date">
+  <time class="post-time" datetime="2021-03-31T12:16:10.000Z" itemprop="datePublished">
+    <span class="post-month">3月</span><br/>
+    <span class="post-day">31</span>
+  </time>
+</a>
+   
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      类
+    </h1>
+  
+
+        <div>
+          
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/c/">c++</a>
+  </div>
+
+          
+              
+
+          
+        </div>
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>最近好像很久没有更新过关于c++ primer 的读书笔记了，一来自己最近遇到了烦心事，中断了一段时间的读书。第二个是因为我有点想写点随笔之类的东西了，中间更新了两篇随笔<a href="http://masimaroweb.com/why-read-books.html" target="_blank" rel="noopener">《关于读书》</a>、<a href="http://masimaroweb.com/2021-2025-plan.html" target="_blank" rel="noopener">《我的五年计划》</a>。第三个是因为关于类这部分的内容确实有点多了，要读完也需要花费一定时间。因此更新就慢了起来。我发现我已经忘记了如何给这类文章取名字了，还是看着以前的项目想起来的。既然我定下来了未来5年的发展计划，那么从现在开始就应该坚持下来了。</p>
+<a id="more"></a>
+
+<h2 id="定义抽象数据类型"><a href="#定义抽象数据类型" class="headerlink" title="定义抽象数据类型"></a>定义抽象数据类型</h2><p>这里定义抽象数据类型就是定义一个类，只要学过c++的对定义一个类并并不陌生，这里就不再详细的说明该如何定义一个类了。这部分主要需要注意：1</p>
+<ol>
+<li><p>类的const成员函数：一般类的成员函数会隐式的传入当前对象的地址即 <code>ClassExample::func(ClassExample* this);</code>const型的成员函数传入的是一个const型的this指针，<code>ClassExample::func(const ClassExample* this);</code> 从这个角度上说不允许在常函数里面修改对象的值。同时由于const类型无法自动转化为非const类型，所以const型对象只能调用const成员函数。</p>
+</li>
+<li><p>类的作用域：类本身就是一个作用域，类中的所有成员定义在类这个作用域中。编译器在编译类的时候分两步，首先编译成员的声明，然后编译成员函数，因此在成员函数中可以随意使用类的其他成员而不用关心这些成员出现的顺序。</p>
+</li>
+<li><p>如果一个函数在概念上属于这个类，但是不定义为类的成员函数，一般将这个类定义在类声明的头文件中</p>
+</li>
+</ol>
+<h2 id="访问控制与封装"><a href="#访问控制与封装" class="headerlink" title="访问控制与封装"></a>访问控制与封装</h2><p>一般来说定义类的时候应该将类中的数据成员定义为私有或者保护类型，通过成员函数来访问类的数据成员，这样有两个好处：</p>
+<ol>
+<li>当我们发现数据成员的值不正常的时候，由于类外部是无法访问到数据成员的，所以在调试时只用关注改变了该数据成员的函数即可</li>
+<li>使用者在使用时只需要关注类提供的功能，不需要知道它里面具体的实现。只用调用类方法就好了，不用关注该如何设置数据成员</li>
+</ol>
+<p>到此为止，书中提到了两种访问权限，public和private：</p>
+<p>public: 后定义的成员可以在整个程序内被访问<br>private: 后定义的成员只能在类的成员函数中被访问</p>
+<p>每个访问说明符指定了接下来的成员的访问级别，其有效范围直到出现下一个访问说明符或者达到类的结尾为止</p>
+<p>使用class或者struct关键字定义的唯一区别是默认的访问控制符，class默认是private、而struct默认的是public</p>
+<h2 id="友元"><a href="#友元" class="headerlink" title="友元"></a>友元</h2><p>在某些时候，可能必须要在类外部使用类的私有成员，这个时候可以将对应的函数或者类声明为类的友元函数或者友元类，友元函数或者友元类可以随意使用类的私有成员。</p>
+<p>如果类想把一个函数作为它的友元，只需要增加一条以friend 关键字开始的函数声明语句即可</p>
+<p>友元声明只能出现在类内部，但是在类内出现的具体位置不限，友元不是类的成员也不受它所在区域访问控制级别的约束。</p>
+<p>需要注意在设计时尽量考虑清楚是不是一定要用到友元，毕竟友元已经在一定程度上破坏了类的封装性</p>
+<h2 id="类的其他特性"><a href="#类的其他特性" class="headerlink" title="类的其他特性"></a>类的其他特性</h2><p>除了一些基本的使用和访问权限控制外，书中还提到了类的其他特性：</p>
+<ol>
+<li>在类中，常有一些规模较小的函数合适于被声明成内联函数。定义在类内部的成员是自动inline的，当然也可以显式的声明为inline函数，这样就可以在类外部定义</li>
+<li>我们可以仅仅只声明而暂时不定义它，这种声明有时候被称作前向声明。这个类在声明之后，定义之前是一个不完全类型。不完全类型可以用于定义该类型的指针或者引用，也可以声明以该类型作为参数或者返回该类型的函数。</li>
+<li>对一个类来说，在创建它的对象之前必须被定义。因为编译器在创建对象的时候必须知道类对象占多少存储空间</li>
+<li>如果一个类指定了友元类，那么这个友元类的成员函数可以访问此类包括非公有成员在内的所有成员</li>
+<li>友元关系不具备传递性，每个类单独控制自己的友元类或者友元函数</li>
+<li>除了令整个类作为友元之外，还可以只为某个成员函数单独提供访问权限。当把成员函数声明为友元的时候，我们必须明确指出该成员属于哪个类</li>
+<li>如果一个类想把一组重载函数声明为友元，它需要对这组函数中的每一个分别声明</li>
+</ol>
+<h2 id="类的作用域"><a href="#类的作用域" class="headerlink" title="类的作用域"></a>类的作用域</h2><p>一个类就是一个作用域，在类的外部类成员都被隐藏起来了。</p>
+<p>在c++ 中，内层作用域中的同名成员会覆盖外层，当函数内部或者类内部定义了与全局作用域相同的变量时，要使用全局作用域中的变量可以使用::</p>
+<h2 id="类构造函数相关"><a href="#类构造函数相关" class="headerlink" title="类构造函数相关"></a>类构造函数相关</h2><ol>
+<li>在构造函数中初始化列表相当于先定义再赋值，而要做到对成员变量定义的同时初始化，可以使用初始值列表的形式</li>
+<li>在某些场合下初始值列表必不可少：初始化const成员或者引用成员</li>
+<li>构造函数初始值列表只说明用于初始化成员的值，而不限定初始化的具体执行顺序</li>
+<li>成员的初始化顺序与他们在类中定义的顺序一致。构造函数初始值列表中初始值的前后位置关系不会影响实际的初始化顺序</li>
+<li>最好令构造函数初始值的顺序与成员声明的顺序保持一致。而且如果可能的话，尽量避免使用某些成员初始化其他成员</li>
+</ol>
+<h2 id="类的静态成员"><a href="#类的静态成员" class="headerlink" title="类的静态成员"></a>类的静态成员</h2><p>类的静态数据成员存在于任何对象之外，对象中不包含任何与静态数据成员有关的数据。</p>
+<p>类似的类的静态函数成员也不与任何对象绑定在一起。它们不包含this指针，静态函数成员不能被声明成const类型，也不能在静态函数成员中调用非类的静态成员</p>
+<p>不能在类的内部初始化类的静态成员，static关键字只能出现在类内部声明语句中，定义的时候不能加static关键字</p>
+<p>针对constexpr类型的static成员，可以在类内定义类内初始值</p>
+<p>由于静态数据成员不与类绑定，所以在计算类大小的时候可以不用考虑静态成员。这样就可以在类内定义该类型的静态数据成员，而非静态数据成员只能定义为该类型的指针或者引用<br>#+BEGIN_SRC c++<br>class Menu<br>{<br>private:<br>    static Menu me1;<br>    Menu* me2;<br>    Menu&amp; me3;<br>};<br>#+END_SRC</p>
+<p>另外我们可是用静态成员做成员函数的默认实参</p>
+<hr />
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://www.masimaroweb.com/cpp-base-6.html" data-id="ckmxgncu10000ceux84obbws3" class="article-share-link">分享</a>
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/C/" rel="tag">C++</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/c-11/" rel="tag">c++11</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E5%9F%BA%E7%A1%80/" rel="tag">基础</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E8%AF%AD%E6%B3%95/" rel="tag">语法</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+  
+    <a href="/2021-2025-plan.html" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">下一篇</strong>
+      <div class="article-nav-title">我的5年计划</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+
+</section>
+        
+          <aside id="sidebar">
+  
+    <div class="widget-wrap">
+  <h3 class="widget-title"></h3>
+  <div class="widget">
+    <h1 class="blog-title">Masimaro&#39;s blog</h1>
+    <h2 class="blog-subtitle"></h2>
+    <ul class="blog-link">
+     
+          <a href="/" title="Home">
+            <li>主页</li>
+          </a>
+        
+          <a href="/archives" title="Archives">
+            <li>归档</li>
+          </a>
+        
+          <a href="/categories" title="Categories">
+            <li>分类</li>
+          </a>
+        
+          <a href="/tags" title="Tags">
+            <li>标签</li>
+          </a>
+        
+          <a href="/about" title="About">
+            <li>关于</li>
+          </a>
+        
+    </ul>
+  </div>
+</div>
+
+  
+    <div class="widget-wrap">
+  <h3 class="widget-title"></h3>
+  <div class="widget">
+    <img class="avatar" src="https://avatars0.githubusercontent.com/u/20333903?v=3&amp;s=460">
+    <h2 class="author">Masimaro</h2>
+    <h3 class="description"></h3>
+    <div class="count-box">
+      <a href="/archives"><div><strong>105</strong><br>文章</div></a>
+      <a href="/categories"><div><strong>20</strong><br>分类</div></a>
+      <a href="/tags"><div><strong>152</strong><br>标签</div></a>
+    </div>
+
+
+
+    <div class="social-link">
+      
+        <a class="hvr-bounce-in" href="http://github.com/ShanaMaid" target="_blank" title="Github">
+          Github
+        </a>
+      
+        <a class="hvr-bounce-in" href="liu1793222129@163.com" target="_blank" title="邮箱">
+          邮箱
+        </a>
+      
+    </div>
+
+    <div class="friend-link">
+      <h2>友情链接</h2>
+      
+        <a class="hvr-bounce-in" href="http://blog.shanamaid.top/" target="_blank" title="ShanaMaid">
+          ShanaMaid
+        </a>
+      
+    </div>
+  </div>
+</div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy;2020 - 2021 Masimaro<br>
+      由<a href="http://hexo.io/" target="_blank">Hexo</a>强力驱动 | 
+      主题-<a href="https://github.com/ShanaMaid/hexo-theme-shana" target="_blank" rel="noopener">Shana</a>
+      
+    </div>
+    
+  </div>
+</footer>
+    </div>
+    
+
+<script src="//apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js"></script>
+<script src="//apps.bdimg.com/libs/wow/0.1.6/wow.min.js"></script>
+<script>
+new WOW().init();
+</script>   
+
+
+  
+<link rel="stylesheet" href="/plugin/fancybox/jquery.fancybox.css">
+
+  
+<script src="/plugin/fancybox/jquery.fancybox.pack.js"></script>
+
+
+
+
+  
+<link rel="stylesheet" href="/plugin/galmenu/GalMenu.css">
+
+  
+<script src="/plugin/galmenu/GalMenu.js"></script>
+
+  <div class="GalMenu GalDropDown">
+      <div class="circle" id="gal">
+        <div class="ring">
+          
+            <a href="/" title="" class="menuItem">首页</a>
+          
+            <a href="/tags" title="" class="menuItem">标签</a>
+          
+            <a href="/categories" title="" class="menuItem">分类</a>
+          
+            <a href="/archives" title="" class="menuItem">归档</a>
+          
+            <a href="/about" title="" class="menuItem">关于</a>
+          
+        </div>
+        
+          <audio id="audio" src="#"></audio>
+        
+      </div> 
+</div>
+<div id="overlay" style="opacity: 1; cursor: pointer;"></div>
+  <script type="text/javascript">var items = document.querySelectorAll('.menuItem');
+    for (var i = 0,
+    l = items.length; i < l; i++) {
+      items[i].style.left = (50 - 35 * Math.cos( - 0.5 * Math.PI - 2 * (1 / l) * i * Math.PI)).toFixed(4) + "%";
+      items[i].style.top = (50 + 35 * Math.sin( - 0.5 * Math.PI - 2 * (1 / l) * i * Math.PI)).toFixed(4) + "%"
+    }</script>
+<script type="text/javascript">
+  $(document).ready(function() {
+    $('body').GalMenu({
+      'menu': 'GalDropDown'
+    })
+  });
+</script>
+
+  <section class="hidden-xs"> 
+  <ul class="cb-slideshow"> 
+    <li><span>苟利</span></li> 
+    <li><span>国家</span></li> 
+    <li><span>生死以</span></li> 
+    <li><span>岂能</span></li> 
+    <li><span>祸福</span></li> 
+    <li><span>趋避之</span></li> 
+  </ul>
+</section>
+
+<script src="/js/script.js"></script>
+
+
+
+
+  </div>
+</body>
+</html>
