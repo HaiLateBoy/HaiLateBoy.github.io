@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>关联容器 | Masimaro&#39;s blog</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="之前介绍过标准库中的顺序容器，顺序容器是元素在内存中按照一定顺序进行排列的，都是按线性结构进行排列。除了顺序容器外，c++中还有关联容器。与顺序容器不同的是，关联容器中元素是按照关键字来保存和访问的。与之相对的顺序容器是按它们在容器中的位置来顺序的保存和访问的。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="关联容器">
+<meta property="og:url" content="http://www.masimaroweb.com/cpp-base-10.html">
+<meta property="og:site_name" content="Masimaro&#39;s blog">
+<meta property="og:description" content="之前介绍过标准库中的顺序容器，顺序容器是元素在内存中按照一定顺序进行排列的，都是按线性结构进行排列。除了顺序容器外，c++中还有关联容器。与顺序容器不同的是，关联容器中元素是按照关键字来保存和访问的。与之相对的顺序容器是按它们在容器中的位置来顺序的保存和访问的。">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2021-05-16T01:21:45.000Z">
+<meta property="article:modified_time" content="2021-05-16T01:31:42.784Z">
+<meta property="article:author" content="Masimaro">
+<meta property="article:tag" content="C++">
+<meta property="article:tag" content=" 语法">
+<meta property="article:tag" content=" 基础">
+<meta property="article:tag" content=" c++11">
+<meta name="twitter:card" content="summary">
+  
+    <link rel="alternate" href="/atom.xml" title="Masimaro&#39;s blog" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+<link rel="stylesheet" href="/plugin/bganimation/bg.css">
+
+  
+
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css" rel="stylesheet" type="text/css">
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <div class="outer">
+        <div class="widget-wrap mobile-header">
+  <h3 class="widget-title"></h3>
+  <div class="widget">
+    <img class="avatar" src="https://avatars0.githubusercontent.com/u/20333903?v=3&amp;s=460">
+    <h2 class="author">Masimaro</h2>
+    <h3 class="description"></h3>
+    <div class="count-box">
+      <a href="/archives"><div><strong>109</strong><br>文章</div></a>
+      <a href="/categories"><div><strong>21</strong><br>分类</div></a>
+      <a href="/tags"><div><strong>152</strong><br>标签</div></a>
+    </div>
+    <ul class="blog-link">
+     
+          <a href="/" title="Home">
+            <li>主页</li>
+          </a>
+        
+          <a href="/archives" title="Archives">
+            <li>归档</li>
+          </a>
+        
+          <a href="/categories" title="Categories">
+            <li>分类</li>
+          </a>
+        
+          <a href="/tags" title="Tags">
+            <li>标签</li>
+          </a>
+        
+          <a href="/about" title="About">
+            <li>关于</li>
+          </a>
+        
+    </ul>
+  </div>
+</div>
+
+        <section id="main"><article id="post-cpp-base-10" class="wow slideInRight article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/cpp-base-10.html" class="article-date">
+  <time class="post-time" datetime="2021-05-16T01:21:45.000Z" itemprop="datePublished">
+    <span class="post-month">5月</span><br/>
+    <span class="post-day">16</span>
+  </time>
+</a>
+   
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      关联容器
+    </h1>
+  
+
+        <div>
+          
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/C/">C++</a>
+  </div>
+
+          
+              
+
+          
+        </div>
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>之前介绍过标准库中的顺序容器，顺序容器是元素在内存中按照一定顺序进行排列的，都是按线性结构进行排列。除了顺序容器外，c++中还有关联容器。与顺序容器不同的是，关联容器中元素是按照关键字来保存和访问的。与之相对的顺序容器是按它们在容器中的位置来顺序的保存和访问的。</p>
+<a id="more"></a>
+
+<p>关联容器支持高效的查找和访问。两个主要的关联容器类型是map和set。</p>
+<p>标准库提供8种关联容器，这8个容器见的不同体现在3个维度</p>
+<ol>
+<li>或者是一个set，或者是一个map</li>
+<li>或者要求不重复的关键字，或者允许重复关键字</li>
+<li>按顺序保存元素或者无序保存</li>
+</ol>
+<p>允许重复关键字的容器都包含单词 multi ，不保持关键字按顺序存储的容器的名字都以单词unordered 开头</p>
+<p>这8中容器分别是 map、set、multimap、multiset、unordered_map、unordered_set、unordered_multimap、unordered_multiset</p>
+<h2 id="关联容器概述"><a href="#关联容器概述" class="headerlink" title="关联容器概述"></a>关联容器概述</h2><p>关联容器不支持顺序容器中的位置相关操作，例如 push_back、push_front。原因是关联容器是按照关键字存储的，这些操作对关联容器没有意义</p>
+<p>对于map、multimap、set、multiset 关键字类型必须定义元素的比较方法。默认情况下标准库使用关键字类型的&lt; 运算符来比较两个关键字</p>
+<p>在介绍关联容器的操作之前，我们需要了解名为pair的标准库类型。</p>
+<p>一个pair保存两个数据成员。类似容器，pair是一个用来生成特定类型的模板。当创建一个pair时，需要提供两个类型名，pair的数据成员将具有对应的类型。两个类型不要求一样</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">pair&lt;<span class="built_in">string</span>, <span class="built_in">string</span>&gt; anon;</span><br><span class="line">pair&lt;<span class="built_in">string</span>, <span class="keyword">size_t</span>&gt; word_count;</span><br><span class="line">pair&lt;<span class="built_in">string</span>, <span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt;&gt; <span class="built_in">line</span>;</span><br></pre></td></tr></table></figure>
+
+<p>初始化时，会调用类型的默认构造函数进行初始化，也可以为每个成员提供初始化器:</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pair&lt;<span class="built_in">string</span>, <span class="built_in">string</span>&gt; author&#123;<span class="string">"James"</span>, <span class="string">"Joyce"</span>&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>pair 的数据成员是public的，两个成员分别命名为first和second。我们用普通的成员访问符号来访问它们。</p>
+<h2 id="关联容器的操作"><a href="#关联容器的操作" class="headerlink" title="关联容器的操作"></a>关联容器的操作</h2><p>关联容器定义了额外的类型别名</p>
+<ol>
+<li>key_type: 此容器类型的关键字类型</li>
+<li>mapped_type: 每个关键字关联的类型：只适用与map</li>
+<li>value_type: 对于set，与key_value 相同；对于map，为 <code>pair&lt;const key_type, mapped_type&gt;</code></li>
+</ol>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">set</span>&lt;<span class="built_in">string</span>&gt;::value_type v1; <span class="comment">//v1 是一个string</span></span><br><span class="line"><span class="built_in">set</span>&lt;<span class="built_in">string</span>&gt;::key_value v2; <span class="comment">//v2 是一个string</span></span><br><span class="line"><span class="built_in">map</span>&lt;<span class="built_in">string</span>, <span class="keyword">int</span>&gt;::value_type v3; <span class="comment">//v3 是一个pair&lt;const string, int&gt;</span></span><br><span class="line"><span class="built_in">map</span>&lt;<span class="built_in">string</span>, <span class="keyword">int</span>&gt;::key_type v4; <span class="comment">//v4 是一个string</span></span><br><span class="line"><span class="built_in">map</span>&lt;<span class="built_in">string</span>, <span class="keyword">int</span>&gt;::mapped_type v5; <span class="comment">//v5 是一个int</span></span><br></pre></td></tr></table></figure>
+
+<p>我们使用作用域运算符来提取一个类型的成员。</p>
+<p>当解引用一个关联容器的迭代器的时候，会得到一个类型为容器的value_type 的值的引用。对map而言，value_type 是一个pair 类型，其first成员保存const的关键字，second成员保存值</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">auto</span> map_it = word_count.<span class="built_in">begin</span>();</span><br><span class="line"><span class="built_in">cout</span> &lt;&lt; map_it-&gt;first;</span><br><span class="line"><span class="built_in">cout</span> &lt;&lt; <span class="string">" "</span> &lt;&lt; map_it-&gt;second;</span><br><span class="line">map_it-&gt;first = <span class="string">"new key"</span>; <span class="comment">//错误 first是const类型</span></span><br><span class="line">++map_it-&gt;second;</span><br></pre></td></tr></table></figure>
+
+<p>set 的迭代器是const的。关联容器中键值是无法通过迭代器进行修改的。只能通过迭代器读，每次修改键值都会导致容器中元素的重新排序。因此不允许通过迭代修改键值</p>
+<p>我们通常不能对关联容器使用泛型算法。关键字是const这一特性意味着不能将关联容器传递给修改或者重排容器元素的算法。关联容器可以使用只读取元素的算法。但是很多这类算法都要搜索序列。由于关联容器中的元素不能通过它们的关键字进行快速查找，因此对其使用泛型算法几乎总是一个坏主意</p>
+<p>关联容器中有一个find的成员，我们可以使用find算法来根据关键字查找元素。</p>
+<p>关联容器的insert成员可以向容器中添加一个元素或者元素范围。因为set和map无法包含关键字重复的元素，因此插入已存在的元素对容器没有任何影响</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt; ivec = &#123;<span class="number">2</span>, <span class="number">4</span>, <span class="number">6</span>, <span class="number">8</span>, <span class="number">2</span>, <span class="number">4</span>, <span class="number">6</span>, <span class="number">8</span>&#125;; <span class="comment">//ivec 有8个元素</span></span><br><span class="line"><span class="built_in">set</span>&lt;<span class="keyword">int</span>&gt; set2;</span><br><span class="line">set2.insert(ivec.cbegin(), ivec.cend()); <span class="comment">//set2 现在有4个元素</span></span><br><span class="line">set2.insert(&#123;<span class="number">1</span>, <span class="number">3</span>, <span class="number">5</span>, <span class="number">7</span>, <span class="number">1</span>, <span class="number">3</span>, <span class="number">5</span>, <span class="number">7</span>&#125;); <span class="comment">//set2 现在有8个元素</span></span><br></pre></td></tr></table></figure>
+
+<p>对一个map执行insert操作时，需要记住元素类型是pair。通常在insert的参数列表中创建一个pair</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//向word_count 插入word的4种方法</span></span><br><span class="line">word_count.insert(&#123;<span class="keyword">word</span>, <span class="number">1</span>&#125;);</span><br><span class="line">word_count.insert(make_pair(<span class="keyword">word</span>, <span class="number">1</span>));</span><br><span class="line">word_count.insert(pair&lt;<span class="built_in">string</span>, <span class="keyword">size_t</span>)&gt;(<span class="keyword">word</span>, <span class="number">1</span>));</span><br><span class="line">word_count.insert(<span class="built_in">map</span>&lt;<span class="built_in">string</span>, <span class="keyword">size_t</span>&gt;::value_type(<span class="keyword">word</span>, <span class="number">1</span>));</span><br></pre></td></tr></table></figure>
+
+<p>insert 的返回值依赖于容器类型和参数。对于不包含重复关键字的容器，添加单一元素的insert和emplace版本返回一个pair，告诉我们插入是否成功。pair的first成员是一个迭代器，指向具有给定关键字的元素；second成员是一个bool值，指出元素是插入成功还是已经存在于容器中。如果关键字已经存在于容器中，则insert什么也不做，且返回值中的bool部分为false。如果关键字不存在，元素被插入容器，且bool值为true</p>
+<p>对于允许重复关键字的容器，接受单个元素的insert操作返回一个指向新元素的迭代器。这里无须返回一个bool值，因为insert总是向这类容器中加入一个新元素</p>
+<p>关联容器定义了三个版本的erase。可以通过传入一个迭代器或者一个迭代器对来删除一个元素或者一个元素范围。如果指定的元素被删除，函数返回void</p>
+<p>关联容器提供一个额外的erase函数，它允许传入一个key_type 参数，删除所有匹配给定关键字的元素，返回实际删除元素的数量。</p>
+<p>对于map和unordered_map 容器提供了下标运算，下标中填入key_type的值，得到value_type，如果关键字不在map中，会为它创建一个元素并插入map中。</p>
+<p>使用容器的find访问关联容器，传入key_type，如果能找到对应值，返回一个指向对应元素的迭代器，否则返回一个指向容器end()位置的迭代器的</p>
+<p>使用容器的count方法，传入key_type，返回容器中相同关键字元素的个数</p>
+<p>对于map使用find代替下标操作，使用下标如果未找到对应关键字则会插入一个新的元素，这样会产生未知行为。如果我们只想知道一个给定关键字是否在map中，而不想改变map，这种情况下应该使用find。</p>
+<p>对于不允许存储重复关键字的关联容器来说，通过关键字查找元素只会找到一个，而对于允许重复关键字的关联容器来说，会返回第一个元素的迭代器，而相同关键字的元素会相邻存储。在遍历所有相同关键字的元素时，可以首先使用find找到第一个元素的迭代器，然后使用count找到公有多少个元素。最后循环递增迭代器即可访问到所有相同关键字的元素</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="built_in">string</span> <span class="title">search_item</span><span class="params">(<span class="string">"Alain de Botton"</span>)</span></span>;</span><br><span class="line"><span class="keyword">auto</span> enteris = authors.count(search_item);</span><br><span class="line"><span class="keyword">auto</span> iter = authors.<span class="built_in">find</span>(search_item);</span><br><span class="line"><span class="keyword">while</span>(enteris)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="built_in">cout</span> &lt;&lt; iter-&gt;second &lt;&lt; <span class="built_in">endl</span>;</span><br><span class="line">    ++iter;</span><br><span class="line">    --enteris;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>除了上述方法，还可以使用 lower_bound和 upper_bound；lower_bound 指向第一个对应的元素，upper_bound 指向匹配的最后一个元素的下一个位置。如果未找到对应元素，则二者指向同一个迭代器，指向一个不影响排序的关键字插入位置</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span>(<span class="keyword">auto</span> beg = authors.lower_bound(search_item), <span class="built_in">end</span> = authors.upper_bound(search_item); beg != <span class="built_in">end</span>; ++beg)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="built_in">cout</span> &lt;&lt; beg-&gt;second &lt;&lt; <span class="built_in">endl</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>解决此问题的最后一个方法是直接使用容器的equal_range函数。该函数返回一个pair，保存的是两个迭代器。指向的位置与 lower_bound 和 upper_bound 相同</p>
+<p>解决此问题的最后一个方法是直接使用容器的equal_range函数。该函数返回一个pair，保存的是两个迭代器。指向的位置与 lower_bound 和 upper_bound 相同</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span>(<span class="keyword">auto</span> pos = authors.equal_range(search_item); pos.first != pos.<span class="built_in">end</span>; ++pos.first)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="built_in">cout</span> &lt;&lt; pos.first-&gt;second &lt;&lt; <span class="built_in">endl</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="无序容器"><a href="#无序容器" class="headerlink" title="无序容器"></a>无序容器</h2><p>新标准中定义了4种无序关联容器，这些容器不是使用比较运算符来组织元素，而是使用一个哈希函数和关键字类型的 == 运算符。在关键字类型的元素没有明显的序关系时，无序容器是非常有用的。</p>
+<p>对于自定义类型的关键字，无法直接在无序容器中使用，还需要提供该类型的hash操作。</p>
+<hr />
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://www.masimaroweb.com/cpp-base-10.html" data-id="ckoqi6kk00000zmux3ab62x5r" class="article-share-link">分享</a>
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/C/" rel="tag">C++</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/c-11/" rel="tag">c++11</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E5%9F%BA%E7%A1%80/" rel="tag">基础</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E8%AF%AD%E6%B3%95/" rel="tag">语法</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+  
+    <a href="/cpp-base-9.html" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">下一篇</strong>
+      <div class="article-nav-title">泛型算法</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+
+</section>
+        
+          <aside id="sidebar">
+  
+    <div class="widget-wrap">
+  <h3 class="widget-title"></h3>
+  <div class="widget">
+    <h1 class="blog-title">Masimaro&#39;s blog</h1>
+    <h2 class="blog-subtitle"></h2>
+    <ul class="blog-link">
+     
+          <a href="/" title="Home">
+            <li>主页</li>
+          </a>
+        
+          <a href="/archives" title="Archives">
+            <li>归档</li>
+          </a>
+        
+          <a href="/categories" title="Categories">
+            <li>分类</li>
+          </a>
+        
+          <a href="/tags" title="Tags">
+            <li>标签</li>
+          </a>
+        
+          <a href="/about" title="About">
+            <li>关于</li>
+          </a>
+        
+    </ul>
+  </div>
+</div>
+
+  
+    <div class="widget-wrap">
+  <h3 class="widget-title"></h3>
+  <div class="widget">
+    <img class="avatar" src="https://avatars0.githubusercontent.com/u/20333903?v=3&amp;s=460">
+    <h2 class="author">Masimaro</h2>
+    <h3 class="description"></h3>
+    <div class="count-box">
+      <a href="/archives"><div><strong>109</strong><br>文章</div></a>
+      <a href="/categories"><div><strong>21</strong><br>分类</div></a>
+      <a href="/tags"><div><strong>152</strong><br>标签</div></a>
+    </div>
+
+
+
+    <div class="social-link">
+      
+        <a class="hvr-bounce-in" href="http://github.com/aMonst" target="_blank" title="Github">
+          Github
+        </a>
+      
+        <a class="hvr-bounce-in" href="liu1793222129@163.com" target="_blank" title="邮箱">
+          邮箱
+        </a>
+      
+    </div>
+
+    <div class="friend-link">
+      <h2>友情链接</h2>
+      
+        <a class="hvr-bounce-in" href="http://blog.shanamaid.top/" target="_blank" title="ShanaMaid">
+          ShanaMaid
+        </a>
+      
+    </div>
+  </div>
+</div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy;2020 - 2021 Masimaro<br>
+      由<a href="http://hexo.io/" target="_blank">Hexo</a>强力驱动 | 
+      主题-<a href="https://github.com/ShanaMaid/hexo-theme-shana" target="_blank" rel="noopener">Shana</a>
+      
+    </div>
+    
+  </div>
+</footer>
+    </div>
+    
+
+<script src="//apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js"></script>
+<script src="//apps.bdimg.com/libs/wow/0.1.6/wow.min.js"></script>
+<script>
+new WOW().init();
+</script>   
+
+
+  
+<link rel="stylesheet" href="/plugin/fancybox/jquery.fancybox.css">
+
+  
+<script src="/plugin/fancybox/jquery.fancybox.pack.js"></script>
+
+
+
+
+  
+<link rel="stylesheet" href="/plugin/galmenu/GalMenu.css">
+
+  
+<script src="/plugin/galmenu/GalMenu.js"></script>
+
+  <div class="GalMenu GalDropDown">
+      <div class="circle" id="gal">
+        <div class="ring">
+          
+            <a href="/" title="" class="menuItem">首页</a>
+          
+            <a href="/tags" title="" class="menuItem">标签</a>
+          
+            <a href="/categories" title="" class="menuItem">分类</a>
+          
+            <a href="/archives" title="" class="menuItem">归档</a>
+          
+            <a href="/about" title="" class="menuItem">关于</a>
+          
+        </div>
+        
+          <audio id="audio" src="#"></audio>
+        
+      </div> 
+</div>
+<div id="overlay" style="opacity: 1; cursor: pointer;"></div>
+  <script type="text/javascript">var items = document.querySelectorAll('.menuItem');
+    for (var i = 0,
+    l = items.length; i < l; i++) {
+      items[i].style.left = (50 - 35 * Math.cos( - 0.5 * Math.PI - 2 * (1 / l) * i * Math.PI)).toFixed(4) + "%";
+      items[i].style.top = (50 + 35 * Math.sin( - 0.5 * Math.PI - 2 * (1 / l) * i * Math.PI)).toFixed(4) + "%"
+    }</script>
+<script type="text/javascript">
+  $(document).ready(function() {
+    $('body').GalMenu({
+      'menu': 'GalDropDown'
+    })
+  });
+</script>
+
+  <section class="hidden-xs"> 
+  <ul class="cb-slideshow"> 
+    <li><span>苟利</span></li> 
+    <li><span>国家</span></li> 
+    <li><span>生死以</span></li> 
+    <li><span>岂能</span></li> 
+    <li><span>祸福</span></li> 
+    <li><span>趋避之</span></li> 
+  </ul>
+</section>
+
+<script src="/js/script.js"></script>
+
+
+
+
+  </div>
+</body>
+</html>
