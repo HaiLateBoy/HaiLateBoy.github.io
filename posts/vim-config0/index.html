@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="robots" content="noodp" />
+        <title>从零开始匹配vim(0)——vimscript 简介 - Masimaro&#39;s blog</title><meta name="Description" content="这是我用于记录日常和学习的小站"><meta property="og:title" content="从零开始匹配vim(0)——vimscript 简介" />
+<meta property="og:description" content="通过之前一系列的文章，相信各位小伙伴应该已经对vim产生了浓厚的兴趣，可能不少小伙伴通过慢慢的使用变的跟我一样，离开vim就不会写代码了。如" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://HaiLateBoy.github.io/posts/vim-config0/" /><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2022-07-06T10:40:56+08:00" />
+<meta property="article:modified_time" content="2022-07-06T10:40:56+08:00" /><meta property="og:site_name" content="Masimaro&#39;s blog" />
+
+<meta name="twitter:card" content="summary"/><meta name="twitter:title" content="从零开始匹配vim(0)——vimscript 简介"/>
+<meta name="twitter:description" content="通过之前一系列的文章，相信各位小伙伴应该已经对vim产生了浓厚的兴趣，可能不少小伙伴通过慢慢的使用变的跟我一样，离开vim就不会写代码了。如"/>
+<meta name="application-name" content="My cool site">
+<meta name="apple-mobile-web-app-title" content="My cool site"><meta name="theme-color" content="#ffffff"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="manifest" href="/site.webmanifest"><link rel="canonical" href="http://HaiLateBoy.github.io/posts/vim-config0/" /><link rel="prev" href="http://HaiLateBoy.github.io/posts/vim-tutorial-24/" /><link rel="next" href="http://HaiLateBoy.github.io/posts/vim-config1/" /><link rel="stylesheet" href="/css/style.min.css"><link rel="preload" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css"></noscript><link rel="preload" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css"></noscript><script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "BlogPosting",
+        "headline": "从零开始匹配vim(0)——vimscript 简介",
+        "inLanguage": "zh-CN",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "http:\/\/HaiLateBoy.github.io\/posts\/vim-config0\/"
+        },"genre": "posts","keywords": "vim, 编辑工具, 文本处理, lua, 编辑器","wordcount":  2005 ,
+        "url": "http:\/\/HaiLateBoy.github.io\/posts\/vim-config0\/","datePublished": "2022-07-06T10:40:56+08:00","dateModified": "2022-07-06T10:40:56+08:00","publisher": {
+            "@type": "Organization",
+            "name": ""},"author": {
+                "@type": "Person",
+                "name": "Masimaro"
+            },"description": ""
+    }
+    </script></head>
+    <body data-header-desktop="fixed" data-header-mobile="auto"><script type="text/javascript">(window.localStorage && localStorage.getItem('theme') ? localStorage.getItem('theme') === 'dark' : ('auto' === 'auto' ? window.matchMedia('(prefers-color-scheme: dark)').matches : 'auto' === 'dark')) && document.body.setAttribute('theme', 'dark');</script>
+
+        <div id="mask"></div><div class="wrapper"><header class="desktop" id="header-desktop">
+    <div class="header-wrapper">
+        <div class="header-title">
+            <a href="/" title="Masimaro&#39;s blog">My cool site</a>
+        </div>
+        <div class="menu">
+            <div class="menu-inner"><a class="menu-item" href="/posts/" title="文章列表"> 文章 </a><a class="menu-item" href="/tags/" title="标签"> 标签 </a><a class="menu-item" href="/categories/" title="分类"> 分类 </a><a class="menu-item" href="/about" title="关于本站"> 关于 </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-desktop">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-desktop" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-desktop" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-desktop">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </span><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                    <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+                </a></div>
+        </div>
+    </div>
+</header><header class="mobile" id="header-mobile">
+    <div class="header-container">
+        <div class="header-wrapper">
+            <div class="header-title">
+                <a href="/" title="Masimaro&#39;s blog">My cool site</a>
+            </div>
+            <div class="menu-toggle" id="menu-toggle-mobile">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+        <div class="menu" id="menu-mobile"><div class="search-wrapper">
+                    <div class="search mobile" id="search-mobile">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-mobile">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-mobile" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-mobile" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-mobile">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </div>
+                    <a href="javascript:void(0);" class="search-cancel" id="search-cancel-mobile">
+                        Cancel
+                    </a>
+                </div><a class="menu-item" href="/posts/" title="文章列表">文章</a><a class="menu-item" href="/tags/" title="标签">标签</a><a class="menu-item" href="/categories/" title="分类">分类</a><a class="menu-item" href="/about" title="关于本站">关于</a><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+            </a></div>
+    </div>
+</header><div class="search-dropdown desktop">
+        <div id="search-dropdown-desktop"></div>
+    </div>
+    <div class="search-dropdown mobile">
+        <div id="search-dropdown-mobile"></div>
+    </div><main class="main">
+                <div class="container"><div class="toc" id="toc-auto">
+            <h2 class="toc-title">Contents</h2>
+            <div class="toc-content" id="toc-content-auto"></div>
+        </div><article class="page single"><h1 class="single-title animate__animated animate__flipInX">从零开始匹配vim(0)——vimscript 简介</h1><div class="post-meta">
+            <div class="post-meta-line"><span class="post-author"><a href="https://www.masimaro.xyz" title="Author" target="_blank" rel="noopener noreffer author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Masimaro</a></span>&nbsp;<span class="post-category">included in <a href="/categories/vim-%E9%85%8D%E7%BD%AE/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>vim 配置</a></span></div>
+            <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw" aria-hidden="true"></i>&nbsp;<time datetime="2022-07-06">2022-07-06</time>&nbsp;<i class="fas fa-pencil-alt fa-fw" aria-hidden="true"></i>&nbsp;2005 words&nbsp;
+                <i class="far fa-clock fa-fw" aria-hidden="true"></i>&nbsp;5 minutes&nbsp;</div>
+        </div><div class="details toc" id="toc-static"  data-kept="true">
+                <div class="details-summary toc-title">
+                    <span>Contents</span>
+                    <span><i class="details-icon fas fa-angle-right" aria-hidden="true"></i></span>
+                </div>
+                <div class="details-content toc-content" id="toc-content-static"><nav id="TableOfContents">
+  <ul>
+    <li><a href="#演示环境">演示环境</a></li>
+    <li><a href="#第一个-vimscript-脚本">第一个 vimscript 脚本</a></li>
+  </ul>
+</nav></div>
+            </div><div class="content" id="content"><p>通过之前一系列的文章，相信各位小伙伴应该已经对vim产生了浓厚的兴趣，可能不少小伙伴通过慢慢的使用变的跟我一样，离开vim就不会写代码了。如果你希望继续长时间使用vim，甚至将vim作为主要的代码编辑器，那么花一定的时间来学习vim的配置是很有用的。如果你只是因为 <code>linux</code> 平台默认安装了 <code>vi/vim</code> ，平时又主要用它改改匹配文件，临时用用，那么还是赶紧退出这个文章，免得耽误时间吧。</p>
+<p>标题上说从零基础打造vim多少有点标题党，要理解后面一系列文章的内容至少要了解vim里面的一些基本概念，我认为在阅读本系列专栏之前，你应该了解以下内容</p>
+<ol>
+<li>知道vim，并且知道 vim 的基本操作，例如进入插入模式、移动光标，并且知道如何保存退出</li>
+<li>知道vim的相关术语，缓冲区列表、缓冲区、窗口、命令模式、插入模式等等</li>
+<li>知道 vim的配置文件在哪</li>
+</ol>
+<p>如果你还不知道，请移步我的专栏，跟着专栏中的内容做做实验。理解一下里面提到的这些概念。</p>
+<p>关于配置部分，我准备介绍以下几个方面的内容：</p>
+<ol>
+<li>vimscript 的基础内容，并补充一些之前没介绍过的vim的特性</li>
+<li>neovim lua对应的接口</li>
+<li>推荐一些插件和相关配置，做到抛砖引玉</li>
+</ol>
+<p>可能有小伙伴要问了，<code>vimscript</code> 不管写还是读都比较晦涩，而且 <code>neovim</code> 已经采用更容易理解也更加现代化的 <code>lua</code>了，有必要学习 <code>vim script</code>吗？</p>
+<p>我觉得是有必要的，首先 <code>neovim</code> 是 <code>vim</code> 的另一个实现版本，要想学好 <code>neovim</code> 自然绕不开 <code>vim</code>，而学好 <code>vim</code> 自然也绕不开 <code>vimscript</code> 。其次，<code>lua</code> 脚本中的接口继承自 <code>vimscript</code> 。想要使用 <code>lua</code> 配置的前提是知道使用 <code>vimscript</code> 配置。它们就好像学习 <code>MFC</code> 绕不开 <code>Win32 API</code> 一样。所以我觉得想要学习 <code>neovim</code> 的配置自然绕不开 <code>vimscript</code> 。而且 <code>neovim</code> 完全兼容 <code>vim</code> 基本不用担心 <code>vimscript</code> 在 <code>neovim</code> 中执行不了的问题。 倒是 <code>neovim</code> 并没有实现 <code>vimscript</code> 百分之百的功能，有些时候还是得靠 <code>vimscript</code> 来实现。</p>
+<h2 id="演示环境">演示环境</h2>
+<p>之前一系列的文章本来打算在 <code>mac</code> 上做演示的，但是我发现 <code>mac</code>上录屏比较麻烦，而且 <code>mac</code>上的 <code>neovim</code> 我已经配置好了，行为上可能跟裸 <code>vim</code> 有些差距(虽然可以不加载配置文件启动)，所以我采用 WSL2 Ubuntu上的 neovim做演示。</p>
+<p>刚好这个演示环境没有对vim进行过配置。也方便演示从0开始配置。</p>
+<p>本教程的环境是 linux中 <code>neovim</code> 的 <code>0.6.1</code> 版本，虽然官方已经放出来 0.8 版本，但是Ubuntu官方源中好像还是 0.6。这里就继续用它演示吧</p>
+<h2 id="第一个-vimscript-脚本">第一个 vimscript 脚本</h2>
+<p>我学习的任何一门语言好像都是从打印 <code>hello world</code> 开始的，我也不能免俗。我们这个教程也从打印 <code>hello world</code> 开始吧</p>
+<p><code>vimscript</code> 中可以使用 <code>echo</code> 和 <code>echom</code> 来打印语句，例如我们可以在命令模式中输入 <code>echo &quot;hello world&quot;</code>。我们发现在屏幕的下方出现了 <code>hello world</code> 字样。
+<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://img-blog.csdnimg.cn/cdd4691c36664e0fba7a8d23995af579.gif#pic_center"
+        data-srcset="https://img-blog.csdnimg.cn/cdd4691c36664e0fba7a8d23995af579.gif#pic_center, https://img-blog.csdnimg.cn/cdd4691c36664e0fba7a8d23995af579.gif#pic_center 1.5x, https://img-blog.csdnimg.cn/cdd4691c36664e0fba7a8d23995af579.gif#pic_center 2x"
+        data-sizes="auto"
+        alt="https://img-blog.csdnimg.cn/cdd4691c36664e0fba7a8d23995af579.gif#pic_center"
+        title="在这里插入图片描述" /></p>
+<p>接着我们再使用 <code>echom &quot;hello world&quot;</code> 发现，它仍然在下方打印了 <code>hello world</code> 字样。这两者有什么区别呢？</p>
+<p>要理解它们的区别我们需要介绍一个新的命令 <code>:message</code> 。这条命令可以查看 <code>message-history</code> 中的内容，我们可以简单的将这条命令理解为查看 <code>vim</code> 的运行日志（虽然并不是在查看日志）。执行这条命令我们发现，<code>message-history</code> 中只有一条 <code>hello world</code>。这个时候他们的区别就出来了，一个在打印的同时会将打印信息写入 <code>message-history</code>，另一个就仅仅只是打印而已。
+<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://img-blog.csdnimg.cn/522f053b12cf42e7b2a93110cd0008f3.gif#pic_center"
+        data-srcset="https://img-blog.csdnimg.cn/522f053b12cf42e7b2a93110cd0008f3.gif#pic_center, https://img-blog.csdnimg.cn/522f053b12cf42e7b2a93110cd0008f3.gif#pic_center 1.5x, https://img-blog.csdnimg.cn/522f053b12cf42e7b2a93110cd0008f3.gif#pic_center 2x"
+        data-sizes="auto"
+        alt="https://img-blog.csdnimg.cn/522f053b12cf42e7b2a93110cd0008f3.gif#pic_center"
+        title="在这里插入图片描述" />
+各位小伙伴只需要简单打印不同的语句就能知道 <code>echom</code> 会将内容写入到日志中，而 <code>echo</code> 不会。这里留个各位自己去实验吧，我就不做演示了。</p>
+<p>我们现在来完成一个小练习，使用vim脚本来写一段欢迎信息例如 <code>hello, jack</code>， 我们让用户每次打开都能看到这个欢迎信息 。这里的用户我们暂时让它固定，后续我们可以做到动态的修改 欢迎的用户。</p>
+<p>我们知道每次打开vim，它都会去加载配置文件，我们只要将要执行的命令写到配置文件中就好了。还记得配置文件在哪吗？针对 <code>neovim</code> 来说它支持 <code>vimscript</code> 和 <code>lua</code> 配置（当然它也支持其他语言）。我们将目录切换到 <code>~/.config/nvim</code> 。如果各位小伙伴之前有过配置，那么请先将配置做一个备份。同时确保 <code>init.lua</code> （lua配置）和 <code>init.vim</code> (vimscript 配置) 只能有一个</p>
+<p>我们先尝试着用 <code>vimscript</code> 的方式来完成这个功能。我们建立一个新文件 <code>~/.config/nvim/init.vim</code>。然后在里面写上一句 <code>echo 'hello, jack'</code>，然后退出。我们发现每次进入 <code>neovim</code> 之后，总会在下方显示这么一句话了。
+<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://img-blog.csdnimg.cn/fe048398a4f9447ea90a60c2a36f0c5e.gif#pic_center"
+        data-srcset="https://img-blog.csdnimg.cn/fe048398a4f9447ea90a60c2a36f0c5e.gif#pic_center, https://img-blog.csdnimg.cn/fe048398a4f9447ea90a60c2a36f0c5e.gif#pic_center 1.5x, https://img-blog.csdnimg.cn/fe048398a4f9447ea90a60c2a36f0c5e.gif#pic_center 2x"
+        data-sizes="auto"
+        alt="https://img-blog.csdnimg.cn/fe048398a4f9447ea90a60c2a36f0c5e.gif#pic_center"
+        title="在这里插入图片描述" />
+<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://img-blog.csdnimg.cn/005f0866c8b84fefb096a5bc447bee95.gif#pic_center"
+        data-srcset="https://img-blog.csdnimg.cn/005f0866c8b84fefb096a5bc447bee95.gif#pic_center, https://img-blog.csdnimg.cn/005f0866c8b84fefb096a5bc447bee95.gif#pic_center 1.5x, https://img-blog.csdnimg.cn/005f0866c8b84fefb096a5bc447bee95.gif#pic_center 2x"
+        data-sizes="auto"
+        alt="https://img-blog.csdnimg.cn/005f0866c8b84fefb096a5bc447bee95.gif#pic_center"
+        title="在这里插入图片描述" /></p>
+<p>我们再来看看如何使用 <code>lua</code> 来打印这么一句话呢？<code>lua</code> 中对应的函数是 <code>print</code> 。我们可以直接在 之前备份的 <code>init.lua</code> 中写上 <code>print(&quot;hello, jack&quot;)</code> 来完成这一个工作(记得现将之前的 <code>init.vim 备份</code>)。需要注意的是 <code>lua</code> 中的 <code>print</code> 写将信息一并写入到 <code>message</code> 中，也就是说它与 <code>echom</code> 效果相同。如果想执行 <code>echo</code> 操作可以使用 <code>api.vim.nvim_echo()</code> 。它的用法比较复杂，这就就不介绍它了，有兴趣的小伙伴可以去官网查一下，试试用它来实现这个打印欢迎信息的例子。
+<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://img-blog.csdnimg.cn/b6dc158bdf1b479cbfbe956906946183.gif#pic_center"
+        data-srcset="https://img-blog.csdnimg.cn/b6dc158bdf1b479cbfbe956906946183.gif#pic_center, https://img-blog.csdnimg.cn/b6dc158bdf1b479cbfbe956906946183.gif#pic_center 1.5x, https://img-blog.csdnimg.cn/b6dc158bdf1b479cbfbe956906946183.gif#pic_center 2x"
+        data-sizes="auto"
+        alt="https://img-blog.csdnimg.cn/b6dc158bdf1b479cbfbe956906946183.gif#pic_center"
+        title="在这里插入图片描述" />
+这篇文章的内容到此就结束了，最后给大家做一个总结：</p>
+<ol>
+<li>neovim如果想要加载 vimscript配置，可以将配置文件放到 <code>~/.config/nvim/init.vim</code> 中，如果想要加载 <code>lua</code> 配置，可以将文件放到 <code>~/.config/nvim/init.lua</code> 中。</li>
+<li><code>echo</code>、<code>echom</code> 都会打印字符串，不同的是 <code>echom</code> 将打印的内容往一个叫做 <code>message-history</code> 的地方写。<code>lua</code> 中的 <code>print</code> 具备 <code>echom</code>的功能</li>
+<li>可以使用 <code>message</code> 命令查看 <code>message-history</code> 的内容</li>
+<li>从 <code>vimscript</code> 的使用上看，它里面写的是vim的一些命令，我们将命令写在文件中让vim去执行。vim命令与 <code>vimscript</code> 的关系有点像 <code>shell</code> 命令和 <code>shell</code> 脚本的关系</li>
+</ol>
+</div><div class="post-footer" id="post-footer">
+    <div class="post-info">
+        <div class="post-info-line">
+            <div class="post-info-mod">
+                <span>Updated on 2022-07-06</span>
+            </div></div>
+        <div class="post-info-line">
+            <div class="post-info-md"></div>
+            <div class="post-info-share">
+                <span><a href="javascript:void(0);" title="Share on Twitter" data-sharer="twitter" data-url="http://HaiLateBoy.github.io/posts/vim-config0/" data-title="从零开始匹配vim(0)——vimscript 简介" data-hashtags="vim,编辑工具,文本处理,lua,编辑器"><i class="fab fa-twitter fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Facebook" data-sharer="facebook" data-url="http://HaiLateBoy.github.io/posts/vim-config0/" data-hashtag="vim"><i class="fab fa-facebook-square fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Hacker News" data-sharer="hackernews" data-url="http://HaiLateBoy.github.io/posts/vim-config0/" data-title="从零开始匹配vim(0)——vimscript 简介"><i class="fab fa-hacker-news fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Line" data-sharer="line" data-url="http://HaiLateBoy.github.io/posts/vim-config0/" data-title="从零开始匹配vim(0)——vimscript 简介"><i data-svg-src="https://cdn.jsdelivr.net/npm/simple-icons@7.3.0/icons/line.svg" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on 微博" data-sharer="weibo" data-url="http://HaiLateBoy.github.io/posts/vim-config0/" data-title="从零开始匹配vim(0)——vimscript 简介"><i class="fab fa-weibo fa-fw" aria-hidden="true"></i></a></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="post-info-more">
+        <section class="post-tags"><i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/vim/">vim</a>,&nbsp;<a href="/tags/%E7%BC%96%E8%BE%91%E5%B7%A5%E5%85%B7/">编辑工具</a>,&nbsp;<a href="/tags/%E6%96%87%E6%9C%AC%E5%A4%84%E7%90%86/">文本处理</a>,&nbsp;<a href="/tags/lua/">lua</a>,&nbsp;<a href="/tags/%E7%BC%96%E8%BE%91%E5%99%A8/">编辑器</a></section>
+        <section>
+            <span><a href="javascript:void(0);" onclick="window.history.back();">Back</a></span>&nbsp;|&nbsp;<span><a href="/">Home</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav"><a href="/posts/vim-tutorial-24/" class="prev" rel="prev" title="vim 从嫌弃到依赖(23)——最后的闲扯"><i class="fas fa-angle-left fa-fw" aria-hidden="true"></i>vim 从嫌弃到依赖(23)——最后的闲扯</a>
+            <a href="/posts/vim-config1/" class="next" rel="next" title="从零开始匹配vim(1)——选项设置">从零开始匹配vim(1)——选项设置<i class="fas fa-angle-right fa-fw" aria-hidden="true"></i></a></div>
+</div>
+</article></div>
+            </main><footer class="footer">
+        <div class="footer-container"><div class="footer-line">Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener noreffer" title="Hugo 0.121.2">Hugo</a> | Theme - <a href="https://github.com/dillonzq/LoveIt" target="_blank" rel="noopener noreffer" title="LoveIt 0.2.11"><i class="far fa-kiss-wink-heart fa-fw" aria-hidden="true"></i> LoveIt</a>
+                </div><div class="footer-line" itemscope itemtype="http://schema.org/CreativeWork"><i class="far fa-copyright fa-fw" aria-hidden="true"></i><span itemprop="copyrightYear">2022 - 2024</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="https://www.masimaro.xyz" target="_blank">Masimaro</a></span></div>
+        </div>
+    </footer></div>
+
+        <div id="fixed-buttons"><a href="#" id="back-to-top" class="fixed-button" title="Back to Top">
+                <i class="fas fa-arrow-up fa-fw" aria-hidden="true"></i>
+            </a><a href="#" id="view-comments" class="fixed-button" title="View Comments">
+                <i class="fas fa-comment fa-fw" aria-hidden="true"></i>
+            </a>
+        </div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.css"><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/autocomplete.js@0.38.1/dist/autocomplete.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lunr@2.3.9/lunr.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lazysizes@5.3.2/lazysizes.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/clipboard@2.0.11/dist/clipboard.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/sharer.js@0.5.1/sharer.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/auto-render.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/copy-tex.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/mhchem.min.js"></script><script type="text/javascript">window.config={"code":{"copyTitle":"Copy to clipboard","maxShownLines":50},"comment":{},"math":{"delimiters":[{"display":true,"left":"$$","right":"$$"},{"display":true,"left":"\\[","right":"\\]"},{"display":true,"left":"\\begin{equation}","right":"\\end{equation}"},{"display":true,"left":"\\begin{equation*}","right":"\\end{equation*}"},{"display":true,"left":"\\begin{align}","right":"\\end{align}"},{"display":true,"left":"\\begin{align*}","right":"\\end{align*}"},{"display":true,"left":"\\begin{alignat}","right":"\\end{alignat}"},{"display":true,"left":"\\begin{alignat*}","right":"\\end{alignat*}"},{"display":true,"left":"\\begin{gather}","right":"\\end{gather}"},{"display":true,"left":"\\begin{CD}","right":"\\end{CD}"},{"display":false,"left":"$","right":"$"},{"display":false,"left":"\\(","right":"\\)"}],"strict":false},"search":{"highlightTag":"em","maxResultLength":10,"noResultsFound":"No results found","snippetLength":50}};</script><script type="text/javascript" src="/js/theme.min.js"></script></body>
+</html>

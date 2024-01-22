@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="robots" content="noodp" />
+        <title>C&#43;&#43;多态 - Masimaro&#39;s blog</title><meta name="Description" content="这是我用于记录日常和学习的小站"><meta property="og:title" content="C&#43;&#43;多态" />
+<meta property="og:description" content="面向对象的程序设计的三大要素之一就是多态，多态是指基类的指针指向不同的派生类，其行为不同。多态的实现主要是通过虚函数和虚表来完成，虚表保存在" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://HaiLateBoy.github.io/posts/c-plus-polymorphism/" /><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2018-02-12T14:19:19+00:00" />
+<meta property="article:modified_time" content="2018-02-12T14:19:19+00:00" /><meta property="og:site_name" content="Masimaro&#39;s blog" />
+
+<meta name="twitter:card" content="summary"/><meta name="twitter:title" content="C&#43;&#43;多态"/>
+<meta name="twitter:description" content="面向对象的程序设计的三大要素之一就是多态，多态是指基类的指针指向不同的派生类，其行为不同。多态的实现主要是通过虚函数和虚表来完成，虚表保存在"/>
+<meta name="application-name" content="My cool site">
+<meta name="apple-mobile-web-app-title" content="My cool site"><meta name="theme-color" content="#ffffff"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="manifest" href="/site.webmanifest"><link rel="canonical" href="http://HaiLateBoy.github.io/posts/c-plus-polymorphism/" /><link rel="prev" href="http://HaiLateBoy.github.io/posts/c-plus-structure-and-destruct/" /><link rel="next" href="http://HaiLateBoy.github.io/posts/oledb-and-ado-5/" /><link rel="stylesheet" href="/css/style.min.css"><link rel="preload" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css"></noscript><link rel="preload" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css"></noscript><script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "BlogPosting",
+        "headline": "C++多态",
+        "inLanguage": "zh-CN",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "http:\/\/HaiLateBoy.github.io\/posts\/c-plus-polymorphism\/"
+        },"genre": "posts","keywords": "VC\u002b\u002b, 反汇编, C\u002b\u002b实现原理","wordcount":  1455 ,
+        "url": "http:\/\/HaiLateBoy.github.io\/posts\/c-plus-polymorphism\/","datePublished": "2018-02-12T14:19:19+00:00","dateModified": "2018-02-12T14:19:19+00:00","publisher": {
+            "@type": "Organization",
+            "name": ""},"author": {
+                "@type": "Person",
+                "name": "Masimaro"
+            },"description": ""
+    }
+    </script></head>
+    <body data-header-desktop="fixed" data-header-mobile="auto"><script type="text/javascript">(window.localStorage && localStorage.getItem('theme') ? localStorage.getItem('theme') === 'dark' : ('auto' === 'auto' ? window.matchMedia('(prefers-color-scheme: dark)').matches : 'auto' === 'dark')) && document.body.setAttribute('theme', 'dark');</script>
+
+        <div id="mask"></div><div class="wrapper"><header class="desktop" id="header-desktop">
+    <div class="header-wrapper">
+        <div class="header-title">
+            <a href="/" title="Masimaro&#39;s blog">My cool site</a>
+        </div>
+        <div class="menu">
+            <div class="menu-inner"><a class="menu-item" href="/posts/" title="文章列表"> 文章 </a><a class="menu-item" href="/tags/" title="标签"> 标签 </a><a class="menu-item" href="/categories/" title="分类"> 分类 </a><a class="menu-item" href="/about" title="关于本站"> 关于 </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-desktop">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-desktop" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-desktop" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-desktop">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </span><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                    <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+                </a></div>
+        </div>
+    </div>
+</header><header class="mobile" id="header-mobile">
+    <div class="header-container">
+        <div class="header-wrapper">
+            <div class="header-title">
+                <a href="/" title="Masimaro&#39;s blog">My cool site</a>
+            </div>
+            <div class="menu-toggle" id="menu-toggle-mobile">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+        <div class="menu" id="menu-mobile"><div class="search-wrapper">
+                    <div class="search mobile" id="search-mobile">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-mobile">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-mobile" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-mobile" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-mobile">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </div>
+                    <a href="javascript:void(0);" class="search-cancel" id="search-cancel-mobile">
+                        Cancel
+                    </a>
+                </div><a class="menu-item" href="/posts/" title="文章列表">文章</a><a class="menu-item" href="/tags/" title="标签">标签</a><a class="menu-item" href="/categories/" title="分类">分类</a><a class="menu-item" href="/about" title="关于本站">关于</a><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+            </a></div>
+    </div>
+</header><div class="search-dropdown desktop">
+        <div id="search-dropdown-desktop"></div>
+    </div>
+    <div class="search-dropdown mobile">
+        <div id="search-dropdown-mobile"></div>
+    </div><main class="main">
+                <div class="container"><div class="toc" id="toc-auto">
+            <h2 class="toc-title">Contents</h2>
+            <div class="toc-content" id="toc-content-auto"></div>
+        </div><article class="page single"><h1 class="single-title animate__animated animate__flipInX">C++多态</h1><div class="post-meta">
+            <div class="post-meta-line"><span class="post-author"><a href="https://www.masimaro.xyz" title="Author" target="_blank" rel="noopener noreffer author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Masimaro</a></span>&nbsp;<span class="post-category">included in <a href="/categories/vc++%E5%8F%8D%E6%B1%87%E7%BC%96%E5%88%86%E6%9E%90/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>VC++反汇编分析</a></span></div>
+            <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw" aria-hidden="true"></i>&nbsp;<time datetime="2018-02-12">2018-02-12</time>&nbsp;<i class="fas fa-pencil-alt fa-fw" aria-hidden="true"></i>&nbsp;1455 words&nbsp;
+                <i class="far fa-clock fa-fw" aria-hidden="true"></i>&nbsp;3 minutes&nbsp;</div>
+        </div><div class="details toc" id="toc-static"  data-kept="true">
+                <div class="details-summary toc-title">
+                    <span>Contents</span>
+                    <span><i class="details-icon fas fa-angle-right" aria-hidden="true"></i></span>
+                </div>
+                <div class="details-content toc-content" id="toc-content-static"><nav id="TableOfContents"></nav></div>
+            </div><div class="content" id="content"><p>面向对象的程序设计的三大要素之一就是多态，多态是指基类的指针指向不同的派生类，其行为不同。多态的实现主要是通过虚函数和虚表来完成，虚表保存在对象的头四个字节，要调用虚函数必须存在对象，也就是说虚函数必须作为类的成员函数来使用。</p>
+<!-- raw HTML omitted -->
+<p>编译器为每个拥有虚函数的对象准备了一个虚函数表，表中存储了虚函数的地址，类对象在头四个字节中存储了虚函数表的指针。
+下面是一个具体的例子</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">CVirtual</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl"><span class="k">public</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">    <span class="k">virtual</span> <span class="kt">void</span> <span class="n">showNumber</span><span class="p">(){</span>
+</span></span><span class="line"><span class="cl">        <span class="n">printf</span><span class="p">(</span><span class="s">&#34;%d</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">,</span> <span class="n">nNum</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">virtual</span> <span class="kt">void</span> <span class="nf">setNumber</span><span class="p">(</span><span class="kt">int</span> <span class="n">n</span><span class="p">){</span>
+</span></span><span class="line"><span class="cl">        <span class="n">nNum</span> <span class="o">=</span> <span class="n">n</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="k">private</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">int</span> <span class="n">nNum</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">};</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kt">int</span> <span class="nf">main</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">CVirtual</span> <span class="n">cv</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">cv</span><span class="p">.</span><span class="n">setNumber</span><span class="p">(</span><span class="mi">2</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">cv</span><span class="p">.</span><span class="n">showNumber</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p>上述这段代码定义了两个虚函数setNumber和showNumber，并在主函数中调用了他们，下面通过反汇编的方式来展示编译器是如何调用虚函数的</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-asm" data-lang="asm"><span class="line"><span class="cl"><span class="err">26:</span>       <span class="nf">CVirtual</span> <span class="no">cv</span><span class="c1">;
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">00401288</span>   <span class="nf">lea</span>         <span class="no">ecx</span><span class="p">,[</span><span class="no">ebp-8</span><span class="p">]</span><span class="c1">;对象中有一个整形数字占4个字节，同时又有虚函数，头四个字节用来存储虚函数表指针，总共占8个字节
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">0040128</span><span class="nf">B</span>   <span class="no">call</span>        <span class="err">@</span><span class="no">ILT</span><span class="err">+</span><span class="mi">25</span><span class="p">(</span><span class="no">CVirtual</span><span class="p">::</span><span class="no">CVirtual</span><span class="p">)</span> <span class="p">(</span><span class="mi">0040101</span><span class="no">e</span><span class="p">)</span><span class="c1">;调用构造函数
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">27:</span>       <span class="nf">cv.setNumber</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="c1">;
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">00401290</span>   <span class="nf">push</span>        <span class="mi">2</span>
+</span></span><span class="line"><span class="cl"><span class="err">00401292</span>   <span class="nf">lea</span>         <span class="no">ecx</span><span class="p">,[</span><span class="no">ebp-8</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="err">00401295</span>   <span class="nf">call</span>        <span class="err">@</span><span class="no">ILT</span><span class="err">+</span><span class="mi">0</span><span class="p">(</span><span class="no">CVirtual</span><span class="p">::</span><span class="no">setNumber</span><span class="p">)</span> <span class="p">(</span><span class="mi">00401005</span><span class="p">)</span><span class="c1">;调用虚函数
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">28:</span>       <span class="nf">cv.showNumber</span><span class="p">()</span><span class="c1">;
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">0040129</span><span class="nf">A</span>   <span class="no">lea</span>         <span class="no">ecx</span><span class="p">,[</span><span class="no">ebp-8</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="err">0040129</span><span class="nf">D</span>   <span class="no">call</span>        <span class="err">@</span><span class="no">ILT</span><span class="err">+</span><span class="mi">5</span><span class="p">(</span><span class="no">CVirtual</span><span class="p">::</span><span class="no">showNumber</span><span class="p">)</span> <span class="p">(</span><span class="mi">0040100</span><span class="no">a</span><span class="p">)</span><span class="c1">;调用虚函数
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">29:</span>       <span class="nf">return</span> <span class="mi">0</span><span class="c1">;
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">004012</span><span class="nf">A2</span>   <span class="no">xor</span>         <span class="no">eax</span><span class="p">,</span><span class="no">eax</span>
+</span></span><span class="line"><span class="cl"><span class="c1">;构造函数
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">0401389</span>   <span class="nf">pop</span>         <span class="no">ecx</span><span class="c1">;还原ecx使得ecx保存对象的首地址
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">0040138</span><span class="nf">A</span>   <span class="no">mov</span>         <span class="no">dword</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">ebp-4</span><span class="p">],</span><span class="no">ecx</span>
+</span></span><span class="line"><span class="cl"><span class="err">0040138</span><span class="nf">D</span>   <span class="no">mov</span>         <span class="no">eax</span><span class="p">,</span><span class="no">dword</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">ebp-4</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="err">00401390</span>   <span class="nf">mov</span>         <span class="no">dword</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">eax</span><span class="p">],</span><span class="no">offset</span> <span class="no">CVirtual</span><span class="p">::</span><span class="err">`</span><span class="no">vftable</span><span class="err">&#39;</span> <span class="p">(</span><span class="mi">0042</span><span class="no">f020</span><span class="p">)</span><span class="c1">;将虚函数表的首地址赋值到对象的头4个字节
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">00401396</span>   <span class="nf">mov</span>         <span class="no">eax</span><span class="p">,</span><span class="no">dword</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">ebp-4</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="err">00401399</span>   <span class="nf">pop</span>         <span class="no">edi</span>
+</span></span><span class="line"><span class="cl"><span class="err">0040139</span><span class="nf">A</span>   <span class="no">pop</span>         <span class="no">esi</span>
+</span></span><span class="line"><span class="cl"><span class="err">0040139</span><span class="nf">B</span>   <span class="no">pop</span>         <span class="no">ebx</span>
+</span></span><span class="line"><span class="cl"><span class="err">0040139</span><span class="nf">C</span>   <span class="no">mov</span>         <span class="no">esp</span><span class="p">,</span><span class="no">ebp</span>
+</span></span><span class="line"><span class="cl"><span class="err">0040139</span><span class="nf">E</span>   <span class="no">pop</span>         <span class="no">ebp</span>
+</span></span><span class="line"><span class="cl"><span class="err">0040139</span><span class="nf">F</span>   <span class="no">ret</span>
+</span></span><span class="line"><span class="cl"><span class="c1">;setNumber(int n)
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">0040134</span><span class="nf">A</span>   <span class="no">mov</span>         <span class="no">dword</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">ebp-4</span><span class="p">],</span><span class="no">ecx</span>
+</span></span><span class="line"><span class="cl"><span class="err">18:</span>           <span class="nf">nNum</span> <span class="err">=</span> <span class="no">n</span><span class="c1">;
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">0040134</span><span class="nf">D</span>   <span class="no">mov</span>         <span class="no">eax</span><span class="p">,</span><span class="no">dword</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">ebp-4</span><span class="p">]</span><span class="c1">;eax = ecx
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">00401350</span>   <span class="nf">mov</span>         <span class="no">ecx</span><span class="p">,</span><span class="no">dword</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">ebp</span><span class="err">+</span><span class="mi">8</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="err">00401353</span>   <span class="nf">mov</span>         <span class="no">dword</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">eax</span><span class="err">+</span><span class="mi">4</span><span class="p">],</span><span class="no">ecx</span>
+</span></span></code></pre></div><p>从上面的汇编代码可以看到，当类中有虚函数的时候，编译器会提供一个默认的构造函数，用于初始化对象的头4个字节，这四个字节存储的是一个指针值，我们定位到这个指针所在的内存如下图：
+<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="http://img.blog.csdn.net/20160705230043001"
+        data-srcset="http://img.blog.csdn.net/20160705230043001, http://img.blog.csdn.net/20160705230043001 1.5x, http://img.blog.csdn.net/20160705230043001 2x"
+        data-sizes="auto"
+        alt="http://img.blog.csdn.net/20160705230043001"
+        title="虚函数表的内荣" />
+这段内存中存储了两个值，分别为0x0040100AH和0x00401005H，我们执行后面的代码发现，这两个地址给定的是虚函数所在的地址。
+<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="http://img.blog.csdn.net/20160705230337494"
+        data-srcset="http://img.blog.csdn.net/20160705230337494, http://img.blog.csdn.net/20160705230337494 1.5x, http://img.blog.csdn.net/20160705230337494 2x"
+        data-sizes="auto"
+        alt="http://img.blog.csdn.net/20160705230337494"
+        title="虚函数地址" />
+在调用时编译器直接调用对应的虚函数，并没有通过虚表来寻址到对应的函数地址。下面看另外一个例子:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">CParent</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl"><span class="k">public</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">    <span class="k">virtual</span> <span class="kt">void</span> <span class="n">showClass</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">printf</span><span class="p">(</span><span class="s">&#34;CParent</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">};</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">CChild</span><span class="o">:</span><span class="k">public</span> <span class="n">CParent</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl"><span class="k">public</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">    <span class="k">virtual</span> <span class="kt">void</span> <span class="n">showClass</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">printf</span><span class="p">(</span><span class="s">&#34;CChild</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">};</span>
+</span></span><span class="line"><span class="cl"><span class="kt">int</span> <span class="nf">main</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">CParent</span> <span class="o">*</span><span class="n">pClass</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">CParent</span> <span class="n">cp</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">CChild</span> <span class="n">cc</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">pClass</span> <span class="o">=</span> <span class="o">&amp;</span><span class="n">cp</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">pClass</span><span class="o">-&gt;</span><span class="n">showClass</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">    <span class="n">pClass</span> <span class="o">=</span> <span class="o">&amp;</span><span class="n">cc</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">pClass</span><span class="o">-&gt;</span><span class="n">showClass</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">    <span class="n">pClass</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p>上述代码定义了一个基类和派生类，并且在派生类中重写了函数showClass,在调用时用分别利用基类的指针指向基类和派生类的对象来调用这个虚函数，得到的结果自然是不同的，这样构成了多态。下面是它的反汇编代码，这段代码基本展示了多态的实现原理</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-asm" data-lang="asm"><span class="line"><span class="cl"><span class="err">29:</span>       <span class="nf">CParent</span> <span class="p">*</span><span class="no">pClass</span> <span class="err">=</span> <span class="no">NULL</span><span class="c1">;
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">00401288</span>   <span class="nf">mov</span>         <span class="no">dword</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">ebp-4</span><span class="p">],</span><span class="mi">0</span>
+</span></span><span class="line"><span class="cl"><span class="err">30:</span>       <span class="nf">CParent</span> <span class="no">cp</span><span class="c1">;
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">0040128</span><span class="nf">F</span>   <span class="no">lea</span>         <span class="no">ecx</span><span class="p">,[</span><span class="no">ebp-8</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="err">00401292</span>   <span class="nf">call</span>        <span class="err">@</span><span class="no">ILT</span><span class="err">+</span><span class="mi">30</span><span class="p">(</span><span class="no">CParent</span><span class="p">::</span><span class="no">CParent</span><span class="p">)</span> <span class="p">(</span><span class="mi">00401023</span><span class="p">)</span><span class="c1">;调用构造函数
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">31:</span>       <span class="nf">CChild</span> <span class="no">cc</span><span class="c1">;
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">00401297</span>   <span class="nf">lea</span>         <span class="no">ecx</span><span class="p">,[</span><span class="no">ebp-0Ch</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="err">0040129</span><span class="nf">A</span>   <span class="no">call</span>        <span class="err">@</span><span class="no">ILT</span><span class="err">+</span><span class="mi">0</span><span class="p">(</span><span class="no">CChild</span><span class="p">::</span><span class="no">CChild</span><span class="p">)</span> <span class="p">(</span><span class="mi">00401005</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="err">32:</span>       <span class="nf">pClass</span> <span class="err">=</span> <span class="err">&amp;</span><span class="no">cp</span><span class="c1">;
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">0040129</span><span class="nf">F</span>   <span class="no">lea</span>         <span class="no">eax</span><span class="p">,[</span><span class="no">ebp-8</span><span class="p">]</span><span class="c1">;取对象的首地址
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">004012</span><span class="nf">A2</span>   <span class="no">mov</span>         <span class="no">dword</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">ebp-4</span><span class="p">],</span><span class="no">eax</span><span class="c1">;
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">33:</span>       <span class="nf">pClass-</span><span class="err">&gt;</span><span class="no">showClass</span><span class="p">()</span><span class="c1">;
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">004012</span><span class="nf">A5</span>   <span class="no">mov</span>         <span class="no">ecx</span><span class="p">,</span><span class="no">dword</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">ebp-4</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="err">004012</span><span class="nf">A8</span>   <span class="no">mov</span>         <span class="no">edx</span><span class="p">,</span><span class="no">dword</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">ecx</span><span class="p">]</span><span class="c1">;将指针值放入到edx中
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">004012</span><span class="nf">AA</span>   <span class="no">mov</span>         <span class="no">esi</span><span class="p">,</span><span class="no">esp</span>
+</span></span><span class="line"><span class="cl"><span class="err">004012</span><span class="nf">AC</span>   <span class="no">mov</span>         <span class="no">ecx</span><span class="p">,</span><span class="no">dword</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">ebp-4</span><span class="p">]</span><span class="c1">;获取虚函数表指针
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">004012</span><span class="nf">AF</span>   <span class="no">call</span>        <span class="no">dword</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">edx</span><span class="p">]</span><span class="c1">;调转到虚函数指针所对应的位置执行代码
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">004012</span><span class="nf">B1</span>   <span class="no">cmp</span>         <span class="no">esi</span><span class="p">,</span><span class="no">esp</span>
+</span></span><span class="line"><span class="cl"><span class="err">004012</span><span class="nf">B3</span>   <span class="no">call</span>        <span class="no">__chkesp</span> <span class="p">(</span><span class="mi">00401560</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="err">34:</span>       <span class="nf">pClass</span> <span class="err">=</span> <span class="err">&amp;</span><span class="no">cc</span><span class="c1">;
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">004012</span><span class="nf">B8</span>   <span class="no">lea</span>         <span class="no">eax</span><span class="p">,[</span><span class="no">ebp-0Ch</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="err">004012</span><span class="nf">BB</span>   <span class="no">mov</span>         <span class="no">dword</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">ebp-4</span><span class="p">],</span><span class="no">eax</span>
+</span></span><span class="line"><span class="cl"><span class="err">35:</span>       <span class="nf">pClass-</span><span class="err">&gt;</span><span class="no">showClass</span><span class="p">()</span><span class="c1">;
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">004012</span><span class="nf">BE</span>   <span class="no">mov</span>         <span class="no">ecx</span><span class="p">,</span><span class="no">dword</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">ebp-4</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="err">004012</span><span class="nf">C1</span>   <span class="no">mov</span>         <span class="no">edx</span><span class="p">,</span><span class="no">dword</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">ecx</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="err">004012</span><span class="nf">C3</span>   <span class="no">mov</span>         <span class="no">esi</span><span class="p">,</span><span class="no">esp</span>
+</span></span><span class="line"><span class="cl"><span class="err">004012</span><span class="nf">C5</span>   <span class="no">mov</span>         <span class="no">ecx</span><span class="p">,</span><span class="no">dword</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">ebp-4</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="err">004012</span><span class="nf">C8</span>   <span class="no">call</span>        <span class="no">dword</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">edx</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="err">004012</span><span class="nf">CA</span>   <span class="no">cmp</span>         <span class="no">esi</span><span class="p">,</span><span class="no">esp</span>
+</span></span><span class="line"><span class="cl"><span class="err">004012</span><span class="nf">CC</span>   <span class="no">call</span>        <span class="no">__chkesp</span> <span class="p">(</span><span class="mi">00401560</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="err">36:</span>       <span class="nf">pClass</span> <span class="err">=</span> <span class="no">NULL</span><span class="c1">;
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">004012</span><span class="nf">D1</span>   <span class="no">mov</span>         <span class="no">dword</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">ebp-4</span><span class="p">],</span><span class="mi">0</span>
+</span></span><span class="line"><span class="cl"><span class="err">37:</span>       <span class="nf">return</span> <span class="mi">0</span><span class="c1">;
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">004012</span><span class="nf">D8</span>   <span class="no">xor</span>         <span class="no">eax</span><span class="p">,</span><span class="no">eax</span>
+</span></span></code></pre></div><p>从上述代码来看，在调用虚函数时首先根据头四个字节的值找到对应的虚函数表，然后根据虚函数表中存储的内容来找到对应函数的地址，最后根据函数地址跳转到对应的位置，执行函数代码。由于虚函数表中的虚函数是在编译时就根据对象的不同将对应的函数装入到各自对象的虚函数表中，因此，不同的对象所拥有的虚函数表不同，最终根据虚函数表寻址到的虚函数也就不同，这样就构成了多态。
+对于虚函数的调用，先后经历了几次间接寻址，比直接调用函数效率低了一些，通过虚函数间接寻址访问的情况只有利用类对象的指针或者引用来访问虚函数时才会出现，利用对象本身调用虚函数时，没有必要进行查表，因为已经明确调用的是自身的成员函数，没有构成多态，查表只会降低程序的运行效率。</p>
+<!-- raw HTML omitted -->
+</div><div class="post-footer" id="post-footer">
+    <div class="post-info">
+        <div class="post-info-line">
+            <div class="post-info-mod">
+                <span>Updated on 2018-02-12</span>
+            </div></div>
+        <div class="post-info-line">
+            <div class="post-info-md"></div>
+            <div class="post-info-share">
+                <span><a href="javascript:void(0);" title="Share on Twitter" data-sharer="twitter" data-url="http://HaiLateBoy.github.io/posts/c-plus-polymorphism/" data-title="C&#43;&#43;多态" data-hashtags="VC&#43;&#43;,反汇编,C&#43;&#43;实现原理"><i class="fab fa-twitter fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Facebook" data-sharer="facebook" data-url="http://HaiLateBoy.github.io/posts/c-plus-polymorphism/" data-hashtag="VC&#43;&#43;"><i class="fab fa-facebook-square fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Hacker News" data-sharer="hackernews" data-url="http://HaiLateBoy.github.io/posts/c-plus-polymorphism/" data-title="C&#43;&#43;多态"><i class="fab fa-hacker-news fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Line" data-sharer="line" data-url="http://HaiLateBoy.github.io/posts/c-plus-polymorphism/" data-title="C&#43;&#43;多态"><i data-svg-src="https://cdn.jsdelivr.net/npm/simple-icons@7.3.0/icons/line.svg" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on 微博" data-sharer="weibo" data-url="http://HaiLateBoy.github.io/posts/c-plus-polymorphism/" data-title="C&#43;&#43;多态"><i class="fab fa-weibo fa-fw" aria-hidden="true"></i></a></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="post-info-more">
+        <section class="post-tags"><i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/vc&#43;&#43;/">VC&#43;&#43;</a>,&nbsp;<a href="/tags/%E5%8F%8D%E6%B1%87%E7%BC%96/">反汇编</a>,&nbsp;<a href="/tags/c&#43;&#43;%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86/">C&#43;&#43;实现原理</a></section>
+        <section>
+            <span><a href="javascript:void(0);" onclick="window.history.back();">Back</a></span>&nbsp;|&nbsp;<span><a href="/">Home</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav"><a href="/posts/c-plus-structure-and-destruct/" class="prev" rel="prev" title="C&#43;&#43;类的构造函数与析构函数"><i class="fas fa-angle-left fa-fw" aria-hidden="true"></i>C++类的构造函数与析构函数</a>
+            <a href="/posts/oledb-and-ado-5/" class="next" rel="next" title="数据更新接口与延迟更新">数据更新接口与延迟更新<i class="fas fa-angle-right fa-fw" aria-hidden="true"></i></a></div>
+</div>
+</article></div>
+            </main><footer class="footer">
+        <div class="footer-container"><div class="footer-line">Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener noreffer" title="Hugo 0.121.2">Hugo</a> | Theme - <a href="https://github.com/dillonzq/LoveIt" target="_blank" rel="noopener noreffer" title="LoveIt 0.2.11"><i class="far fa-kiss-wink-heart fa-fw" aria-hidden="true"></i> LoveIt</a>
+                </div><div class="footer-line" itemscope itemtype="http://schema.org/CreativeWork"><i class="far fa-copyright fa-fw" aria-hidden="true"></i><span itemprop="copyrightYear">2022 - 2024</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="https://www.masimaro.xyz" target="_blank">Masimaro</a></span></div>
+        </div>
+    </footer></div>
+
+        <div id="fixed-buttons"><a href="#" id="back-to-top" class="fixed-button" title="Back to Top">
+                <i class="fas fa-arrow-up fa-fw" aria-hidden="true"></i>
+            </a><a href="#" id="view-comments" class="fixed-button" title="View Comments">
+                <i class="fas fa-comment fa-fw" aria-hidden="true"></i>
+            </a>
+        </div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.css"><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/autocomplete.js@0.38.1/dist/autocomplete.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lunr@2.3.9/lunr.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lazysizes@5.3.2/lazysizes.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/clipboard@2.0.11/dist/clipboard.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/sharer.js@0.5.1/sharer.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/auto-render.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/copy-tex.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/mhchem.min.js"></script><script type="text/javascript">window.config={"code":{"copyTitle":"Copy to clipboard","maxShownLines":50},"comment":{},"math":{"delimiters":[{"display":true,"left":"$$","right":"$$"},{"display":true,"left":"\\[","right":"\\]"},{"display":true,"left":"\\begin{equation}","right":"\\end{equation}"},{"display":true,"left":"\\begin{equation*}","right":"\\end{equation*}"},{"display":true,"left":"\\begin{align}","right":"\\end{align}"},{"display":true,"left":"\\begin{align*}","right":"\\end{align*}"},{"display":true,"left":"\\begin{alignat}","right":"\\end{alignat}"},{"display":true,"left":"\\begin{alignat*}","right":"\\end{alignat*}"},{"display":true,"left":"\\begin{gather}","right":"\\end{gather}"},{"display":true,"left":"\\begin{CD}","right":"\\end{CD}"},{"display":false,"left":"$","right":"$"},{"display":false,"left":"\\(","right":"\\)"}],"strict":false},"search":{"highlightTag":"em","maxResultLength":10,"noResultsFound":"No results found","snippetLength":50}};</script><script type="text/javascript" src="/js/theme.min.js"></script></body>
+</html>

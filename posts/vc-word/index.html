@@ -1,0 +1,773 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="robots" content="noodp" />
+        <title>VC&#43;&#43;&#43;  操作word - Masimaro&#39;s blog</title><meta name="Description" content="这是我用于记录日常和学习的小站"><meta property="og:title" content="VC&#43;&#43;&#43;  操作word" />
+<meta property="og:description" content="最近完成了一个使用VC&#43;&#43; 操作word生成扫描报告的功能，在这里将过程记录下来，开发环境为visual studio 2008 导入接口 首先在创建的MFC项目中引" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://HaiLateBoy.github.io/posts/vc-word/" /><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2019-04-14T11:42:10+00:00" />
+<meta property="article:modified_time" content="2019-04-14T11:42:10+00:00" /><meta property="og:site_name" content="Masimaro&#39;s blog" />
+
+<meta name="twitter:card" content="summary"/><meta name="twitter:title" content="VC&#43;&#43;&#43;  操作word"/>
+<meta name="twitter:description" content="最近完成了一个使用VC&#43;&#43; 操作word生成扫描报告的功能，在这里将过程记录下来，开发环境为visual studio 2008 导入接口 首先在创建的MFC项目中引"/>
+<meta name="application-name" content="My cool site">
+<meta name="apple-mobile-web-app-title" content="My cool site"><meta name="theme-color" content="#ffffff"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="manifest" href="/site.webmanifest"><link rel="canonical" href="http://HaiLateBoy.github.io/posts/vc-word/" /><link rel="prev" href="http://HaiLateBoy.github.io/posts/quick-sort/" /><link rel="next" href="http://HaiLateBoy.github.io/posts/java-base1/" /><link rel="stylesheet" href="/css/style.min.css"><link rel="preload" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css"></noscript><link rel="preload" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css"></noscript><script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "BlogPosting",
+        "headline": "VC+++  操作word",
+        "inLanguage": "zh-CN",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "http:\/\/HaiLateBoy.github.io\/posts\/vc-word\/"
+        },"genre": "posts","keywords": "VC, word, 组件","wordcount":  5509 ,
+        "url": "http:\/\/HaiLateBoy.github.io\/posts\/vc-word\/","datePublished": "2019-04-14T11:42:10+00:00","dateModified": "2019-04-14T11:42:10+00:00","publisher": {
+            "@type": "Organization",
+            "name": ""},"author": {
+                "@type": "Person",
+                "name": "Masimaro"
+            },"description": ""
+    }
+    </script></head>
+    <body data-header-desktop="fixed" data-header-mobile="auto"><script type="text/javascript">(window.localStorage && localStorage.getItem('theme') ? localStorage.getItem('theme') === 'dark' : ('auto' === 'auto' ? window.matchMedia('(prefers-color-scheme: dark)').matches : 'auto' === 'dark')) && document.body.setAttribute('theme', 'dark');</script>
+
+        <div id="mask"></div><div class="wrapper"><header class="desktop" id="header-desktop">
+    <div class="header-wrapper">
+        <div class="header-title">
+            <a href="/" title="Masimaro&#39;s blog">My cool site</a>
+        </div>
+        <div class="menu">
+            <div class="menu-inner"><a class="menu-item" href="/posts/" title="文章列表"> 文章 </a><a class="menu-item" href="/tags/" title="标签"> 标签 </a><a class="menu-item" href="/categories/" title="分类"> 分类 </a><a class="menu-item" href="/about" title="关于本站"> 关于 </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-desktop">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-desktop" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-desktop" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-desktop">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </span><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                    <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+                </a></div>
+        </div>
+    </div>
+</header><header class="mobile" id="header-mobile">
+    <div class="header-container">
+        <div class="header-wrapper">
+            <div class="header-title">
+                <a href="/" title="Masimaro&#39;s blog">My cool site</a>
+            </div>
+            <div class="menu-toggle" id="menu-toggle-mobile">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+        <div class="menu" id="menu-mobile"><div class="search-wrapper">
+                    <div class="search mobile" id="search-mobile">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-mobile">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-mobile" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-mobile" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-mobile">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </div>
+                    <a href="javascript:void(0);" class="search-cancel" id="search-cancel-mobile">
+                        Cancel
+                    </a>
+                </div><a class="menu-item" href="/posts/" title="文章列表">文章</a><a class="menu-item" href="/tags/" title="标签">标签</a><a class="menu-item" href="/categories/" title="分类">分类</a><a class="menu-item" href="/about" title="关于本站">关于</a><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+            </a></div>
+    </div>
+</header><div class="search-dropdown desktop">
+        <div id="search-dropdown-desktop"></div>
+    </div>
+    <div class="search-dropdown mobile">
+        <div id="search-dropdown-mobile"></div>
+    </div><main class="main">
+                <div class="container"><div class="toc" id="toc-auto">
+            <h2 class="toc-title">Contents</h2>
+            <div class="toc-content" id="toc-content-auto"></div>
+        </div><article class="page single"><h1 class="single-title animate__animated animate__flipInX">VC+++  操作word</h1><div class="post-meta">
+            <div class="post-meta-line"><span class="post-author"><a href="https://www.masimaro.xyz" title="Author" target="_blank" rel="noopener noreffer author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Masimaro</a></span>&nbsp;<span class="post-category">included in <a href="/categories/windows-%E9%AB%98%E7%BA%A7%E7%BC%96%E7%A8%8B/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>Windows 高级编程</a></span></div>
+            <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw" aria-hidden="true"></i>&nbsp;<time datetime="2019-04-14">2019-04-14</time>&nbsp;<i class="fas fa-pencil-alt fa-fw" aria-hidden="true"></i>&nbsp;5509 words&nbsp;
+                <i class="far fa-clock fa-fw" aria-hidden="true"></i>&nbsp;11 minutes&nbsp;</div>
+        </div><div class="details toc" id="toc-static"  data-kept="true">
+                <div class="details-summary toc-title">
+                    <span>Contents</span>
+                    <span><i class="details-icon fas fa-angle-right" aria-hidden="true"></i></span>
+                </div>
+                <div class="details-content toc-content" id="toc-content-static"><nav id="TableOfContents">
+  <ul>
+    <li><a href="#导入接口">导入接口</a></li>
+    <li><a href="#常见接口介绍">常见接口介绍</a></li>
+    <li><a href="#相关操作">相关操作</a></li>
+    <li><a href="#特殊操作">特殊操作</a>
+      <ul>
+        <li><a href="#书签的使用">书签的使用</a></li>
+        <li><a href="#表格的使用">表格的使用</a></li>
+        <li><a href="#移动光标跳出表格">移动光标跳出表格</a></li>
+        <li><a href="#样式的使用">样式的使用</a></li>
+      </ul>
+    </li>
+    <li><a href="#插入图表">插入图表</a></li>
+  </ul>
+</nav></div>
+            </div><div class="content" id="content"><p>最近完成了一个使用VC++ 操作word生成扫描报告的功能，在这里将过程记录下来，开发环境为visual studio 2008</p>
+<!-- raw HTML omitted -->
+<h2 id="导入接口">导入接口</h2>
+<p>首先在创建的MFC项目中引入word相关组件
+右键点击 项目 &ndash;&gt; 添加 &ndash;&gt; 新类,在弹出的对话框中选择Typelib中的MFC类。
+<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="/VC-Word/1.jpg"
+        data-srcset="/VC-Word/1.jpg, /VC-Word/1.jpg 1.5x, /VC-Word/1.jpg 2x"
+        data-sizes="auto"
+        alt="/VC-Word/1.jpg"
+        title="1" />
+然后在弹出的对话框中选择文件，从文件中导入MSWORD.OLB组件。
+<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="/VC-Word/2.jpg"
+        data-srcset="/VC-Word/2.jpg, /VC-Word/2.jpg 1.5x, /VC-Word/2.jpg 2x"
+        data-sizes="auto"
+        alt="/VC-Word/2.jpg"
+        title="2" /></p>
+<p>这个文件的路径一般在C:\Program Files (x86)\Microsoft Office\Office14 中，注意：最后一层可能不一定是Office14，这个看机器中安装的office 版本。
+选择之后会要求我们决定导入那些接口，为了方便我们导入所有接口。
+<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="/VC-Word/3.jpg"
+        data-srcset="/VC-Word/3.jpg, /VC-Word/3.jpg 1.5x, /VC-Word/3.jpg 2x"
+        data-sizes="auto"
+        alt="/VC-Word/3.jpg"
+        title="3" /></p>
+<p>导入之后可以看到项目中省成本了很多代码文件，这些就是系统生成的操作Word的相关类。</p>
+<p>这里编译可能会报错，error C2786: “BOOL (HDC,int,int,int,int)”: __uuidof 的操作数无效
+解决方法：
+修改对应头文件</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="cp">#import &#34;C:\\Program Files\\Microsoft Office\\Office14\\MSWORD.OLB&#34; no_namespace
+</span></span></span></code></pre></div><p>为：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="cp">#import &#34;C:\\Program Files\\Microsoft Office\\Office14\\MSWORD.OLB&#34; no_namespace raw_interfaces_only \
+</span></span></span><span class="line"><span class="cl"><span class="cp">	rename(&#34;FindText&#34;,&#34;_FindText&#34;) \
+</span></span></span><span class="line"><span class="cl"><span class="cp">	rename(&#34;Rectangle&#34;,&#34;_Rectangle&#34;) \
+</span></span></span><span class="line"><span class="cl"><span class="cp">	rename(&#34;ExitWindows&#34;,&#34;_ExitWindows&#34;)
+</span></span></span></code></pre></div><p>再次编译，错误消失</p>
+<h2 id="常见接口介绍">常见接口介绍</h2>
+<p>要了解一些常见的类，我们首先需要明白这些接口的层次结构：</p>
+<pre tabindex="0"><code>Application(WORD 为例，只列出一部分）
+　　Documents（所有的文档）
+        Document（一个文档）
+            ......
+　　Templates（所有模板）
+        Template（一个模板）
+            ......
+　　Windows（所有窗口）
+        Window
+        Selection
+        View
+　　Selection（编辑对象）
+        Font
+        Style
+        Range
+</code></pre><p>这些组件其实是采用远程调用的方式调用word进程来完成相关操作。</p>
+<ul>
+<li>Application：相当于一个word进程，每次操作之前都需要一个application对象，这个对象用于创建一个word进程。</li>
+<li>Documents：相当于word中打开的所有文档，如果用过word编辑多个文件，那么这个概念应该很好理解</li>
+<li>Templates：是一个模板对象，至于word模板，不了解的请自行百度</li>
+<li>Windows：word进程中的窗口</li>
+<li>Selection：编辑对象。也就是我们要写入word文档中的内容。一般包括文本、样式、图形等等对象。</li>
+</ul>
+<p>回忆一下我们手动编写word的情景，其实使用这些接口是很简单的。我们在使用word编辑的时候首先会打开word程序，这里对应在代码里面就是创建一个Application对象。然后我们会用word程序打开一个文档或者新建一个文档。这里对应着创建Documents对象并从中引用一个Document对象表示一个具体的文档。当然这个Document对象可以是新建的也可以是打开一个现有的。接着就是进行相关操作了，比如插入图片、插入表格、编写段落文本等等了。这些都对应着创建类似于Font、Style、TypeText对象，然后将这些对象进行添加的操作了。
+说了这么多。这些接口这么多，我怎么知道哪个接口对应哪个对象呢，而且这些参数怎么传递呢？其实这个问题很好解决。我们可以手工进行相关操作，然后用宏记录下来，最后我们再将宏中的VB代码转化为VC代码即可。</p>
+<h2 id="相关操作">相关操作</h2>
+<p>为了方便在项目中使用，这里创建一个类用于封装Word的相关操作</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">CCreateWordReport</span>  
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl"><span class="k">private</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">    <span class="n">CApplication</span> <span class="n">m_wdApp</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">CDocuments</span> <span class="n">m_wdDocs</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">CDocument0</span> <span class="n">m_wdDoc</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">CSelection</span> <span class="n">m_wdSel</span><span class="p">;</span> 
+</span></span><span class="line"><span class="cl">    <span class="n">CRange</span>     <span class="n">m_wdRange</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">CnlineShapes</span> <span class="n">m_wdInlineShapes</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">CnlineShape</span> <span class="n">m_wdInlineShape</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="k">public</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">    <span class="n">CCreateWordReport</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">    <span class="k">virtual</span> <span class="o">~</span><span class="n">CCreateWordReport</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">public</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">//操作
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1">//**********************创建新文档*******************************************
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="n">BOOL</span> <span class="n">CreateApp</span><span class="p">();</span>                    <span class="c1">//创建一个新的WORD应用程序
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="n">BOOL</span> <span class="nf">CreateDocuments</span><span class="p">();</span>                <span class="c1">//创建一个新的Word文档集合
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="n">BOOL</span> <span class="nf">CreateDocument</span><span class="p">();</span>                <span class="c1">//创建一个新的Word文档
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="n">BOOL</span> <span class="nf">Create</span><span class="p">();</span>                        <span class="c1">//创建新的WORD应用程序并创建一个新的文档
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="kt">void</span> <span class="nf">ShowApp</span><span class="p">();</span>                        <span class="c1">//显示WORD文档
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="kt">void</span> <span class="nf">HideApp</span><span class="p">();</span>                        <span class="c1">//隐藏word文档
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>
+</span></span><span class="line"><span class="cl">    <span class="c1">//**********************打开文档*********************************************
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="n">BOOL</span> <span class="nf">OpenDocument</span><span class="p">(</span><span class="n">CString</span> <span class="n">fileName</span><span class="p">);</span><span class="c1">//打开已经存在的文档。
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="n">BOOL</span> <span class="nf">Open</span><span class="p">(</span><span class="n">CString</span> <span class="n">fileName</span><span class="p">);</span>        <span class="c1">//创建新的WORD应用程序并打开一个已经存在的文档。
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="n">BOOL</span> <span class="nf">SetActiveDocument</span><span class="p">(</span><span class="kt">short</span> <span class="n">i</span><span class="p">);</span>    <span class="c1">//设置当前激活的文档。
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>
+</span></span><span class="line"><span class="cl">    <span class="c1">//**********************保存文档*********************************************
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="n">BOOL</span> <span class="nf">SaveDocument</span><span class="p">();</span>                <span class="c1">//文档是以打开形式，保存。
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="n">BOOL</span> <span class="nf">SaveDocumentAs</span><span class="p">(</span><span class="n">CString</span> <span class="n">fileName</span><span class="p">);</span><span class="c1">//文档以创建形式，保存。
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="n">BOOL</span> <span class="nf">CloseDocument</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">void</span> <span class="nf">CloseApp</span><span class="p">();</span> 
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="c1">//**********************文本书写操作*****************************************
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="kt">void</span> <span class="nf">WriteText</span><span class="p">(</span><span class="n">CString</span> <span class="n">szText</span><span class="p">);</span>        <span class="c1">//当前光标处写文本
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="kt">void</span> <span class="nf">WriteNewLineText</span><span class="p">(</span><span class="n">CString</span> <span class="n">szText</span><span class="p">,</span> <span class="kt">int</span> <span class="n">nLineCount</span> <span class="o">=</span> <span class="mi">1</span><span class="p">);</span> <span class="c1">//换N行写字
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="kt">void</span> <span class="nf">WriteEndLine</span><span class="p">(</span><span class="n">CString</span> <span class="n">szText</span><span class="p">);</span>    <span class="c1">//文档结尾处写文本
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="kt">void</span> <span class="nf">WholeStory</span><span class="p">();</span>                    <span class="c1">//全选文档内容
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="kt">void</span> <span class="nf">Copy</span><span class="p">();</span>                        <span class="c1">//复制文本内容到剪贴板
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="kt">void</span> <span class="nf">InsertFile</span><span class="p">(</span><span class="n">CString</span> <span class="n">fileName</span><span class="p">);</span>    <span class="c1">//将本地的文件全部内容写入到当前文档的光标处。
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="kt">void</span> <span class="nf">InsertTable</span><span class="p">(</span><span class="kt">int</span> <span class="n">nRow</span><span class="p">,</span> <span class="kt">int</span> <span class="n">nColumn</span><span class="p">,</span> <span class="n">CTable0</span><span class="o">&amp;</span> <span class="n">wdTable</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">//**********************图片插入操作*****************************************
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="kt">void</span> <span class="nf">InsertShapes</span><span class="p">(</span><span class="n">CString</span> <span class="n">fileName</span><span class="p">);</span><span class="c1">//在当前光标的位置插入图片
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    
+</span></span><span class="line"><span class="cl">    <span class="c1">//**********************超链接插入操作*****************************************
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="kt">void</span> <span class="nf">InsertHyperlink</span><span class="p">(</span><span class="n">CString</span> <span class="n">fileLink</span><span class="p">);</span><span class="c1">//超级链接地址，可以是相对路径。
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>
+</span></span><span class="line"><span class="cl">	<span class="c1">//***********************表格操作表格操作**********************************
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="n">BOOL</span> <span class="nf">InsertTableToMarkBook</span><span class="p">(</span><span class="k">const</span> <span class="n">CString</span> <span class="n">csMarkName</span><span class="p">,</span> <span class="kt">int</span> <span class="n">nRow</span><span class="p">,</span> <span class="kt">int</span> <span class="n">nColumn</span><span class="p">,</span> <span class="n">CTable0</span><span class="o">&amp;</span> <span class="n">wdTable</span><span class="p">);</span> <span class="c1">//表格行数与列数
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="n">BOOL</span> <span class="nf">WriteDataToTable</span><span class="p">(</span><span class="n">CTable0</span><span class="o">&amp;</span> <span class="n">wdTable</span><span class="p">,</span> <span class="kt">int</span> <span class="n">nRow</span><span class="p">,</span> <span class="kt">int</span> <span class="n">nColumn</span><span class="p">,</span> <span class="k">const</span> <span class="n">CString</span> <span class="o">&amp;</span><span class="n">csData</span><span class="p">);</span> <span class="c1">//往表格中写入输入
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">};</span>
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="n">BOOL</span> <span class="n">CCreateWordReport</span><span class="o">::</span><span class="n">CreateApp</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="p">(</span><span class="n">FALSE</span> <span class="o">==</span> <span class="n">m_wdApp</span><span class="p">.</span><span class="n">CreateDispatch</span><span class="p">(</span><span class="s">&#34;word.application&#34;</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">AfxMessageBox</span><span class="p">(</span><span class="s">&#34;Application创建失败，请确保安装了word 2000或以上版本!&#34;</span><span class="p">,</span> <span class="n">MB_OK</span><span class="o">|</span><span class="n">MB_ICONWARNING</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="n">FALSE</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="n">TRUE</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">BOOL</span> <span class="n">CCreateWordReport</span><span class="o">::</span><span class="n">CreateDocuments</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="p">(</span><span class="n">FALSE</span> <span class="o">==</span> <span class="n">CreateApp</span><span class="p">())</span> 
+</span></span><span class="line"><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="n">FALSE</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="n">m_wdDocs</span> <span class="o">=</span> <span class="n">m_wdApp</span><span class="p">.</span><span class="n">get_Documents</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">m_wdDocs</span><span class="p">.</span><span class="n">m_lpDispatch</span><span class="p">)</span> 
+</span></span><span class="line"><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">AfxMessageBox</span><span class="p">(</span><span class="s">&#34;Documents创建失败!&#34;</span><span class="p">,</span> <span class="n">MB_OK</span><span class="o">|</span><span class="n">MB_ICONWARNING</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="n">FALSE</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="n">TRUE</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">BOOL</span> <span class="n">CCreateWordReport</span><span class="o">::</span><span class="n">CreateDocument</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">m_wdDocs</span><span class="p">.</span><span class="n">m_lpDispatch</span><span class="p">)</span> 
+</span></span><span class="line"><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">AfxMessageBox</span><span class="p">(</span><span class="s">&#34;Documents为空!&#34;</span><span class="p">,</span> <span class="n">MB_OK</span><span class="o">|</span><span class="n">MB_ICONWARNING</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="n">FALSE</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="n">COleVariant</span> <span class="nf">varTrue</span><span class="p">(</span><span class="kt">short</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span><span class="n">VT_BOOL</span><span class="p">),</span><span class="n">vOptional</span><span class="p">((</span><span class="kt">long</span><span class="p">)</span><span class="n">DISP_E_PARAMNOTFOUND</span><span class="p">,</span> <span class="n">VT_ERROR</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">CComVariant</span> <span class="nf">Template</span><span class="p">(</span><span class="n">_T</span><span class="p">(</span><span class="s">&#34;&#34;</span><span class="p">));</span>    <span class="c1">//没有使用WORD的文档模板
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="n">CComVariant</span> <span class="nf">NewTemplate</span><span class="p">(</span><span class="nb">false</span><span class="p">),</span><span class="n">DocumentType</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span><span class="n">Visible</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="n">m_wdDocs</span><span class="p">.</span><span class="n">Add</span><span class="p">(</span><span class="o">&amp;</span><span class="n">Template</span><span class="p">,</span><span class="o">&amp;</span><span class="n">NewTemplate</span><span class="p">,</span><span class="o">&amp;</span><span class="n">DocumentType</span><span class="p">,</span><span class="o">&amp;</span><span class="n">Visible</span><span class="p">);</span>    
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="c1">//得到document变量
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="n">m_wdDoc</span> <span class="o">=</span> <span class="n">m_wdApp</span><span class="p">.</span><span class="n">get_ActiveDocument</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">m_wdDoc</span><span class="p">.</span><span class="n">m_lpDispatch</span><span class="p">)</span> 
+</span></span><span class="line"><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">AfxMessageBox</span><span class="p">(</span><span class="s">&#34;Document获取失败!&#34;</span><span class="p">,</span> <span class="n">MB_OK</span><span class="o">|</span><span class="n">MB_ICONWARNING</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="n">FALSE</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">//得到selection变量
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="n">m_wdSel</span> <span class="o">=</span> <span class="n">m_wdApp</span><span class="p">.</span><span class="n">get_Selection</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">m_wdSel</span><span class="p">.</span><span class="n">m_lpDispatch</span><span class="p">)</span> 
+</span></span><span class="line"><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">AfxMessageBox</span><span class="p">(</span><span class="s">&#34;Select获取失败!&#34;</span><span class="p">,</span> <span class="n">MB_OK</span><span class="o">|</span><span class="n">MB_ICONWARNING</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="n">FALSE</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">//得到Range变量
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="n">m_wdRange</span> <span class="o">=</span> <span class="n">m_wdDoc</span><span class="p">.</span><span class="n">Range</span><span class="p">(</span><span class="n">vOptional</span><span class="p">,</span><span class="n">vOptional</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="n">m_wdRange</span><span class="p">.</span><span class="n">m_lpDispatch</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">AfxMessageBox</span><span class="p">(</span><span class="s">&#34;Range获取失败!&#34;</span><span class="p">,</span> <span class="n">MB_OK</span><span class="o">|</span><span class="n">MB_ICONWARNING</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="n">FALSE</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="n">TRUE</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">BOOL</span> <span class="n">CCreateWordReport</span><span class="o">::</span><span class="n">Create</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="p">(</span><span class="n">FALSE</span> <span class="o">==</span> <span class="n">CreateDocuments</span><span class="p">())</span> 
+</span></span><span class="line"><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="n">FALSE</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="nf">CreateDocument</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">BOOL</span> <span class="n">CCreateWordReport</span><span class="o">::</span><span class="n">OpenDocument</span><span class="p">(</span><span class="n">CString</span> <span class="n">fileName</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">m_wdDocs</span><span class="p">.</span><span class="n">m_lpDispatch</span><span class="p">)</span> 
+</span></span><span class="line"><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">AfxMessageBox</span><span class="p">(</span><span class="s">&#34;Documents为空!&#34;</span><span class="p">,</span> <span class="n">MB_OK</span><span class="o">|</span><span class="n">MB_ICONWARNING</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="n">FALSE</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="n">COleVariant</span> <span class="nf">vTrue</span><span class="p">((</span><span class="kt">short</span><span class="p">)</span><span class="n">TRUE</span><span class="p">),</span>    
+</span></span><span class="line"><span class="cl">                <span class="n">vFalse</span><span class="p">((</span><span class="kt">short</span><span class="p">)</span><span class="n">FALSE</span><span class="p">),</span>
+</span></span><span class="line"><span class="cl">                <span class="n">vOptional</span><span class="p">((</span><span class="kt">long</span><span class="p">)</span><span class="n">DISP_E_PARAMNOTFOUND</span><span class="p">,</span> <span class="n">VT_ERROR</span><span class="p">),</span>
+</span></span><span class="line"><span class="cl">                <span class="n">vZ</span><span class="p">((</span><span class="kt">short</span><span class="p">)</span><span class="mi">0</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">COleVariant</span>     <span class="nf">vFileName</span><span class="p">(</span><span class="n">_T</span><span class="p">(</span><span class="n">fileName</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="c1">//得到document变量
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="n">m_wdDoc</span> <span class="o">=</span> <span class="n">m_wdDocs</span><span class="p">.</span><span class="n">Open</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">                                <span class="n">vFileName</span><span class="p">,</span>        <span class="c1">// FileName
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>                                <span class="n">vTrue</span><span class="p">,</span>            <span class="c1">// Confirm Conversion.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>                                <span class="n">vFalse</span><span class="p">,</span>            <span class="c1">// ReadOnly.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>                                <span class="n">vFalse</span><span class="p">,</span>            <span class="c1">// AddToRecentFiles.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>                                <span class="n">vOptional</span><span class="p">,</span>        <span class="c1">// PasswordDocument.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>                                <span class="n">vOptional</span><span class="p">,</span>        <span class="c1">// PasswordTemplate.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>                                <span class="n">vOptional</span><span class="p">,</span>        <span class="c1">// Revert.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>                                <span class="n">vOptional</span><span class="p">,</span>        <span class="c1">// WritePasswordDocument.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>                                <span class="n">vOptional</span><span class="p">,</span>        <span class="c1">// WritePasswordTemplate.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>                                <span class="n">vOptional</span><span class="p">,</span>        <span class="c1">// Format. // Last argument for Word 97
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>                                <span class="n">vOptional</span><span class="p">,</span>        <span class="c1">// Encoding // New for Word 2000/2002
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>                                <span class="n">vOptional</span><span class="p">,</span>        <span class="c1">// Visible
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>                                <span class="cm">/*如下4个是word2003需要的参数。本版本是word2000。*/</span>
+</span></span><span class="line"><span class="cl">                                <span class="n">vOptional</span><span class="p">,</span>    <span class="c1">// OpenAndRepair
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>                                <span class="n">vZ</span><span class="p">,</span>            <span class="c1">// DocumentDirection wdDocumentDirection LeftToRight
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>                                <span class="n">vOptional</span><span class="p">,</span>    <span class="c1">// NoEncodingDialog
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>                                <span class="n">vOptional</span>
+</span></span><span class="line"><span class="cl">    <span class="p">);</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">m_wdDoc</span><span class="p">.</span><span class="n">m_lpDispatch</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">AfxMessageBox</span><span class="p">(</span><span class="s">&#34;Document获取失败!&#34;</span><span class="p">,</span> <span class="n">MB_OK</span><span class="o">|</span><span class="n">MB_ICONWARNING</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="n">FALSE</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">//得到selection变量
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="n">m_wdSel</span> <span class="o">=</span> <span class="n">m_wdApp</span><span class="p">.</span><span class="n">get_Selection</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">m_wdSel</span><span class="p">.</span><span class="n">m_lpDispatch</span><span class="p">)</span> 
+</span></span><span class="line"><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">AfxMessageBox</span><span class="p">(</span><span class="s">&#34;Select获取失败!&#34;</span><span class="p">,</span> <span class="n">MB_OK</span><span class="o">|</span><span class="n">MB_ICONWARNING</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="n">FALSE</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">//得到全部DOC的Range变量
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="n">m_wdRange</span> <span class="o">=</span> <span class="n">m_wdDoc</span><span class="p">.</span><span class="n">Range</span><span class="p">(</span><span class="n">vOptional</span><span class="p">,</span><span class="n">vOptional</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="n">m_wdRange</span><span class="p">.</span><span class="n">m_lpDispatch</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">AfxMessageBox</span><span class="p">(</span><span class="s">&#34;Range获取失败!&#34;</span><span class="p">,</span> <span class="n">MB_OK</span><span class="o">|</span><span class="n">MB_ICONWARNING</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="n">FALSE</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="n">TRUE</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">BOOL</span> <span class="n">CCreateWordReport</span><span class="o">::</span><span class="n">Open</span><span class="p">(</span><span class="n">CString</span> <span class="n">fileName</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="p">(</span><span class="n">FALSE</span> <span class="o">==</span> <span class="n">CreateDocuments</span><span class="p">())</span> 
+</span></span><span class="line"><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="n">FALSE</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="nf">OpenDocument</span><span class="p">(</span><span class="n">fileName</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">BOOL</span> <span class="n">CCreateWordReport</span><span class="o">::</span><span class="n">SetActiveDocument</span><span class="p">(</span><span class="kt">short</span> <span class="n">i</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">COleVariant</span>     <span class="nf">vIndex</span><span class="p">(</span><span class="n">_T</span><span class="p">(</span><span class="n">i</span><span class="p">)),</span><span class="n">vOptional</span><span class="p">((</span><span class="kt">long</span><span class="p">)</span><span class="n">DISP_E_PARAMNOTFOUND</span><span class="p">,</span> <span class="n">VT_ERROR</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="n">m_wdDoc</span><span class="p">.</span><span class="n">AttachDispatch</span><span class="p">(</span><span class="n">m_wdDocs</span><span class="p">.</span><span class="n">Item</span><span class="p">(</span><span class="n">vIndex</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">    <span class="n">m_wdDoc</span><span class="p">.</span><span class="n">Activate</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">m_wdDoc</span><span class="p">.</span><span class="n">m_lpDispatch</span><span class="p">)</span> 
+</span></span><span class="line"><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">AfxMessageBox</span><span class="p">(</span><span class="s">&#34;Document获取失败!&#34;</span><span class="p">,</span> <span class="n">MB_OK</span><span class="o">|</span><span class="n">MB_ICONWARNING</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="n">FALSE</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">//得到selection变量
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="n">m_wdSel</span> <span class="o">=</span> <span class="n">m_wdApp</span><span class="p">.</span><span class="n">get_Selection</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">m_wdSel</span><span class="p">.</span><span class="n">m_lpDispatch</span><span class="p">)</span> 
+</span></span><span class="line"><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">AfxMessageBox</span><span class="p">(</span><span class="s">&#34;Select获取失败!&#34;</span><span class="p">,</span> <span class="n">MB_OK</span><span class="o">|</span><span class="n">MB_ICONWARNING</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="n">FALSE</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">//得到全部DOC的Range变量
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="n">m_wdRange</span> <span class="o">=</span> <span class="n">m_wdDoc</span><span class="p">.</span><span class="n">Range</span><span class="p">(</span><span class="n">vOptional</span><span class="p">,</span><span class="n">vOptional</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="n">m_wdRange</span><span class="p">.</span><span class="n">m_lpDispatch</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">AfxMessageBox</span><span class="p">(</span><span class="s">&#34;Range获取失败!&#34;</span><span class="p">,</span> <span class="n">MB_OK</span><span class="o">|</span><span class="n">MB_ICONWARNING</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="n">FALSE</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="c1">//	HideApp();
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="k">return</span> <span class="n">TRUE</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">BOOL</span> <span class="n">CCreateWordReport</span><span class="o">::</span><span class="n">SaveDocument</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">m_wdDoc</span><span class="p">.</span><span class="n">m_lpDispatch</span><span class="p">)</span> 
+</span></span><span class="line"><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">AfxMessageBox</span><span class="p">(</span><span class="s">&#34;Document获取失败!&#34;</span><span class="p">,</span> <span class="n">MB_OK</span><span class="o">|</span><span class="n">MB_ICONWARNING</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="n">FALSE</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="n">m_wdDoc</span><span class="p">.</span><span class="n">Save</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="n">TRUE</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">BOOL</span> <span class="n">CCreateWordReport</span><span class="o">::</span><span class="n">SaveDocumentAs</span><span class="p">(</span><span class="n">CString</span> <span class="n">fileName</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">m_wdDoc</span><span class="p">.</span><span class="n">m_lpDispatch</span><span class="p">)</span> 
+</span></span><span class="line"><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">AfxMessageBox</span><span class="p">(</span><span class="s">&#34;Document获取失败!&#34;</span><span class="p">,</span> <span class="n">MB_OK</span><span class="o">|</span><span class="n">MB_ICONWARNING</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="n">FALSE</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="n">COleVariant</span> <span class="nf">covOptional</span><span class="p">((</span><span class="kt">long</span><span class="p">)</span><span class="n">DISP_E_PARAMNOTFOUND</span><span class="p">,</span><span class="n">VT_ERROR</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="n">COleVariant</span> <span class="nf">varZero</span><span class="p">((</span><span class="kt">short</span><span class="p">)</span><span class="mi">0</span><span class="p">);</span> 
+</span></span><span class="line"><span class="cl">	<span class="n">COleVariant</span> <span class="nf">varTrue</span><span class="p">(</span><span class="kt">short</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span><span class="n">VT_BOOL</span><span class="p">);</span> 
+</span></span><span class="line"><span class="cl">	<span class="n">COleVariant</span> <span class="nf">varFalse</span><span class="p">(</span><span class="kt">short</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span><span class="n">VT_BOOL</span><span class="p">);</span> 
+</span></span><span class="line"><span class="cl">    <span class="n">COleVariant</span> <span class="nf">vFileName</span><span class="p">(</span><span class="n">_T</span><span class="p">(</span><span class="n">fileName</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="n">m_wdDoc</span><span class="p">.</span><span class="n">SaveAs</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">		<span class="n">vFileName</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">		<span class="n">covOptional</span><span class="p">,</span> 
+</span></span><span class="line"><span class="cl">		<span class="n">covOptional</span><span class="p">,</span> 
+</span></span><span class="line"><span class="cl">		<span class="n">covOptional</span><span class="p">,</span> 
+</span></span><span class="line"><span class="cl">		<span class="n">covOptional</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">		<span class="n">covOptional</span><span class="p">,</span> 
+</span></span><span class="line"><span class="cl">		<span class="n">covOptional</span><span class="p">,</span> 
+</span></span><span class="line"><span class="cl">		<span class="n">covOptional</span><span class="p">,</span> 
+</span></span><span class="line"><span class="cl">		<span class="n">covOptional</span><span class="p">,</span> 
+</span></span><span class="line"><span class="cl">		<span class="n">covOptional</span><span class="p">,</span> 
+</span></span><span class="line"><span class="cl">		<span class="n">covOptional</span><span class="p">,</span> 
+</span></span><span class="line"><span class="cl">		<span class="n">covOptional</span><span class="p">,</span> 
+</span></span><span class="line"><span class="cl">		<span class="n">covOptional</span><span class="p">,</span> 
+</span></span><span class="line"><span class="cl">		<span class="n">covOptional</span><span class="p">,</span> 
+</span></span><span class="line"><span class="cl">		<span class="n">covOptional</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">		<span class="n">covOptional</span>
+</span></span><span class="line"><span class="cl">	<span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span>    <span class="n">TRUE</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">BOOL</span> <span class="n">CCreateWordReport</span><span class="o">::</span><span class="n">CloseDocument</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">COleVariant</span> <span class="nf">vTrue</span><span class="p">((</span><span class="kt">short</span><span class="p">)</span><span class="n">TRUE</span><span class="p">),</span>    
+</span></span><span class="line"><span class="cl">                <span class="n">vFalse</span><span class="p">((</span><span class="kt">short</span><span class="p">)</span><span class="n">FALSE</span><span class="p">),</span>
+</span></span><span class="line"><span class="cl">                <span class="n">vOptional</span><span class="p">((</span><span class="kt">long</span><span class="p">)</span><span class="n">DISP_E_PARAMNOTFOUND</span><span class="p">,</span> <span class="n">VT_ERROR</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">m_wdDoc</span><span class="p">.</span><span class="n">Close</span><span class="p">(</span><span class="n">vFalse</span><span class="p">,</span>    <span class="c1">// SaveChanges.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>             <span class="n">vTrue</span><span class="p">,</span>            <span class="c1">// OriginalFormat.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>             <span class="n">vFalse</span>            <span class="c1">// RouteDocument.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>             <span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">m_wdDoc</span><span class="p">.</span><span class="n">AttachDispatch</span><span class="p">(</span><span class="n">m_wdApp</span><span class="p">.</span><span class="n">get_ActiveDocument</span><span class="p">());</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">m_wdDoc</span><span class="p">.</span><span class="n">m_lpDispatch</span><span class="p">)</span> 
+</span></span><span class="line"><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">AfxMessageBox</span><span class="p">(</span><span class="s">&#34;Document获取失败!&#34;</span><span class="p">,</span> <span class="n">MB_OK</span><span class="o">|</span><span class="n">MB_ICONWARNING</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="n">FALSE</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">//得到selection变量
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="n">m_wdSel</span> <span class="o">=</span> <span class="n">m_wdApp</span><span class="p">.</span><span class="n">get_Selection</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">m_wdSel</span><span class="p">.</span><span class="n">m_lpDispatch</span><span class="p">)</span> 
+</span></span><span class="line"><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">AfxMessageBox</span><span class="p">(</span><span class="s">&#34;Select获取失败!&#34;</span><span class="p">,</span> <span class="n">MB_OK</span><span class="o">|</span><span class="n">MB_ICONWARNING</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="n">FALSE</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">//得到全部DOC的Range变量
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="n">m_wdRange</span> <span class="o">=</span> <span class="n">m_wdDoc</span><span class="p">.</span><span class="n">Range</span><span class="p">(</span><span class="n">vOptional</span><span class="p">,</span><span class="n">vOptional</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="n">m_wdRange</span><span class="p">.</span><span class="n">m_lpDispatch</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">AfxMessageBox</span><span class="p">(</span><span class="s">&#34;Range获取失败!&#34;</span><span class="p">,</span> <span class="n">MB_OK</span><span class="o">|</span><span class="n">MB_ICONWARNING</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="n">FALSE</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="n">TRUE</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kt">void</span> <span class="n">CCreateWordReport</span><span class="o">::</span><span class="n">CloseApp</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">COleVariant</span> <span class="nf">vTrue</span><span class="p">((</span><span class="kt">short</span><span class="p">)</span><span class="n">TRUE</span><span class="p">),</span>    
+</span></span><span class="line"><span class="cl">                <span class="n">vFalse</span><span class="p">((</span><span class="kt">short</span><span class="p">)</span><span class="n">FALSE</span><span class="p">),</span>
+</span></span><span class="line"><span class="cl">                <span class="n">vOptional</span><span class="p">((</span><span class="kt">long</span><span class="p">)</span><span class="n">DISP_E_PARAMNOTFOUND</span><span class="p">,</span> <span class="n">VT_ERROR</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">m_wdDoc</span><span class="p">.</span><span class="n">Save</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">    <span class="n">m_wdApp</span><span class="p">.</span><span class="n">Quit</span><span class="p">(</span><span class="n">vFalse</span><span class="p">,</span>    <span class="c1">// SaveChanges.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>             <span class="n">vTrue</span><span class="p">,</span>            <span class="c1">// OriginalFormat.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>             <span class="n">vFalse</span>            <span class="c1">// RouteDocument.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>             <span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">//释放内存申请资源
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="n">m_wdInlineShape</span><span class="p">.</span><span class="n">ReleaseDispatch</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">    <span class="n">m_wdInlineShapes</span><span class="p">.</span><span class="n">ReleaseDispatch</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">//m_wdTb.ReleaseDispatch();
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="n">m_wdRange</span><span class="p">.</span><span class="n">ReleaseDispatch</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">    <span class="n">m_wdSel</span><span class="p">.</span><span class="n">ReleaseDispatch</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">//m_wdFt.ReleaseDispatch();
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="n">m_wdDoc</span><span class="p">.</span><span class="n">ReleaseDispatch</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">    <span class="n">m_wdDocs</span><span class="p">.</span><span class="n">ReleaseDispatch</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">    <span class="n">m_wdApp</span><span class="p">.</span><span class="n">ReleaseDispatch</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kt">void</span> <span class="n">CCreateWordReport</span><span class="o">::</span><span class="n">WriteText</span><span class="p">(</span><span class="n">CString</span> <span class="n">szText</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">m_wdSel</span><span class="p">.</span><span class="n">TypeText</span><span class="p">(</span><span class="n">szText</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kt">void</span> <span class="n">CCreateWordReport</span><span class="o">::</span><span class="n">WriteNewLineText</span><span class="p">(</span><span class="n">CString</span> <span class="n">szText</span><span class="p">,</span> <span class="kt">int</span> <span class="n">nLineCount</span> <span class="cm">/* = 1 */</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">int</span> <span class="n">i</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="p">(</span><span class="n">nLineCount</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">nLineCount</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="k">for</span> <span class="p">(</span><span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">nLineCount</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">m_wdSel</span><span class="p">.</span><span class="n">TypeParagraph</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="n">WriteText</span><span class="p">(</span><span class="n">szText</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kt">void</span> <span class="n">CCreateWordReport</span><span class="o">::</span><span class="n">WriteEndLine</span><span class="p">(</span><span class="n">CString</span> <span class="n">szText</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">m_wdRange</span><span class="p">.</span><span class="n">InsertAfter</span><span class="p">(</span><span class="n">szText</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kt">void</span> <span class="n">CCreateWordReport</span><span class="o">::</span><span class="n">WholeStory</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">m_wdRange</span><span class="p">.</span><span class="n">WholeStory</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kt">void</span> <span class="n">CCreateWordReport</span><span class="o">::</span><span class="n">Copy</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">m_wdRange</span><span class="p">.</span><span class="n">CopyAsPicture</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kt">void</span> <span class="n">CCreateWordReport</span><span class="o">::</span><span class="n">InsertFile</span><span class="p">(</span><span class="n">CString</span> <span class="n">fileName</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">COleVariant</span>     <span class="nf">vFileName</span><span class="p">(</span><span class="n">fileName</span><span class="p">),</span>
+</span></span><span class="line"><span class="cl">                 <span class="n">vTrue</span><span class="p">((</span><span class="kt">short</span><span class="p">)</span><span class="n">TRUE</span><span class="p">),</span>
+</span></span><span class="line"><span class="cl">                 <span class="n">vFalse</span><span class="p">((</span><span class="kt">short</span><span class="p">)</span><span class="n">FALSE</span><span class="p">),</span>
+</span></span><span class="line"><span class="cl">                 <span class="n">vOptional</span><span class="p">((</span><span class="kt">long</span><span class="p">)</span><span class="n">DISP_E_PARAMNOTFOUND</span><span class="p">,</span> <span class="n">VT_ERROR</span><span class="p">),</span>
+</span></span><span class="line"><span class="cl">                 <span class="n">vNull</span><span class="p">(</span><span class="n">_T</span><span class="p">(</span><span class="s">&#34;&#34;</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">    <span class="cm">/*
+</span></span></span><span class="line"><span class="cl"><span class="cm">    void InsertFile(LPCTSTR FileName, VARIANT* Range, VARIANT* ConfirmConversions, VARIANT* Link, VARIANT* Attachment);
+</span></span></span><span class="line"><span class="cl"><span class="cm">    */</span>
+</span></span><span class="line"><span class="cl">    <span class="n">m_wdSel</span><span class="p">.</span><span class="n">InsertFile</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">                    <span class="n">fileName</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                    <span class="n">vNull</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                    <span class="n">vFalse</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                    <span class="n">vFalse</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                    <span class="n">vFalse</span>
+</span></span><span class="line"><span class="cl">                    <span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kt">void</span> <span class="n">CCreateWordReport</span><span class="o">::</span><span class="n">InsertShapes</span><span class="p">(</span><span class="n">CString</span> <span class="n">fileName</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">COleVariant</span> <span class="nf">vTrue</span><span class="p">((</span><span class="kt">short</span><span class="p">)</span><span class="n">TRUE</span><span class="p">),</span>    
+</span></span><span class="line"><span class="cl">                <span class="n">vFalse</span><span class="p">((</span><span class="kt">short</span><span class="p">)</span><span class="n">FALSE</span><span class="p">),</span>
+</span></span><span class="line"><span class="cl">                <span class="n">vOptional</span><span class="p">((</span><span class="kt">long</span><span class="p">)</span><span class="n">DISP_E_PARAMNOTFOUND</span><span class="p">,</span> <span class="n">VT_ERROR</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">m_wdInlineShapes</span><span class="o">=</span><span class="n">m_wdSel</span><span class="p">.</span><span class="n">get_InlineShapes</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">    <span class="n">m_wdInlineShape</span><span class="o">=</span><span class="n">m_wdInlineShapes</span><span class="p">.</span><span class="n">AddPicture</span><span class="p">(</span><span class="n">fileName</span><span class="p">,</span><span class="n">vFalse</span><span class="p">,</span><span class="n">vTrue</span><span class="p">,</span><span class="n">vOptional</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kt">void</span> <span class="n">CCreateWordReport</span><span class="o">::</span><span class="n">InsertHyperlink</span><span class="p">(</span><span class="n">CString</span> <span class="n">fileLink</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">COleVariant</span>     <span class="nf">vAddress</span><span class="p">(</span><span class="n">_T</span><span class="p">(</span><span class="n">fileLink</span><span class="p">)),</span><span class="n">vSubAddress</span><span class="p">(</span><span class="n">_T</span><span class="p">(</span><span class="s">&#34;&#34;</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">    <span class="n">CRange</span> <span class="n">aRange</span> <span class="o">=</span> <span class="n">m_wdSel</span><span class="p">.</span><span class="n">get_Range</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">    <span class="n">CHyperlinks</span> <span class="nf">vHyperlinks</span><span class="p">(</span><span class="n">aRange</span><span class="p">.</span><span class="n">get_Hyperlinks</span><span class="p">());</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="n">vHyperlinks</span><span class="p">.</span><span class="n">Add</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">                    <span class="n">aRange</span><span class="p">,</span>            <span class="c1">//Object，必需。转换为超链接的文本或图形。
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>                    <span class="n">vAddress</span><span class="p">,</span>         <span class="c1">//Variant 类型，可选。指定的链接的地址。此地址可以是电子邮件地址、Internet 地址或文件名。请注意，Microsoft Word 不检查该地址的正确性。
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>                    <span class="n">vSubAddress</span><span class="p">,</span>     <span class="c1">//Variant 类型，可选。目标文件内的位置名，如书签、已命名的区域或幻灯片编号。
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>                    <span class="n">vAddress</span><span class="p">,</span>         <span class="c1">//Variant 类型，可选。当鼠标指针放在指定的超链接上时显示的可用作“屏幕提示”的文本。默认值为 Address。
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>                    <span class="n">vAddress</span><span class="p">,</span>         <span class="c1">//Variant 类型，可选。指定的超链接的显示文本。此参数的值将取代由 Anchor 指定的文本或图形。
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>                    <span class="n">vSubAddress</span>        <span class="c1">//Variant 类型，可选。要在其中打开指定的超链接的框架或窗口的名字。
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>                    <span class="p">);</span> 
+</span></span><span class="line"><span class="cl">	<span class="n">aRange</span><span class="p">.</span><span class="n">ReleaseDispatch</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">    <span class="n">vHyperlinks</span><span class="p">.</span><span class="n">ReleaseDispatch</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p>这样我们就封装好了一些基本的操作，其实这些操作都是我自己根据网上的资料以及VB宏转化而来得到的代码。</p>
+<h2 id="特殊操作">特殊操作</h2>
+<p>在这里主要介绍一些比较骚的操作，这也是这篇文章主要有用的内容，前面基本操作网上都有源代码直接拿来用就OK了，这里的骚操作是我在项目中使用的主要操作，应该有应用价值。先请各位仔细想想，如果我们要根据前面的代码，从0开始完全用代码生成一个完整的报表是不是很累，而且一般报表都会包含一些通用的废话，这些话基本不会变化。如果将这些写到代码里面，如果后面这些话变了，我们就要修改并重新编译，是不是很麻烦。所以这里介绍的第一个操作就是利用模板和书签在合适的位置插入内容。</p>
+<h3 id="书签的使用">书签的使用</h3>
+<p>首先我们在Word中的适当位置创建一个标签，至于如何创建标签，请自行百度。然后在代码中的思路就是在文档中查找我们的标签，再获取光标的位置，最后就是在该位置处添加相应的内容了，这里我们举一个在光标位置插入文本的例子:</p>
+<pre tabindex="0"><code>void CCreateWordReport::WriteTextToBookMark(const CString&amp; csMarkName, const CString&amp; szText)
+{
+	CBookmarks bks = m_wdDoc.get_Bookmarks(); //获取文档中的所有书签
+	CBookmark0 bk;
+	COleVariant bk_name(csMarkName); 
+	
+	bk = bks.Item(&amp;bk_name); //查询对应名称的书签
+	CRange  hRange = bk.get_Range(); //获取书签位置
+	
+	if (hRange != NULL)
+	{
+		hRange.put_Text(szText); //在该位置处插入文本
+	}
+
+    //最后不要忘记清理相关资源
+	hRange.ReleaseDispatch();
+	bk.ReleaseDispatch();
+	bks.ReleaseDispatch();
+}
+</code></pre><h3 id="表格的使用">表格的使用</h3>
+<p>在word报表中表格应该是一个重头戏，表格中常用的接口如下:</p>
+<ul>
+<li>CTables0: 表格集合</li>
+<li>CTable0: 某个具体的表格，一般通过CTables来创建CTable</li>
+<li>CColumn: 表格列对象</li>
+<li>CRow：表格行对象</li>
+<li>CCel：表格单元格对象</li>
+</ul>
+<p>创建表格一般的操作如下:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="kt">void</span> <span class="n">CCreateWordReport</span><span class="o">::</span><span class="n">InsertTable</span><span class="p">(</span><span class="kt">int</span> <span class="n">nRow</span><span class="p">,</span> <span class="kt">int</span> <span class="n">nColumn</span><span class="p">,</span> <span class="n">CTable0</span><span class="o">&amp;</span> <span class="n">wdTable</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">	<span class="n">VARIANT</span> <span class="n">vtDefault</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">COleVariant</span> <span class="n">vtAuto</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">vtDefault</span><span class="p">.</span><span class="n">vt</span> <span class="o">=</span> <span class="n">VT_INT</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">vtDefault</span><span class="p">.</span><span class="n">intVal</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">vtAuto</span><span class="p">.</span><span class="n">vt</span> <span class="o">=</span> <span class="n">VT_INT</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">vtAuto</span><span class="p">.</span><span class="n">intVal</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">	<span class="n">CTables0</span> <span class="n">wordtables</span> <span class="o">=</span> <span class="n">m_wdDoc</span><span class="p">.</span><span class="n">get_Tables</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">	<span class="n">wdTable</span> <span class="o">=</span> 	<span class="n">wordtables</span><span class="p">.</span><span class="n">Add</span><span class="p">(</span><span class="n">m_wdSel</span><span class="p">.</span><span class="n">get_Range</span><span class="p">(),</span> <span class="n">nRow</span><span class="p">,</span> <span class="n">nColumn</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">vtDefault</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">vtAuto</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="n">wordtables</span><span class="p">.</span><span class="n">ReleaseDispatch</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p>往表格中写入内容的操作如下:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="n">BOOL</span> <span class="n">CCreateWordReport</span><span class="o">::</span><span class="n">WriteDataToTable</span><span class="p">(</span><span class="n">CTable0</span><span class="o">&amp;</span> <span class="n">wdTable</span><span class="p">,</span> <span class="kt">int</span> <span class="n">nRow</span><span class="p">,</span> <span class="kt">int</span> <span class="n">nColumn</span><span class="p">,</span> <span class="k">const</span> <span class="n">CString</span> <span class="o">&amp;</span><span class="n">csData</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span> 
+</span></span><span class="line"><span class="cl">	<span class="n">CCell</span> <span class="n">cell</span> <span class="o">=</span> <span class="n">wdTable</span><span class="p">.</span><span class="n">Cell</span><span class="p">(</span><span class="n">nRow</span><span class="p">,</span> <span class="n">nColumn</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="n">cell</span><span class="p">.</span><span class="n">Select</span><span class="p">();</span> <span class="c1">//将光标移动到单元格
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="n">m_wdSel</span><span class="p">.</span><span class="n">TypeText</span><span class="p">(</span><span class="n">csData</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	
+</span></span><span class="line"><span class="cl">	<span class="n">cell</span><span class="p">.</span><span class="n">ReleaseDispatch</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">	<span class="k">return</span> <span class="n">TRUE</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p>合并单元格的操作如下:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="n">CTable0</span> <span class="n">wdTable</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="n">InsertTable</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">wdTable</span><span class="p">);</span> <span class="c1">//创建一个5行3列的表格
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="n">CCell</span> <span class="n">cell</span> <span class="o">=</span> <span class="n">wdTable</span><span class="p">.</span><span class="n">Cell</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span> <span class="c1">//获得第一行第一列的单元格
+</span></span></span><span class="line"><span class="cl"><span class="c1">//设置第二列列宽
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="n">CColumns0</span> <span class="n">columns</span> <span class="o">=</span> <span class="n">wdTable</span><span class="p">.</span><span class="n">get_Columns</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl"><span class="n">CColumn</span> <span class="n">col</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="n">col</span><span class="p">.</span><span class="n">AttachDispatch</span><span class="p">(</span><span class="n">columns</span><span class="p">.</span><span class="n">Item</span><span class="p">(</span><span class="mi">2</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl"><span class="n">col</span><span class="p">.</span><span class="n">SetWidth</span><span class="p">(</span><span class="mi">40</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">cell</span><span class="p">.</span><span class="n">Merge</span><span class="p">(</span><span class="n">wdTable</span><span class="p">.</span><span class="n">Cell</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">1</span><span class="p">));</span> <span class="c1">//合并单元格，一直合并到第5行的第1列。
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="n">cell</span><span class="p">.</span><span class="n">SetWidth</span><span class="p">(</span><span class="mi">30</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="n">cell</span><span class="p">.</span><span class="n">ReleaseDispatch</span><span class="p">();</span>
+</span></span></code></pre></div><p>合并单元格用的是Merge函数，该函数的参数是一个单元格对象，表示合并结束的单元格。这里合并类似于我们画矩形时提供的左上角坐标和右下角坐标</p>
+<h3 id="移动光标跳出表格">移动光标跳出表格</h3>
+<p>当时由于需要连续的生成多个表格，当时我将前一个表格的数据填完，光标位于最后一个单元格里面，这个时候如果再插入的时候会在这个单元格里面插入表格，这个时候需要我手动向下移动光标，让光标移除到表格外。移动光标的代码如下:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="n">m_wdSel</span><span class="p">.</span><span class="n">MoveDown</span><span class="p">(</span><span class="o">&amp;</span><span class="n">COleVariant</span><span class="p">((</span><span class="kt">short</span><span class="p">)</span><span class="n">wdLine</span><span class="p">),</span> <span class="o">&amp;</span><span class="n">COleVariant</span><span class="p">((</span><span class="kt">short</span><span class="p">)</span><span class="mi">1</span><span class="p">),</span> <span class="o">&amp;</span><span class="n">COleVariant</span><span class="p">((</span><span class="kt">short</span><span class="p">)</span><span class="n">wdNULL</span><span class="p">));</span> 
+</span></span></code></pre></div><p>这里wdLine 是word相关接口定义的，表示希望以何种单位来移动，这里我是以行为单位。后面的1表示移动1行。</p>
+<p>但是我发现在面临换页的时候一次移动根本移动不出来，这个时候我又添加了一行这样的代码移动两行。但是问题又出现了，这一系列表格后面跟着另一个大标题，多移动几次之后可能会造成它移动到大标题的位置，而破坏我原来定义的模板，这个时候该怎么办呢？我采取的办法是，判断当前光标是否在表格中，如果是则移动一行，知道出了表格。这里的代码如下:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="c1">//移动光标，直到跳出表格外
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="k">while</span> <span class="p">(</span><span class="n">TRUE</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">m_wdSel</span><span class="p">.</span><span class="n">MoveDown</span><span class="p">(</span><span class="o">&amp;</span><span class="n">COleVariant</span><span class="p">((</span><span class="kt">short</span><span class="p">)</span><span class="n">wdLine</span><span class="p">),</span> <span class="o">&amp;</span><span class="n">COleVariant</span><span class="p">((</span><span class="kt">short</span><span class="p">)</span><span class="mi">1</span><span class="p">),</span> <span class="o">&amp;</span><span class="n">COleVariant</span><span class="p">((</span><span class="kt">short</span><span class="p">)</span><span class="n">wdNULL</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">    <span class="n">m_wdSel</span><span class="p">.</span><span class="n">Collapse</span><span class="p">(</span><span class="o">&amp;</span><span class="n">COleVariant</span><span class="p">((</span><span class="kt">short</span><span class="p">)</span><span class="n">wdCollapseStart</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">m_wdSel</span><span class="p">.</span><span class="n">get_Information</span><span class="p">((</span><span class="kt">long</span><span class="p">)</span><span class="n">wdWithInTable</span><span class="p">).</span><span class="n">boolVal</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="k">break</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><h3 id="样式的使用">样式的使用</h3>
+<p>在使用样式的时候当然也可以用代码来定义，但是我们可以采取另一种方式，我们可以事先在模板文件中创建一系列样式，然后在需要的时候直接定义段落或者文本的样式即可</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="n">m_wdSel</span><span class="p">.</span><span class="n">put_Style</span><span class="p">(</span><span class="n">COleVariant</span><span class="p">(</span><span class="s">&#34;二级标题&#34;</span><span class="p">));</span> <span class="c1">//在当前光标处的样式定义为二级标题样式，这里的二级标题样式是我们在word中事先定义好的
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="n">m_wdSel</span><span class="p">.</span><span class="n">TypeText</span><span class="p">(</span><span class="n">csTitle</span><span class="p">);</span> <span class="c1">//在当前位置输出文本
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="n">m_wdSel</span><span class="p">.</span><span class="n">TypeParagraph</span><span class="p">();</span> <span class="c1">//插入段落，这里主要为了换行，这个时候光标也会跟着动
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="n">m_wdSel</span><span class="p">.</span><span class="n">put_Style</span><span class="p">(</span><span class="n">COleVariant</span><span class="p">(</span><span class="s">&#34;正文&#34;</span><span class="p">));</span> <span class="c1">//定义此处样式为正文样式
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="n">m_wdSel</span><span class="p">.</span><span class="n">TypeText</span><span class="p">(</span><span class="n">csText</span><span class="p">;</span>
+</span></span></code></pre></div><h2 id="插入图表">插入图表</h2>
+<p>我自己尝试用word生成的图表样式还可以，但是用代码插入的时候，样式就特别丑，这里没有办法，我采用GDI+绘制了一个饼图，然后将图片插入word中。</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="n">BOOL</span> <span class="n">CCreateWordReport</span><span class="o">::</span><span class="n">DrawVulInforPic</span><span class="p">(</span><span class="k">const</span> <span class="n">CString</span><span class="o">&amp;</span> <span class="n">csMarkName</span><span class="p">,</span> <span class="kt">int</span> <span class="n">nVulCnt</span><span class="p">,</span> <span class="kt">int</span> <span class="n">nVulCris</span><span class="p">,</span> <span class="kt">int</span> <span class="n">nHigh</span><span class="p">,</span> <span class="kt">int</span> <span class="n">nMid</span><span class="p">,</span> <span class="kt">int</span> <span class="n">nLow</span><span class="p">,</span> <span class="kt">int</span> <span class="n">nPossible</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">	<span class="n">CBookmarks</span> <span class="n">bks</span> <span class="o">=</span> <span class="n">m_wdDoc</span><span class="p">.</span><span class="n">get_Bookmarks</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">	<span class="n">COleVariant</span> <span class="nf">bk_name</span><span class="p">(</span><span class="n">csMarkName</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="n">CBookmark0</span> <span class="n">bk</span> <span class="o">=</span> <span class="n">bks</span><span class="p">.</span><span class="n">Item</span><span class="p">(</span><span class="o">&amp;</span><span class="n">bk_name</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="n">bk</span><span class="p">.</span><span class="n">Select</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">	
+</span></span><span class="line"><span class="cl">	<span class="n">CnlineShapes</span> <span class="n">isps</span> <span class="o">=</span> <span class="n">m_wdSel</span><span class="p">.</span><span class="n">get_InlineShapes</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">	<span class="n">COleVariant</span> <span class="nf">vFalse</span><span class="p">((</span><span class="kt">short</span><span class="p">)</span><span class="n">FALSE</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="n">COleVariant</span> <span class="nf">vNull</span><span class="p">(</span><span class="s">&#34;&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="n">COleVariant</span> <span class="nf">vOptional</span><span class="p">((</span><span class="kt">long</span><span class="p">)</span><span class="n">DISP_E_PARAMNOTFOUND</span><span class="p">,</span><span class="n">VT_ERROR</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="c1">//创建一个与桌面环境兼容的内存DC
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="n">HWND</span> <span class="n">hWnd</span> <span class="o">=</span> <span class="n">GetDesktopWindow</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">	<span class="n">HDC</span> <span class="n">hDc</span> <span class="o">=</span> <span class="n">GetDC</span><span class="p">(</span><span class="n">hWnd</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="n">HDC</span> <span class="n">hMemDc</span> <span class="o">=</span> <span class="n">CreateCompatibleDC</span><span class="p">(</span><span class="n">hDc</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="n">HBITMAP</span> <span class="n">hMemBmp</span> <span class="o">=</span> <span class="n">CreateCompatibleBitmap</span><span class="p">(</span><span class="n">hDc</span><span class="p">,</span> <span class="n">PICTURE_WIDTH</span> <span class="o">+</span> <span class="n">GLOBAL_MARGIN</span><span class="p">,</span> <span class="n">PICTURE_LENGTH</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">GLOBAL_MARGIN</span> <span class="o">+</span> <span class="n">LENGED_BORDER_LENGTH</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="n">SelectObject</span><span class="p">(</span><span class="n">hMemDc</span><span class="p">,</span> <span class="n">hMemBmp</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="c1">//绘制并保存图表
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="n">DrawPie</span><span class="p">(</span><span class="n">hMemDc</span><span class="p">,</span> <span class="n">nVulCnt</span><span class="p">,</span> <span class="n">nVulCris</span><span class="p">,</span> <span class="n">nHigh</span><span class="p">,</span> <span class="n">nMid</span><span class="p">,</span> <span class="n">nLow</span><span class="p">,</span> <span class="n">nPossible</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	
+</span></span><span class="line"><span class="cl">	<span class="n">COleVariant</span> <span class="nf">vTrue</span><span class="p">((</span><span class="kt">short</span><span class="p">)</span><span class="n">TRUE</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="n">CnlineShape</span> <span class="n">isp</span><span class="o">=</span><span class="n">isps</span><span class="p">.</span><span class="n">AddPicture</span><span class="p">(</span><span class="s">&#34;D:</span><span class="se">\\</span><span class="s">Program</span><span class="se">\\</span><span class="s">WordReport</span><span class="se">\\</span><span class="s">WordReport</span><span class="se">\\</span><span class="s">test.png&#34;</span><span class="p">,</span><span class="n">vFalse</span><span class="p">,</span><span class="n">vTrue</span><span class="p">,</span><span class="n">vOptional</span><span class="p">);</span>  <span class="c1">//以图片的方式插入图表
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	
+</span></span><span class="line"><span class="cl">    <span class="c1">//设置图片的大小
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="n">isp</span><span class="p">.</span><span class="n">put_Height</span><span class="p">(</span><span class="mi">141</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="n">isp</span><span class="p">.</span><span class="n">put_Width</span><span class="p">(</span><span class="mi">423</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	
+</span></span><span class="line"><span class="cl">    <span class="n">bks</span><span class="p">.</span><span class="n">ReleaseDispatch</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">	<span class="n">bk</span><span class="p">.</span><span class="n">ReleaseDispatch</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">	<span class="n">isps</span><span class="p">.</span><span class="n">ReleaseDispatch</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">	<span class="n">isp</span><span class="p">.</span><span class="n">ReleaseDispatch</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">	<span class="n">DeleteObject</span><span class="p">(</span><span class="n">hMemDc</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="n">DeleteDC</span><span class="p">(</span><span class="n">hMemDc</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="n">ReleaseDC</span><span class="p">(</span><span class="n">hWnd</span><span class="p">,</span> <span class="n">hDc</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	
+</span></span><span class="line"><span class="cl">	<span class="k">return</span> <span class="n">TRUE</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p>最后，各个接口的参数可以参考下面的链接:
+<a href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.office.interop.word?view=word-pia" target="_blank" rel="noopener noreffer ">.net Word office组件接口文档</a></p>
+<!-- raw HTML omitted -->
+</div><div class="post-footer" id="post-footer">
+    <div class="post-info">
+        <div class="post-info-line">
+            <div class="post-info-mod">
+                <span>Updated on 2019-04-14</span>
+            </div></div>
+        <div class="post-info-line">
+            <div class="post-info-md"></div>
+            <div class="post-info-share">
+                <span><a href="javascript:void(0);" title="Share on Twitter" data-sharer="twitter" data-url="http://HaiLateBoy.github.io/posts/vc-word/" data-title="VC&#43;&#43;&#43;  操作word" data-hashtags="VC,word,组件"><i class="fab fa-twitter fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Facebook" data-sharer="facebook" data-url="http://HaiLateBoy.github.io/posts/vc-word/" data-hashtag="VC"><i class="fab fa-facebook-square fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Hacker News" data-sharer="hackernews" data-url="http://HaiLateBoy.github.io/posts/vc-word/" data-title="VC&#43;&#43;&#43;  操作word"><i class="fab fa-hacker-news fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Line" data-sharer="line" data-url="http://HaiLateBoy.github.io/posts/vc-word/" data-title="VC&#43;&#43;&#43;  操作word"><i data-svg-src="https://cdn.jsdelivr.net/npm/simple-icons@7.3.0/icons/line.svg" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on 微博" data-sharer="weibo" data-url="http://HaiLateBoy.github.io/posts/vc-word/" data-title="VC&#43;&#43;&#43;  操作word"><i class="fab fa-weibo fa-fw" aria-hidden="true"></i></a></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="post-info-more">
+        <section class="post-tags"><i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/vc/">VC</a>,&nbsp;<a href="/tags/word/">word</a>,&nbsp;<a href="/tags/%E7%BB%84%E4%BB%B6/">组件</a></section>
+        <section>
+            <span><a href="javascript:void(0);" onclick="window.history.back();">Back</a></span>&nbsp;|&nbsp;<span><a href="/">Home</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav"><a href="/posts/quick-sort/" class="prev" rel="prev" title="算法与数据结构(七)：快速排序"><i class="fas fa-angle-left fa-fw" aria-hidden="true"></i>算法与数据结构(七)：快速排序</a>
+            <a href="/posts/java-base1/" class="next" rel="next" title="Java 学习笔记(1)——java基础语法">Java 学习笔记(1)——java基础语法<i class="fas fa-angle-right fa-fw" aria-hidden="true"></i></a></div>
+</div>
+</article></div>
+            </main><footer class="footer">
+        <div class="footer-container"><div class="footer-line">Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener noreffer" title="Hugo 0.121.2">Hugo</a> | Theme - <a href="https://github.com/dillonzq/LoveIt" target="_blank" rel="noopener noreffer" title="LoveIt 0.2.11"><i class="far fa-kiss-wink-heart fa-fw" aria-hidden="true"></i> LoveIt</a>
+                </div><div class="footer-line" itemscope itemtype="http://schema.org/CreativeWork"><i class="far fa-copyright fa-fw" aria-hidden="true"></i><span itemprop="copyrightYear">2022 - 2024</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="https://www.masimaro.xyz" target="_blank">Masimaro</a></span></div>
+        </div>
+    </footer></div>
+
+        <div id="fixed-buttons"><a href="#" id="back-to-top" class="fixed-button" title="Back to Top">
+                <i class="fas fa-arrow-up fa-fw" aria-hidden="true"></i>
+            </a><a href="#" id="view-comments" class="fixed-button" title="View Comments">
+                <i class="fas fa-comment fa-fw" aria-hidden="true"></i>
+            </a>
+        </div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.css"><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/autocomplete.js@0.38.1/dist/autocomplete.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lunr@2.3.9/lunr.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lazysizes@5.3.2/lazysizes.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/clipboard@2.0.11/dist/clipboard.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/sharer.js@0.5.1/sharer.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/auto-render.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/copy-tex.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/mhchem.min.js"></script><script type="text/javascript">window.config={"code":{"copyTitle":"Copy to clipboard","maxShownLines":50},"comment":{},"math":{"delimiters":[{"display":true,"left":"$$","right":"$$"},{"display":true,"left":"\\[","right":"\\]"},{"display":true,"left":"\\begin{equation}","right":"\\end{equation}"},{"display":true,"left":"\\begin{equation*}","right":"\\end{equation*}"},{"display":true,"left":"\\begin{align}","right":"\\end{align}"},{"display":true,"left":"\\begin{align*}","right":"\\end{align*}"},{"display":true,"left":"\\begin{alignat}","right":"\\end{alignat}"},{"display":true,"left":"\\begin{alignat*}","right":"\\end{alignat*}"},{"display":true,"left":"\\begin{gather}","right":"\\end{gather}"},{"display":true,"left":"\\begin{CD}","right":"\\end{CD}"},{"display":false,"left":"$","right":"$"},{"display":false,"left":"\\(","right":"\\)"}],"strict":false},"search":{"highlightTag":"em","maxResultLength":10,"noResultsFound":"No results found","snippetLength":50}};</script><script type="text/javascript" src="/js/theme.min.js"></script></body>
+</html>

@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="robots" content="noodp" />
+        <title>OLEDB 静态绑定和数据转化接口 - Masimaro&#39;s blog</title><meta name="Description" content="这是我用于记录日常和学习的小站"><meta property="og:title" content="OLEDB 静态绑定和数据转化接口" />
+<meta property="og:description" content="OLEDB 提供了静态绑定和动态绑定两种方式，相比动态绑定来说，静态绑定在使用上更加简单，而在灵活性上不如动态绑定，动态绑定在前面已经介绍过了，本文主" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://HaiLateBoy.github.io/posts/oledb-and-ado-12/" /><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2018-04-27T20:13:54+00:00" />
+<meta property="article:modified_time" content="2018-04-27T20:13:54+00:00" /><meta property="og:site_name" content="Masimaro&#39;s blog" />
+
+<meta name="twitter:card" content="summary"/><meta name="twitter:title" content="OLEDB 静态绑定和数据转化接口"/>
+<meta name="twitter:description" content="OLEDB 提供了静态绑定和动态绑定两种方式，相比动态绑定来说，静态绑定在使用上更加简单，而在灵活性上不如动态绑定，动态绑定在前面已经介绍过了，本文主"/>
+<meta name="application-name" content="My cool site">
+<meta name="apple-mobile-web-app-title" content="My cool site"><meta name="theme-color" content="#ffffff"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="manifest" href="/site.webmanifest"><link rel="canonical" href="http://HaiLateBoy.github.io/posts/oledb-and-ado-12/" /><link rel="prev" href="http://HaiLateBoy.github.io/posts/oledb-and-ado-11/" /><link rel="next" href="http://HaiLateBoy.github.io/posts/python-deal-with-re/" /><link rel="stylesheet" href="/css/style.min.css"><link rel="preload" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css"></noscript><link rel="preload" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css"></noscript><script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "BlogPosting",
+        "headline": "OLEDB 静态绑定和数据转化接口",
+        "inLanguage": "zh-CN",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "http:\/\/HaiLateBoy.github.io\/posts\/oledb-and-ado-12\/"
+        },"genre": "posts","keywords": "OLEDB, 数据库编程, VC\u002b\u002b, 数据库, 静态绑定, 数据转化对象接口","wordcount":  1849 ,
+        "url": "http:\/\/HaiLateBoy.github.io\/posts\/oledb-and-ado-12\/","datePublished": "2018-04-27T20:13:54+00:00","dateModified": "2018-04-27T20:13:54+00:00","publisher": {
+            "@type": "Organization",
+            "name": ""},"author": {
+                "@type": "Person",
+                "name": "Masimaro"
+            },"description": ""
+    }
+    </script></head>
+    <body data-header-desktop="fixed" data-header-mobile="auto"><script type="text/javascript">(window.localStorage && localStorage.getItem('theme') ? localStorage.getItem('theme') === 'dark' : ('auto' === 'auto' ? window.matchMedia('(prefers-color-scheme: dark)').matches : 'auto' === 'dark')) && document.body.setAttribute('theme', 'dark');</script>
+
+        <div id="mask"></div><div class="wrapper"><header class="desktop" id="header-desktop">
+    <div class="header-wrapper">
+        <div class="header-title">
+            <a href="/" title="Masimaro&#39;s blog">My cool site</a>
+        </div>
+        <div class="menu">
+            <div class="menu-inner"><a class="menu-item" href="/posts/" title="文章列表"> 文章 </a><a class="menu-item" href="/tags/" title="标签"> 标签 </a><a class="menu-item" href="/categories/" title="分类"> 分类 </a><a class="menu-item" href="/about" title="关于本站"> 关于 </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-desktop">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-desktop" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-desktop" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-desktop">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </span><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                    <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+                </a></div>
+        </div>
+    </div>
+</header><header class="mobile" id="header-mobile">
+    <div class="header-container">
+        <div class="header-wrapper">
+            <div class="header-title">
+                <a href="/" title="Masimaro&#39;s blog">My cool site</a>
+            </div>
+            <div class="menu-toggle" id="menu-toggle-mobile">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+        <div class="menu" id="menu-mobile"><div class="search-wrapper">
+                    <div class="search mobile" id="search-mobile">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-mobile">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-mobile" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-mobile" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-mobile">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </div>
+                    <a href="javascript:void(0);" class="search-cancel" id="search-cancel-mobile">
+                        Cancel
+                    </a>
+                </div><a class="menu-item" href="/posts/" title="文章列表">文章</a><a class="menu-item" href="/tags/" title="标签">标签</a><a class="menu-item" href="/categories/" title="分类">分类</a><a class="menu-item" href="/about" title="关于本站">关于</a><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+            </a></div>
+    </div>
+</header><div class="search-dropdown desktop">
+        <div id="search-dropdown-desktop"></div>
+    </div>
+    <div class="search-dropdown mobile">
+        <div id="search-dropdown-mobile"></div>
+    </div><main class="main">
+                <div class="container"><div class="toc" id="toc-auto">
+            <h2 class="toc-title">Contents</h2>
+            <div class="toc-content" id="toc-content-auto"></div>
+        </div><article class="page single"><h1 class="single-title animate__animated animate__flipInX">OLEDB 静态绑定和数据转化接口</h1><div class="post-meta">
+            <div class="post-meta-line"><span class="post-author"><a href="https://www.masimaro.xyz" title="Author" target="_blank" rel="noopener noreffer author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Masimaro</a></span>&nbsp;<span class="post-category">included in <a href="/categories/windows-%E6%95%B0%E6%8D%AE%E5%BA%93%E7%BC%96%E7%A8%8B/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>windows 数据库编程</a></span></div>
+            <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw" aria-hidden="true"></i>&nbsp;<time datetime="2018-04-27">2018-04-27</time>&nbsp;<i class="fas fa-pencil-alt fa-fw" aria-hidden="true"></i>&nbsp;1849 words&nbsp;
+                <i class="far fa-clock fa-fw" aria-hidden="true"></i>&nbsp;4 minutes&nbsp;</div>
+        </div><div class="details toc" id="toc-static"  data-kept="true">
+                <div class="details-summary toc-title">
+                    <span>Contents</span>
+                    <span><i class="details-icon fas fa-angle-right" aria-hidden="true"></i></span>
+                </div>
+                <div class="details-content toc-content" id="toc-content-static"><nav id="TableOfContents">
+  <ul>
+    <li><a href="#静态绑定">静态绑定</a>
+      <ul>
+        <li><a href="#数据关系对应表">数据关系对应表</a></li>
+      </ul>
+    </li>
+    <li><a href="#实例">实例</a></li>
+    <li><a href="#数据类型转化">数据类型转化</a>
+      <ul>
+        <li><a href="#数据转换接口的使用">数据转换接口的使用</a></li>
+        <li><a href="#实例-1">实例</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav></div>
+            </div><div class="content" id="content"><p>OLEDB 提供了静态绑定和动态绑定两种方式，相比动态绑定来说，静态绑定在使用上更加简单，而在灵活性上不如动态绑定，动态绑定在前面已经介绍过了，本文主要介绍OLEDB中的静态，以及常用的数据类型转化接口。</p>
+<!-- raw HTML omitted -->
+<h2 id="静态绑定">静态绑定</h2>
+<p>之前的例子都是根据返回的COLUMNINFO结构来知晓数据表中各项的具体信息，然后进行绑定操作，这个操作由于可以动态的针对不同的数据类型绑定为不同的类型，因此称之为动态绑定。动态绑定是建立在我们对数据库中表结构一无所知，而又需要对数据库进行编程，但是一般在实际的项目中开发人员都是知道数据库的具体结构的，而且一旦数据库设计好了后续更改的可能性也不太大，因此可以采取静态绑定的方式来减少编程的复杂度。
+在进行静态绑定时，一般针对每个数据库表结构定义一个结构体用来描述表的各项数据，然后利用结构体的偏移来绑定到数据库中。</p>
+<h3 id="数据关系对应表">数据关系对应表</h3>
+<p>一般静态绑定需要将数据库表的各项数据与结构体中的成员一一对应，这个时候就涉及到数据库数据类型到C/C++中数据类型的转化，下表列举了常见的数据库类型到C/C++数据类型的转化关系</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">数据库类型</th>
+<th style="text-align:left">OLEDB 类型</th>
+<th style="text-align:left">C/C++类型</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">binary</td>
+<td style="text-align:left">DBTYPE_BYTES/DBTYPE_IUNKNOWN</td>
+<td style="text-align:left">BYTE[length]/BLOB</td>
+</tr>
+<tr>
+<td style="text-align:left">varbinary</td>
+<td style="text-align:left">DBTYPE_BYTES/DBTYPE_IUNKNOWN</td>
+<td style="text-align:left">BLOB</td>
+</tr>
+<tr>
+<td style="text-align:left">bit</td>
+<td style="text-align:left">DBTYPE_BOOL</td>
+<td style="text-align:left">VARIANT_BOOL</td>
+</tr>
+<tr>
+<td style="text-align:left">char</td>
+<td style="text-align:left">DBTYPE_STR</td>
+<td style="text-align:left">char[length]</td>
+</tr>
+<tr>
+<td style="text-align:left">varchar</td>
+<td style="text-align:left">DBTYPE_STR</td>
+<td style="text-align:left">char[length]</td>
+</tr>
+<tr>
+<td style="text-align:left">nvarchar</td>
+<td style="text-align:left">DBTYPE_WSTR</td>
+<td style="text-align:left">wchar_t[length]</td>
+</tr>
+<tr>
+<td style="text-align:left">nchar</td>
+<td style="text-align:left">DBTYPE_WSTR</td>
+<td style="text-align:left">wchar_t[length]</td>
+</tr>
+<tr>
+<td style="text-align:left">text</td>
+<td style="text-align:left">DBTYPE_STR/DBTYPE_IUNKNOWN</td>
+<td style="text-align:left">BLOB</td>
+</tr>
+<tr>
+<td style="text-align:left">image</td>
+<td style="text-align:left">DBTYPE_BYTES/DBTYPE_IUNKNOWN</td>
+<td style="text-align:left">BLOB</td>
+</tr>
+<tr>
+<td style="text-align:left">ntext</td>
+<td style="text-align:left">DBTYPE_WSTR/DBTYPE_IUNKNOWN</td>
+<td style="text-align:left">BLOB</td>
+</tr>
+<tr>
+<td style="text-align:left">tinyint</td>
+<td style="text-align:left">DBTYPE_UI1</td>
+<td style="text-align:left">BYTE</td>
+</tr>
+<tr>
+<td style="text-align:left">smallint</td>
+<td style="text-align:left">DBTYPE_I2</td>
+<td style="text-align:left">SHORT</td>
+</tr>
+<tr>
+<td style="text-align:left">int</td>
+<td style="text-align:left">DBTYPE_I4</td>
+<td style="text-align:left">LONG</td>
+</tr>
+<tr>
+<td style="text-align:left">bigint</td>
+<td style="text-align:left">DBTYPE_I8</td>
+<td style="text-align:left">LARGE_INTEGER</td>
+</tr>
+<tr>
+<td style="text-align:left">real</td>
+<td style="text-align:left">DBTYPE_R4</td>
+<td style="text-align:left">float</td>
+</tr>
+<tr>
+<td style="text-align:left">float</td>
+<td style="text-align:left">DBTYPE_R8</td>
+<td style="text-align:left">double</td>
+</tr>
+<tr>
+<td style="text-align:left">money</td>
+<td style="text-align:left">DBTYPE_CY</td>
+<td style="text-align:left">LARGE_INTEGER</td>
+</tr>
+<tr>
+<td style="text-align:left">numeric</td>
+<td style="text-align:left">DBTYPE_NUMERIC</td>
+<td style="text-align:left">typedef struct tagDB_NUMERIC {<!-- raw HTML omitted -->    BYTE precision;<!-- raw HTML omitted -->    BYTE scale;<!-- raw HTML omitted -->    BYTE sign;<!-- raw HTML omitted -->    BYTE val[16];<!-- raw HTML omitted -->} DB_NUMERIC;</td>
+</tr>
+<tr>
+<td style="text-align:left">decimal</td>
+<td style="text-align:left">DBTYPE_NUMERIC</td>
+<td style="text-align:left">typedef struct tagDB_NUMERIC {<!-- raw HTML omitted -->    BYTE precision;<!-- raw HTML omitted -->    BYTE scale;<!-- raw HTML omitted -->    BYTE sign;<!-- raw HTML omitted -->    BYTE val[16];<!-- raw HTML omitted -->} DB_NUMERIC;</td>
+</tr>
+<tr>
+<td style="text-align:left">sysname</td>
+<td style="text-align:left">DBTYPE_WSTR</td>
+<td style="text-align:left">wchar_t[length]</td>
+</tr>
+<tr>
+<td style="text-align:left">datetime</td>
+<td style="text-align:left">DBTYPE_DBTIMESTAMP</td>
+<td style="text-align:left">typedef struct tagDBTIMESTAMP {<!-- raw HTML omitted -->    SHORT   year;<!-- raw HTML omitted -->    USHORT  month;<!-- raw HTML omitted -->    USHORT  day;<!-- raw HTML omitted -->    USHORT  hour;<!-- raw HTML omitted -->    USHORT  minute;<!-- raw HTML omitted -->    USHORT  second;<!-- raw HTML omitted -->    ULONG   fraction;<!-- raw HTML omitted -->}DBTIMESTAMP;</td>
+</tr>
+<tr>
+<td style="text-align:left">timestamp</td>
+<td style="text-align:left">DBTYPE_BYTES</td>
+<td style="text-align:left">BYTE[length]</td>
+</tr>
+<tr>
+<td style="text-align:left">uniqueidentifier</td>
+<td style="text-align:left">DBTYPE_GUID</td>
+<td style="text-align:left">GUID</td>
+</tr>
+</tbody>
+</table>
+<h2 id="实例">实例</h2>
+<p>下面是一个静态绑定的例子</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="c1">//静态绑定的结构
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="k">typedef</span> <span class="k">struct</span> <span class="nc">_tag_DBSTRUCT</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">	<span class="n">DBSTATUS</span> <span class="n">dbCodeStatus</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">ULONG</span> <span class="n">uCodeLength</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="kt">int</span> <span class="n">nCode</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="n">DBSTATUS</span> <span class="n">dbNameStatus</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">ULONG</span> <span class="n">uNameLength</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">WCHAR</span> <span class="n">szName</span><span class="p">[</span><span class="n">NAME_LENGTH</span><span class="p">];</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span><span class="n">DBSTRUCT</span><span class="p">,</span> <span class="o">*</span><span class="n">LPDBSTRUCT</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">dbBindings</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">bPrecision</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">dbBindings</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">bScale</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">dbBindings</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">cbMaxLen</span> <span class="o">=</span> <span class="k">sizeof</span><span class="p">(</span><span class="kt">int</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="n">dbBindings</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">dwMemOwner</span> <span class="o">=</span> <span class="n">DBMEMOWNER_CLIENTOWNED</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">dbBindings</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">dwPart</span> <span class="o">=</span> <span class="n">DBPART_STATUS</span> <span class="o">|</span> <span class="n">DBPART_LENGTH</span> <span class="o">|</span> <span class="n">DBPART_VALUE</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">dbBindings</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">iOrdinal</span> <span class="o">=</span> <span class="n">pdbColumnInfo</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">iOrdinal</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">dbBindings</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">obStatus</span> <span class="o">=</span> <span class="n">offsetof</span><span class="p">(</span><span class="n">DBSTRUCT</span><span class="p">,</span> <span class="n">dbCodeStatus</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="n">dbBindings</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">obLength</span> <span class="o">=</span> <span class="n">offsetof</span><span class="p">(</span><span class="n">DBSTRUCT</span><span class="p">,</span> <span class="n">uCodeLength</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="n">dbBindings</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">obValue</span> <span class="o">=</span> <span class="n">offsetof</span><span class="p">(</span><span class="n">DBSTRUCT</span><span class="p">,</span> <span class="n">nCode</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="n">dbBindings</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">wType</span> <span class="o">=</span> <span class="n">DBTYPE_I4</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="n">dbBindings</span><span class="p">[</span><span class="mi">1</span><span class="p">].</span><span class="n">bPrecision</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">dbBindings</span><span class="p">[</span><span class="mi">1</span><span class="p">].</span><span class="n">bScale</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">dbBindings</span><span class="p">[</span><span class="mi">1</span><span class="p">].</span><span class="n">cbMaxLen</span> <span class="o">=</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">WCHAR</span><span class="p">)</span> <span class="o">*</span> <span class="n">NAME_LENGTH</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">dbBindings</span><span class="p">[</span><span class="mi">1</span><span class="p">].</span><span class="n">dwMemOwner</span> <span class="o">=</span> <span class="n">DBMEMOWNER_CLIENTOWNED</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">dbBindings</span><span class="p">[</span><span class="mi">1</span><span class="p">].</span><span class="n">dwPart</span> <span class="o">=</span> <span class="n">DBPART_STATUS</span> <span class="o">|</span> <span class="n">DBPART_LENGTH</span> <span class="o">|</span> <span class="n">DBPART_VALUE</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">dbBindings</span><span class="p">[</span><span class="mi">1</span><span class="p">].</span><span class="n">iOrdinal</span> <span class="o">=</span> <span class="n">pdbColumnInfo</span><span class="p">[</span><span class="mi">1</span><span class="p">].</span><span class="n">iOrdinal</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">dbBindings</span><span class="p">[</span><span class="mi">1</span><span class="p">].</span><span class="n">obStatus</span> <span class="o">=</span> <span class="n">offsetof</span><span class="p">(</span><span class="n">DBSTRUCT</span><span class="p">,</span> <span class="n">dbNameStatus</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="n">dbBindings</span><span class="p">[</span><span class="mi">1</span><span class="p">].</span><span class="n">obLength</span> <span class="o">=</span> <span class="n">offsetof</span><span class="p">(</span><span class="n">DBSTRUCT</span><span class="p">,</span> <span class="n">uNameLength</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="n">dbBindings</span><span class="p">[</span><span class="mi">1</span><span class="p">].</span><span class="n">obValue</span> <span class="o">=</span> <span class="n">offsetof</span><span class="p">(</span><span class="n">DBSTRUCT</span><span class="p">,</span> <span class="n">szName</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="n">dbBindings</span><span class="p">[</span><span class="mi">1</span><span class="p">].</span><span class="n">wType</span> <span class="o">=</span> <span class="n">DBTYPE_WSTR</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="n">hRes</span> <span class="o">=</span> <span class="n">pIAccessor</span><span class="o">-&gt;</span><span class="n">CreateAccessor</span><span class="p">(</span><span class="n">DBACCESSOR_ROWDATA</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">dbBindings</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">hAccessor</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="n">pdbStruct</span> <span class="o">=</span> <span class="p">(</span><span class="n">DBSTRUCT</span><span class="o">*</span><span class="p">)</span><span class="n">COM_ALLOC</span><span class="p">(</span><span class="k">sizeof</span><span class="p">(</span><span class="n">DBSTRUCT</span><span class="p">)</span> <span class="o">*</span> <span class="n">cRows</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="k">while</span> <span class="p">(</span><span class="n">TRUE</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">	<span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="n">hRes</span> <span class="o">=</span> <span class="n">pIRowset</span><span class="o">-&gt;</span><span class="n">GetNextRows</span><span class="p">(</span><span class="n">DB_NULL_HCHAPTER</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">cRows</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">cRowsObtained</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">prghRows</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">		<span class="k">if</span> <span class="p">(</span><span class="n">hRes</span> <span class="o">!=</span> <span class="n">S_OK</span> <span class="o">&amp;&amp;</span> <span class="n">cRowsObtained</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">		<span class="p">{</span>
+</span></span><span class="line"><span class="cl">			<span class="k">break</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">		<span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">		<span class="n">ZeroMemory</span><span class="p">(</span><span class="n">pdbStruct</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">DBSTRUCT</span><span class="p">)</span> <span class="o">*</span> <span class="n">cRows</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">		<span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">cRowsObtained</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">		<span class="p">{</span>
+</span></span><span class="line"><span class="cl">			<span class="n">hRes</span> <span class="o">=</span> <span class="n">pIRowset</span><span class="o">-&gt;</span><span class="n">GetData</span><span class="p">(</span><span class="n">prghRows</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">hAccessor</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">pdbStruct</span><span class="p">[</span><span class="n">i</span><span class="p">]);</span>
+</span></span><span class="line"><span class="cl">			<span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">FAILED</span><span class="p">(</span><span class="n">hRes</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl">			<span class="p">{</span>
+</span></span><span class="line"><span class="cl">				<span class="n">COM_PRINTF</span><span class="p">(</span><span class="n">_T</span><span class="p">(</span><span class="s">&#34;%012d</span><span class="se">\t</span><span class="s">%s</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">),</span> <span class="n">pdbStruct</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">nCode</span><span class="p">,</span> <span class="n">pdbStruct</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">szName</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">			<span class="p">}</span>
+</span></span><span class="line"><span class="cl">		<span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">		<span class="n">pIRowset</span><span class="o">-&gt;</span><span class="n">ReleaseRows</span><span class="p">(</span><span class="n">cRowsObtained</span><span class="p">,</span> <span class="n">prghRows</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span></code></pre></div><p>我们针对之前的行政区表来进行演示，在这个表中我们只查询其中的两列数据，与之前的例子相似，针对每列定义3项数据，分别是状态，长度和真实的数据，在绑定的时候就不需要计算总体需要内存的大小，行内存大小就是结构体的大小，在绑定的时候我们结构体成员在结构体中的偏移作为返回数据时各项在缓冲中的偏移。而在访问数据时就需要自己计算偏移，直接使用结构体中的成员即可。
+从上面的例子，我总结了静态绑定和动态绑定之间的差别：</p>
+<ol>
+<li>其实从本质上将动态绑定和静态绑定没有区别，都是分配一段缓冲作为行集的缓冲，然后在使用的时候进行偏移的计算</li>
+<li>静态绑定是利用我们提前知道数据库的结构，实现通过结构体来安排各项在缓冲中的偏移所占内存的大小。</li>
+<li>动态绑定中所有成员的分配和所占内存大小都是根据COLUMNINFO结构事后动态分配的，需要自己计算偏移。</li>
+<li>相比于动态绑定来说，静态绑定不需要获取数据库的各项的属性信息，不需要自己计算各项的偏移，相对比较简单，适用于事先知道数据库的表结构，使用相对固定，一旦数据库结构改变就需要改变代码</li>
+<li>动态绑定可以适用于几乎任何情形，可扩展性强，几乎不需要考虑数据库表结构变更问题。代码灵活，但是需要自己计算偏移，自己分配管理内存，相对来说对程序员的功力要求更高一些。</li>
+</ol>
+<h2 id="数据类型转化">数据类型转化</h2>
+<p>数据库中数据类型繁多，而对应到具体的编程语言上有不同的展示方式，具体的语言中对同一种数据库类型有不同的数据类型对应，甚至有的可能并没有什么类型可以直接对应，这就涉及到一个从数据库数据类型到具体编程语言数据类型之间进行转换的问题，针对这一问题OLEDB提供了一个接口——IDataConvert
+一般情况下任何数据类型都可以转化为相应格式的字符串，而对应的字符串又可以反过来转化为数据库中相应的数据类型。当然一些特殊转换也是允许的,比如:整型数据间的转换,浮点数间的转换等。这也是使用这个数据转化接口的主要原则。</p>
+<h3 id="数据转换接口的使用">数据转换接口的使用</h3>
+<ol>
+<li>使用COM标准的方式创建IDataConver接口（调用CreateInstance函数传入CLSID_OLEDB_CONVERSIONLIBRARY创建一个IID_IDataConvert接口）</li>
+<li>接着调用该接口的DataConvert方法可以进行数据转化</li>
+<li>调用接口的CanConvert可以知道两种数据类型之间能否进行转化。</li>
+<li>调用GetConversionSize可以知道源数据类型转化为指定类型时需要的缓冲大小。</li>
+</ol>
+<h3 id="实例-1">实例</h3>
+<p>这个例子相对比较简单，就简单的在之前打印数据库数据中加了一句转化为字符串的操作，然后打印，就不在文中展示了，具体的例子见我放到码云中的代码片段</p>
+<p>例子代码:</p>
+<ol>
+<li><a href="https://gitee.com/masimaro/codes/tcesnrul0g2yi76bam5dj19#StaticBind" target="_blank" rel="noopener noreffer ">静态绑定</a></li>
+<li><a href="https://gitee.com/masimaro/codes/tcesnrul0g2yi76bam5dj19#DataConvert" target="_blank" rel="noopener noreffer ">数据类型转化</a></li>
+</ol>
+<!-- raw HTML omitted -->
+</div><div class="post-footer" id="post-footer">
+    <div class="post-info">
+        <div class="post-info-line">
+            <div class="post-info-mod">
+                <span>Updated on 2018-04-27</span>
+            </div></div>
+        <div class="post-info-line">
+            <div class="post-info-md"></div>
+            <div class="post-info-share">
+                <span><a href="javascript:void(0);" title="Share on Twitter" data-sharer="twitter" data-url="http://HaiLateBoy.github.io/posts/oledb-and-ado-12/" data-title="OLEDB 静态绑定和数据转化接口" data-hashtags="OLEDB,数据库编程,VC&#43;&#43;,数据库,静态绑定,数据转化对象接口"><i class="fab fa-twitter fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Facebook" data-sharer="facebook" data-url="http://HaiLateBoy.github.io/posts/oledb-and-ado-12/" data-hashtag="OLEDB"><i class="fab fa-facebook-square fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Hacker News" data-sharer="hackernews" data-url="http://HaiLateBoy.github.io/posts/oledb-and-ado-12/" data-title="OLEDB 静态绑定和数据转化接口"><i class="fab fa-hacker-news fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Line" data-sharer="line" data-url="http://HaiLateBoy.github.io/posts/oledb-and-ado-12/" data-title="OLEDB 静态绑定和数据转化接口"><i data-svg-src="https://cdn.jsdelivr.net/npm/simple-icons@7.3.0/icons/line.svg" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on 微博" data-sharer="weibo" data-url="http://HaiLateBoy.github.io/posts/oledb-and-ado-12/" data-title="OLEDB 静态绑定和数据转化接口"><i class="fab fa-weibo fa-fw" aria-hidden="true"></i></a></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="post-info-more">
+        <section class="post-tags"><i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/oledb/">OLEDB</a>,&nbsp;<a href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93%E7%BC%96%E7%A8%8B/">数据库编程</a>,&nbsp;<a href="/tags/vc&#43;&#43;/">VC&#43;&#43;</a>,&nbsp;<a href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93/">数据库</a>,&nbsp;<a href="/tags/%E9%9D%99%E6%80%81%E7%BB%91%E5%AE%9A/">静态绑定</a>,&nbsp;<a href="/tags/%E6%95%B0%E6%8D%AE%E8%BD%AC%E5%8C%96%E5%AF%B9%E8%B1%A1%E6%8E%A5%E5%8F%A3/">数据转化对象接口</a></section>
+        <section>
+            <span><a href="javascript:void(0);" onclick="window.history.back();">Back</a></span>&nbsp;|&nbsp;<span><a href="/">Home</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav"><a href="/posts/oledb-and-ado-11/" class="prev" rel="prev" title="OLEDB存取BLOB型数据"><i class="fas fa-angle-left fa-fw" aria-hidden="true"></i>OLEDB存取BLOB型数据</a>
+            <a href="/posts/python-deal-with-re/" class="next" rel="next" title="Python处理正则表达式超时的办法">Python处理正则表达式超时的办法<i class="fas fa-angle-right fa-fw" aria-hidden="true"></i></a></div>
+</div>
+</article></div>
+            </main><footer class="footer">
+        <div class="footer-container"><div class="footer-line">Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener noreffer" title="Hugo 0.121.2">Hugo</a> | Theme - <a href="https://github.com/dillonzq/LoveIt" target="_blank" rel="noopener noreffer" title="LoveIt 0.2.11"><i class="far fa-kiss-wink-heart fa-fw" aria-hidden="true"></i> LoveIt</a>
+                </div><div class="footer-line" itemscope itemtype="http://schema.org/CreativeWork"><i class="far fa-copyright fa-fw" aria-hidden="true"></i><span itemprop="copyrightYear">2022 - 2024</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="https://www.masimaro.xyz" target="_blank">Masimaro</a></span></div>
+        </div>
+    </footer></div>
+
+        <div id="fixed-buttons"><a href="#" id="back-to-top" class="fixed-button" title="Back to Top">
+                <i class="fas fa-arrow-up fa-fw" aria-hidden="true"></i>
+            </a><a href="#" id="view-comments" class="fixed-button" title="View Comments">
+                <i class="fas fa-comment fa-fw" aria-hidden="true"></i>
+            </a>
+        </div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.css"><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/autocomplete.js@0.38.1/dist/autocomplete.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lunr@2.3.9/lunr.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lazysizes@5.3.2/lazysizes.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/clipboard@2.0.11/dist/clipboard.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/sharer.js@0.5.1/sharer.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/auto-render.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/copy-tex.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/mhchem.min.js"></script><script type="text/javascript">window.config={"code":{"copyTitle":"Copy to clipboard","maxShownLines":50},"comment":{},"math":{"delimiters":[{"display":true,"left":"$$","right":"$$"},{"display":true,"left":"\\[","right":"\\]"},{"display":true,"left":"\\begin{equation}","right":"\\end{equation}"},{"display":true,"left":"\\begin{equation*}","right":"\\end{equation*}"},{"display":true,"left":"\\begin{align}","right":"\\end{align}"},{"display":true,"left":"\\begin{align*}","right":"\\end{align*}"},{"display":true,"left":"\\begin{alignat}","right":"\\end{alignat}"},{"display":true,"left":"\\begin{alignat*}","right":"\\end{alignat*}"},{"display":true,"left":"\\begin{gather}","right":"\\end{gather}"},{"display":true,"left":"\\begin{CD}","right":"\\end{CD}"},{"display":false,"left":"$","right":"$"},{"display":false,"left":"\\(","right":"\\)"}],"strict":false},"search":{"highlightTag":"em","maxResultLength":10,"noResultsFound":"No results found","snippetLength":50}};</script><script type="text/javascript" src="/js/theme.min.js"></script></body>
+</html>

@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="robots" content="noodp" />
+        <title>c&#43;&#43;基础之函数 - Masimaro&#39;s blog</title><meta name="Description" content="这是我用于记录日常和学习的小站"><meta property="og:title" content="c&#43;&#43;基础之函数" />
+<meta property="og:description" content="距离上次更新又过了一周，又该更新新的读书笔记了。本次更新的主要是c&#43;&#43;中函数部分的内容 c&#43;&#43; 中的函数与c语言中的函数大致用法或者语法是一样的，这" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://HaiLateBoy.github.io/posts/cpp-base-5/" /><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2021-03-08T19:53:49+00:00" />
+<meta property="article:modified_time" content="2021-03-08T19:53:49+00:00" /><meta property="og:site_name" content="Masimaro&#39;s blog" />
+
+<meta name="twitter:card" content="summary"/><meta name="twitter:title" content="c&#43;&#43;基础之函数"/>
+<meta name="twitter:description" content="距离上次更新又过了一周，又该更新新的读书笔记了。本次更新的主要是c&#43;&#43;中函数部分的内容 c&#43;&#43; 中的函数与c语言中的函数大致用法或者语法是一样的，这"/>
+<meta name="application-name" content="My cool site">
+<meta name="apple-mobile-web-app-title" content="My cool site"><meta name="theme-color" content="#ffffff"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="manifest" href="/site.webmanifest"><link rel="canonical" href="http://HaiLateBoy.github.io/posts/cpp-base-5/" /><link rel="prev" href="http://HaiLateBoy.github.io/posts/cpp-base-4/" /><link rel="next" href="http://HaiLateBoy.github.io/posts/why-read-books/" /><link rel="stylesheet" href="/css/style.min.css"><link rel="preload" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css"></noscript><link rel="preload" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css"></noscript><script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "BlogPosting",
+        "headline": "c++基础之函数",
+        "inLanguage": "zh-CN",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "http:\/\/HaiLateBoy.github.io\/posts\/cpp-base-5\/"
+        },"genre": "posts","keywords": "C\u002b\u002b, 语法, 基础, c\u002b\u002b11","wordcount":  5364 ,
+        "url": "http:\/\/HaiLateBoy.github.io\/posts\/cpp-base-5\/","datePublished": "2021-03-08T19:53:49+00:00","dateModified": "2021-03-08T19:53:49+00:00","publisher": {
+            "@type": "Organization",
+            "name": ""},"author": {
+                "@type": "Person",
+                "name": "Masimaro"
+            },"description": ""
+    }
+    </script></head>
+    <body data-header-desktop="fixed" data-header-mobile="auto"><script type="text/javascript">(window.localStorage && localStorage.getItem('theme') ? localStorage.getItem('theme') === 'dark' : ('auto' === 'auto' ? window.matchMedia('(prefers-color-scheme: dark)').matches : 'auto' === 'dark')) && document.body.setAttribute('theme', 'dark');</script>
+
+        <div id="mask"></div><div class="wrapper"><header class="desktop" id="header-desktop">
+    <div class="header-wrapper">
+        <div class="header-title">
+            <a href="/" title="Masimaro&#39;s blog">My cool site</a>
+        </div>
+        <div class="menu">
+            <div class="menu-inner"><a class="menu-item" href="/posts/" title="文章列表"> 文章 </a><a class="menu-item" href="/tags/" title="标签"> 标签 </a><a class="menu-item" href="/categories/" title="分类"> 分类 </a><a class="menu-item" href="/about" title="关于本站"> 关于 </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-desktop">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-desktop" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-desktop" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-desktop">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </span><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                    <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+                </a></div>
+        </div>
+    </div>
+</header><header class="mobile" id="header-mobile">
+    <div class="header-container">
+        <div class="header-wrapper">
+            <div class="header-title">
+                <a href="/" title="Masimaro&#39;s blog">My cool site</a>
+            </div>
+            <div class="menu-toggle" id="menu-toggle-mobile">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+        <div class="menu" id="menu-mobile"><div class="search-wrapper">
+                    <div class="search mobile" id="search-mobile">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-mobile">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-mobile" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-mobile" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-mobile">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </div>
+                    <a href="javascript:void(0);" class="search-cancel" id="search-cancel-mobile">
+                        Cancel
+                    </a>
+                </div><a class="menu-item" href="/posts/" title="文章列表">文章</a><a class="menu-item" href="/tags/" title="标签">标签</a><a class="menu-item" href="/categories/" title="分类">分类</a><a class="menu-item" href="/about" title="关于本站">关于</a><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+            </a></div>
+    </div>
+</header><div class="search-dropdown desktop">
+        <div id="search-dropdown-desktop"></div>
+    </div>
+    <div class="search-dropdown mobile">
+        <div id="search-dropdown-mobile"></div>
+    </div><main class="main">
+                <div class="container"><div class="toc" id="toc-auto">
+            <h2 class="toc-title">Contents</h2>
+            <div class="toc-content" id="toc-content-auto"></div>
+        </div><article class="page single"><h1 class="single-title animate__animated animate__flipInX">c++基础之函数</h1><div class="post-meta">
+            <div class="post-meta-line"><span class="post-author"><a href="https://www.masimaro.xyz" title="Author" target="_blank" rel="noopener noreffer author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Masimaro</a></span>&nbsp;<span class="post-category">included in <a href="/categories/c++/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>C++</a></span></div>
+            <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw" aria-hidden="true"></i>&nbsp;<time datetime="2021-03-08">2021-03-08</time>&nbsp;<i class="fas fa-pencil-alt fa-fw" aria-hidden="true"></i>&nbsp;5364 words&nbsp;
+                <i class="far fa-clock fa-fw" aria-hidden="true"></i>&nbsp;11 minutes&nbsp;</div>
+        </div><div class="details toc" id="toc-static"  data-kept="true">
+                <div class="details-summary toc-title">
+                    <span>Contents</span>
+                    <span><i class="details-icon fas fa-angle-right" aria-hidden="true"></i></span>
+                </div>
+                <div class="details-content toc-content" id="toc-content-static"><nav id="TableOfContents">
+  <ul>
+    <li><a href="#局部对象">局部对象</a></li>
+    <li><a href="#参数传递">参数传递</a>
+      <ul>
+        <li><a href="#数组形参">数组形参</a></li>
+        <li><a href="#可变形参">可变形参</a></li>
+      </ul>
+    </li>
+    <li><a href="#返回类型和return语句">返回类型和return语句</a>
+      <ul>
+        <li><a href="#无返回值的函数">无返回值的函数</a></li>
+        <li><a href="#返回普通值的函数">返回普通值的函数</a></li>
+        <li><a href="#返回数组指针的函数">返回数组指针的函数</a></li>
+      </ul>
+    </li>
+    <li><a href="#函数重载">函数重载</a></li>
+    <li><a href="#特殊用途的语言特性">特殊用途的语言特性</a>
+      <ul>
+        <li><a href="#默认实参">默认实参</a></li>
+        <li><a href="#内联函数">内联函数</a></li>
+        <li><a href="#constexpr-函数">constexpr 函数</a></li>
+        <li><a href="#调试帮助">调试帮助</a></li>
+      </ul>
+    </li>
+    <li><a href="#函数匹配">函数匹配</a>
+      <ul>
+        <li><a href="#确定候选函数和可行函数">确定候选函数和可行函数</a></li>
+        <li><a href="#寻找最佳匹配">寻找最佳匹配</a></li>
+        <li><a href="#实参类型转化">实参类型转化</a></li>
+        <li><a href="#函数指针">函数指针</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav></div>
+            </div><div class="content" id="content"><p>距离上次更新又过了一周，又该更新新的读书笔记了。本次更新的主要是c++中函数部分的内容</p>
+<!-- raw HTML omitted -->
+<p>c++ 中的函数与c语言中的函数大致用法或者语法是一样的，这里就不就这点详细展开了。需要注意的是c/c++中并没有规定函数中参数的求值顺序，所以在调用函数时需要特别注意，在传递实参的同时不要修改实参的值，也就是不要写类似<code>func(i, ++i)</code>这样的语句</p>
+<h2 id="局部对象">局部对象</h2>
+<p>高级语言中，名字只是用来访问对象所在内存的一个工具，一个对象可以分为对象名和它实际所占的内存空间。这个对象名有它的作用域，对象所在内存有自己的声明周期。这二者不是一个概念，不要弄混淆了。</p>
+<p>变量的作用域一般只在它所定义的语句块中起作用。但是变量本身根据定义位置不同，生命周期也不同，例如</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="kt">int</span> <span class="nf">func</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">for</span><span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="mi">10</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p>上述代码中i这个名称仅仅在for循环中有效，而i所指代的变量，它会一直持续到函数结束(可以参考鄙人曾经写过的关于c++反汇编分析相关的内容)</p>
+<p>根据定义位置的不同，变量分为局部变量和全局变量；</p>
+<ol>
+<li>局部变量，或者在书中有一个新的名字叫自动对象，对于局部变量来说，当代码执行到变量定义语句时创建该对象，当到达定义所在语句块的末端时销毁它，只存在于块执行期间的对象称作自动对象</li>
+<li>全局变量：定义在函数外部的变量称之为全局变量，全局变量的生命周期从程序启动时创建到程序结束时销毁。</li>
+</ol>
+<p>除了这两类以外，还有在函数中使用static关键字定义的局部静态变量，局部静态变量在程序第一次经过对象定义语句时初始化，并且直到程序终止时才会销毁。在此期间即使对象所在的函数结束执行也不会对它有影响。它与全局变量的生命周期相同，只是它的变量名被限定在了函数内部(关于什么时候为它分配内存，什么时候销毁的详细内容，也可以参考鄙人曾今写过的关于static的汇编分析)</p>
+<h2 id="参数传递">参数传递</h2>
+<p>参数传递主要有值传递、指针传递和引用传递</p>
+<ol>
+<li>值传递：将实参的值拷贝到形参，然后执行函数，函数中对形参的改变不影响函数外的实参</li>
+<li>指针传递：指针值本身也是一个拷贝，在函数中可以通过对指针进行解引用操作来间接的改变函数外的实参</li>
+<li>引用传递：引用本身是对象的别名，可以在函数中通过对引用的修改，来修改函数外实参的值（其实本质上也是通过指针来进行修改）</li>
+</ol>
+<p>根据这几种传参方式，我们总结出来这样几点：</p>
+<ol>
+<li>需要改变实参的值，只能传递指针或者引用</li>
+<li>由于存在值拷贝，所以在传递大的结构体的时候尽量传递结构体的指针或者引用，如果不想修改结构体的值，可以将形参定义为const型</li>
+<li>函数通过return语句只能返回一个值，如果要返回多个值，可以使用指针或者引用。</li>
+<li>return 语句本身会进行拷贝，并且在赋值给外部变量时也会进行拷贝，尽量返回4或者8个字节的结构，对于大的结构体尽量使用引用来返回</li>
+</ol>
+<p>当形参有顶层const时，传给它常量对象或者非常量对象都是可以的。</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="kt">int</span> <span class="nf">func</span><span class="p">(</span><span class="k">const</span> <span class="kt">int</span> <span class="n">i</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="kt">int</span> <span class="nf">func</span><span class="p">(</span><span class="kt">int</span> <span class="n">i</span><span class="p">);</span>
+</span></span></code></pre></div><p>由于顶层const被自动忽略，所以在上面代码会报错，两个函数的名称、形参列表实际上是相同的。</p>
+<h3 id="数组形参">数组形参</h3>
+<p>除了上述这样常规的参数传递，函数中也可以传递数组，这个时候数组会自动退化为指针，例如面试或者笔试题中，经常会问到的一个问题</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="n">size_t</span> <span class="nf">size_arr</span><span class="p">(</span><span class="kt">int</span><span class="p">[</span><span class="mi">10</span><span class="p">]</span> <span class="n">i</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">i</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p>这个时候，如果传递数组的首地址，在函数中会退化为指针，所以实际计算的是int*指针所占的内存。根据平台的不同，指针大小为4字节(32位版本)或者8字节(64位版本)</p>
+<p>如果想要真正的传递数组，可以使用引用的方式</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="n">size_t</span> <span class="nf">size_arr</span><span class="p">(</span><span class="kt">int</span> <span class="p">(</span><span class="o">&amp;</span><span class="n">arr</span><span class="p">)[</span><span class="mi">10</span><span class="p">])</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">arr</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p>此时arr表示有10个int型数据的数组的引用，最终得到的结果应该是 sizeof(int) * 10</p>
+<p>由于传递数组名时，数组名会退化为指针，所以如果只传递数组名，则在函数中无法确定数组的大小，为了解决这个问题，一般有3种方案：</p>
+<ol>
+<li>使用特殊标记，表示数组的结尾，一般字符串会这么干</li>
+<li>传递两个指针，表示数组的首地址和尾部地址，可以使用标准库中的begin 和 end 函数分别获取数组的首地址与尾地址</li>
+<li>显式传递一个表示数组元素个数的形参。这种情况一般使用下标运算，当下标达到这个指定值时退出循环</li>
+</ol>
+<p>当我们传递的是多维数组时，按照两个思路进行分析，多维数组其实是数组的数组，传递数组名实质上是数组的首元素地址。根据这两个原则进行分析，在传递多维数组时，后面的维度是数组元素类型，不能省略。而真正传递的是第一个该类型元素的地址。</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="kt">void</span> <span class="nf">print</span><span class="p">(</span><span class="kt">int</span> <span class="p">(</span><span class="o">*</span><span class="n">matrix</span><span class="p">)[</span><span class="mi">10</span><span class="p">]);</span> 
+</span></span><span class="line"><span class="cl"><span class="kt">void</span> <span class="nf">print</span><span class="p">(</span><span class="kt">int</span> <span class="n">matrix</span><span class="p">[][</span><span class="mi">10</span><span class="p">],</span> <span class="kt">int</span> <span class="n">rowSize</span><span class="p">);</span> <span class="c1">//等价定义
+</span></span></span></code></pre></div><p>上述定义中，数组的第一维被忽略掉，第二维是10个整数的数组。上面的两个定义其实是等价的</p>
+<h3 id="可变形参">可变形参</h3>
+<p>与以往使用 <code>...</code> 来表示可变形参不同的是，在c++ 中新增了一个名为initializer_list 的标准库类型，这个类型只能处理所有实参类型相同的情况，对于实参类型不同的情况，可以使用可变参函数模板。</p>
+<p>initializer_list 本身是一个类似与list的结构，但是与list不同的是，initializer_list中的对象永远是常量，无法修改该容器中的值，换一个角度来说，也就无法修改实参的值了。</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="kt">void</span> <span class="nf">error_msg</span><span class="p">(</span><span class="n">initializer_list</span><span class="o">&lt;</span><span class="n">string</span><span class="o">&gt;</span> <span class="n">il</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">for</span><span class="p">(</span><span class="k">auto</span> <span class="n">beg</span> <span class="o">=</span> <span class="n">il</span><span class="p">.</span><span class="n">begin</span><span class="p">();</span> <span class="n">beg</span> <span class="o">!=</span> <span class="n">il</span><span class="p">.</span><span class="n">end</span><span class="p">();</span> <span class="o">++</span><span class="n">beg</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="o">*</span><span class="n">beg</span> <span class="o">&lt;&lt;</span> <span class="s">&#34; &#34;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">endl</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">//由于它是一个容器，所以在传递值的时候应该使用一对花括号把所有值括起来
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="k">if</span><span class="p">(</span><span class="n">expected</span> <span class="o">!=</span> <span class="n">actual</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">error_msg</span><span class="p">({</span><span class="s">&#34;functionX&#34;</span><span class="p">,</span> <span class="s">&#34;expected&#34;</span><span class="p">,</span> <span class="s">&#34;actual&#34;</span><span class="p">});</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span><span class="k">else</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">error_msg</span><span class="p">({</span><span class="s">&#34;functionX&#34;</span><span class="p">,</span> <span class="s">&#34;okay&#34;</span><span class="p">});</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><h2 id="返回类型和return语句">返回类型和return语句</h2>
+<p>函数根据返回值类型可以分为三大类，无返回值的函数、返回普通值的函数、返回指针或者引用的函数。</p>
+<h3 id="无返回值的函数">无返回值的函数</h3>
+<p>无返回值的函数不要求非要有return 语句，这类函数在最后一句执行完后会隐式的执行return语句</p>
+<p>如果无返回值的函数需要在中间位置提前退出的话，可以使用return语句</p>
+<p>另一个使用return的场景是，直接在return后面加上函数调用，不过被调用的函数需要也是无返回值的函数</p>
+<h3 id="返回普通值的函数">返回普通值的函数</h3>
+<p>有返回值的函数，必须使用return 返回一个值，返回的值必须与函数的返回类型相同，或者能隐式的转化成函数的返回值</p>
+<p>要注意保证所有路径都有返回值，一般编译器能发现这类情况，但是有的编译器不能，如果执行了没有返回值的分支，将产生未定义错误</p>
+<p>不要返回局部对象的指针或者引用</p>
+<p>函数的调用优先级与点运算和箭头运算的优先级相同，并且也附和左结合律</p>
+<p>函数的返回类型决定函数调用是否是左值，调用一个返回引用的函数得到一个左值，其他返回类型得到右值，我们能为返回类型是非常量引用的函数结果赋值</p>
+<p>当返回一个容器时，c++ 11开始，可以返回由大括号组成的初始化列表</p>
+<p>针对main函数来说，最后可以不加return语句，如果最后没有return 则编译器默认给它加上一个return 0</p>
+<h3 id="返回数组指针的函数">返回数组指针的函数</h3>
+<p>因为数组不能被拷贝，所以不能直接返回数组，不过可以返回数组的指针或者引用</p>
+<p>定义指向数组的指针采用的是<code>int (*p)[10];</code> 的方式，同样的定义返回数组指针的函数，只需要把p定义为函数形式即可:<code>int (*func(int i))[10];</code>。</p>
+<p>上述定义写起来比较麻烦，而且也不容易理解，因此可以使用类型别名的方式来简化定义方式</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="kt">int</span> <span class="n">odd</span><span class="p">[]</span> <span class="o">=</span> <span class="p">{</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">9</span><span class="p">};</span>
+</span></span><span class="line"><span class="cl"><span class="kt">int</span> <span class="n">even</span><span class="p">[]</span> <span class="o">=</span> <span class="p">{</span><span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">10</span><span class="p">};</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">decltype</span><span class="p">(</span><span class="n">odd</span><span class="p">)</span><span class="o">*</span> <span class="n">arrPtr</span><span class="p">(</span><span class="kt">int</span> <span class="n">i</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="p">(</span><span class="n">i</span> <span class="o">%</span> <span class="mi">2</span><span class="p">)</span> <span class="o">?</span> <span class="o">&amp;</span><span class="n">odd</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">even</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p>当我们直到返回的数组指针具体指向哪个数组，可以使用decltype关键字来声明函数的返回类型。</p>
+<p>从c++11 开始，提供了一种新的定义方式，即尾置返回类型的方式</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="k">auto</span> <span class="nf">func</span><span class="p">(</span><span class="kt">int</span> <span class="n">i</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt">int</span> <span class="p">(</span><span class="o">*</span><span class="p">)[</span><span class="mi">10</span><span class="p">];</span>
+</span></span></code></pre></div><h2 id="函数重载">函数重载</h2>
+<p>c++ 与 c语言中的一个很大的不同就是c++ 允许函数重载。</p>
+<p>同一作用域内的几个函数名称相同，但形参列表不同的，称之为函数重载。注意这里的几个前提条件：同一作用域、函数名称相同、形参列表不同；这些条件缺一不可。而且这里说的是形参列表不同，返回值不同的不能算是重载。</p>
+<p>main函数作为入口函数，只能有一个</p>
+<p>顶层const不影响传入的参数，因此认为顶层const与普通形参相同，不认为是重载</p>
+<p>如果传入的参数是引用或者指针，可以根据它所指向的对象是否为const来进行区分，所以底层const可以作为重载</p>
+<p>由于非const型参数能转化为const型，所以当传参中多个函数都满足，编译器会优先选择const版本</p>
+<p>在实际使用时，根据调用时的传参，来与一组重载函数中的某一个关联起来，这个过程叫做函数匹配或者叫做重载确定</p>
+<p>一般情况下函数匹配过程很容易分别出来，要么是形参个数不同，要么是类型毫无关系，但是也有例外，例如：</p>
+<ol>
+<li>形参中存在默认值</li>
+<li>形参中一种类型可以转化为另一种类型</li>
+</ol>
+<p>目前来说调用函数的时候会出现下列三种情况：</p>
+<ol>
+<li>可以从一堆重载函数中正确匹配，编译通过</li>
+<li>没有函数复合调用时传入的实惨，此时编译报错，无法找到对应函数</li>
+<li>多个重载形式都复合传入的实惨，此时编译报错，存在二义性</li>
+</ol>
+<p>不要在局部作用域中定义函数，因为局部作用域内出现重名情况时，会进行名称覆盖</p>
+<h2 id="特殊用途的语言特性">特殊用途的语言特性</h2>
+<h3 id="默认实参">默认实参</h3>
+<p>在定义函数时，对于后续多次调用时，传入相同实参值的形参，可以给予一个默认值。这样在调用这个函数时，针对提供了默认值的参数，可以传参也可以不传</p>
+<p>函数调用时按照实参位置解析，默认实参负责填补函数调用缺少的尾部实参</p>
+<h3 id="内联函数">内联函数</h3>
+<p>一般函数调用涉及到参数的拷贝，返回值的拷贝，以及最终栈的回收等一系列操作。调用函数存在一定的性能开销，因此为了提高性能或者提高代码的重复使用率，c中可以使用宏定义来定义一个短小的常规操作，最终编译时会被编译器展开。但是宏定义无法对传入参数进行校验，而且需要注意的问题较多，不好理解。C++中引入内联函数，它与宏的功能类似，是一种没有额外开销的函数</p>
+<p>一般在函数的返回值类型前面加上inline 关键字就定义了一个内联函数</p>
+<p>并不是所有的函数都可以定义为内联函数。内联函数用于优化规模小、流程直接、调用频繁的函数，很多编译器不支持内联递归函数。而且一个大于75行的函数也不大可能在调用点内联展开</p>
+<h3 id="constexpr-函数">constexpr 函数</h3>
+<p>constexpr 函数是指能用于常量表达式的函数。</p>
+<p>constexpr函数与普通函数的定义相同，不过要遵循几项约定：</p>
+<ol>
+<li>函数的返回值以及所有形参类型都是字面值类型</li>
+<li>函数体中必须有且只有一条return语句</li>
+</ol>
+<p>在编译阶段，constexpr函数会被直接替换为它返回的具体的值，为了便于函数正常展开，constexpr函数默认都是内联函数</p>
+<p>由于在编译阶段编译器需要知道内联函数和constexpr 函数的定义。因此这两种函数可以重复定义。但是定义时要保证内容完全相同，基于这个理由，可以将这两种函数统一放到一个头文件中，在需要使用的时候包含它</p>
+<h3 id="调试帮助">调试帮助</h3>
+<p>可以使用assert预处理宏与NODEBUG宏，其中assert只有在调试模式下才会起作用，而NODEBUG宏则表示当前在发布模式下，此时assert函数不会起作用
+另外C++ 也定义一些名字便于调试：</p>
+<ol>
+<li><strong>FILE</strong>: 当前代码所在文件的名称</li>
+<li><strong>LINE</strong>: 当前代码所在行数</li>
+<li><strong>TIME</strong>: 当前代码文件被编译的时间</li>
+<li><strong>DATE</strong>: 当前代码文件被编译的日期</li>
+<li><strong>func</strong>: 当前代码所在的函数</li>
+</ol>
+<h2 id="函数匹配">函数匹配</h2>
+<p>在大多数情况下，很容易分辨某次调用应该选择哪个重载函数，然而当几个重载函数的形参数量相等以及某些形参的类型可以由其他类型转化得来时，这项工作就不那么容易了。</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="kt">void</span> <span class="nf">f</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl"><span class="kt">void</span> <span class="nf">f</span><span class="p">(</span><span class="kt">int</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="kt">void</span> <span class="nf">f</span><span class="p">(</span><span class="kt">int</span><span class="p">,</span> <span class="kt">int</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="kt">void</span> <span class="nf">f</span><span class="p">(</span><span class="kt">double</span><span class="p">,</span> <span class="kt">double</span> <span class="o">=</span> <span class="mf">3.14</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">//调用
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="n">f</span><span class="p">(</span><span class="mf">5.6</span><span class="p">);</span>
+</span></span></code></pre></div><p>函数匹配过程一般经历如下步骤：</p>
+<h3 id="确定候选函数和可行函数">确定候选函数和可行函数</h3>
+<p>第一步选定本次调用对应的重载函数集，集合中的函数被称之为候选函数。候选函数具备两个特点，一是与被调用的函数同名，二是其声明在调用点可见，这步下来，上述例子中所有f函数都满足条件
+第二步考察本次调用提供的实参，然后从候选函数中选择能被这组实参调用的函数，这些函数被称为可行函数，可行函数也有两个特征，一是其形参数量与本次调用提供的实参数量相同，二是每个实参与对应形参类型相同，或者能转化成形参的类型。上述实例，调用传入的是一个double类型的参数，double可以转化为int，因此这个时候发现满足条件的是 <code>void f(int);</code> 和 <code>void f(double, double=3.14);</code></p>
+<h3 id="寻找最佳匹配">寻找最佳匹配</h3>
+<p>第三步是从可行函数中寻找与本次调用最匹配的函数，它的基本思想是实参类型与形参类型越接近，它们匹配的越好。</p>
+<p>如果多个形参都与调用函数的实参较为接近且，如果有且只有一个函数同时满足下面两个条件，则匹配成功：</p>
+<ol>
+<li>该函数每个实参的匹配不劣与其他可行函数需要的匹配</li>
+<li>至少有一个实参的匹配优于其他可行函数提供的方案</li>
+</ol>
+<p>如果检查了所有实参后没有任何一个函数脱颖而出，则调用错误，编译器将报告二义性。</p>
+<p>调用重载函数尽量避免强制类型转换，如果在实际应用中需要进行强制类型转换，说明我们设计的形参集合不合理</p>
+<p>分析上面的例子，如果采用 <code>void f(int);</code> 在调用时会进行一次将double转化为int的类型转化，如果使用 <code>void f(double, double=3.14);</code> 5.6作为double的第一个参数进行传递不需要类型转化，而第二个参数使用默认形参，这里可以不传，因此相比较与第一种int的传参方式，后一种显然更加复合</p>
+<h3 id="实参类型转化">实参类型转化</h3>
+<p>为了确定最佳匹配，编译器将实参类型到形参类型的转化划分为几个等级，具体排序如下所示：</p>
+<ol>
+<li>
+<p>精确匹配，包括下列情况
+1.1. 实参类型和形参类型相同
+1.2. 实参从数组类型或者函数类型转化为对应的指针类型
+1.3. 像实参添加顶层const或者从实参中删除顶层const</p>
+</li>
+<li>
+<p>通过const转换实现的类型匹配</p>
+</li>
+<li>
+<p>通过类型提升实现的类型匹配</p>
+</li>
+<li>
+<p>通过算术类型转换或者指针转换实现的匹配</p>
+</li>
+<li>
+<p>通过类类型转换实现的匹配</p>
+</li>
+</ol>
+<h3 id="函数指针">函数指针</h3>
+<p>声明函数指针时，只需要将函数声明中的函数名写为指针名即可，但是需要注意使用括号将表示指针的*与指针名称括起来</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="kt">void</span> <span class="p">(</span><span class="o">*</span><span class="n">f</span><span class="p">)(</span><span class="kt">int</span><span class="p">);</span>
+</span></span></code></pre></div><p>当我们把函数名直接作为一个值使用时，该函数自动转化为指针；也可以使用取地址符针对函数名称取地址，二者是等价的。</p>
+<p>指向不同类型函数的指针不存在类型转化</p>
+<p>重载函数的指针必须与某个函数精确匹配，不存在形参类型转化之类的规则</p>
+<p>可以使用typedef来为函数指针类型定义一个类型别名</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="k">typedef</span> <span class="nf">void</span><span class="p">(</span><span class="o">*</span><span class="n">f</span><span class="p">)(</span><span class="kt">int</span><span class="p">);</span> <span class="c1">//将返回void、传入一个int参数的函数指针取类型别名为f
+</span></span></span></code></pre></div><!-- raw HTML omitted -->
+</div><div class="post-footer" id="post-footer">
+    <div class="post-info">
+        <div class="post-info-line">
+            <div class="post-info-mod">
+                <span>Updated on 2021-03-08</span>
+            </div></div>
+        <div class="post-info-line">
+            <div class="post-info-md"></div>
+            <div class="post-info-share">
+                <span><a href="javascript:void(0);" title="Share on Twitter" data-sharer="twitter" data-url="http://HaiLateBoy.github.io/posts/cpp-base-5/" data-title="c&#43;&#43;基础之函数" data-hashtags="C&#43;&#43;,语法,基础,c&#43;&#43;11"><i class="fab fa-twitter fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Facebook" data-sharer="facebook" data-url="http://HaiLateBoy.github.io/posts/cpp-base-5/" data-hashtag="C&#43;&#43;"><i class="fab fa-facebook-square fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Hacker News" data-sharer="hackernews" data-url="http://HaiLateBoy.github.io/posts/cpp-base-5/" data-title="c&#43;&#43;基础之函数"><i class="fab fa-hacker-news fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Line" data-sharer="line" data-url="http://HaiLateBoy.github.io/posts/cpp-base-5/" data-title="c&#43;&#43;基础之函数"><i data-svg-src="https://cdn.jsdelivr.net/npm/simple-icons@7.3.0/icons/line.svg" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on 微博" data-sharer="weibo" data-url="http://HaiLateBoy.github.io/posts/cpp-base-5/" data-title="c&#43;&#43;基础之函数"><i class="fab fa-weibo fa-fw" aria-hidden="true"></i></a></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="post-info-more">
+        <section class="post-tags"><i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/c&#43;&#43;/">C&#43;&#43;</a>,&nbsp;<a href="/tags/%E8%AF%AD%E6%B3%95/">语法</a>,&nbsp;<a href="/tags/%E5%9F%BA%E7%A1%80/">基础</a>,&nbsp;<a href="/tags/c&#43;&#43;11/">c&#43;&#43;11</a></section>
+        <section>
+            <span><a href="javascript:void(0);" onclick="window.history.back();">Back</a></span>&nbsp;|&nbsp;<span><a href="/">Home</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav"><a href="/posts/cpp-base-4/" class="prev" rel="prev" title="c&#43;&#43;基础之语句"><i class="fas fa-angle-left fa-fw" aria-hidden="true"></i>c++基础之语句</a>
+            <a href="/posts/why-read-books/" class="next" rel="next" title="我为什么读书">我为什么读书<i class="fas fa-angle-right fa-fw" aria-hidden="true"></i></a></div>
+</div>
+</article></div>
+            </main><footer class="footer">
+        <div class="footer-container"><div class="footer-line">Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener noreffer" title="Hugo 0.121.2">Hugo</a> | Theme - <a href="https://github.com/dillonzq/LoveIt" target="_blank" rel="noopener noreffer" title="LoveIt 0.2.11"><i class="far fa-kiss-wink-heart fa-fw" aria-hidden="true"></i> LoveIt</a>
+                </div><div class="footer-line" itemscope itemtype="http://schema.org/CreativeWork"><i class="far fa-copyright fa-fw" aria-hidden="true"></i><span itemprop="copyrightYear">2022 - 2024</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="https://www.masimaro.xyz" target="_blank">Masimaro</a></span></div>
+        </div>
+    </footer></div>
+
+        <div id="fixed-buttons"><a href="#" id="back-to-top" class="fixed-button" title="Back to Top">
+                <i class="fas fa-arrow-up fa-fw" aria-hidden="true"></i>
+            </a><a href="#" id="view-comments" class="fixed-button" title="View Comments">
+                <i class="fas fa-comment fa-fw" aria-hidden="true"></i>
+            </a>
+        </div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.css"><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/autocomplete.js@0.38.1/dist/autocomplete.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lunr@2.3.9/lunr.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lazysizes@5.3.2/lazysizes.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/clipboard@2.0.11/dist/clipboard.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/sharer.js@0.5.1/sharer.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/auto-render.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/copy-tex.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/mhchem.min.js"></script><script type="text/javascript">window.config={"code":{"copyTitle":"Copy to clipboard","maxShownLines":50},"comment":{},"math":{"delimiters":[{"display":true,"left":"$$","right":"$$"},{"display":true,"left":"\\[","right":"\\]"},{"display":true,"left":"\\begin{equation}","right":"\\end{equation}"},{"display":true,"left":"\\begin{equation*}","right":"\\end{equation*}"},{"display":true,"left":"\\begin{align}","right":"\\end{align}"},{"display":true,"left":"\\begin{align*}","right":"\\end{align*}"},{"display":true,"left":"\\begin{alignat}","right":"\\end{alignat}"},{"display":true,"left":"\\begin{alignat*}","right":"\\end{alignat*}"},{"display":true,"left":"\\begin{gather}","right":"\\end{gather}"},{"display":true,"left":"\\begin{CD}","right":"\\end{CD}"},{"display":false,"left":"$","right":"$"},{"display":false,"left":"\\(","right":"\\)"}],"strict":false},"search":{"highlightTag":"em","maxResultLength":10,"noResultsFound":"No results found","snippetLength":50}};</script><script type="text/javascript" src="/js/theme.min.js"></script></body>
+</html>

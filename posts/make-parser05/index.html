@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="robots" content="noodp" />
+        <title>从0开始自制解释器——添加对乘除法的支持 - Masimaro&#39;s blog</title><meta name="Description" content="这是我用于记录日常和学习的小站"><meta property="og:title" content="从0开始自制解释器——添加对乘除法的支持" />
+<meta property="og:description" content="在上一篇中，我们实现了对减法的支持，并且介绍了语法图。针对简单的语法进行描述，用语法图描述当然是没问题的。但是针对一些复杂的语法进行描述，如" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://HaiLateBoy.github.io/posts/make-parser05/" /><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2023-03-22T15:00:51+08:00" />
+<meta property="article:modified_time" content="2023-03-22T15:00:51+08:00" /><meta property="og:site_name" content="Masimaro&#39;s blog" />
+
+<meta name="twitter:card" content="summary"/><meta name="twitter:title" content="从0开始自制解释器——添加对乘除法的支持"/>
+<meta name="twitter:description" content="在上一篇中，我们实现了对减法的支持，并且介绍了语法图。针对简单的语法进行描述，用语法图描述当然是没问题的。但是针对一些复杂的语法进行描述，如"/>
+<meta name="application-name" content="My cool site">
+<meta name="apple-mobile-web-app-title" content="My cool site"><meta name="theme-color" content="#ffffff"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="manifest" href="/site.webmanifest"><link rel="canonical" href="http://HaiLateBoy.github.io/posts/make-parser05/" /><link rel="prev" href="http://HaiLateBoy.github.io/posts/make-parser04/" /><link rel="next" href="http://HaiLateBoy.github.io/posts/make-parser06/" /><link rel="stylesheet" href="/css/style.min.css"><link rel="preload" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css"></noscript><link rel="preload" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css"></noscript><script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "BlogPosting",
+        "headline": "从0开始自制解释器——添加对乘除法的支持",
+        "inLanguage": "zh-CN",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "http:\/\/HaiLateBoy.github.io\/posts\/make-parser05\/"
+        },"genre": "posts","keywords": "编译原理, 编译器, c语言","wordcount":  2756 ,
+        "url": "http:\/\/HaiLateBoy.github.io\/posts\/make-parser05\/","datePublished": "2023-03-22T15:00:51+08:00","dateModified": "2023-03-22T15:00:51+08:00","publisher": {
+            "@type": "Organization",
+            "name": ""},"author": {
+                "@type": "Person",
+                "name": "Masimaro"
+            },"description": ""
+    }
+    </script></head>
+    <body data-header-desktop="fixed" data-header-mobile="auto"><script type="text/javascript">(window.localStorage && localStorage.getItem('theme') ? localStorage.getItem('theme') === 'dark' : ('auto' === 'auto' ? window.matchMedia('(prefers-color-scheme: dark)').matches : 'auto' === 'dark')) && document.body.setAttribute('theme', 'dark');</script>
+
+        <div id="mask"></div><div class="wrapper"><header class="desktop" id="header-desktop">
+    <div class="header-wrapper">
+        <div class="header-title">
+            <a href="/" title="Masimaro&#39;s blog">My cool site</a>
+        </div>
+        <div class="menu">
+            <div class="menu-inner"><a class="menu-item" href="/posts/" title="文章列表"> 文章 </a><a class="menu-item" href="/tags/" title="标签"> 标签 </a><a class="menu-item" href="/categories/" title="分类"> 分类 </a><a class="menu-item" href="/about" title="关于本站"> 关于 </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-desktop">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-desktop" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-desktop" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-desktop">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </span><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                    <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+                </a></div>
+        </div>
+    </div>
+</header><header class="mobile" id="header-mobile">
+    <div class="header-container">
+        <div class="header-wrapper">
+            <div class="header-title">
+                <a href="/" title="Masimaro&#39;s blog">My cool site</a>
+            </div>
+            <div class="menu-toggle" id="menu-toggle-mobile">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+        <div class="menu" id="menu-mobile"><div class="search-wrapper">
+                    <div class="search mobile" id="search-mobile">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-mobile">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-mobile" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-mobile" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-mobile">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </div>
+                    <a href="javascript:void(0);" class="search-cancel" id="search-cancel-mobile">
+                        Cancel
+                    </a>
+                </div><a class="menu-item" href="/posts/" title="文章列表">文章</a><a class="menu-item" href="/tags/" title="标签">标签</a><a class="menu-item" href="/categories/" title="分类">分类</a><a class="menu-item" href="/about" title="关于本站">关于</a><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+            </a></div>
+    </div>
+</header><div class="search-dropdown desktop">
+        <div id="search-dropdown-desktop"></div>
+    </div>
+    <div class="search-dropdown mobile">
+        <div id="search-dropdown-mobile"></div>
+    </div><main class="main">
+                <div class="container"><div class="toc" id="toc-auto">
+            <h2 class="toc-title">Contents</h2>
+            <div class="toc-content" id="toc-content-auto"></div>
+        </div><article class="page single"><h1 class="single-title animate__animated animate__flipInX">从0开始自制解释器——添加对乘除法的支持</h1><div class="post-meta">
+            <div class="post-meta-line"><span class="post-author"><a href="https://www.masimaro.xyz" title="Author" target="_blank" rel="noopener noreffer author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Masimaro</a></span>&nbsp;<span class="post-category">included in <a href="/categories/%E8%87%AA%E5%88%B6%E8%A7%A3%E9%87%8A%E5%99%A8/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>自制解释器</a></span></div>
+            <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw" aria-hidden="true"></i>&nbsp;<time datetime="2023-03-22">2023-03-22</time>&nbsp;<i class="fas fa-pencil-alt fa-fw" aria-hidden="true"></i>&nbsp;2756 words&nbsp;
+                <i class="far fa-clock fa-fw" aria-hidden="true"></i>&nbsp;6 minutes&nbsp;</div>
+        </div><div class="details toc" id="toc-static"  data-kept="true">
+                <div class="details-summary toc-title">
+                    <span>Contents</span>
+                    <span><i class="details-icon fas fa-angle-right" aria-hidden="true"></i></span>
+                </div>
+                <div class="details-content toc-content" id="toc-content-static"><nav id="TableOfContents">
+  <ul>
+    <li><a href="#bnf范式与上下文无关文法">BNF范式与上下文无关文法</a></li>
+    <li><a href="#代码编写">代码编写</a></li>
+  </ul>
+</nav></div>
+            </div><div class="content" id="content"><p>在上一篇中，我们实现了对减法的支持，并且介绍了语法图。针对简单的语法进行描述，用语法图描述当然是没问题的。但是针对一些复杂的语法进行描述，如果每个部分都通过语法图来描述就显得有些繁琐了。这篇我们先介绍另一种描述语法的方式，并进一步介绍一些关于语法分析的知识。</p>
+<h2 id="bnf范式与上下文无关文法">BNF范式与上下文无关文法</h2>
+<p>巴科斯范式 以美国人巴科斯(Backus)和丹麦人诺尔(Naur)的名字命名的一种形式化的语法表示方法，用来描述语法的一种形式体系，是一种典型的元语言。又称巴科斯-诺尔形式(Backus-Naur form)。它不仅能严格地表示语法规则，而且所描述的语法是与上下文无关的。它以递归方式描述语言中的各种成分，凡遵守其规则的程序就可保证语法上的正确性。它具有语法简单，表示明确，便于语法分析和编译的特点。</p>
+<p>BNF表示语法规则的方式为：非终结符用尖括号括起。每条规则的左部是一个非终结符，右部是由非终结符和终结符组成的一个符号串，中间一般以“：：=”分开。具有相同左部的规则可以共用一个左部，各右部之间以直竖“|”隔开。所谓非终结符就是语言中某些抽象的概念不能直接出现在语言中的符号，终结符就是可以直接出现在语言中的符号。</p>
+<p>其实这些都是一些官话，初看起来只觉得拗口和难以理解，但是它的形式非常简单。它主要是用下面几个符号来表达含义</p>
+<ul>
+<li>使用&lt;&gt;来表示必须包含的部分</li>
+<li>使用[]来表示可选部分</li>
+<li>使用{}来表示可以重复0次或者无数次</li>
+<li>使用|来表示左右两边任选一部分，相当于OR</li>
+<li>使用::=来表示被定义为</li>
+</ul>
+<p>现在来给出具体的例子，我们都看过《西游记》，里面的取经4人组包括唐僧、孙悟空、猪八戒和沙僧。使用BNF范式进行定义，可以写成 <code>&lt;取经团队&gt;::=&lt;唐僧&gt;&lt;孙悟空&gt;&lt;猪八戒&gt;&lt;沙僧&gt;</code>。</p>
+<p>我们再来举一个例子，我们知道一个文章由若干个段落组成、一个段落由若干个句子组成、一个句子由符合一定语法规则的汉字组成并且以句号作为结尾。我们简单的将句子的语法规则定义为主谓宾三个部分。而这里的主谓宾我们简单的用一些名词和动词来定义。因此这里的一系列结构可以定义为如下内容</p>
+<p>&lt;文章&gt;::={&lt;段落&gt;}
+&lt;段落&gt;::={&lt;句子&gt;}
+&lt;句子&gt;::=&lt;主语&gt;&lt;谓语&gt;&lt;宾语&gt;。
+&lt;主语&gt;::=人|狗|猫|天
+&lt;谓语&gt;::=吃|抓|下
+&lt;宾语&gt;::=饭|雨|肉|鱼</p>
+<p>根据这个表达式我们很容易的推出类似 <code>人吃饭。</code>、<code>天下雨。</code>、<code>猫抓鱼。</code> 这样的句子。相信到这里小伙伴应该明白BNF范式的一些基本概念和使用方式了。</p>
+<p>我们再来插入一个题外话，既然这里提到BNF范式是一种上下文无关文法，那什么是上下文、什么是上下文无关。先别着急了解概念，我们仍然通过例子来说明。在上述的句子的定义中，我们一共可以生成 <code>4 * 3 * 4 = 48</code> 种 结果，我们可以获得类似 <code>人吃饭。</code>、<code>猫抓鱼。</code>这种有意义的句子，也可能产生像<code>天吃鱼。</code>、<code>人下雨</code> 这种读起来感觉别扭的非正常语句。但是在上下文无关的语法中，主语宾语和谓语的内容没有相互关联，也就是说谓语和宾语的产生与主语无关。那上下文有关的文法呢？这里为了产生一些有意义的句子，我们给它加上一些限定。例如<code>人</code>后面只能接 <code>吃</code> <code>抓</code>作为谓语、而当吃作为谓语时只能将 <code>饭</code>、<code>肉</code>、<code>鱼</code>作为宾语。针对这种需求，我们可以进行如下定义</p>
+<p>&lt;句子&gt;::=&lt;主语&gt;&lt;谓语&gt;&lt;宾语&gt;。
+&lt;主语&gt;::=人|狗|猫|天
+人&lt;谓语&gt;::=人(吃|抓)
+吃&lt;宾语&gt;::=吃(饭｜肉|鱼)</p>
+<p>这样我们对这个产生式进行了一些限定，当主语是人的时候，谓语只能产生吃和抓这样的宾语。这种情况下的描述就被称之为上下文有关。上下文无关我自己的理解就是后续表达式的产生不依赖前面已产生的内容。而上下文有关的含义则与之相法。这个上下文就跟我们这么多年阅读理解题里面写的“请根据上下文来理解某个词表达了作者怎样的心情”这里的上下文类似。</p>
+<p>当然更加规范的说法就是，在应用一个产生式进行推导时，前后已经推导出的部分结果就是上下文。上下文无关就是只要文法的定义里面有一个定义，不管前面的产生串是什么都可以应用相应的产生推导后面的内容。</p>
+<h2 id="代码编写">代码编写</h2>
+<p>上面的定义只是开胃菜，希望通过上面的描述，小伙伴能够理解BNF范式的应用，至于上下文无关和上下文有关。这些暂时不用考虑，毕竟我们目前还是在做上下文无关文法相关的内容。</p>
+<p>这里我们要支持乘法和除法，首先要做的就是在 <code>ETokenType</code> 结构中添加对乘法和除法相关的定义</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="k">typedef</span> <span class="k">enum</span> <span class="n">e_TokenType</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">CINT</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="c1">//整数
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="n">PLUS</span><span class="p">,</span> <span class="c1">//加法
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="n">MINUS</span><span class="p">,</span> <span class="c1">//减法
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="n">DIV</span><span class="p">,</span> <span class="c1">//乘法
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="n">MUL</span><span class="p">,</span> <span class="c1">//除法
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="n">END_OF_FILE</span> <span class="c1">// 字符串末尾结束符号
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">}</span><span class="n">ETokenType</span><span class="p">;</span>
+</span></span></code></pre></div><p>接着在 <code>get_next_token</code>和 <code>get_oper()</code> 函数中添加对这两个运算符的支持</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="c1">// get_next_token
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="k">else</span> <span class="nf">if</span> <span class="p">(</span><span class="n">c</span> <span class="o">==</span> <span class="sc">&#39;*&#39;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">pToken</span><span class="o">-&gt;</span><span class="n">type</span> <span class="o">=</span> <span class="n">DIV</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">dyncstring_catch</span><span class="p">(</span><span class="o">&amp;</span><span class="n">pToken</span><span class="o">-&gt;</span><span class="n">value</span><span class="p">,</span> <span class="sc">&#39;*&#39;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="k">else</span> <span class="nf">if</span> <span class="p">(</span><span class="n">c</span> <span class="o">==</span> <span class="sc">&#39;/&#39;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">pToken</span><span class="o">-&gt;</span><span class="n">type</span> <span class="o">=</span> <span class="n">MUL</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">dyncstring_catch</span><span class="p">(</span><span class="o">&amp;</span><span class="n">pToken</span><span class="o">-&gt;</span><span class="n">value</span><span class="p">,</span> <span class="sc">&#39;/&#39;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// get_oper
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="k">if</span> <span class="p">(</span><span class="nf">get_next_token</span><span class="p">(</span><span class="o">&amp;</span><span class="n">token</span><span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="p">(</span><span class="n">token</span><span class="p">.</span><span class="n">type</span> <span class="o">==</span> <span class="n">PLUS</span> <span class="o">||</span> <span class="n">token</span><span class="p">.</span><span class="n">type</span> <span class="o">==</span> <span class="n">MINUS</span> <span class="o">||</span> <span class="n">token</span><span class="p">.</span><span class="n">type</span> <span class="o">==</span> <span class="n">DIV</span> <span class="o">||</span> <span class="n">token</span><span class="p">.</span><span class="n">type</span> <span class="o">==</span> <span class="n">MUL</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">oper</span> <span class="o">=</span> <span class="n">token</span><span class="p">.</span><span class="n">type</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="p">(</span><span class="n">pRet</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="o">*</span><span class="n">pRet</span> <span class="o">=</span> <span class="nb">true</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p>现在词法分析部分已经可以支持乘除法的符号解析了。接着来完成语法分析的部分。首先我们来定义一下这个简单计算器的文法。</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-txt" data-lang="txt"><span class="line"><span class="cl">&lt;expr&gt;::=&lt;term&gt;{&lt;oper&gt;&lt;term&gt;}
+</span></span><span class="line"><span class="cl">&lt;term&gt;::={0|1|2|3|4|5|6|7|8|9}
+</span></span><span class="line"><span class="cl">&lt;oper&gt;::=PLUS|MINUS|DIV|MUL
+</span></span></code></pre></div><p>回忆一下上一节给出的语法图，理解这个表达式并不算困难。但是这里我们定义的文法有一个问题，就是从文法上体现不出运算的优先级。学过小学数学的都知道算数运算中优先计算乘除法，最后算加减法。但是根据这个文法我们无法体现出乘除法的优先级。因此这里我们需要修改定义。优先计算乘除法在文法上可以理解成，乘除法单独成一个部分，我们获取这个部分的计算结果最后与其他部分一起计算加减法。用BNF范式来体现就是</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-txt" data-lang="txt"><span class="line"><span class="cl">&lt;expr&gt;::=&lt;term&gt;{(PLUS|MINUS)&lt;term&gt;}
+</span></span><span class="line"><span class="cl">&lt;term&gt;::=&lt;factor&gt;{(DIV|MUL)&lt;factor&gt;}
+</span></span><span class="line"><span class="cl">&lt;factor&gt;::={0|1|2|3|4|5|6|7|8|9}
+</span></span></code></pre></div><p>与语法图类似，范式也可以很容易转化为代码。允许出现多次的我们在代码实现上体现为循环。而文法中相关的定义我们直接采用一些get方式来获取对应被打上标记的值即可。上述文法描述可以转化为如下的<code>c</code> 代码</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="kt">int</span> <span class="nf">expr</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">bool</span> <span class="n">bRet</span> <span class="o">=</span> <span class="nb">false</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">int</span> <span class="n">result</span> <span class="o">=</span> <span class="nf">get_term</span><span class="p">(</span><span class="o">&amp;</span><span class="n">bRet</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">int</span> <span class="n">bEOF</span> <span class="o">=</span> <span class="nb">false</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="k">do</span>
+</span></span><span class="line"><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">ETokenType</span> <span class="n">oper</span> <span class="o">=</span> <span class="nf">get_oper</span><span class="p">(</span><span class="o">&amp;</span><span class="n">bRet</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="k">switch</span> <span class="p">(</span><span class="n">oper</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="p">{</span>
+</span></span><span class="line"><span class="cl">            <span class="k">case</span> <span class="nl">PLUS</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">            <span class="p">{</span>
+</span></span><span class="line"><span class="cl">                <span class="kt">int</span> <span class="n">num</span> <span class="o">=</span> <span class="nf">get_term</span><span class="p">(</span><span class="o">&amp;</span><span class="n">bRet</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">                <span class="k">if</span><span class="p">(</span><span class="n">bRet</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">                    <span class="n">result</span> <span class="o">+=</span> <span class="n">num</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">            <span class="p">}</span>
+</span></span><span class="line"><span class="cl">            <span class="k">break</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="k">case</span> <span class="nl">MINUS</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">            <span class="p">{</span>
+</span></span><span class="line"><span class="cl">                <span class="kt">int</span> <span class="n">num</span> <span class="o">=</span> <span class="nf">get_term</span><span class="p">(</span><span class="o">&amp;</span><span class="n">bRet</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">                <span class="k">if</span><span class="p">(</span><span class="n">bRet</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">                    <span class="n">result</span> <span class="o">-=</span> <span class="n">num</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">            <span class="p">}</span>
+</span></span><span class="line"><span class="cl">            <span class="k">break</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="k">case</span> <span class="nl">END_OF_FILE</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">            <span class="nf">printf</span><span class="p">(</span><span class="s">&#34;%d</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">,</span> <span class="n">result</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">            <span class="n">bEOF</span> <span class="o">=</span> <span class="nb">true</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">            <span class="k">break</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="k">default</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">            <span class="n">bRet</span> <span class="o">=</span> <span class="nb">false</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">            <span class="k">break</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span> <span class="k">while</span> <span class="p">(</span><span class="n">bRet</span> <span class="o">&amp;&amp;</span> <span class="o">!</span><span class="n">bEOF</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">bRet</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="nf">printf</span><span class="p">(</span><span class="s">&#34;Syntax Error!</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p>上述<code>expr</code>的定义就是由一个<code>term</code>加若干个 <code>+|-</code> 和后面的若干个<code>term</code> 来组成，因此这里有一个循环。来取出所有<code>term</code> 和所有加减法，并进行计算。</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="kt">int</span> <span class="nf">get_term</span><span class="p">(</span><span class="kt">bool</span><span class="o">*</span> <span class="n">pValid</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">int</span> <span class="n">result</span> <span class="o">=</span> <span class="nf">get_factor</span><span class="p">(</span><span class="n">pValid</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">int</span> <span class="n">bEOF</span> <span class="o">=</span> <span class="nb">false</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="k">do</span>
+</span></span><span class="line"><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">ETokenType</span> <span class="n">oper</span> <span class="o">=</span> <span class="nf">get_oper</span><span class="p">(</span><span class="n">pValid</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="k">switch</span> <span class="p">(</span><span class="n">oper</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="k">case</span> <span class="nl">DIV</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">            <span class="p">{</span>
+</span></span><span class="line"><span class="cl">                <span class="kt">int</span> <span class="n">num</span> <span class="o">=</span> <span class="nf">get_factor</span><span class="p">(</span><span class="n">pValid</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">                <span class="k">if</span> <span class="p">(</span><span class="o">*</span><span class="n">pValid</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">                    <span class="n">result</span> <span class="o">*=</span> <span class="n">num</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">            <span class="p">}</span>
+</span></span><span class="line"><span class="cl">            <span class="k">break</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="k">case</span> <span class="nl">MUL</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">            <span class="p">{</span>
+</span></span><span class="line"><span class="cl">                <span class="kt">int</span> <span class="n">num</span> <span class="o">=</span> <span class="nf">get_factor</span><span class="p">(</span><span class="n">pValid</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">                <span class="k">if</span> <span class="p">(</span><span class="o">*</span><span class="n">pValid</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">                    <span class="n">result</span> <span class="o">/=</span> <span class="n">num</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">            <span class="p">}</span>
+</span></span><span class="line"><span class="cl">            <span class="k">break</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="k">case</span> <span class="nl">PLUS</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">        <span class="k">case</span> <span class="nl">MINUS</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">            <span class="p">{</span>
+</span></span><span class="line"><span class="cl">                <span class="n">g_pPosition</span><span class="o">--</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">                <span class="n">bEOF</span> <span class="o">=</span> <span class="nb">true</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">            <span class="p">}</span>
+</span></span><span class="line"><span class="cl">            <span class="k">break</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="k">case</span> <span class="nl">END_OF_FILE</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">            <span class="p">{</span>
+</span></span><span class="line"><span class="cl">                <span class="n">g_pPosition</span><span class="o">--</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">                <span class="n">bEOF</span> <span class="o">=</span> <span class="nb">true</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">            <span class="p">}</span>
+</span></span><span class="line"><span class="cl">        <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span> <span class="k">while</span> <span class="p">(</span><span class="n">pValid</span> <span class="o">&amp;&amp;</span> <span class="o">!</span><span class="n">bEOF</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="n">result</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p>而<code>term</code> 则是由整数以及若干个乘除法和另一个整数组成，所以代码中也用循环来取一直到取到不是这个<code>term</code> 定义所组成的部。注意这里与之前一样，当取到term的结束部分，我们仍然需要将索引进行递减。</p>
+<p>而最终的<code>oper</code> 和 <code>factor</code> 则保持原来的算法不变。</p>
+<p>好了，本篇到此也就结束了，小伙伴可以到<a href="https://github.com/aMonst/MMTCC" target="_blank" rel="noopener noreffer ">该位置</a> 取出代码来进行阅读和修改。</p>
+</div><div class="post-footer" id="post-footer">
+    <div class="post-info">
+        <div class="post-info-line">
+            <div class="post-info-mod">
+                <span>Updated on 2023-03-22</span>
+            </div></div>
+        <div class="post-info-line">
+            <div class="post-info-md"></div>
+            <div class="post-info-share">
+                <span><a href="javascript:void(0);" title="Share on Twitter" data-sharer="twitter" data-url="http://HaiLateBoy.github.io/posts/make-parser05/" data-title="从0开始自制解释器——添加对乘除法的支持" data-hashtags="编译原理,编译器,c语言"><i class="fab fa-twitter fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Facebook" data-sharer="facebook" data-url="http://HaiLateBoy.github.io/posts/make-parser05/" data-hashtag="编译原理"><i class="fab fa-facebook-square fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Hacker News" data-sharer="hackernews" data-url="http://HaiLateBoy.github.io/posts/make-parser05/" data-title="从0开始自制解释器——添加对乘除法的支持"><i class="fab fa-hacker-news fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Line" data-sharer="line" data-url="http://HaiLateBoy.github.io/posts/make-parser05/" data-title="从0开始自制解释器——添加对乘除法的支持"><i data-svg-src="https://cdn.jsdelivr.net/npm/simple-icons@7.3.0/icons/line.svg" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on 微博" data-sharer="weibo" data-url="http://HaiLateBoy.github.io/posts/make-parser05/" data-title="从0开始自制解释器——添加对乘除法的支持"><i class="fab fa-weibo fa-fw" aria-hidden="true"></i></a></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="post-info-more">
+        <section class="post-tags"><i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/%E7%BC%96%E8%AF%91%E5%8E%9F%E7%90%86/">编译原理</a>,&nbsp;<a href="/tags/%E7%BC%96%E8%AF%91%E5%99%A8/">编译器</a>,&nbsp;<a href="/tags/c%E8%AF%AD%E8%A8%80/">C语言</a></section>
+        <section>
+            <span><a href="javascript:void(0);" onclick="window.history.back();">Back</a></span>&nbsp;|&nbsp;<span><a href="/">Home</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav"><a href="/posts/make-parser04/" class="prev" rel="prev" title="从0开始自制解释器——实现多个整数的加减法"><i class="fas fa-angle-left fa-fw" aria-hidden="true"></i>从0开始自制解释器——实现多个整数的加减法</a>
+            <a href="/posts/make-parser06/" class="next" rel="next" title="从0开始自制解释器——添加对括号的支持">从0开始自制解释器——添加对括号的支持<i class="fas fa-angle-right fa-fw" aria-hidden="true"></i></a></div>
+</div>
+</article></div>
+            </main><footer class="footer">
+        <div class="footer-container"><div class="footer-line">Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener noreffer" title="Hugo 0.121.2">Hugo</a> | Theme - <a href="https://github.com/dillonzq/LoveIt" target="_blank" rel="noopener noreffer" title="LoveIt 0.2.11"><i class="far fa-kiss-wink-heart fa-fw" aria-hidden="true"></i> LoveIt</a>
+                </div><div class="footer-line" itemscope itemtype="http://schema.org/CreativeWork"><i class="far fa-copyright fa-fw" aria-hidden="true"></i><span itemprop="copyrightYear">2022 - 2024</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="https://www.masimaro.xyz" target="_blank">Masimaro</a></span></div>
+        </div>
+    </footer></div>
+
+        <div id="fixed-buttons"><a href="#" id="back-to-top" class="fixed-button" title="Back to Top">
+                <i class="fas fa-arrow-up fa-fw" aria-hidden="true"></i>
+            </a><a href="#" id="view-comments" class="fixed-button" title="View Comments">
+                <i class="fas fa-comment fa-fw" aria-hidden="true"></i>
+            </a>
+        </div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.css"><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/autocomplete.js@0.38.1/dist/autocomplete.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lunr@2.3.9/lunr.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lazysizes@5.3.2/lazysizes.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/clipboard@2.0.11/dist/clipboard.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/sharer.js@0.5.1/sharer.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/auto-render.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/copy-tex.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/mhchem.min.js"></script><script type="text/javascript">window.config={"code":{"copyTitle":"Copy to clipboard","maxShownLines":50},"comment":{},"math":{"delimiters":[{"display":true,"left":"$$","right":"$$"},{"display":true,"left":"\\[","right":"\\]"},{"display":true,"left":"\\begin{equation}","right":"\\end{equation}"},{"display":true,"left":"\\begin{equation*}","right":"\\end{equation*}"},{"display":true,"left":"\\begin{align}","right":"\\end{align}"},{"display":true,"left":"\\begin{align*}","right":"\\end{align*}"},{"display":true,"left":"\\begin{alignat}","right":"\\end{alignat}"},{"display":true,"left":"\\begin{alignat*}","right":"\\end{alignat*}"},{"display":true,"left":"\\begin{gather}","right":"\\end{gather}"},{"display":true,"left":"\\begin{CD}","right":"\\end{CD}"},{"display":false,"left":"$","right":"$"},{"display":false,"left":"\\(","right":"\\)"}],"strict":false},"search":{"highlightTag":"em","maxResultLength":10,"noResultsFound":"No results found","snippetLength":50}};</script><script type="text/javascript" src="/js/theme.min.js"></script></body>
+</html>

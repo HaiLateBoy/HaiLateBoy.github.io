@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="robots" content="noodp" />
+        <title>WinSock 重叠IO模型 - Masimaro&#39;s blog</title><meta name="Description" content="这是我用于记录日常和学习的小站"><meta property="og:title" content="WinSock 重叠IO模型" />
+<meta property="og:description" content="之前介绍的WSAAsyncSelect和WSAEvent模型解决了收发数据的时机问题，但是网卡这种设备相比于CPU和内存来说仍然是慢速设备，" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://HaiLateBoy.github.io/posts/winsock-overlapped/" /><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2018-06-29T20:26:13+00:00" />
+<meta property="article:modified_time" content="2018-06-29T20:26:13+00:00" /><meta property="og:site_name" content="Masimaro&#39;s blog" />
+
+<meta name="twitter:card" content="summary"/><meta name="twitter:title" content="WinSock 重叠IO模型"/>
+<meta name="twitter:description" content="之前介绍的WSAAsyncSelect和WSAEvent模型解决了收发数据的时机问题，但是网卡这种设备相比于CPU和内存来说仍然是慢速设备，"/>
+<meta name="application-name" content="My cool site">
+<meta name="apple-mobile-web-app-title" content="My cool site"><meta name="theme-color" content="#ffffff"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="manifest" href="/site.webmanifest"><link rel="canonical" href="http://HaiLateBoy.github.io/posts/winsock-overlapped/" /><link rel="prev" href="http://HaiLateBoy.github.io/posts/winsock-wsaeventselect/" /><link rel="next" href="http://HaiLateBoy.github.io/posts/brief-history-of-humankind/" /><link rel="stylesheet" href="/css/style.min.css"><link rel="preload" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css"></noscript><link rel="preload" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css"></noscript><script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "BlogPosting",
+        "headline": "WinSock 重叠IO模型",
+        "inLanguage": "zh-CN",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "http:\/\/HaiLateBoy.github.io\/posts\/winsock-overlapped\/"
+        },"genre": "posts","keywords": "WinSock 模型, 网络编程, 重叠IO模型","wordcount":  4634 ,
+        "url": "http:\/\/HaiLateBoy.github.io\/posts\/winsock-overlapped\/","datePublished": "2018-06-29T20:26:13+00:00","dateModified": "2018-06-29T20:26:13+00:00","publisher": {
+            "@type": "Organization",
+            "name": ""},"author": {
+                "@type": "Person",
+                "name": "Masimaro"
+            },"description": ""
+    }
+    </script></head>
+    <body data-header-desktop="fixed" data-header-mobile="auto"><script type="text/javascript">(window.localStorage && localStorage.getItem('theme') ? localStorage.getItem('theme') === 'dark' : ('auto' === 'auto' ? window.matchMedia('(prefers-color-scheme: dark)').matches : 'auto' === 'dark')) && document.body.setAttribute('theme', 'dark');</script>
+
+        <div id="mask"></div><div class="wrapper"><header class="desktop" id="header-desktop">
+    <div class="header-wrapper">
+        <div class="header-title">
+            <a href="/" title="Masimaro&#39;s blog">My cool site</a>
+        </div>
+        <div class="menu">
+            <div class="menu-inner"><a class="menu-item" href="/posts/" title="文章列表"> 文章 </a><a class="menu-item" href="/tags/" title="标签"> 标签 </a><a class="menu-item" href="/categories/" title="分类"> 分类 </a><a class="menu-item" href="/about" title="关于本站"> 关于 </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-desktop">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-desktop" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-desktop" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-desktop">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </span><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                    <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+                </a></div>
+        </div>
+    </div>
+</header><header class="mobile" id="header-mobile">
+    <div class="header-container">
+        <div class="header-wrapper">
+            <div class="header-title">
+                <a href="/" title="Masimaro&#39;s blog">My cool site</a>
+            </div>
+            <div class="menu-toggle" id="menu-toggle-mobile">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+        <div class="menu" id="menu-mobile"><div class="search-wrapper">
+                    <div class="search mobile" id="search-mobile">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-mobile">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-mobile" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-mobile" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-mobile">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </div>
+                    <a href="javascript:void(0);" class="search-cancel" id="search-cancel-mobile">
+                        Cancel
+                    </a>
+                </div><a class="menu-item" href="/posts/" title="文章列表">文章</a><a class="menu-item" href="/tags/" title="标签">标签</a><a class="menu-item" href="/categories/" title="分类">分类</a><a class="menu-item" href="/about" title="关于本站">关于</a><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+            </a></div>
+    </div>
+</header><div class="search-dropdown desktop">
+        <div id="search-dropdown-desktop"></div>
+    </div>
+    <div class="search-dropdown mobile">
+        <div id="search-dropdown-mobile"></div>
+    </div><main class="main">
+                <div class="container"><div class="toc" id="toc-auto">
+            <h2 class="toc-title">Contents</h2>
+            <div class="toc-content" id="toc-content-auto"></div>
+        </div><article class="page single"><h1 class="single-title animate__animated animate__flipInX">WinSock 重叠IO模型</h1><div class="post-meta">
+            <div class="post-meta-line"><span class="post-author"><a href="https://www.masimaro.xyz" title="Author" target="_blank" rel="noopener noreffer author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Masimaro</a></span>&nbsp;<span class="post-category">included in <a href="/categories/windows-%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>Windows 网络编程</a></span></div>
+            <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw" aria-hidden="true"></i>&nbsp;<time datetime="2018-06-29">2018-06-29</time>&nbsp;<i class="fas fa-pencil-alt fa-fw" aria-hidden="true"></i>&nbsp;4634 words&nbsp;
+                <i class="far fa-clock fa-fw" aria-hidden="true"></i>&nbsp;10 minutes&nbsp;</div>
+        </div><div class="details toc" id="toc-static"  data-kept="true">
+                <div class="details-summary toc-title">
+                    <span>Contents</span>
+                    <span><i class="details-icon fas fa-angle-right" aria-hidden="true"></i></span>
+                </div>
+                <div class="details-content toc-content" id="toc-content-static"><nav id="TableOfContents">
+  <ul>
+    <li><a href="#重叠io简介">重叠IO简介</a></li>
+    <li><a href="#创建重叠io的socket">创建重叠IO的socket</a></li>
+    <li><a href="#重叠io的通知模型">重叠IO的通知模型</a></li>
+    <li><a href="#完成过程模型">完成过程模型</a></li>
+  </ul>
+</nav></div>
+            </div><div class="content" id="content"><p>之前介绍的WSAAsyncSelect和WSAEvent模型解决了收发数据的时机问题，但是网卡这种设备相比于CPU和内存来说仍然是慢速设备，而调用send和recv进行数据收发操作仍然是同步的操作，即使我们能够在恰当的时机调用对应的函数进行收发操作，但是仍然需要快速的CPU等待慢速的网卡。这样仍然存在等待的问题，这篇博文介绍的重叠IO模型将解决这个等待的问题</p>
+<!-- raw HTML omitted -->
+<h2 id="重叠io简介">重叠IO简介</h2>
+<p>一般接触重叠IO最早是在读写磁盘时提出的一种异步操作模型，它主要思想是CPU只管发送读写的命令，而不用等待读写完成，CPU发送命令后接着去执行自己后面的命令，至于具体的读写操作由硬件的DMA来控制，当读写完成时会向CPU发送一个终端信号，此时CPU中断当前的工作转而去进行IO完成的处理。
+这是在磁盘操作中的一种高效工作的方式，为什么在网络中又拿出来说呢？仔细想想，前面的模型解决了接收数据的时机问题，现在摆在面前的就是如何高效的读写数据，与磁盘操作做类比，当接收到WSAAsyncSelect对应的消息或者WSAEvent返回时就是执行读写操作的时机，下面紧接着就是调用对应的读写函数来进行读写数据了，而联想到linux中的一切皆文件的思想，我们是不是可以认为操作网卡也是在操作文件？这也是在WinSock1中，使用WriteFile和ReadFile来进行网络数据读写的原因。既然它本质上也是CPU需要等待慢速的设备，那么为了效率它必定可以支持异步操作，也就可以使用重叠IO。</p>
+<h2 id="创建重叠io的socket">创建重叠IO的socket</h2>
+<p>要想使用重叠IO，就不能在像之前那样使用socket函数来创建SOCKET, 这函数最多只能创建一个普通SOCKET然后设置它为非阻塞(请注意非阻塞与异步的区别)。要创建异步的SOCKET需要使用WinSock2.0函数 WSASocket</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="n">SOCKET</span> <span class="nf">WSASocket</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">int</span> <span class="n">af</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">int</span> <span class="n">type</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">int</span> <span class="n">protocol</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">LPWSAPROTOCOL_INFO</span> <span class="n">lpProtocolInfo</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">GROUP</span> <span class="n">g</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">DWORD</span> <span class="n">dwFlags</span>
+</span></span><span class="line"><span class="cl"><span class="p">);</span>
+</span></span></code></pre></div><p>该函数的前3个参数与socket的参数含义相同,第4个参数是一个协议的具体信息，配合WSAEnumProtocols 使用可以将枚举出来的网络协议信息传入，这样不通过前三个参数就可以创建一个针对具体协议的SOCKET。第5个参数目前不受支持简单的传入0即可。第6个参数是一个标志，如果要创建重叠IO的SOCKET，需要将这个参数设置为WSA_FLAG_OVERLAPPED。否则普通的SOCKET直接传入0即可</p>
+<p>使用重叠IO除了要将SOCKET设置为支持重叠IO外，还需要使用对应的支持重叠IO的函数，之前了解的巴克利套接字函数最多只能算是支持非阻塞而不支持异步。在WinSock1.0 中可以使用ReadFile和WriteFile来支持重叠IO，但是WinSock2.0 中重新设计的一套函数来支持重叠IO</p>
+<ul>
+<li>WSASend (send的等价函数)</li>
+<li>WSASendTo (sendto的等价函数)</li>
+<li>WSARecv (recv的等价函数)</li>
+<li>WSARecvFrom (recvfrom的等价函数)</li>
+<li>WSAIoctl (ioctlsocket的等价函数)</li>
+<li>WSARecvMsg (recv OOB版的等价函数)</li>
+<li>AcceptEx (accept 等价函数)</li>
+<li>ConnectEx (connect 等价函数)</li>
+<li>TransmitFile (专门用于高效发送文件的扩展API)</li>
+<li>TransmitPackets (专门用于高效发送大规模数据包的扩展API)</li>
+<li>DisconnectEx (扩展的断开连接的Winsock API)</li>
+<li>WSANSPIoctl (用于操作名字空间的重叠I/O版扩展控制API)</li>
+</ul>
+<p>那么如果使用上述函数但是传入一个非阻塞的SOCKET会怎么样呢，这些函数只看是否传入OVERLAPPED结构而不管SOCKET是否是阻塞的，一律按重叠IO的方式来运行。这也就是说,要使用重叠I/O方式来操作SOCKET,那么不一定非要一开初就创建一个重叠I/O方式的SOCKET对象(但是针对AcceptEx 来说如果传入的是普通的SOCKET，它会以阻塞的方式执行。当时测试时我传入的是使用WSASocket创建的SOCKET，我将函数的最后一个标志设置为0，发现AcceptEx只有当客户端连接时才会返回)</p>
+<h2 id="重叠io的通知模型">重叠IO的通知模型</h2>
+<p>与文件的重叠IO类似，重叠IO的第一种模型就是事件通知模型.</p>
+<ol>
+<li>利用该模型首先需要把一个event对象绑定到OVERLAPPED(WinSokc中一般是WSAOVERLAPPED)上，然后利用这个OVERLAPPED结构来进行IO操作.如:WSASend/WSARecv等</li>
+<li>判断对应IO操作的返回值，如果使用重叠IO模式，IO操作函数不会返回成功，而是会返回失败，使用WSAGetLastError得到的错误码为WSA_IO_PENDING,此时认为函数进行一种待决状态，也就是CPU将命令发送出去了，而任务没有最终完成</li>
+<li>然后CPU可以去做接下来的工作，而在需要操作结果的地方调用对应的等待函数来等待对应的事件对象。如果事件对象为有信号表示操作完成</li>
+<li>接着可以设置事件对象为无信号，然后继续投递IO操作.</li>
+</ol>
+<p>要等待这些事件句柄,可以调用WSAWaitForMultipleEvents函数,该函数原型如下:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="n">DWORD</span> <span class="nf">WSAWaitForMultipleEvents</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">  <span class="n">__in</span>  <span class="n">DWORD</span> <span class="n">cEvents</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">  <span class="n">__in</span>  <span class="k">const</span> <span class="n">WSAEVENT</span><span class="o">*</span> <span class="n">lphEvents</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">  <span class="n">__in</span>  <span class="n">BOOL</span> <span class="n">fWaitAll</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">  <span class="n">__in</span>  <span class="n">DWORD</span> <span class="n">dwTimeout</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">  <span class="n">__in</span>  <span class="n">BOOL</span> <span class="n">fAlertable</span>
+</span></span><span class="line"><span class="cl"><span class="p">);</span>
+</span></span></code></pre></div><p>第一个参数是事件对象的数目；第二个参数是事件对象的数组首地址；第三个参数是一个bool类型表示是否等待数组中所有的对象都变为有信号；第四个参数表示超时值；第五个参数是表示在等待的时候是否进入可警告状态</p>
+<p>在函数返回后我们只知道IO操作完成了，但是完成的结果是成功还是失败是不知道的，此时可以使用WSAGetOverlappedResult来确定IO操作执行的结果，该函数原型如下:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="n">BOOL</span> <span class="nf">WSAGetOverlappedResult</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">  <span class="n">SOCKET</span> <span class="n">s</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">  <span class="n">LPWSAOVERLAPPED</span> <span class="n">lpOverlapped</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">  <span class="n">LPDWORD</span> <span class="n">lpcbTransfer</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">  <span class="n">BOOL</span> <span class="n">fWait</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">  <span class="n">LPDWORD</span> <span class="n">lpdwFlags</span>
+</span></span><span class="line"><span class="cl"><span class="p">);</span>
+</span></span></code></pre></div><p>第一个参数是对应的socket；第二个参数是对应的OVERLAPPED结构；第三个参数是一个输出参数，表示完成IO操作的字节数，通常出错的时候返回0；第四个参数指明调用者是否等待一个重叠I/O操作完成,通常在成功等待到事件句柄后,这个参数在这个模型中没有意义了；第五个参数是一个输出参数负责接收完成结果的标志。
+下面是一个事件通知模型的例子</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="k">typedef</span> <span class="k">struct</span> <span class="nc">_tag_CLIENTCONTENT</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">	<span class="n">OVERLAPPED</span> <span class="n">Overlapped</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">SOCKET</span> <span class="n">sClient</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">WSABUF</span> <span class="n">DataBuf</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="kt">char</span> <span class="n">szBuf</span><span class="p">[</span><span class="n">WSA_BUFFER_LENGHT</span><span class="p">];</span>
+</span></span><span class="line"><span class="cl">	<span class="n">WSAEVENT</span> <span class="n">hEvent</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span><span class="n">CLIENTCONTENT</span><span class="p">,</span> <span class="o">*</span><span class="n">LPCLIENTCONTENT</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kt">int</span> <span class="nf">_tmain</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="n">TCHAR</span> <span class="o">*</span><span class="n">argv</span><span class="p">[])</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">	<span class="n">WSADATA</span> <span class="n">wd</span> <span class="o">=</span> <span class="p">{</span><span class="mi">0</span><span class="p">};</span>
+</span></span><span class="line"><span class="cl">	<span class="n">WSAStartup</span><span class="p">(</span><span class="n">MAKEWORD</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="o">&amp;</span><span class="n">wd</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="n">CLIENTCONTENT</span> <span class="n">ClientContent</span><span class="p">[</span><span class="n">WSA_MAXIMUM_WAIT_EVENTS</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="mi">0</span><span class="p">};</span>
+</span></span><span class="line"><span class="cl">	<span class="n">WSAEVENT</span> <span class="n">Event</span><span class="p">[</span><span class="n">WSA_MAXIMUM_WAIT_EVENTS</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="mi">0</span><span class="p">};</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="kt">int</span> <span class="n">nTotal</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">SOCKET</span> <span class="n">skServer</span> <span class="o">=</span> <span class="n">WSASocket</span><span class="p">(</span><span class="n">AF_INET</span><span class="p">,</span> <span class="n">SOCK_STREAM</span><span class="p">,</span> <span class="n">IPPROTO_IP</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">WSA_FLAG_OVERLAPPED</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="n">SOCKADDR_IN</span> <span class="n">ServerAddr</span> <span class="o">=</span> <span class="p">{</span><span class="mi">0</span><span class="p">};</span>
+</span></span><span class="line"><span class="cl">	<span class="n">ServerAddr</span><span class="p">.</span><span class="n">sin_family</span> <span class="o">=</span> <span class="n">AF_INET</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">ServerAddr</span><span class="p">.</span><span class="n">sin_port</span> <span class="o">=</span> <span class="n">htons</span><span class="p">(</span><span class="n">SERVER_PORT</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="n">ServerAddr</span><span class="p">.</span><span class="n">sin_addr</span><span class="p">.</span><span class="n">s_addr</span> <span class="o">=</span> <span class="n">htonl</span><span class="p">(</span><span class="n">INADDR_ANY</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="n">bind</span><span class="p">(</span><span class="n">skServer</span><span class="p">,</span> <span class="p">(</span><span class="n">SOCKADDR</span><span class="o">*</span><span class="p">)</span><span class="o">&amp;</span><span class="n">ServerAddr</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">SOCKADDR</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">	<span class="n">listen</span><span class="p">(</span><span class="n">skServer</span><span class="p">,</span> <span class="mi">5</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="n">printf</span><span class="p">(</span><span class="s">&#34;开始监听...........</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="n">Event</span><span class="p">[</span><span class="n">nTotal</span><span class="p">]</span> <span class="o">=</span> <span class="n">WSACreateEvent</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">	<span class="n">ClientContent</span><span class="p">[</span><span class="n">nTotal</span><span class="p">].</span><span class="n">hEvent</span> <span class="o">=</span> <span class="n">Event</span><span class="p">[</span><span class="n">nTotal</span><span class="p">];</span>
+</span></span><span class="line"><span class="cl">	<span class="n">ClientContent</span><span class="p">[</span><span class="n">nTotal</span><span class="p">].</span><span class="n">Overlapped</span><span class="p">.</span><span class="n">hEvent</span> <span class="o">=</span> <span class="n">Event</span><span class="p">[</span><span class="n">nTotal</span><span class="p">];</span>
+</span></span><span class="line"><span class="cl">	<span class="n">ClientContent</span><span class="p">[</span><span class="n">nTotal</span><span class="p">].</span><span class="n">DataBuf</span><span class="p">.</span><span class="n">len</span> <span class="o">=</span> <span class="n">WSA_BUFFER_LENGHT</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">ClientContent</span><span class="p">[</span><span class="n">nTotal</span><span class="p">].</span><span class="n">sClient</span> <span class="o">=</span> <span class="n">skServer</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="c1">//针对监听套接字做特殊的处理
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="n">WSAEventSelect</span><span class="p">(</span><span class="n">skServer</span><span class="p">,</span> <span class="n">Event</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">FD_ACCEPT</span> <span class="o">|</span> <span class="n">FD_CLOSE</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="n">nTotal</span><span class="o">++</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="k">while</span> <span class="p">(</span><span class="n">TRUE</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">	<span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="n">DWORD</span> <span class="n">dwTransfer</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">		<span class="n">DWORD</span> <span class="n">dwFlags</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">		<span class="n">DWORD</span> <span class="n">dwNumberOfBytesRecv</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">		<span class="kt">int</span> <span class="n">nIndex</span> <span class="o">=</span> <span class="n">WSAWaitForMultipleEvents</span><span class="p">(</span><span class="n">nTotal</span><span class="p">,</span> <span class="n">Event</span><span class="p">,</span> <span class="n">FALSE</span><span class="p">,</span> <span class="n">WSA_INFINITE</span><span class="p">,</span> <span class="n">FALSE</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">		<span class="n">WSAResetEvent</span><span class="p">(</span><span class="n">Event</span><span class="p">[</span><span class="n">nIndex</span> <span class="o">-</span> <span class="n">WSA_WAIT_EVENT_0</span><span class="p">]);</span>
+</span></span><span class="line"><span class="cl">		<span class="c1">//监听socket返回
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>		<span class="k">if</span> <span class="p">(</span><span class="n">nIndex</span> <span class="o">-</span> <span class="n">WSA_WAIT_EVENT_0</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">		<span class="p">{</span>
+</span></span><span class="line"><span class="cl">			<span class="n">SOCKADDR_IN</span> <span class="n">ClientAddr</span> <span class="o">=</span> <span class="p">{</span><span class="n">AF_INET</span><span class="p">};</span>
+</span></span><span class="line"><span class="cl">			<span class="kt">int</span> <span class="n">nClientAddrSize</span> <span class="o">=</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">SOCKADDR</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">			<span class="n">SOCKET</span> <span class="n">skClient</span> <span class="o">=</span> <span class="n">WSAAccept</span><span class="p">(</span><span class="n">skServer</span><span class="p">,</span> <span class="p">(</span><span class="n">SOCKADDR</span><span class="o">*</span><span class="p">)</span><span class="o">&amp;</span><span class="n">ClientAddr</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">nClientAddrSize</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">			<span class="k">if</span> <span class="p">(</span><span class="n">SOCKET_ERROR</span> <span class="o">==</span> <span class="n">skClient</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">			<span class="p">{</span>
+</span></span><span class="line"><span class="cl">				<span class="n">printf</span><span class="p">(</span><span class="s">&#34;接受客户端连接请求失败，错误码为:%08x</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">,</span> <span class="n">WSAGetLastError</span><span class="p">());</span>
+</span></span><span class="line"><span class="cl">				<span class="k">continue</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">			<span class="p">}</span>
+</span></span><span class="line"><span class="cl">			<span class="n">printf</span><span class="p">(</span><span class="s">&#34;有客户端连接进来[%s:%u]</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">,</span> <span class="n">inet_ntoa</span><span class="p">(</span><span class="n">ClientAddr</span><span class="p">.</span><span class="n">sin_addr</span><span class="p">),</span> <span class="n">ntohs</span><span class="p">(</span><span class="n">ClientAddr</span><span class="p">.</span><span class="n">sin_port</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">			<span class="n">Event</span><span class="p">[</span><span class="n">nTotal</span><span class="p">]</span> <span class="o">=</span> <span class="n">WSACreateEvent</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">			<span class="n">ClientContent</span><span class="p">[</span><span class="n">nTotal</span><span class="p">].</span><span class="n">hEvent</span> <span class="o">=</span> <span class="n">Event</span><span class="p">[</span><span class="n">nTotal</span><span class="p">];</span>
+</span></span><span class="line"><span class="cl">			<span class="n">ClientContent</span><span class="p">[</span><span class="n">nTotal</span><span class="p">].</span><span class="n">Overlapped</span><span class="p">.</span><span class="n">hEvent</span> <span class="o">=</span> <span class="n">Event</span><span class="p">[</span><span class="n">nTotal</span><span class="p">];</span>
+</span></span><span class="line"><span class="cl">			<span class="n">ClientContent</span><span class="p">[</span><span class="n">nTotal</span><span class="p">].</span><span class="n">DataBuf</span><span class="p">.</span><span class="n">len</span> <span class="o">=</span> <span class="n">WSA_BUFFER_LENGHT</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">			<span class="n">ClientContent</span><span class="p">[</span><span class="n">nTotal</span><span class="p">].</span><span class="n">DataBuf</span><span class="p">.</span><span class="n">buf</span> <span class="o">=</span> <span class="n">ClientContent</span><span class="p">[</span><span class="n">nTotal</span><span class="p">].</span><span class="n">szBuf</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">			<span class="n">ClientContent</span><span class="p">[</span><span class="n">nTotal</span><span class="p">].</span><span class="n">sClient</span> <span class="o">=</span> <span class="n">skClient</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">			<span class="c1">//获取客户端发送数据,这是为了触发后面的等待
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>			<span class="n">WSARecv</span><span class="p">(</span><span class="n">ClientContent</span><span class="p">[</span><span class="n">nTotal</span><span class="p">].</span><span class="n">sClient</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">ClientContent</span><span class="p">[</span><span class="n">nTotal</span><span class="p">].</span><span class="n">DataBuf</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">dwNumberOfBytesRecv</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">dwFlags</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">ClientContent</span><span class="p">[</span><span class="n">nTotal</span><span class="p">].</span><span class="n">Overlapped</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">			<span class="n">nTotal</span><span class="o">++</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">			<span class="k">continue</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">		<span class="p">}</span><span class="k">else</span>
+</span></span><span class="line"><span class="cl">		<span class="p">{</span>
+</span></span><span class="line"><span class="cl">			<span class="c1">//等待发送完成
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>			<span class="n">WSAGetOverlappedResult</span><span class="p">(</span><span class="n">ClientContent</span><span class="p">[</span><span class="n">nIndex</span> <span class="o">-</span> <span class="n">WSA_WAIT_EVENT_0</span><span class="p">].</span><span class="n">sClient</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">ClientContent</span><span class="p">[</span><span class="n">nIndex</span> <span class="o">-</span> <span class="n">WSA_WAIT_EVENT_0</span><span class="p">].</span><span class="n">Overlapped</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">dwTransfer</span><span class="p">,</span> <span class="n">TRUE</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">dwFlags</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">			<span class="k">if</span> <span class="p">(</span><span class="n">dwTransfer</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">			<span class="p">{</span>
+</span></span><span class="line"><span class="cl">				<span class="n">printf</span><span class="p">(</span><span class="s">&#34;接受数据失败:%08x</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">,</span> <span class="n">WSAGetLastError</span><span class="p">());</span>
+</span></span><span class="line"><span class="cl">				<span class="n">closesocket</span><span class="p">(</span><span class="n">ClientContent</span><span class="p">[</span><span class="n">nIndex</span> <span class="o">-</span> <span class="n">WSA_WAIT_EVENT_0</span><span class="p">].</span><span class="n">sClient</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">				<span class="n">WSACloseEvent</span><span class="p">(</span><span class="n">ClientContent</span><span class="p">[</span><span class="n">nIndex</span> <span class="o">-</span> <span class="n">WSA_WAIT_EVENT_0</span><span class="p">].</span><span class="n">hEvent</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">				<span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="n">nIndex</span> <span class="o">-</span> <span class="n">WSA_WAIT_EVENT_0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">nTotal</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">				<span class="p">{</span>
+</span></span><span class="line"><span class="cl">					<span class="n">ClientContent</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">ClientContent</span><span class="p">[</span><span class="n">i</span><span class="p">];</span>
+</span></span><span class="line"><span class="cl">					<span class="n">Event</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">Event</span><span class="p">[</span><span class="n">i</span><span class="p">];</span>
+</span></span><span class="line"><span class="cl">					<span class="n">nTotal</span><span class="o">--</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">				<span class="p">}</span>
+</span></span><span class="line"><span class="cl">			<span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">			<span class="k">if</span> <span class="p">(</span><span class="n">strcmp</span><span class="p">(</span><span class="s">&#34;exit&#34;</span><span class="p">,</span> <span class="n">ClientContent</span><span class="p">[</span><span class="n">nIndex</span> <span class="o">-</span> <span class="n">WSA_WAIT_EVENT_0</span><span class="p">].</span><span class="n">DataBuf</span><span class="p">.</span><span class="n">buf</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">			<span class="p">{</span>
+</span></span><span class="line"><span class="cl">				<span class="n">closesocket</span><span class="p">(</span><span class="n">ClientContent</span><span class="p">[</span><span class="n">nIndex</span> <span class="o">-</span> <span class="n">WSA_WAIT_EVENT_0</span><span class="p">].</span><span class="n">sClient</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">				<span class="n">WSACloseEvent</span><span class="p">(</span><span class="n">ClientContent</span><span class="p">[</span><span class="n">nIndex</span> <span class="o">-</span> <span class="n">WSA_WAIT_EVENT_0</span><span class="p">].</span><span class="n">hEvent</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">				<span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="n">nIndex</span> <span class="o">-</span> <span class="n">WSA_WAIT_EVENT_0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">nTotal</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">				<span class="p">{</span>
+</span></span><span class="line"><span class="cl">					<span class="n">ClientContent</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">ClientContent</span><span class="p">[</span><span class="n">i</span><span class="p">];</span>
+</span></span><span class="line"><span class="cl">					<span class="n">Event</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">Event</span><span class="p">[</span><span class="n">i</span><span class="p">];</span>
+</span></span><span class="line"><span class="cl">					<span class="n">nTotal</span><span class="o">--</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">				<span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">				<span class="k">continue</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">			<span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">			<span class="n">send</span><span class="p">(</span><span class="n">ClientContent</span><span class="p">[</span><span class="n">nIndex</span> <span class="o">-</span> <span class="n">WSA_WAIT_EVENT_0</span><span class="p">].</span><span class="n">sClient</span><span class="p">,</span> <span class="n">ClientContent</span><span class="p">[</span><span class="n">nIndex</span> <span class="o">-</span> <span class="n">WSA_WAIT_EVENT_0</span><span class="p">].</span><span class="n">DataBuf</span><span class="p">.</span><span class="n">buf</span><span class="p">,</span> <span class="n">dwTransfer</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">			<span class="n">WSARecv</span><span class="p">(</span><span class="n">ClientContent</span><span class="p">[</span><span class="n">nIndex</span> <span class="o">-</span> <span class="n">WSA_WAIT_EVENT_0</span><span class="p">].</span><span class="n">sClient</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">ClientContent</span><span class="p">[</span><span class="n">nIndex</span> <span class="o">-</span> <span class="n">WSA_WAIT_EVENT_0</span><span class="p">].</span><span class="n">DataBuf</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">dwNumberOfBytesRecv</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">dwFlags</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">ClientContent</span><span class="p">[</span><span class="n">nIndex</span> <span class="o">-</span> <span class="n">WSA_WAIT_EVENT_0</span><span class="p">].</span><span class="n">Overlapped</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">		<span class="p">}</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="n">WSACleanup</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">	<span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p>上述代码中定义了一个结构，方便我们根据事件对象获取一些重要信息。
+在main函数中首先完成了WinSock环境的初始化然后创建监听套接字，绑定，监听。然后定义一个事件对象让他与对应的WSAOVERLAPPED绑定,然后WSAEventSelect来投递监听SOCKET以便获取到客户端的连接请求（这里没有使用AcceptEx，因为它需要特殊的加载方式）
+接着在循环中首先调用WSAWaitForMultipleEvents等待所有信号，当函数返回时判断当前是否为监听套接字，如果是那么调用WSAAccept函数接收连接,并准备对应的事件和WSAOVERLAPPED结构，接着调用WSARecv接收客户端传入数据
+如果不是监听套接字则表明客户端发送数据过来，此时调用WSAGetOverlappedResult获取重叠IO执行的结果，如果成功则判断是否为exit，如果是exit关闭当前与客户端的链接，否则调用send函数原样返回数据接着调用WSARecv再次等待客户端传送数据。</p>
+<h2 id="完成过程模型">完成过程模型</h2>
+<p>对于重叠I/O模型来说,前面的事件通知模型在资源的消耗上有时是惊人的。这主要是因为对于每个重叠I/O操作(WSASend/WSARecv等)来说,都必须额外创建一个Event对象。对于一个I/O密集型SOCKET应用来说,这种消耗会造成资源的严重浪费。由于Event对象是一个内核对象，它在应用层表现为一个4字节的句柄值，但是在内核中它对应的是一个具体的结构，而且所有的进程共享同一块内核的内存，因此某几个进程创建大量的内核对象的话，会影响整个系统的性能。</p>
+<p>为此重叠I/O又提供了一种称之为完成过程方式的模型。该模型不需要像前面那样提供对应的事件句柄。它需要为每个I/O操作提供一个完成之后回调处理的函数。</p>
+<p>完成历程的本质是一个历程它仍然是使用当前线程的环境。它主要向系统注册一些完成函数，当对应的IO操作完成时，系统会将函数放入到线程的APC队列，当线程陷入可警告状态时，它利用线程的环境来依次执行队列中的APC函数、
+要使用重叠I/O完成过程模型,那么也需要为每个I/O操作提供WSAOVERLAPPED结构体,只是此时不需要Event对象了。取而代之的是提供一个完成过程的函数</p>
+<p>完成历程的原型如下:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="kt">void</span> <span class="n">CALLBACK</span> <span class="nf">CompletionROUTINE</span><span class="p">(</span><span class="n">DWORD</span> <span class="n">dwError</span><span class="p">,</span> <span class="n">DWORD</span> <span class="n">cbTransferred</span><span class="p">,</span><span class="n">LPWSAOVERLAPPED</span> <span class="n">lpOverlapped</span><span class="p">,</span> <span class="n">DWORD</span> <span class="n">dwFlags</span><span class="p">);</span>
+</span></span></code></pre></div><p>要使对应的完成函数能够执行需要在恰当的时机让对应线程进入可警告状态，一般的方式是调用SleepEx函数，还有就是调用Wait家族的相关Ex函数，但是如果使用Wait函数就需要使用一个内核对象进行等待，如果使用Event对象这样就与之前的事件通知模式有相同的资源消耗大的问问题了。此时我们可以考虑使用线程的句柄来进行等待，但是等待线程句柄时必须设置一个超时值而不能直接使用INFINIT了，因为等待线程就是要等到线程结束，而如果使用INFINIT，这样Wait函数永远不会返回，线程永远不会结束，此时就造成了死锁。</p>
+<p>下面是一个使用完成过程的模型</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="k">typedef</span> <span class="k">struct</span> <span class="nc">_tag_OVERLAPPED_COMPILE</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">	<span class="n">WSAOVERLAPPED</span> <span class="n">overlapped</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">LONG</span> <span class="n">lNetworks</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">SOCKET</span> <span class="n">sClient</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">WSABUF</span> <span class="n">pszBuf</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">DWORD</span> <span class="n">dwTransfer</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">DWORD</span> <span class="n">dwFlags</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">DWORD</span> <span class="n">dwNumberOfBytesRecv</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">DWORD</span> <span class="n">dwNumberOfBytesSend</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span><span class="n">OVERLAPPED_COMPILE</span><span class="p">,</span> <span class="o">*</span><span class="n">LPOVERLAPPED_COMPILE</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kt">void</span> <span class="n">CALLBACK</span> <span class="nf">CompletionROUTINE</span><span class="p">(</span><span class="n">DWORD</span> <span class="n">dwError</span><span class="p">,</span> <span class="n">DWORD</span> <span class="n">cbTransferred</span><span class="p">,</span> <span class="n">LPWSAOVERLAPPED</span> <span class="n">lpOverlapped</span><span class="p">,</span> <span class="n">DWORD</span> <span class="n">dwFlags</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kt">int</span> <span class="nf">_tmain</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="n">TCHAR</span> <span class="o">*</span><span class="n">argv</span><span class="p">[])</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">	<span class="n">WSADATA</span> <span class="n">wd</span> <span class="o">=</span> <span class="p">{</span><span class="mi">0</span><span class="p">};</span>
+</span></span><span class="line"><span class="cl">	<span class="n">WSAStartup</span><span class="p">(</span><span class="n">MAKEWORD</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="o">&amp;</span><span class="n">wd</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="n">SOCKET</span> <span class="n">skServer</span> <span class="o">=</span> <span class="n">WSASocket</span><span class="p">(</span><span class="n">AF_INET</span><span class="p">,</span> <span class="n">SOCK_STREAM</span><span class="p">,</span> <span class="n">IPPROTO_IP</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">WSA_FLAG_OVERLAPPED</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="n">SOCKADDR_IN</span> <span class="n">ServerClient</span> <span class="o">=</span> <span class="p">{</span><span class="mi">0</span><span class="p">};</span>
+</span></span><span class="line"><span class="cl">	<span class="n">ServerClient</span><span class="p">.</span><span class="n">sin_family</span> <span class="o">=</span> <span class="n">AF_INET</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">ServerClient</span><span class="p">.</span><span class="n">sin_port</span> <span class="o">=</span> <span class="n">htons</span><span class="p">(</span><span class="n">SERVER_PORT</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="n">ServerClient</span><span class="p">.</span><span class="n">sin_addr</span><span class="p">.</span><span class="n">s_addr</span> <span class="o">=</span> <span class="n">htonl</span><span class="p">(</span><span class="n">INADDR_ANY</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="n">bind</span><span class="p">(</span><span class="n">skServer</span><span class="p">,</span> <span class="p">(</span><span class="n">SOCKADDR</span><span class="o">*</span><span class="p">)</span><span class="o">&amp;</span><span class="n">ServerClient</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">SOCKADDR</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="n">listen</span><span class="p">(</span><span class="n">skServer</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="k">while</span> <span class="p">(</span><span class="n">TRUE</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">	<span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="n">SOCKADDR_IN</span> <span class="n">AddrClient</span> <span class="o">=</span> <span class="p">{</span><span class="mi">0</span><span class="p">};</span>
+</span></span><span class="line"><span class="cl">		<span class="kt">int</span> <span class="n">AddrSize</span> <span class="o">=</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">SOCKADDR</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">		<span class="n">SOCKET</span> <span class="n">skClient</span> <span class="o">=</span> <span class="n">WSAAccept</span><span class="p">(</span><span class="n">skServer</span><span class="p">,</span> <span class="p">(</span><span class="n">SOCKADDR</span><span class="o">*</span><span class="p">)</span><span class="o">&amp;</span><span class="n">AddrClient</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">AddrSize</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">		<span class="n">printf</span><span class="p">(</span><span class="s">&#34;有客户端[%s:%u]连接进来....</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">,</span> <span class="n">inet_ntoa</span><span class="p">(</span><span class="n">AddrClient</span><span class="p">.</span><span class="n">sin_addr</span><span class="p">),</span> <span class="n">ntohs</span><span class="p">(</span><span class="n">AddrClient</span><span class="p">.</span><span class="n">sin_port</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">		<span class="n">LPOVERLAPPED_COMPILE</span> <span class="n">lpOc</span> <span class="o">=</span> <span class="k">new</span> <span class="n">OVERLAPPED_COMPILE</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">		<span class="n">ZeroMemory</span><span class="p">(</span><span class="n">lpOc</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">OVERLAPPED_COMPILE</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">		<span class="n">lpOc</span><span class="o">-&gt;</span><span class="n">dwFlags</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">		<span class="n">lpOc</span><span class="o">-&gt;</span><span class="n">dwTransfer</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">		<span class="n">lpOc</span><span class="o">-&gt;</span><span class="n">lNetworks</span> <span class="o">=</span> <span class="n">FD_READ</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">		<span class="n">lpOc</span><span class="o">-&gt;</span><span class="n">pszBuf</span><span class="p">.</span><span class="n">buf</span> <span class="o">=</span> <span class="k">new</span> <span class="kt">char</span><span class="p">[</span><span class="mi">1024</span><span class="p">];</span>
+</span></span><span class="line"><span class="cl">		<span class="n">ZeroMemory</span><span class="p">(</span><span class="n">lpOc</span><span class="o">-&gt;</span><span class="n">pszBuf</span><span class="p">.</span><span class="n">buf</span><span class="p">,</span> <span class="mi">1024</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">		<span class="n">lpOc</span><span class="o">-&gt;</span><span class="n">pszBuf</span><span class="p">.</span><span class="n">len</span> <span class="o">=</span> <span class="mi">1024</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">		<span class="n">lpOc</span><span class="o">-&gt;</span><span class="n">sClient</span> <span class="o">=</span> <span class="n">skClient</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">		<span class="n">lpOc</span><span class="o">-&gt;</span><span class="n">dwNumberOfBytesRecv</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">		<span class="n">WSARecv</span><span class="p">(</span><span class="n">skClient</span><span class="p">,</span> <span class="o">&amp;</span><span class="p">(</span><span class="n">lpOc</span><span class="o">-&gt;</span><span class="n">pszBuf</span><span class="p">),</span> <span class="mi">1</span><span class="p">,</span> <span class="o">&amp;</span><span class="p">(</span><span class="n">lpOc</span><span class="o">-&gt;</span><span class="n">dwNumberOfBytesRecv</span><span class="p">),</span> <span class="o">&amp;</span><span class="p">(</span><span class="n">lpOc</span><span class="o">-&gt;</span><span class="n">dwFlags</span><span class="p">),</span> <span class="o">&amp;</span><span class="p">(</span><span class="n">lpOc</span><span class="o">-&gt;</span><span class="n">overlapped</span><span class="p">),</span> <span class="n">CompletionROUTINE</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">		<span class="n">SleepEx</span><span class="p">(</span><span class="mi">2000</span><span class="p">,</span> <span class="n">TRUE</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="cl">	<span class="n">WSACleanup</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">	<span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kt">void</span> <span class="n">CALLBACK</span> <span class="nf">CompletionROUTINE</span><span class="p">(</span><span class="n">DWORD</span> <span class="n">dwError</span><span class="p">,</span> <span class="n">DWORD</span> <span class="n">cbTransferred</span><span class="p">,</span> <span class="n">LPWSAOVERLAPPED</span> <span class="n">lpOverlapped</span><span class="p">,</span> <span class="n">DWORD</span> <span class="n">dwFlags</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">	<span class="n">LPOVERLAPPED_COMPILE</span> <span class="n">lpOc</span> <span class="o">=</span> <span class="p">(</span><span class="n">LPOVERLAPPED_COMPILE</span><span class="p">)</span><span class="n">lpOverlapped</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="k">if</span> <span class="p">(</span><span class="mi">0</span> <span class="o">!=</span> <span class="n">dwError</span> <span class="o">||</span> <span class="mi">0</span> <span class="o">==</span> <span class="n">cbTransferred</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">	<span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="n">printf</span><span class="p">(</span><span class="s">&#34;与客户端通信发生错误，错误码为:%08x</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">,</span> <span class="n">WSAGetLastError</span><span class="p">());</span>
+</span></span><span class="line"><span class="cl">		<span class="n">closesocket</span><span class="p">(</span><span class="n">lpOc</span><span class="o">-&gt;</span><span class="n">sClient</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">		<span class="k">delete</span><span class="p">[]</span> <span class="n">lpOc</span><span class="o">-&gt;</span><span class="n">pszBuf</span><span class="p">.</span><span class="n">buf</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">		<span class="k">delete</span> <span class="n">lpOc</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">		<span class="k">return</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="k">if</span> <span class="p">(</span><span class="n">lpOc</span><span class="o">-&gt;</span><span class="n">lNetworks</span> <span class="o">==</span> <span class="n">FD_READ</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">	<span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="k">if</span> <span class="p">(</span><span class="mi">0</span> <span class="o">==</span> <span class="n">strcmp</span><span class="p">(</span><span class="n">lpOc</span><span class="o">-&gt;</span><span class="n">pszBuf</span><span class="p">.</span><span class="n">buf</span><span class="p">,</span> <span class="s">&#34;exit&#34;</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl">		<span class="p">{</span>
+</span></span><span class="line"><span class="cl">			<span class="n">closesocket</span><span class="p">(</span><span class="n">lpOc</span><span class="o">-&gt;</span><span class="n">sClient</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">			<span class="k">delete</span><span class="p">[]</span> <span class="n">lpOc</span><span class="o">-&gt;</span><span class="n">pszBuf</span><span class="p">.</span><span class="n">buf</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">			<span class="k">delete</span> <span class="n">lpOc</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">			<span class="k">return</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">		<span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">		<span class="n">send</span><span class="p">(</span><span class="n">lpOc</span><span class="o">-&gt;</span><span class="n">sClient</span><span class="p">,</span> <span class="n">lpOc</span><span class="o">-&gt;</span><span class="n">pszBuf</span><span class="p">.</span><span class="n">buf</span><span class="p">,</span> <span class="n">cbTransferred</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">lpOc</span><span class="o">-&gt;</span><span class="n">dwNumberOfBytesRecv</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">ZeroMemory</span><span class="p">(</span><span class="n">lpOc</span><span class="o">-&gt;</span><span class="n">pszBuf</span><span class="p">.</span><span class="n">buf</span><span class="p">,</span> <span class="mi">1024</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">lpOc</span><span class="o">-&gt;</span><span class="n">dwFlags</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">		<span class="n">lpOc</span><span class="o">-&gt;</span><span class="n">dwTransfer</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">		<span class="n">lpOc</span><span class="o">-&gt;</span><span class="n">lNetworks</span> <span class="o">=</span> <span class="n">FD_READ</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">WSARecv</span><span class="p">(</span><span class="n">lpOc</span><span class="o">-&gt;</span><span class="n">sClient</span><span class="p">,</span> <span class="o">&amp;</span><span class="p">(</span><span class="n">lpOc</span><span class="o">-&gt;</span><span class="n">pszBuf</span><span class="p">),</span> <span class="mi">1</span><span class="p">,</span> <span class="o">&amp;</span><span class="p">(</span><span class="n">lpOc</span><span class="o">-&gt;</span><span class="n">dwNumberOfBytesRecv</span><span class="p">),</span> <span class="o">&amp;</span><span class="p">(</span><span class="n">lpOc</span><span class="o">-&gt;</span><span class="n">dwFlags</span><span class="p">),</span> <span class="o">&amp;</span><span class="p">(</span><span class="n">lpOc</span><span class="o">-&gt;</span><span class="n">overlapped</span><span class="p">),</span> <span class="n">CompletionROUTINE</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p>主函数的写法与之前的例子中的写法类似。也是先初始化环境，绑定，监听等等。在循环中接收连接，当有新客户端连接进来时创建对应的客户端结构，然后调用WSARecv函数接收数据，接下来就是使用SleepEx进入可警告状态，以便让完成历程有机会执行。
+在完成历程中就不需要像之前那样调用WSAGetOverlappedResult了，因为调用完成历程就一定意味着重叠IO操作已经完成了。在完成历程中根据第一个参数来判断IO操作执行是否成功。如果失败则会直接断开与客户端的连接然后清理对应的结构。如果成功则直接获取获取IO操作得到的数据，如果是exit则需要关闭连接，否则原样返回并准备下一次接收数据</p>
+<!-- raw HTML omitted -->
+</div><div class="post-footer" id="post-footer">
+    <div class="post-info">
+        <div class="post-info-line">
+            <div class="post-info-mod">
+                <span>Updated on 2018-06-29</span>
+            </div></div>
+        <div class="post-info-line">
+            <div class="post-info-md"></div>
+            <div class="post-info-share">
+                <span><a href="javascript:void(0);" title="Share on Twitter" data-sharer="twitter" data-url="http://HaiLateBoy.github.io/posts/winsock-overlapped/" data-title="WinSock 重叠IO模型" data-hashtags="WinSock 模型,网络编程,重叠IO模型"><i class="fab fa-twitter fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Facebook" data-sharer="facebook" data-url="http://HaiLateBoy.github.io/posts/winsock-overlapped/" data-hashtag="WinSock 模型"><i class="fab fa-facebook-square fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Hacker News" data-sharer="hackernews" data-url="http://HaiLateBoy.github.io/posts/winsock-overlapped/" data-title="WinSock 重叠IO模型"><i class="fab fa-hacker-news fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Line" data-sharer="line" data-url="http://HaiLateBoy.github.io/posts/winsock-overlapped/" data-title="WinSock 重叠IO模型"><i data-svg-src="https://cdn.jsdelivr.net/npm/simple-icons@7.3.0/icons/line.svg" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on 微博" data-sharer="weibo" data-url="http://HaiLateBoy.github.io/posts/winsock-overlapped/" data-title="WinSock 重叠IO模型"><i class="fab fa-weibo fa-fw" aria-hidden="true"></i></a></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="post-info-more">
+        <section class="post-tags"><i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/winsock-%E6%A8%A1%E5%9E%8B/">WinSock 模型</a>,&nbsp;<a href="/tags/%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B/">网络编程</a>,&nbsp;<a href="/tags/%E9%87%8D%E5%8F%A0io%E6%A8%A1%E5%9E%8B/">重叠IO模型</a></section>
+        <section>
+            <span><a href="javascript:void(0);" onclick="window.history.back();">Back</a></span>&nbsp;|&nbsp;<span><a href="/">Home</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav"><a href="/posts/winsock-wsaeventselect/" class="prev" rel="prev" title="WinSock WSAEventSelect 模型"><i class="fas fa-angle-left fa-fw" aria-hidden="true"></i>WinSock WSAEventSelect 模型</a>
+            <a href="/posts/brief-history-of-humankind/" class="next" rel="next" title="《人类简史》与《未来简史》 读后感">《人类简史》与《未来简史》 读后感<i class="fas fa-angle-right fa-fw" aria-hidden="true"></i></a></div>
+</div>
+</article></div>
+            </main><footer class="footer">
+        <div class="footer-container"><div class="footer-line">Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener noreffer" title="Hugo 0.121.2">Hugo</a> | Theme - <a href="https://github.com/dillonzq/LoveIt" target="_blank" rel="noopener noreffer" title="LoveIt 0.2.11"><i class="far fa-kiss-wink-heart fa-fw" aria-hidden="true"></i> LoveIt</a>
+                </div><div class="footer-line" itemscope itemtype="http://schema.org/CreativeWork"><i class="far fa-copyright fa-fw" aria-hidden="true"></i><span itemprop="copyrightYear">2022 - 2024</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="https://www.masimaro.xyz" target="_blank">Masimaro</a></span></div>
+        </div>
+    </footer></div>
+
+        <div id="fixed-buttons"><a href="#" id="back-to-top" class="fixed-button" title="Back to Top">
+                <i class="fas fa-arrow-up fa-fw" aria-hidden="true"></i>
+            </a><a href="#" id="view-comments" class="fixed-button" title="View Comments">
+                <i class="fas fa-comment fa-fw" aria-hidden="true"></i>
+            </a>
+        </div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.css"><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/autocomplete.js@0.38.1/dist/autocomplete.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lunr@2.3.9/lunr.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lazysizes@5.3.2/lazysizes.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/clipboard@2.0.11/dist/clipboard.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/sharer.js@0.5.1/sharer.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/auto-render.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/copy-tex.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/mhchem.min.js"></script><script type="text/javascript">window.config={"code":{"copyTitle":"Copy to clipboard","maxShownLines":50},"comment":{},"math":{"delimiters":[{"display":true,"left":"$$","right":"$$"},{"display":true,"left":"\\[","right":"\\]"},{"display":true,"left":"\\begin{equation}","right":"\\end{equation}"},{"display":true,"left":"\\begin{equation*}","right":"\\end{equation*}"},{"display":true,"left":"\\begin{align}","right":"\\end{align}"},{"display":true,"left":"\\begin{align*}","right":"\\end{align*}"},{"display":true,"left":"\\begin{alignat}","right":"\\end{alignat}"},{"display":true,"left":"\\begin{alignat*}","right":"\\end{alignat*}"},{"display":true,"left":"\\begin{gather}","right":"\\end{gather}"},{"display":true,"left":"\\begin{CD}","right":"\\end{CD}"},{"display":false,"left":"$","right":"$"},{"display":false,"left":"\\(","right":"\\)"}],"strict":false},"search":{"highlightTag":"em","maxResultLength":10,"noResultsFound":"No results found","snippetLength":50}};</script><script type="text/javascript" src="/js/theme.min.js"></script></body>
+</html>

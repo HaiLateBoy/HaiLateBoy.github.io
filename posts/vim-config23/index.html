@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="robots" content="noodp" />
+        <title>从零开始配置vim(23)——lsp基础配置 - Masimaro&#39;s blog</title><meta name="Description" content="这是我用于记录日常和学习的小站"><meta property="og:title" content="从零开始配置vim(23)——lsp基础配置" />
+<meta property="og:description" content="上一章，我们初步认识了lsp，并且对 nvim-treesitter插件进行了配置，为编辑器提供了代码着色、自动格式化以及增量选中功能。算是初" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://HaiLateBoy.github.io/posts/vim-config23/" /><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2022-09-07T10:02:13+08:00" />
+<meta property="article:modified_time" content="2022-09-07T10:02:13+08:00" /><meta property="og:site_name" content="Masimaro&#39;s blog" />
+
+<meta name="twitter:card" content="summary"/><meta name="twitter:title" content="从零开始配置vim(23)——lsp基础配置"/>
+<meta name="twitter:description" content="上一章，我们初步认识了lsp，并且对 nvim-treesitter插件进行了配置，为编辑器提供了代码着色、自动格式化以及增量选中功能。算是初"/>
+<meta name="application-name" content="My cool site">
+<meta name="apple-mobile-web-app-title" content="My cool site"><meta name="theme-color" content="#ffffff"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="manifest" href="/site.webmanifest"><link rel="canonical" href="http://HaiLateBoy.github.io/posts/vim-config23/" /><link rel="prev" href="http://HaiLateBoy.github.io/posts/vim-config22/" /><link rel="next" href="http://HaiLateBoy.github.io/posts/vim-config24/" /><link rel="stylesheet" href="/css/style.min.css"><link rel="preload" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css"></noscript><link rel="preload" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css"></noscript><script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "BlogPosting",
+        "headline": "从零开始配置vim(23)——lsp基础配置",
+        "inLanguage": "zh-CN",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "http:\/\/HaiLateBoy.github.io\/posts\/vim-config23\/"
+        },"genre": "posts","keywords": "vim, 编辑工具, 文本处理, lua, 编辑器","wordcount":  1690 ,
+        "url": "http:\/\/HaiLateBoy.github.io\/posts\/vim-config23\/","datePublished": "2022-09-07T10:02:13+08:00","dateModified": "2022-09-07T10:02:13+08:00","publisher": {
+            "@type": "Organization",
+            "name": ""},"author": {
+                "@type": "Person",
+                "name": "Masimaro"
+            },"description": ""
+    }
+    </script></head>
+    <body data-header-desktop="fixed" data-header-mobile="auto"><script type="text/javascript">(window.localStorage && localStorage.getItem('theme') ? localStorage.getItem('theme') === 'dark' : ('auto' === 'auto' ? window.matchMedia('(prefers-color-scheme: dark)').matches : 'auto' === 'dark')) && document.body.setAttribute('theme', 'dark');</script>
+
+        <div id="mask"></div><div class="wrapper"><header class="desktop" id="header-desktop">
+    <div class="header-wrapper">
+        <div class="header-title">
+            <a href="/" title="Masimaro&#39;s blog">My cool site</a>
+        </div>
+        <div class="menu">
+            <div class="menu-inner"><a class="menu-item" href="/posts/" title="文章列表"> 文章 </a><a class="menu-item" href="/tags/" title="标签"> 标签 </a><a class="menu-item" href="/categories/" title="分类"> 分类 </a><a class="menu-item" href="/about" title="关于本站"> 关于 </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-desktop">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-desktop" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-desktop" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-desktop">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </span><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                    <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+                </a></div>
+        </div>
+    </div>
+</header><header class="mobile" id="header-mobile">
+    <div class="header-container">
+        <div class="header-wrapper">
+            <div class="header-title">
+                <a href="/" title="Masimaro&#39;s blog">My cool site</a>
+            </div>
+            <div class="menu-toggle" id="menu-toggle-mobile">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+        <div class="menu" id="menu-mobile"><div class="search-wrapper">
+                    <div class="search mobile" id="search-mobile">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-mobile">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-mobile" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-mobile" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-mobile">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </div>
+                    <a href="javascript:void(0);" class="search-cancel" id="search-cancel-mobile">
+                        Cancel
+                    </a>
+                </div><a class="menu-item" href="/posts/" title="文章列表">文章</a><a class="menu-item" href="/tags/" title="标签">标签</a><a class="menu-item" href="/categories/" title="分类">分类</a><a class="menu-item" href="/about" title="关于本站">关于</a><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+            </a></div>
+    </div>
+</header><div class="search-dropdown desktop">
+        <div id="search-dropdown-desktop"></div>
+    </div>
+    <div class="search-dropdown mobile">
+        <div id="search-dropdown-mobile"></div>
+    </div><main class="main">
+                <div class="container"><div class="toc" id="toc-auto">
+            <h2 class="toc-title">Contents</h2>
+            <div class="toc-content" id="toc-content-auto"></div>
+        </div><article class="page single"><h1 class="single-title animate__animated animate__flipInX">从零开始配置vim(23)——lsp基础配置</h1><div class="post-meta">
+            <div class="post-meta-line"><span class="post-author"><a href="https://www.masimaro.xyz" title="Author" target="_blank" rel="noopener noreffer author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Masimaro</a></span>&nbsp;<span class="post-category">included in <a href="/categories/vim-%E9%85%8D%E7%BD%AE/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>vim 配置</a></span></div>
+            <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw" aria-hidden="true"></i>&nbsp;<time datetime="2022-09-07">2022-09-07</time>&nbsp;<i class="fas fa-pencil-alt fa-fw" aria-hidden="true"></i>&nbsp;1690 words&nbsp;
+                <i class="far fa-clock fa-fw" aria-hidden="true"></i>&nbsp;4 minutes&nbsp;</div>
+        </div><div class="details toc" id="toc-static"  data-kept="true">
+                <div class="details-summary toc-title">
+                    <span>Contents</span>
+                    <span><i class="details-icon fas fa-angle-right" aria-hidden="true"></i></span>
+                </div>
+                <div class="details-content toc-content" id="toc-content-static"><nav id="TableOfContents">
+  <ul>
+    <li><a href="#neovim-lsp">neovim lsp</a></li>
+    <li><a href="#安装-nvim-lspconfig">安装 nvim-lspconfig</a></li>
+    <li><a href="#安装对应服务端">安装对应服务端</a></li>
+    <li><a href="#针对lua进行配置">针对lua进行配置</a></li>
+  </ul>
+</nav></div>
+            </div><div class="content" id="content"><p>上一章，我们初步认识了lsp，并且对 nvim-treesitter插件进行了配置，为编辑器提供了代码着色、自动格式化以及增量选中功能。算是初步体验了 lsp的相关功能。从这篇开始我们通过lsp的功能，进一步提升代码编辑、查阅等功能的体验</p>
+<h2 id="neovim-lsp">neovim lsp</h2>
+<p>早期想通过 <code>neovim</code> 使用 <code>lsp</code> 得通过一个额外的插件 <code>nvim-coc</code> 。它使用<code> nodejs</code>实现，而且提供 <code>lua</code> 的接口。但是在 <code>neovim</code> 中混用不同编程语言有时候会出现莫名其妙的问题，比如我之前遇到的补全失效，但是过一段时间它自己又好了。好在 <code>neovim</code> 社区听从了程序员们对于 <code>lsp</code> 的呼唤，它内置了<code>lsp</code> 的客户端，并且为了方便配置服务端，它提供了一个名为 <code>nvim-lspconfig</code> 的插件。在现在的 <code>neovim</code> 版本下配置不同语言的 <code>lsp</code>已经很方便了，根据官方的文档，我们只需要4步即可</p>
+<ol>
+<li>安装 <code>nvim-lspconfig</code> 插件</li>
+<li>安装对应语言 <code>lsp</code> 的服务端</li>
+<li>针对 <code>xx</code>语言，添加语言的配置 <code>require('lspconfig').xx.setup{…}</code></li>
+<li>检查 <code>lsp</code> 的服务端在该缓冲区是否正常运行 <code>print(vim.inspect(vim.lsp.buf_get_clients()))</code></li>
+</ol>
+<h2 id="安装-nvim-lspconfig">安装 nvim-lspconfig</h2>
+<p>好了，我们按照官方的提示，我们先来配置 <code>lua</code> 相关的内容，以便后期在写配置时可以有更好的编程体验。</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-lua" data-lang="lua"><span class="line"><span class="cl"><span class="n">use</span> <span class="p">{</span><span class="s1">&#39;neovim/nvim-lspconfig&#39;</span><span class="p">}</span>
+</span></span></code></pre></div><p>我们可以去微软的官方网站查看各个语言的服务端信息 <code>https://microsoft.github.io/language-server-protocol/implementors/servers/</code></p>
+<h2 id="安装对应服务端">安装对应服务端</h2>
+<p>针对 <code>lua</code> 语言我们选中的是 <code>sumneko/lua-language-server</code> 这个服务端。根据 <code>wiki</code> 页面的安装方式，我们可以使用命令行自行安装。但是现在有了更方便的方式了我们使用 <code>nvim-lsp-installer</code> 插件进行安装。</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-lua" data-lang="lua"><span class="line"><span class="cl"><span class="n">use</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="s2">&#34;williamboman/nvim-lsp-installer&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="s2">&#34;neovim/nvim-lspconfig&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p>我们还是一样，在<code>plugin-config</code> 目录下创建一个配置文件用来配置 <code>nvim-lsp-installer</code> 插件</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-lua" data-lang="lua"><span class="line"><span class="cl"><span class="n">require</span><span class="p">(</span><span class="s2">&#34;nvim-lsp-installer&#34;</span><span class="p">).</span><span class="n">setup</span> <span class="p">{}</span>
+</span></span></code></pre></div><p>我们可以使用 <code>LspInstallInfo</code> 命令来查看当前lsp服务的安装情况。我们使用 <code>:LspInstall --sync [server]</code> 来安装对应的服务端。其中 <code>--sync</code> 代表我们希望以同步的方式安装，也就是安装时会卡主 <code>neovim</code> 主体。使用下面的命令来安装 <code>lua</code> 的服务端</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-lua" data-lang="lua"><span class="line"><span class="cl"><span class="p">:</span><span class="n">LspInstall</span> <span class="c1">--sync sumneko_lua</span>
+</span></span></code></pre></div><p>我们可以在 <a href="https://github.com/williamboman/nvim-lsp-installer#available-lsps" target="_blank" rel="noopener noreffer ">这个页面</a> 查看 <code>nvim-lsp-installer</code> 插件支持的各个语言对应的服务端</p>
+<h2 id="针对lua进行配置">针对lua进行配置</h2>
+<p>安装完成之后，我们来配置 <code>lua</code> 相关的内容。不知道还记不记得我们之前介绍 文件类型的时候说过不同文件类型的配置都在 <code>~/.config/nvim/ftplugin</code> 里面。我们在这个目录里面定义一个 <code>lua.lua</code> 的文件，写入以下内容</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-lua" data-lang="lua"><span class="line"><span class="cl"><span class="c1">-- 是否将 tab 替换为 space</span>
+</span></span><span class="line"><span class="cl"><span class="n">vim.bo</span><span class="p">.</span><span class="n">expandtab</span> <span class="o">=</span> <span class="kc">true</span>
+</span></span><span class="line"><span class="cl"><span class="n">vim.bo</span><span class="p">.</span><span class="n">shiftwidth</span> <span class="o">=</span> <span class="mi">4</span>
+</span></span><span class="line"><span class="cl"><span class="n">vim.bo</span><span class="p">.</span><span class="n">tabstop</span> <span class="o">=</span> <span class="mi">4</span>
+</span></span><span class="line"><span class="cl"><span class="n">vim.bo</span><span class="p">.</span><span class="n">softtabstop</span> <span class="o">=</span> <span class="mi">4</span>
+</span></span><span class="line"><span class="cl"><span class="c1">-- 取消自动注释，当前行是注释时，按下回车键会默认添加一行注释，这里取消这一行为</span>
+</span></span><span class="line"><span class="cl"><span class="n">vim.opt_local</span><span class="p">.</span><span class="n">formatoptions</span> <span class="o">=</span> <span class="n">vim.opt_local</span><span class="p">.</span><span class="n">formatoptions</span> <span class="o">-</span> <span class="p">{</span><span class="s2">&#34;r&#34;</span><span class="p">,</span> <span class="s2">&#34;c&#34;</span><span class="p">,</span> <span class="s2">&#34;o&#34;</span><span class="p">}</span>
+</span></span></code></pre></div><p>我们之前分析过 <code>neovim</code> 是如何实现文件类型检测的。在那篇文章中我们说它定义了自动命令，当检测到对应文件类型的时候会调用 <code>~/.config/nvim/ftplugin</code> 目录中对应以文件类型命名的目录或者 <code>lua</code> 文件。使用这种方式有两个好处，第一个就是我们不用手动使用 <code>require</code> 来加载了，第二个好处就是可以根据文件类型动态的选择调用或者不调用，而且这个工作由 <code>neovim</code> 自动完成，不需要我们进行干预</p>
+<p>基于这些好处，我们在 <code>ftplugin/lua.lua</code> 中保存 <code>lua</code> 相关的配置。另外再在 <code>~/.config/nvim/lua</code> 目录创建一个 <code>lsp</code>目录，专门用来保存语言的配置。然后再在 <code>ftplugin/lua.lua</code> 中加载它</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-lua" data-lang="lua"><span class="line"><span class="cl"><span class="n">require</span><span class="p">(</span><span class="s1">&#39;lsp/lua&#39;</span><span class="p">)</span>
+</span></span></code></pre></div><p>我们在这个文件中添加 <code>Lua</code> 相关的lsp配置</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-lua" data-lang="lua"><span class="line"><span class="cl"><span class="c1">-- 定义快捷键</span>
+</span></span><span class="line"><span class="cl"><span class="c1">-- 根据官方的提示，这里我们使用 on_attach 表示当前缓冲加载服务端完成之后调用</span>
+</span></span><span class="line"><span class="cl"><span class="kd">local</span> <span class="n">on_attach</span> <span class="o">=</span> <span class="kr">function</span><span class="p">(</span><span class="n">client</span><span class="p">,</span> <span class="n">bufnr</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">-- 跳转到声明</span>
+</span></span><span class="line"><span class="cl">    <span class="n">vim.api</span><span class="p">.</span><span class="n">nvim_buf_set_keymap</span><span class="p">(</span><span class="n">bufnr</span><span class="p">,</span> <span class="s2">&#34;n&#34;</span><span class="p">,</span> <span class="s2">&#34;gd&#34;</span><span class="p">,</span> <span class="s2">&#34;&lt;cmd&gt;lua vim.lsp.buf.declaration()&lt;CR&gt;&#34;</span><span class="p">,</span> <span class="p">{</span><span class="n">silent</span> <span class="o">=</span> <span class="kc">true</span><span class="p">,</span> <span class="n">noremap</span> <span class="o">=</span> <span class="kc">true</span><span class="p">})</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">-- 跳转到定义</span>
+</span></span><span class="line"><span class="cl">    <span class="n">vim.api</span><span class="p">.</span><span class="n">nvim_buf_set_keymap</span><span class="p">(</span><span class="n">bufnr</span><span class="p">,</span> <span class="s2">&#34;n&#34;</span><span class="p">,</span> <span class="s2">&#34;gD&#34;</span><span class="p">,</span> <span class="s2">&#34;&lt;cmd&gt;lua vim.lsp.buf.definition()&lt;CR&gt;&#34;</span><span class="p">,</span> <span class="p">{</span><span class="n">silent</span> <span class="o">=</span> <span class="kc">true</span><span class="p">,</span> <span class="n">noremap</span> <span class="o">=</span> <span class="kc">true</span><span class="p">})</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">-- 显示注释文档</span>
+</span></span><span class="line"><span class="cl">    <span class="n">vim.api</span><span class="p">.</span><span class="n">nvim_buf_set_keymap</span><span class="p">(</span><span class="n">bufnr</span><span class="p">,</span> <span class="s2">&#34;n&#34;</span><span class="p">,</span> <span class="s2">&#34;gh&#34;</span><span class="p">,</span> <span class="s2">&#34;&lt;cmd&gt;lua vim.lsp.buf.hover()&lt;CR&gt;&#34;</span><span class="p">,</span> <span class="p">{</span><span class="n">silent</span> <span class="o">=</span> <span class="kc">true</span><span class="p">,</span> <span class="n">noremap</span> <span class="o">=</span> <span class="kc">true</span><span class="p">})</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">-- 跳转到实现</span>
+</span></span><span class="line"><span class="cl">    <span class="n">vim.api</span><span class="p">.</span><span class="n">nvim_buf_set_keymap</span><span class="p">(</span><span class="n">bufnr</span><span class="p">,</span> <span class="s2">&#34;n&#34;</span><span class="p">,</span> <span class="s2">&#34;gi&#34;</span><span class="p">,</span> <span class="s2">&#34;&lt;cmd&gt;lua vim.lsp.buf.implementation()&lt;CR&gt;&#34;</span><span class="p">,</span> <span class="p">{</span><span class="n">silent</span> <span class="o">=</span> <span class="kc">true</span><span class="p">,</span> <span class="n">noremap</span> <span class="o">=</span> <span class="kc">true</span><span class="p">})</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">-- 跳转到引用位置</span>
+</span></span><span class="line"><span class="cl">    <span class="n">vim.api</span><span class="p">.</span><span class="n">nvim_buf_set_keymap</span><span class="p">(</span><span class="n">bufnr</span><span class="p">,</span> <span class="s2">&#34;n&#34;</span><span class="p">,</span> <span class="s2">&#34;gr&#34;</span><span class="p">,</span> <span class="s2">&#34;&lt;cmd&gt;lua vim.lsp.buf.references()&lt;CR&gt;&#34;</span><span class="p">,</span> <span class="p">{</span><span class="n">silent</span> <span class="o">=</span> <span class="kc">true</span><span class="p">,</span> <span class="n">noremap</span> <span class="o">=</span> <span class="kc">true</span><span class="p">})</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">-- 以浮窗形式显示错误</span>
+</span></span><span class="line"><span class="cl">    <span class="n">vim.api</span><span class="p">.</span><span class="n">nvim_buf_set_keymap</span><span class="p">(</span><span class="n">bufnr</span><span class="p">,</span> <span class="s2">&#34;n&#34;</span><span class="p">,</span> <span class="s2">&#34;go&#34;</span><span class="p">,</span> <span class="s2">&#34;&lt;cmd&gt;lua vim.diagnostic.open_float()&lt;CR&gt;&#34;</span><span class="p">,</span> <span class="p">{</span><span class="n">silent</span> <span class="o">=</span> <span class="kc">true</span><span class="p">,</span> <span class="n">noremap</span> <span class="o">=</span> <span class="kc">true</span><span class="p">})</span>
+</span></span><span class="line"><span class="cl">    <span class="n">vim.api</span><span class="p">.</span><span class="n">nvim_buf_set_keymap</span><span class="p">(</span><span class="n">bufnr</span><span class="p">,</span> <span class="s2">&#34;n&#34;</span><span class="p">,</span> <span class="s2">&#34;gp&#34;</span><span class="p">,</span> <span class="s2">&#34;&lt;cmd&gt;lua vim.diagnostic.goto_prev()&lt;CR&gt;&#34;</span><span class="p">,</span> <span class="p">{</span><span class="n">silent</span> <span class="o">=</span> <span class="kc">true</span><span class="p">,</span> <span class="n">noremap</span> <span class="o">=</span> <span class="kc">true</span><span class="p">})</span>
+</span></span><span class="line"><span class="cl">    <span class="n">vim.api</span><span class="p">.</span><span class="n">nvim_buf_set_keymap</span><span class="p">(</span><span class="n">bufnr</span><span class="p">,</span> <span class="s2">&#34;n&#34;</span><span class="p">,</span> <span class="s2">&#34;gn&#34;</span><span class="p">,</span> <span class="s2">&#34;&lt;cmd&gt;lua vim.diagnostic.goto_next()&lt;CR&gt;&#34;</span><span class="p">,</span> <span class="p">{</span><span class="n">silent</span> <span class="o">=</span> <span class="kc">true</span><span class="p">,</span> <span class="n">noremap</span> <span class="o">=</span> <span class="kc">true</span><span class="p">})</span>
+</span></span><span class="line"><span class="cl"><span class="kr">end</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">require</span><span class="s1">&#39;lspconfig&#39;</span><span class="p">.</span><span class="n">sumneko_lua.setup</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">settings</span> <span class="o">=</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">Lua</span> <span class="o">=</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">            <span class="n">runtime</span> <span class="o">=</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">                <span class="c1">-- Tell the language server which version of Lua you&#39;re using (most likely LuaJIT in the case of Neovim)</span>
+</span></span><span class="line"><span class="cl">                <span class="n">version</span> <span class="o">=</span> <span class="s1">&#39;LuaJIT&#39;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">            <span class="p">},</span>
+</span></span><span class="line"><span class="cl">            <span class="n">diagnostics</span> <span class="o">=</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">                <span class="c1">-- Get the language server to recognize the `vim` global</span>
+</span></span><span class="line"><span class="cl">                <span class="n">globals</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;vim&#39;</span><span class="p">},</span>
+</span></span><span class="line"><span class="cl">            <span class="p">},</span>
+</span></span><span class="line"><span class="cl">            <span class="n">workspace</span> <span class="o">=</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">                <span class="c1">-- Make the server aware of Neovim runtime files</span>
+</span></span><span class="line"><span class="cl">                <span class="n">library</span> <span class="o">=</span> <span class="n">vim.api</span><span class="p">.</span><span class="n">nvim_get_runtime_file</span><span class="p">(</span><span class="s2">&#34;&#34;</span><span class="p">,</span> <span class="kc">true</span><span class="p">),</span>
+</span></span><span class="line"><span class="cl">            <span class="p">},</span>
+</span></span><span class="line"><span class="cl">            <span class="c1">-- Do not send telemetry data containing a randomized but unique identifier</span>
+</span></span><span class="line"><span class="cl">            <span class="n">telemetry</span> <span class="o">=</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">                <span class="n">enable</span> <span class="o">=</span> <span class="kc">false</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">            <span class="p">},</span>
+</span></span><span class="line"><span class="cl">        <span class="p">},</span>
+</span></span><span class="line"><span class="cl">    <span class="p">},</span>
+</span></span><span class="line"><span class="cl">    <span class="n">on_attach</span> <span class="o">=</span> <span class="n">on_attach</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p>大部分的配置都是根据 <code>sumneko_lua</code> 官方的文档抄过来的，这里我们需要着重强调一下 <code>on_attach</code> 这里，根据 <code>nvim-config</code> 的描述，当 <code>lsp</code> 服务程序加载完成之后会调用我们在 <code>on_attach</code> 出指定的回调函数，在函数内部我们使用 <code>vim.api.nvim_buf_set_keymap</code> 仅仅针对当前加载了<code>lsp</code> 服务的缓冲区进行，而对于其他普通文件我们不需要用到这些快捷键。</p>
+<p>看到这里不知道小伙伴是否有点头晕了，这次我们安装了好多内容，也创建了不少配置文件，下面来回顾一下</p>
+<ul>
+<li>安装 <code>nvim-lspconfig</code> 来用于lsp的配置</li>
+<li>安装 <code>nvim-lsp-installer</code> 来安装不同语言的 <code>lsp</code> 服务端</li>
+<li>安装 <code>sumneko_lua</code> 作为 <code>lua</code> 语言的 <code>lsp</code> 服务端</li>
+<li>创建了一个 <code>~/.config/nvim/ftplugin</code> 作为加载 <code>lua</code> 语言配置的入口</li>
+<li>创建了一个 <code>~/.config/nvim/lsp/lua.lua</code> 保存<code>lua</code> 语言相关的配置</li>
+</ul>
+<p>本篇只讲了如何基于 <code>neovim</code> 官方给出的那4步来配置一个语言的 <code>lsp</code> 服务端，但是还有如何自动补全没有谈到，下节我们将开始讲解如何使用自动补全。敬请期待!</p>
+</div><div class="post-footer" id="post-footer">
+    <div class="post-info">
+        <div class="post-info-line">
+            <div class="post-info-mod">
+                <span>Updated on 2022-09-07</span>
+            </div></div>
+        <div class="post-info-line">
+            <div class="post-info-md"></div>
+            <div class="post-info-share">
+                <span><a href="javascript:void(0);" title="Share on Twitter" data-sharer="twitter" data-url="http://HaiLateBoy.github.io/posts/vim-config23/" data-title="从零开始配置vim(23)——lsp基础配置" data-hashtags="vim,编辑工具,文本处理,lua,编辑器"><i class="fab fa-twitter fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Facebook" data-sharer="facebook" data-url="http://HaiLateBoy.github.io/posts/vim-config23/" data-hashtag="vim"><i class="fab fa-facebook-square fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Hacker News" data-sharer="hackernews" data-url="http://HaiLateBoy.github.io/posts/vim-config23/" data-title="从零开始配置vim(23)——lsp基础配置"><i class="fab fa-hacker-news fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Line" data-sharer="line" data-url="http://HaiLateBoy.github.io/posts/vim-config23/" data-title="从零开始配置vim(23)——lsp基础配置"><i data-svg-src="https://cdn.jsdelivr.net/npm/simple-icons@7.3.0/icons/line.svg" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on 微博" data-sharer="weibo" data-url="http://HaiLateBoy.github.io/posts/vim-config23/" data-title="从零开始配置vim(23)——lsp基础配置"><i class="fab fa-weibo fa-fw" aria-hidden="true"></i></a></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="post-info-more">
+        <section class="post-tags"><i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/vim/">vim</a>,&nbsp;<a href="/tags/%E7%BC%96%E8%BE%91%E5%B7%A5%E5%85%B7/">编辑工具</a>,&nbsp;<a href="/tags/%E6%96%87%E6%9C%AC%E5%A4%84%E7%90%86/">文本处理</a>,&nbsp;<a href="/tags/lua/">lua</a>,&nbsp;<a href="/tags/%E7%BC%96%E8%BE%91%E5%99%A8/">编辑器</a></section>
+        <section>
+            <span><a href="javascript:void(0);" onclick="window.history.back();">Back</a></span>&nbsp;|&nbsp;<span><a href="/">Home</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav"><a href="/posts/vim-config22/" class="prev" rel="prev" title="从零开始配置vim(22)——lsp简介与treesitter 配置"><i class="fas fa-angle-left fa-fw" aria-hidden="true"></i>从零开始配置vim(22)——lsp简介与treesitter 配置</a>
+            <a href="/posts/vim-config24/" class="next" rel="next" title="从零开始配置vim(24)——自动补全">从零开始配置vim(24)——自动补全<i class="fas fa-angle-right fa-fw" aria-hidden="true"></i></a></div>
+</div>
+</article></div>
+            </main><footer class="footer">
+        <div class="footer-container"><div class="footer-line">Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener noreffer" title="Hugo 0.121.2">Hugo</a> | Theme - <a href="https://github.com/dillonzq/LoveIt" target="_blank" rel="noopener noreffer" title="LoveIt 0.2.11"><i class="far fa-kiss-wink-heart fa-fw" aria-hidden="true"></i> LoveIt</a>
+                </div><div class="footer-line" itemscope itemtype="http://schema.org/CreativeWork"><i class="far fa-copyright fa-fw" aria-hidden="true"></i><span itemprop="copyrightYear">2022 - 2024</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="https://www.masimaro.xyz" target="_blank">Masimaro</a></span></div>
+        </div>
+    </footer></div>
+
+        <div id="fixed-buttons"><a href="#" id="back-to-top" class="fixed-button" title="Back to Top">
+                <i class="fas fa-arrow-up fa-fw" aria-hidden="true"></i>
+            </a><a href="#" id="view-comments" class="fixed-button" title="View Comments">
+                <i class="fas fa-comment fa-fw" aria-hidden="true"></i>
+            </a>
+        </div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.css"><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/autocomplete.js@0.38.1/dist/autocomplete.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lunr@2.3.9/lunr.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lazysizes@5.3.2/lazysizes.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/clipboard@2.0.11/dist/clipboard.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/sharer.js@0.5.1/sharer.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/auto-render.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/copy-tex.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/mhchem.min.js"></script><script type="text/javascript">window.config={"code":{"copyTitle":"Copy to clipboard","maxShownLines":50},"comment":{},"math":{"delimiters":[{"display":true,"left":"$$","right":"$$"},{"display":true,"left":"\\[","right":"\\]"},{"display":true,"left":"\\begin{equation}","right":"\\end{equation}"},{"display":true,"left":"\\begin{equation*}","right":"\\end{equation*}"},{"display":true,"left":"\\begin{align}","right":"\\end{align}"},{"display":true,"left":"\\begin{align*}","right":"\\end{align*}"},{"display":true,"left":"\\begin{alignat}","right":"\\end{alignat}"},{"display":true,"left":"\\begin{alignat*}","right":"\\end{alignat*}"},{"display":true,"left":"\\begin{gather}","right":"\\end{gather}"},{"display":true,"left":"\\begin{CD}","right":"\\end{CD}"},{"display":false,"left":"$","right":"$"},{"display":false,"left":"\\(","right":"\\)"}],"strict":false},"search":{"highlightTag":"em","maxResultLength":10,"noResultsFound":"No results found","snippetLength":50}};</script><script type="text/javascript" src="/js/theme.min.js"></script></body>
+</html>

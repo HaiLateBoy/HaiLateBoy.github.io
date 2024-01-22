@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="robots" content="noodp" />
+        <title>从零开始配置vim(28)——代码的编译、运行与调试 - Masimaro&#39;s blog</title><meta name="Description" content="这是我用于记录日常和学习的小站"><meta property="og:title" content="从零开始配置vim(28)——代码的编译、运行与调试" />
+<meta property="og:description" content="在前面几个章节，我们逐渐为 Vim 配置了语法高亮、代码的跳转和自动补全功能。现在的 Vim 已经可以作为代码编辑器来使用了。但是想将它作为日常发开的主力编" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://HaiLateBoy.github.io/posts/vim-config28/" /><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2022-10-24T17:05:29+08:00" />
+<meta property="article:modified_time" content="2022-10-24T17:05:29+08:00" /><meta property="og:site_name" content="Masimaro&#39;s blog" />
+
+<meta name="twitter:card" content="summary"/><meta name="twitter:title" content="从零开始配置vim(28)——代码的编译、运行与调试"/>
+<meta name="twitter:description" content="在前面几个章节，我们逐渐为 Vim 配置了语法高亮、代码的跳转和自动补全功能。现在的 Vim 已经可以作为代码编辑器来使用了。但是想将它作为日常发开的主力编"/>
+<meta name="application-name" content="My cool site">
+<meta name="apple-mobile-web-app-title" content="My cool site"><meta name="theme-color" content="#ffffff"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="manifest" href="/site.webmanifest"><link rel="canonical" href="http://HaiLateBoy.github.io/posts/vim-config28/" /><link rel="prev" href="http://HaiLateBoy.github.io/posts/vim-config27/" /><link rel="next" href="http://HaiLateBoy.github.io/posts/vim-config29/" /><link rel="stylesheet" href="/css/style.min.css"><link rel="preload" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css"></noscript><link rel="preload" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css"></noscript><script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "BlogPosting",
+        "headline": "从零开始配置vim(28)——代码的编译、运行与调试",
+        "inLanguage": "zh-CN",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "http:\/\/HaiLateBoy.github.io\/posts\/vim-config28\/"
+        },"genre": "posts","keywords": "vim, 编辑工具, 文本处理, lua, 编辑器","wordcount":  2854 ,
+        "url": "http:\/\/HaiLateBoy.github.io\/posts\/vim-config28\/","datePublished": "2022-10-24T17:05:29+08:00","dateModified": "2022-10-24T17:05:29+08:00","publisher": {
+            "@type": "Organization",
+            "name": ""},"author": {
+                "@type": "Person",
+                "name": "Masimaro"
+            },"description": ""
+    }
+    </script></head>
+    <body data-header-desktop="fixed" data-header-mobile="auto"><script type="text/javascript">(window.localStorage && localStorage.getItem('theme') ? localStorage.getItem('theme') === 'dark' : ('auto' === 'auto' ? window.matchMedia('(prefers-color-scheme: dark)').matches : 'auto' === 'dark')) && document.body.setAttribute('theme', 'dark');</script>
+
+        <div id="mask"></div><div class="wrapper"><header class="desktop" id="header-desktop">
+    <div class="header-wrapper">
+        <div class="header-title">
+            <a href="/" title="Masimaro&#39;s blog">My cool site</a>
+        </div>
+        <div class="menu">
+            <div class="menu-inner"><a class="menu-item" href="/posts/" title="文章列表"> 文章 </a><a class="menu-item" href="/tags/" title="标签"> 标签 </a><a class="menu-item" href="/categories/" title="分类"> 分类 </a><a class="menu-item" href="/about" title="关于本站"> 关于 </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-desktop">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-desktop" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-desktop" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-desktop">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </span><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                    <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+                </a></div>
+        </div>
+    </div>
+</header><header class="mobile" id="header-mobile">
+    <div class="header-container">
+        <div class="header-wrapper">
+            <div class="header-title">
+                <a href="/" title="Masimaro&#39;s blog">My cool site</a>
+            </div>
+            <div class="menu-toggle" id="menu-toggle-mobile">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+        <div class="menu" id="menu-mobile"><div class="search-wrapper">
+                    <div class="search mobile" id="search-mobile">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-mobile">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-mobile" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-mobile" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-mobile">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </div>
+                    <a href="javascript:void(0);" class="search-cancel" id="search-cancel-mobile">
+                        Cancel
+                    </a>
+                </div><a class="menu-item" href="/posts/" title="文章列表">文章</a><a class="menu-item" href="/tags/" title="标签">标签</a><a class="menu-item" href="/categories/" title="分类">分类</a><a class="menu-item" href="/about" title="关于本站">关于</a><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+            </a></div>
+    </div>
+</header><div class="search-dropdown desktop">
+        <div id="search-dropdown-desktop"></div>
+    </div>
+    <div class="search-dropdown mobile">
+        <div id="search-dropdown-mobile"></div>
+    </div><main class="main">
+                <div class="container"><div class="toc" id="toc-auto">
+            <h2 class="toc-title">Contents</h2>
+            <div class="toc-content" id="toc-content-auto"></div>
+        </div><article class="page single"><h1 class="single-title animate__animated animate__flipInX">从零开始配置vim(28)——代码的编译、运行与调试</h1><div class="post-meta">
+            <div class="post-meta-line"><span class="post-author"><a href="https://www.masimaro.xyz" title="Author" target="_blank" rel="noopener noreffer author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Masimaro</a></span>&nbsp;<span class="post-category">included in <a href="/categories/vim-%E9%85%8D%E7%BD%AE/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>vim 配置</a></span></div>
+            <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw" aria-hidden="true"></i>&nbsp;<time datetime="2022-10-24">2022-10-24</time>&nbsp;<i class="fas fa-pencil-alt fa-fw" aria-hidden="true"></i>&nbsp;2854 words&nbsp;
+                <i class="far fa-clock fa-fw" aria-hidden="true"></i>&nbsp;6 minutes&nbsp;</div>
+        </div><div class="details toc" id="toc-static"  data-kept="true">
+                <div class="details-summary toc-title">
+                    <span>Contents</span>
+                    <span><i class="details-icon fas fa-angle-right" aria-hidden="true"></i></span>
+                </div>
+                <div class="details-content toc-content" id="toc-content-static"><nav id="TableOfContents">
+  <ul>
+    <li><a href="#自动运行">自动运行</a>
+      <ul>
+        <li><a href="#c-语言的配置">C 语言的配置</a></li>
+        <li><a href="#python的配置">Python的配置</a></li>
+      </ul>
+    </li>
+    <li><a href="#dap-配置">dap 配置</a></li>
+  </ul>
+</nav></div>
+            </div><div class="content" id="content"><p>在前面几个章节，我们逐渐为 <code>Vim</code> 配置了语法高亮、代码的跳转和自动补全功能。现在的 <code>Vim</code> 已经可以作为代码编辑器来使用了。但是想将它作为日常发开的主力编辑器来用还需要很长一段路要走，其中一个就是要为它配置代码的一键编译与运行功能。这里我们仍然以 <code>C</code> 和 <code>Python</code> 为例。一个是需要编译运行的一个是直接就可以运行的，这两个语言应该能代表大多数语言的情况。</p>
+<h2 id="自动运行">自动运行</h2>
+<h3 id="c-语言的配置">C 语言的配置</h3>
+<p>在之前 <code>vim</code> 入门的一系列教程中我们介绍过 <code>vim</code> 自带 <code>make</code> 命令的运行机制以及如何进行自定义。对于其他语言要实现这个自动编译运行的效果我们核心的操作就是在修改 <code>make</code> 命令。而 <code>C/C++</code>  本身采用 <code>make</code> 命令来进行编译和运行，所以这里 <code>C/C++</code> 我们直接采用 vim 自带的 <code>:make</code> 命令</p>
+<p>我们先创建一个 <code>C</code> 的工程。让后使用上一节的生成 hello world 的代码片段生成一个基本的程序。然后提供一个供 <code>:make</code> 命令使用的 <code>Makefile</code> 文件</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-Makefile" data-lang="Makefile"><span class="line"><span class="cl"><span class="nf">main.out</span><span class="o">:</span> <span class="n">main</span>.<span class="n">o</span>
+</span></span><span class="line"><span class="cl">    gcc main.o -o main.out
+</span></span><span class="line"><span class="cl"><span class="nf">main.o</span><span class="o">:</span> <span class="n">main</span>.<span class="n">c</span>
+</span></span><span class="line"><span class="cl">    gcc -c main.c
+</span></span><span class="line"><span class="cl"><span class="nf">clean</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">    rm -rf *.o *.out
+</span></span><span class="line"><span class="cl"><span class="nf">run</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">    ./main.out
+</span></span></code></pre></div><p>然后我们执行 <code>make</code> 用来编译。如果出错了，可以使用 <code>quickfix</code> 相关命令跳转到对应位置。</p>
+<p>我们一般的流程是 <code>:make</code> 进行编译，然后使用 <code>:make run</code> 来进行运行。把命令搞清楚了，下面就考虑如何加快这个流程，做到一键编译运行。我们的思路还是绑定快捷键。每种语言虽然定义相同的快捷键但是运行的命令不同，我们需要根据不同的语言类型绑定对应的命令。这个时候最好的办法就是在 <code>filetype</code> 的机制上完成绑定的操作。</p>
+<p>我们在 <code>lua/lsp/cpp.lua</code> 中绑定快捷键。</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-lua" data-lang="lua"><span class="line"><span class="cl"><span class="kd">local</span> <span class="n">on_attach</span> <span class="o">=</span> <span class="kr">function</span><span class="p">(</span><span class="n">client</span><span class="p">,</span> <span class="n">bufnr</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="n">lsp_set_keymap.set_keymap</span><span class="p">(</span><span class="n">bufnr</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">-- 编译</span>
+</span></span><span class="line"><span class="cl">    <span class="n">vim.api</span><span class="p">.</span><span class="n">nvim_buf_set_keymap</span><span class="p">(</span><span class="n">bufnr</span><span class="p">,</span> <span class="s2">&#34;n&#34;</span><span class="p">,</span> <span class="s2">&#34;&lt;F7&gt;&#34;</span><span class="p">,</span> <span class="s2">&#34;&lt;cmd&gt;make&lt;CR&gt;&#34;</span><span class="p">,</span> <span class="p">{</span><span class="n">silent</span> <span class="o">=</span> <span class="kc">true</span><span class="p">,</span> <span class="n">noremap</span> <span class="o">=</span> <span class="kc">true</span><span class="p">})</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">-- 编译运行</span>
+</span></span><span class="line"><span class="cl">    <span class="n">vim.api</span><span class="p">.</span><span class="n">nvim_buf_set_keymap</span><span class="p">(</span><span class="n">bufnr</span><span class="p">,</span> <span class="s2">&#34;n&#34;</span><span class="p">,</span> <span class="s2">&#34;&lt;F5&gt;&#34;</span><span class="p">,</span> <span class="s2">&#34;&lt;cmd&gt;make run&lt;CR&gt;&#34;</span><span class="p">,</span> <span class="p">{</span><span class="n">silent</span> <span class="o">=</span> <span class="kc">true</span><span class="p">,</span> <span class="n">noremap</span> <span class="o">=</span> <span class="kc">true</span><span class="p">})</span>
+</span></span><span class="line"><span class="cl"><span class="kr">end</span>
+</span></span></code></pre></div><p>到此我们关于 <code>C/C++</code> 的配置就完成了。可能显的有些简单但是已经初步可用了，小伙伴可以根据自己的需求来进一步修改这个配置。使用这个配置的前提是 <code>C/C++</code> 的工程中有已经定义好的 <code>Makefile</code> 文件</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://img-blog.csdnimg.cn/70fcff63b35d467ab558bb91bfcf0ce9.gif#pic_center"
+        data-srcset="https://img-blog.csdnimg.cn/70fcff63b35d467ab558bb91bfcf0ce9.gif#pic_center, https://img-blog.csdnimg.cn/70fcff63b35d467ab558bb91bfcf0ce9.gif#pic_center 1.5x, https://img-blog.csdnimg.cn/70fcff63b35d467ab558bb91bfcf0ce9.gif#pic_center 2x"
+        data-sizes="auto"
+        alt="https://img-blog.csdnimg.cn/70fcff63b35d467ab558bb91bfcf0ce9.gif#pic_center"
+        title="在这里插入图片描述" /></p>
+<h3 id="python的配置">Python的配置</h3>
+<p>之前我们在讲解命令的模式的提到过可以使用 <code>%</code> 来代表当前 <code>buffer</code> 所对应的文件。所以 <code>python</code> 的配置就比较简单了。因为 <code>Python</code> 不需要编译，所以这里直接绑定 <code>&lt;F5&gt;</code> 来运行</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-lua" data-lang="lua"><span class="line"><span class="cl"><span class="n">vim.api</span><span class="p">.</span><span class="n">nvim_buf_set_keymap</span><span class="p">(</span><span class="n">bufnr</span><span class="p">,</span> <span class="s2">&#34;n&#34;</span><span class="p">,</span> <span class="s2">&#34;&lt;F5&gt;&#34;</span><span class="p">,</span> <span class="s2">&#34;&lt;cmd&gt;!python %&lt;CR&gt;&#34;</span><span class="p">,</span> <span class="p">{</span><span class="n">silent</span> <span class="o">=</span> <span class="kc">true</span><span class="p">,</span> <span class="n">noremap</span> <span class="o">=</span> <span class="kc">true</span><span class="p">})</span>
+</span></span></code></pre></div><p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://img-blog.csdnimg.cn/36257919cc7e47958a4033d84de5da9e.gif#pic_center"
+        data-srcset="https://img-blog.csdnimg.cn/36257919cc7e47958a4033d84de5da9e.gif#pic_center, https://img-blog.csdnimg.cn/36257919cc7e47958a4033d84de5da9e.gif#pic_center 1.5x, https://img-blog.csdnimg.cn/36257919cc7e47958a4033d84de5da9e.gif#pic_center 2x"
+        data-sizes="auto"
+        alt="https://img-blog.csdnimg.cn/36257919cc7e47958a4033d84de5da9e.gif#pic_center"
+        title="在这里插入图片描述" /></p>
+<h2 id="dap-配置">dap 配置</h2>
+<p>我们经常看到有人配置 <code>neovim</code> 或者 <code>vim</code> 的时候会介绍到 <code>dap</code> ，那么什么是 <code>dap</code> 呢? <code>dap</code> 的全称是 <code>Debug Adapter Protocol</code> 从名称上看它又是一个协议。它为多种调试器提供了一层统一的适配抽象层。有点类似于前面的介绍的 <code>lsp</code>。只要在适配层提供接口的实现，那么在客户端，也就是代码编辑器这端可以不做任何修改的集成不同调试</p>
+<p>联想到 <code>lsp</code> 的配置，我们配置<code>dap</code> 首先需要的是有一个 <code>dap</code> 的客户端，用来向调试器发送各种命令，例如下断点、显示变量名等等。另外想要能够调试也需要有具体的调试器，用来接收处理这些命令。现在思路有了，我们 这里先以 <code>Python</code> 为例来介绍 <code>dap</code> 的基本配置。</p>
+<p>首先是需要一个客户端，用于通过 <code>neovim</code>下发各种调试命令并实时显示调试信息。</p>
+<p>截止到 <code>0.7</code> 版本 <code>NeoVim</code> 并没有在内部集成 <code>dap</code> 客户端的功能，需要我们单独安装相关插件来实现这部分的功能。这里我们使用的客户端是 <code>nvim-dap</code> 插件。</p>
+<p>我们先使用 <code>use {'mfussenegger/nvim-dap'}</code> 来安装它。</p>
+<p>接着我们来定义一下相关的快捷键，这里我喜欢使用 <code>Visual Studio</code> 的快捷键。各位小伙伴可以自行选择自己喜欢的快捷键。这里我希望在插入模式和选择中也可以使用这些快捷键，由于 <code>vim.api.nvim_set_keymap</code> 函数第一个参数只能有一个模式字符串，如果采用这个函数来定义快捷键，这里同样的代码我要写三次，为了简化代码，这里介绍一个新的函数 <code>vim.keymap.set</code>。它与 <code>vim.api.nvim_set_keymap</code> 函数支持的参数相同，只是它第一个表示模式的参数可以支持用字典来一次绑定到多个模式中。这样就简化了绑定快捷键的代码量。</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-lua" data-lang="lua"><span class="line"><span class="cl"><span class="n">vim.keymap</span><span class="p">.</span><span class="n">set</span><span class="p">({</span><span class="s2">&#34;i&#34;</span><span class="p">,</span> <span class="s2">&#34;n&#34;</span><span class="p">,</span> <span class="s2">&#34;v&#34;</span><span class="p">},</span> <span class="s2">&#34;&lt;F5&gt;&#34;</span><span class="p">,</span> <span class="s2">&#34;&lt;cmd&gt;lua require&#39;dap&#39;.continue()&lt;CR&gt;&#34;</span><span class="p">,</span> <span class="p">{</span><span class="n">silent</span> <span class="o">=</span> <span class="kc">true</span><span class="p">,</span> <span class="n">noremap</span> <span class="o">=</span> <span class="kc">true</span><span class="p">,</span> <span class="n">buffer</span> <span class="o">=</span> <span class="n">bufnr</span><span class="p">})</span>
+</span></span><span class="line"><span class="cl"><span class="n">vim.keymap</span><span class="p">.</span><span class="n">set</span><span class="p">({</span><span class="s2">&#34;i&#34;</span><span class="p">,</span> <span class="s2">&#34;n&#34;</span><span class="p">,</span> <span class="s2">&#34;v&#34;</span><span class="p">},</span> <span class="s2">&#34;&lt;F10&gt;&#34;</span><span class="p">,</span> <span class="s2">&#34;&lt;cmd&gt;lua require&#39;dap&#39;.step_over()&lt;CR&gt;&#34;</span><span class="p">,</span> <span class="p">{</span><span class="n">silent</span> <span class="o">=</span> <span class="kc">true</span><span class="p">,</span> <span class="n">noremap</span> <span class="o">=</span> <span class="kc">true</span><span class="p">,</span> <span class="n">buffer</span> <span class="o">=</span> <span class="n">bufnr</span><span class="p">})</span>
+</span></span><span class="line"><span class="cl"><span class="n">vim.keymap</span><span class="p">.</span><span class="n">set</span><span class="p">({</span><span class="s2">&#34;i&#34;</span><span class="p">,</span> <span class="s2">&#34;n&#34;</span><span class="p">,</span> <span class="s2">&#34;v&#34;</span><span class="p">},</span> <span class="s2">&#34;&lt;F11&gt;&#34;</span><span class="p">,</span> <span class="s2">&#34;&lt;cmd&gt;lua require&#39;dap&#39;.step_into()&lt;CR&gt;&#34;</span><span class="p">,</span> <span class="p">{</span><span class="n">silent</span> <span class="o">=</span> <span class="kc">true</span><span class="p">,</span> <span class="n">noremap</span> <span class="o">=</span> <span class="kc">true</span><span class="p">,</span> <span class="n">buffer</span> <span class="o">=</span> <span class="n">bufnr</span><span class="p">})</span>
+</span></span><span class="line"><span class="cl"><span class="n">vim.keymap</span><span class="p">.</span><span class="n">set</span><span class="p">({</span><span class="s2">&#34;i&#34;</span><span class="p">,</span> <span class="s2">&#34;n&#34;</span><span class="p">,</span> <span class="s2">&#34;v&#34;</span><span class="p">},</span> <span class="s2">&#34;&lt;F12&gt;&#34;</span><span class="p">,</span> <span class="s2">&#34;&lt;cmd&gt;lua require&#39;dap&#39;.step_over()&lt;CR&gt;&#34;</span><span class="p">,</span> <span class="p">{</span><span class="n">silent</span> <span class="o">=</span> <span class="kc">true</span><span class="p">,</span> <span class="n">noremap</span> <span class="o">=</span> <span class="kc">true</span><span class="p">,</span> <span class="n">buffer</span> <span class="o">=</span> <span class="n">bufnr</span><span class="p">})</span>
+</span></span><span class="line"><span class="cl"><span class="n">vim.keymap</span><span class="p">.</span><span class="n">set</span><span class="p">({</span><span class="s2">&#34;i&#34;</span><span class="p">,</span> <span class="s2">&#34;n&#34;</span><span class="p">,</span> <span class="s2">&#34;v&#34;</span><span class="p">},</span> <span class="s2">&#34;&lt;F9&gt;&#34;</span><span class="p">,</span> <span class="s2">&#34;&lt;cmd&gt;lua require&#39;dap&#39;.toggle_breakpoint()&lt;CR&gt;&#34;</span><span class="p">,</span> <span class="p">{</span><span class="n">silent</span> <span class="o">=</span> <span class="kc">true</span><span class="p">,</span> <span class="n">noremap</span> <span class="o">=</span> <span class="kc">true</span><span class="p">,</span> <span class="n">buffer</span> <span class="o">=</span> <span class="n">bufnr</span><span class="p">})</span>
+</span></span></code></pre></div><p>这个函数是 0.7 以后的版本引进的，如果你的是0.7之前的版本，还是老老实实的多写几遍。另外我们这里绑定了 <code>&lt;F5&gt;</code> 快捷键，因此之前我们在 <code>Python</code> 中，绑定的直接运行的 <code>&lt;F5&gt;</code> 键的代码需要注释一下。</p>
+<p>我们想要真正实现调试，还需要配合调试器使用。前面说 <code>dap</code> 只是一层协议，需要客户端服务器按照这一层协议来实现相关功能，某些调试器可能自身支持这个协议，而某些可能不支持，这样就需要额外的配置来使调试器也能支持该协议。下面我们以 <code>Python</code> 为例先把整个调试环境搭建起来，先跑起来再说</p>
+<p><code>Lsp</code> 在安装 <code>Server</code> 的时候有 <code>nvim-lsp-installer</code> 这样的插件来专门安装 <code>LSP server</code> 的，那么 <code>dap</code> 有没有类似的插件来安装 <code>dap</code> 调试器相关的服务呢？有！我们使用 <code>mason</code> 来管理 <code>dap</code> 的调试器。</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-lua" data-lang="lua"><span class="line"><span class="cl"><span class="n">use</span> <span class="p">{</span> <span class="s2">&#34;williamboman/mason.nvim&#34;</span> <span class="p">}</span>
+</span></span></code></pre></div><p>当初我推荐过 <code>nvim-lsp-installer</code> 插件作为下载、管理 <code>lsp server</code> 的工具。后来只是知道作者发布了新的管理工具，因为比较新怕出问题就没怎么关注，后来有好多小伙伴在评论区推荐，我仔细看了一下发现它已经支持 <code>dap</code> 服务的管理了。那还是使用它吧 <code>^_^</code>。</p>
+<p>我们可以使用 <code>Mason</code> 打开一个带界面的 <code>Lsp</code> 和 <code>DAP</code> 的服务管理窗口，可以使用 数字键在上面进行跳转，找到想要的服务之后直接使用 <code>i</code> 来安装
+<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://img-blog.csdnimg.cn/23bc96e1744a45dab8f770fffae70864.gif#pic_center"
+        data-srcset="https://img-blog.csdnimg.cn/23bc96e1744a45dab8f770fffae70864.gif#pic_center, https://img-blog.csdnimg.cn/23bc96e1744a45dab8f770fffae70864.gif#pic_center 1.5x, https://img-blog.csdnimg.cn/23bc96e1744a45dab8f770fffae70864.gif#pic_center 2x"
+        data-sizes="auto"
+        alt="https://img-blog.csdnimg.cn/23bc96e1744a45dab8f770fffae70864.gif#pic_center"
+        title="在这里插入图片描述" /></p>
+<p>也可以使用 <code>MasonInstall</code> 来安装想要的服务。</p>
+<p>我们先在插件配置中删除与 <code>nvim-lsp-installer</code> 相关的配置，包括 <code>packer</code> 中对它的引用和 <code>plugins-config</code> 目录中的配置。</p>
+<p>下一步就是配置 <code>dap</code> 的客户端与 服务端的联动，这需要配置 <code>nvim-dap</code> 插件，根据官方的描述我们主要配置两个部分，第一个部分叫做适配器，主要配置我们加载哪个调试器，以及如何加载调试器。这一步需要提供如下的配置框架</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-lua" data-lang="lua"><span class="line"><span class="cl"><span class="kd">local</span> <span class="n">dap</span> <span class="o">=</span> <span class="n">require</span><span class="p">(</span><span class="s1">&#39;dap&#39;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">dap.adapters</span><span class="p">.</span><span class="n">language</span> <span class="o">=</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p><code>language</code> 是具体的调试器例如 <code>debugpy</code> 这里的 <code>language</code> 就是 <code>python</code>了。既然与语言相关，我们自然的想到要用 <code>ftplugin</code>目录。为了方便管理，这里与 <code>lsp</code> 配置的组织形式类似，我们将所有关于 <code>dap</code> 的配置都放到 <code>lua/dap</code>目录中。并且按语言名称来命名，例如关于 <code>python</code> 的 <code>dap</code> 配置我们放到 <code>lua/dap/python.lua</code> 中。然后在 <code>ftplugin/python.lua</code> 中加载这个配置文件即。</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-lua" data-lang="lua"><span class="line"><span class="cl"><span class="n">require</span><span class="p">(</span><span class="s2">&#34;dap/python&#34;</span><span class="p">)</span>
+</span></span></code></pre></div><p>然后在 <code>python.lua</code> 文件中写入以下配置</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-lua" data-lang="lua"><span class="line"><span class="cl"><span class="kd">local</span> <span class="n">dap</span> <span class="o">=</span> <span class="n">require</span><span class="p">(</span><span class="s1">&#39;dap&#39;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">dap.adapters</span><span class="p">.</span><span class="n">python</span> <span class="o">=</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="n">type</span> <span class="o">=</span> <span class="s1">&#39;executable&#39;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="n">command</span> <span class="o">=</span> <span class="s1">&#39;/usr/bin/python3.8&#39;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="n">args</span> <span class="o">=</span> <span class="p">{</span> <span class="s1">&#39;-m&#39;</span><span class="p">,</span> <span class="s1">&#39;debugpy.adapter&#39;</span> <span class="p">};</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p>其中各个参数的含义如下:</p>
+<ul>
+<li><code>type</code> : 表示启动调试器的方式， <code>executable</code> 表示由客户端自行启动调试器； <code>server</code> 表示 调试器已经单独启动了，后续客户端只需要将调试请求发送到服务器即可。</li>
+<li><code>command</code>: 表示启动调试器的命令</li>
+<li><code>args</code>: 表示启动调试器的命令行参数</li>
+</ul>
+<p>由于 <code>python</code> 调试工具 <code>debugpy</code> 是一个 <code>Python</code> 的第三方模块，因此这里我们使用 <code>python -m debugpy.adapter</code> 来启动这个调试器。</p>
+<p>接着我们需要针对语言来配置如何进行调试。它的配置都放在一个名为 <code>dap.configurations.language</code> 的 字典中。<code>language</code> 代表的是当前文件的文件类型名, 所以针对 <code>Python</code> 来说这里需要填写的是 <code>dap.configurations.python</code>。它的配置如下所示:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-lua" data-lang="lua"><span class="line"><span class="cl"><span class="n">dap.configurations</span><span class="p">.</span><span class="n">python</span> <span class="o">=</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">type</span> <span class="o">=</span> <span class="s2">&#34;python&#34;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="n">request</span> <span class="o">=</span> <span class="s2">&#34;launch&#34;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="n">name</span> <span class="o">=</span> <span class="s2">&#34;launch file&#34;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="n">program</span> <span class="o">=</span> <span class="s2">&#34;${file}&#34;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="n">pythonPath</span> <span class="o">=</span> <span class="kr">function</span> <span class="p">()</span>
+</span></span><span class="line"><span class="cl">            <span class="kr">return</span> <span class="s2">&#34;/usr/bin/python3.8&#34;</span>
+</span></span><span class="line"><span class="cl">        <span class="kr">end</span>
+</span></span><span class="line"><span class="cl">    <span class="p">},</span>
+</span></span><span class="line"><span class="cl"> <span class="p">}</span>
+</span></span></code></pre></div><p>各参数的含义如下:</p>
+<ul>
+<li><code>name</code> : 是一个字符串它表示当前配置的名称，你可以理解为一个id</li>
+<li><code>type</code>: 使用哪个调试器，跟我们之前配置的 <code>dap.adapters</code>相关</li>
+<li><code>request</code>：调试的方式，支持 <code>attach</code> 附加到一个已有的进程或者 <code>launch</code> 启动一个新进程。由于在上一步我们指定由客户端来启动调试器，因此这里应该选择 <code>launch</code> 来启动一个新调试进程</li>
+<li><code>program</code>: 需要调试的代码， <code>${file}</code> 表示当前 <code>buffer</code> 所对应文件</li>
+<li><code>pythonPath</code>： 执行该文件需要使用的 <code>python</code> 解析器路径</li>
+</ul>
+<p>这样我们在某一个打开的文件上按下 <code>&lt;F5&gt;</code> 的时候，它会通过 <code>pythonPath</code> 指定的解析器来执行脚本，并且会按照配置中 <code>request</code> 指定的方式来打开一个新的调试器进程。并且将对应的调试命令发送到调试器完成调试工作。
+<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://img-blog.csdnimg.cn/baadcf4ff3624bbc863da5c5d9ebdf94.gif#pic_center"
+        data-srcset="https://img-blog.csdnimg.cn/baadcf4ff3624bbc863da5c5d9ebdf94.gif#pic_center, https://img-blog.csdnimg.cn/baadcf4ff3624bbc863da5c5d9ebdf94.gif#pic_center 1.5x, https://img-blog.csdnimg.cn/baadcf4ff3624bbc863da5c5d9ebdf94.gif#pic_center 2x"
+        data-sizes="auto"
+        alt="https://img-blog.csdnimg.cn/baadcf4ff3624bbc863da5c5d9ebdf94.gif#pic_center"
+        title="在这里插入图片描述" />
+好了，到此为止我们配置了最基本、最简单的<code>dap</code> 调试。现在只是有一个勉强能用的调试工具，距离好用还差的很远，下一篇里面我们首先会对 <code>dap</code> 功能进行增强，美化，并讨论如何针对 <code>C/C++</code> 这种编译型的语言进行调试。最后感谢各位给我提意见的小伙伴，谢谢大家!</p>
+</div><div class="post-footer" id="post-footer">
+    <div class="post-info">
+        <div class="post-info-line">
+            <div class="post-info-mod">
+                <span>Updated on 2022-10-24</span>
+            </div></div>
+        <div class="post-info-line">
+            <div class="post-info-md"></div>
+            <div class="post-info-share">
+                <span><a href="javascript:void(0);" title="Share on Twitter" data-sharer="twitter" data-url="http://HaiLateBoy.github.io/posts/vim-config28/" data-title="从零开始配置vim(28)——代码的编译、运行与调试" data-hashtags="vim,编辑工具,文本处理,lua,编辑器"><i class="fab fa-twitter fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Facebook" data-sharer="facebook" data-url="http://HaiLateBoy.github.io/posts/vim-config28/" data-hashtag="vim"><i class="fab fa-facebook-square fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Hacker News" data-sharer="hackernews" data-url="http://HaiLateBoy.github.io/posts/vim-config28/" data-title="从零开始配置vim(28)——代码的编译、运行与调试"><i class="fab fa-hacker-news fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Line" data-sharer="line" data-url="http://HaiLateBoy.github.io/posts/vim-config28/" data-title="从零开始配置vim(28)——代码的编译、运行与调试"><i data-svg-src="https://cdn.jsdelivr.net/npm/simple-icons@7.3.0/icons/line.svg" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on 微博" data-sharer="weibo" data-url="http://HaiLateBoy.github.io/posts/vim-config28/" data-title="从零开始配置vim(28)——代码的编译、运行与调试"><i class="fab fa-weibo fa-fw" aria-hidden="true"></i></a></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="post-info-more">
+        <section class="post-tags"><i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/vim/">vim</a>,&nbsp;<a href="/tags/%E7%BC%96%E8%BE%91%E5%B7%A5%E5%85%B7/">编辑工具</a>,&nbsp;<a href="/tags/%E6%96%87%E6%9C%AC%E5%A4%84%E7%90%86/">文本处理</a>,&nbsp;<a href="/tags/lua/">lua</a>,&nbsp;<a href="/tags/%E7%BC%96%E8%BE%91%E5%99%A8/">编辑器</a></section>
+        <section>
+            <span><a href="javascript:void(0);" onclick="window.history.back();">Back</a></span>&nbsp;|&nbsp;<span><a href="/">Home</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav"><a href="/posts/vim-config27/" class="prev" rel="prev" title="从零开始配置vim(27)——代码片段"><i class="fas fa-angle-left fa-fw" aria-hidden="true"></i>从零开始配置vim(27)——代码片段</a>
+            <a href="/posts/vim-config29/" class="next" rel="next" title="从零开始配置vim(29)——DAP 配置">从零开始配置vim(29)——DAP 配置<i class="fas fa-angle-right fa-fw" aria-hidden="true"></i></a></div>
+</div>
+</article></div>
+            </main><footer class="footer">
+        <div class="footer-container"><div class="footer-line">Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener noreffer" title="Hugo 0.121.2">Hugo</a> | Theme - <a href="https://github.com/dillonzq/LoveIt" target="_blank" rel="noopener noreffer" title="LoveIt 0.2.11"><i class="far fa-kiss-wink-heart fa-fw" aria-hidden="true"></i> LoveIt</a>
+                </div><div class="footer-line" itemscope itemtype="http://schema.org/CreativeWork"><i class="far fa-copyright fa-fw" aria-hidden="true"></i><span itemprop="copyrightYear">2022 - 2024</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="https://www.masimaro.xyz" target="_blank">Masimaro</a></span></div>
+        </div>
+    </footer></div>
+
+        <div id="fixed-buttons"><a href="#" id="back-to-top" class="fixed-button" title="Back to Top">
+                <i class="fas fa-arrow-up fa-fw" aria-hidden="true"></i>
+            </a><a href="#" id="view-comments" class="fixed-button" title="View Comments">
+                <i class="fas fa-comment fa-fw" aria-hidden="true"></i>
+            </a>
+        </div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.css"><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/autocomplete.js@0.38.1/dist/autocomplete.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lunr@2.3.9/lunr.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lazysizes@5.3.2/lazysizes.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/clipboard@2.0.11/dist/clipboard.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/sharer.js@0.5.1/sharer.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/auto-render.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/copy-tex.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/mhchem.min.js"></script><script type="text/javascript">window.config={"code":{"copyTitle":"Copy to clipboard","maxShownLines":50},"comment":{},"math":{"delimiters":[{"display":true,"left":"$$","right":"$$"},{"display":true,"left":"\\[","right":"\\]"},{"display":true,"left":"\\begin{equation}","right":"\\end{equation}"},{"display":true,"left":"\\begin{equation*}","right":"\\end{equation*}"},{"display":true,"left":"\\begin{align}","right":"\\end{align}"},{"display":true,"left":"\\begin{align*}","right":"\\end{align*}"},{"display":true,"left":"\\begin{alignat}","right":"\\end{alignat}"},{"display":true,"left":"\\begin{alignat*}","right":"\\end{alignat*}"},{"display":true,"left":"\\begin{gather}","right":"\\end{gather}"},{"display":true,"left":"\\begin{CD}","right":"\\end{CD}"},{"display":false,"left":"$","right":"$"},{"display":false,"left":"\\(","right":"\\)"}],"strict":false},"search":{"highlightTag":"em","maxResultLength":10,"noResultsFound":"No results found","snippetLength":50}};</script><script type="text/javascript" src="/js/theme.min.js"></script></body>
+</html>

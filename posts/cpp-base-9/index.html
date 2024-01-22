@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="robots" content="noodp" />
+        <title>泛型算法 - Masimaro&#39;s blog</title><meta name="Description" content="这是我用于记录日常和学习的小站"><meta property="og:title" content="泛型算法" />
+<meta property="og:description" content="好久没有更新博客了，最近一直想把我以前的老笔记本换成 Arch &#43; dwm 的样式来使用。现在基本已经弄完了。后面会考虑将我的心得发出来。从0开始一点点的增加" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://HaiLateBoy.github.io/posts/cpp-base-9/" /><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2021-05-06T21:37:42+00:00" />
+<meta property="article:modified_time" content="2021-05-06T21:37:42+00:00" /><meta property="og:site_name" content="Masimaro&#39;s blog" />
+
+<meta name="twitter:card" content="summary"/><meta name="twitter:title" content="泛型算法"/>
+<meta name="twitter:description" content="好久没有更新博客了，最近一直想把我以前的老笔记本换成 Arch &#43; dwm 的样式来使用。现在基本已经弄完了。后面会考虑将我的心得发出来。从0开始一点点的增加"/>
+<meta name="application-name" content="My cool site">
+<meta name="apple-mobile-web-app-title" content="My cool site"><meta name="theme-color" content="#ffffff"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="manifest" href="/site.webmanifest"><link rel="canonical" href="http://HaiLateBoy.github.io/posts/cpp-base-9/" /><link rel="prev" href="http://HaiLateBoy.github.io/posts/cpp-base-8/" /><link rel="next" href="http://HaiLateBoy.github.io/posts/cpp-base-10/" /><link rel="stylesheet" href="/css/style.min.css"><link rel="preload" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css"></noscript><link rel="preload" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css"></noscript><script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "BlogPosting",
+        "headline": "泛型算法",
+        "inLanguage": "zh-CN",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "http:\/\/HaiLateBoy.github.io\/posts\/cpp-base-9\/"
+        },"genre": "posts","keywords": "C\u002b\u002b, 语法, 基础, c\u002b\u002b11","wordcount":  5994 ,
+        "url": "http:\/\/HaiLateBoy.github.io\/posts\/cpp-base-9\/","datePublished": "2021-05-06T21:37:42+00:00","dateModified": "2021-05-06T21:37:42+00:00","publisher": {
+            "@type": "Organization",
+            "name": ""},"author": {
+                "@type": "Person",
+                "name": "Masimaro"
+            },"description": ""
+    }
+    </script></head>
+    <body data-header-desktop="fixed" data-header-mobile="auto"><script type="text/javascript">(window.localStorage && localStorage.getItem('theme') ? localStorage.getItem('theme') === 'dark' : ('auto' === 'auto' ? window.matchMedia('(prefers-color-scheme: dark)').matches : 'auto' === 'dark')) && document.body.setAttribute('theme', 'dark');</script>
+
+        <div id="mask"></div><div class="wrapper"><header class="desktop" id="header-desktop">
+    <div class="header-wrapper">
+        <div class="header-title">
+            <a href="/" title="Masimaro&#39;s blog">My cool site</a>
+        </div>
+        <div class="menu">
+            <div class="menu-inner"><a class="menu-item" href="/posts/" title="文章列表"> 文章 </a><a class="menu-item" href="/tags/" title="标签"> 标签 </a><a class="menu-item" href="/categories/" title="分类"> 分类 </a><a class="menu-item" href="/about" title="关于本站"> 关于 </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-desktop">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-desktop" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-desktop" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-desktop">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </span><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                    <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+                </a></div>
+        </div>
+    </div>
+</header><header class="mobile" id="header-mobile">
+    <div class="header-container">
+        <div class="header-wrapper">
+            <div class="header-title">
+                <a href="/" title="Masimaro&#39;s blog">My cool site</a>
+            </div>
+            <div class="menu-toggle" id="menu-toggle-mobile">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+        <div class="menu" id="menu-mobile"><div class="search-wrapper">
+                    <div class="search mobile" id="search-mobile">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-mobile">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-mobile" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-mobile" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-mobile">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </div>
+                    <a href="javascript:void(0);" class="search-cancel" id="search-cancel-mobile">
+                        Cancel
+                    </a>
+                </div><a class="menu-item" href="/posts/" title="文章列表">文章</a><a class="menu-item" href="/tags/" title="标签">标签</a><a class="menu-item" href="/categories/" title="分类">分类</a><a class="menu-item" href="/about" title="关于本站">关于</a><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+            </a></div>
+    </div>
+</header><div class="search-dropdown desktop">
+        <div id="search-dropdown-desktop"></div>
+    </div>
+    <div class="search-dropdown mobile">
+        <div id="search-dropdown-mobile"></div>
+    </div><main class="main">
+                <div class="container"><div class="toc" id="toc-auto">
+            <h2 class="toc-title">Contents</h2>
+            <div class="toc-content" id="toc-content-auto"></div>
+        </div><article class="page single"><h1 class="single-title animate__animated animate__flipInX">泛型算法</h1><div class="post-meta">
+            <div class="post-meta-line"><span class="post-author"><a href="https://www.masimaro.xyz" title="Author" target="_blank" rel="noopener noreffer author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Masimaro</a></span>&nbsp;<span class="post-category">included in <a href="/categories/c++/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>C++</a></span></div>
+            <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw" aria-hidden="true"></i>&nbsp;<time datetime="2021-05-06">2021-05-06</time>&nbsp;<i class="fas fa-pencil-alt fa-fw" aria-hidden="true"></i>&nbsp;5994 words&nbsp;
+                <i class="far fa-clock fa-fw" aria-hidden="true"></i>&nbsp;12 minutes&nbsp;</div>
+        </div><div class="details toc" id="toc-static"  data-kept="true">
+                <div class="details-summary toc-title">
+                    <span>Contents</span>
+                    <span><i class="details-icon fas fa-angle-right" aria-hidden="true"></i></span>
+                </div>
+                <div class="details-content toc-content" id="toc-content-static"><nav id="TableOfContents">
+  <ul>
+    <li><a href="#概述">概述</a></li>
+    <li><a href="#初识泛型算法">初识泛型算法</a>
+      <ul>
+        <li><a href="#只读算法">只读算法</a></li>
+        <li><a href="#写容器元素的算法">写容器元素的算法</a></li>
+      </ul>
+    </li>
+    <li><a href="#定制操作">定制操作</a>
+      <ul>
+        <li><a href="#向算法传递参数">向算法传递参数</a></li>
+        <li><a href="#lambda-表达式">lambda 表达式</a></li>
+        <li><a href="#lambda-捕获和返回">lambda 捕获和返回</a></li>
+        <li><a href="#参数绑定">参数绑定</a></li>
+      </ul>
+    </li>
+    <li><a href="#再谈迭代器">再谈迭代器</a>
+      <ul>
+        <li><a href="#插入迭代器">插入迭代器</a></li>
+        <li><a href="#iostream-迭代器">iostream 迭代器</a></li>
+      </ul>
+    </li>
+    <li><a href="#泛型算法结构">泛型算法结构</a>
+      <ul>
+        <li><a href="#5-类迭代器">5 类迭代器</a></li>
+        <li><a href="#算法形参模式">算法形参模式</a></li>
+        <li><a href="#算法命名规范">算法命名规范</a></li>
+        <li><a href="#特定容器算法">特定容器算法</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav></div>
+            </div><div class="content" id="content"><p>好久没有更新博客了，最近一直想把我以前的老笔记本换成 Arch + dwm 的样式来使用。现在基本已经弄完了。后面会考虑将我的心得发出来。从0开始一点点的增加自己需要的功能确实很繁琐但是也挺有趣的。闲话就到这里，这篇文章继续记录我学习c++ 11的内容。这篇主要是泛型算法相关的内容</p>
+<!-- raw HTML omitted -->
+<p>标准容器自身提供的操作少之又少，在多数情况下可能希望对容器进行其他操作，例如排序、删除指定元素等等。标准库容器中并未针对每个容器都定义成员函数来实现这些操作，而是定义了一组泛型算法，它们实现了一组经典算法的公共接口，可以使用于不同类型的元素和多种容器类型。也就是相同一组算法可以处理多种容器类型</p>
+<h2 id="概述">概述</h2>
+<p>之所以是泛型的，主要是这些通用算法不依赖于具体的容器类型，所有相同算法采用相同的接口</p>
+<p>迭代器的存在使得算法不依赖于具体的容器类型，但是算法依赖于元素类型的相关操作，例如我们可以简单的使用下面的代码来说明这个</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="kt">bool</span> <span class="nf">find</span><span class="p">(</span><span class="n">beg</span><span class="p">,</span> <span class="n">end</span><span class="p">,</span> <span class="n">val</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">for</span><span class="p">(</span><span class="k">auto</span> <span class="n">iter</span> <span class="o">=</span> <span class="n">beg</span><span class="p">;</span> <span class="n">iter</span> <span class="o">!=</span> <span class="n">end</span><span class="p">;</span> <span class="o">++</span><span class="n">iter</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="k">if</span><span class="p">(</span><span class="o">*</span><span class="n">iter</span> <span class="o">==</span> <span class="n">val</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="p">{</span>
+</span></span><span class="line"><span class="cl">            <span class="k">return</span> <span class="nb">true</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="nb">false</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p>上述代码并不限定于只能使用某种类型的容器，只要容器中迭代器支持递增操作，并且元素本身支持比较运算即可。</p>
+<p>泛型算法本身不会执行容器的操作，它们只会运行于迭代器之上，执行迭代器的操作，最多也就只会修改迭代器所指向的元素的值。对容器自身没有影响。算法永远不会改变底层容器的大小。算法可能改变容器中保存的元素的值，也可能在容器中移动元素。但是永远不会直接添加或者删除元素（当然插入迭代器例外）</p>
+<h2 id="初识泛型算法">初识泛型算法</h2>
+<p>除了极少数例外，标准库算法都是对一个范围内的元素进行操作。我们将此元素范围称之为输入范围，接受输入范围的算法总是使用前两个参数来表示此范围。两个参数分别是指向要处理的第一个元素和尾元素之后位置的迭代器。</p>
+<p>理解基本算法的方法就是了解它们是否读取元素、改变元素或者重新排列元素顺序</p>
+<h3 id="只读算法">只读算法</h3>
+<p>一些算法只会读取输入范围内的元素，而从不改变元素。find就是这样一个算法。一些常见的只读算法如下：</p>
+<ol>
+<li>find:查找容器中出现某个元素的位置，需要容器中元素类型实现 == 操作</li>
+<li>count: 返回容器中出现某个元素的次数，同样需要容器中元素类型实现 == 操作</li>
+<li>accumulate: 计算某个迭代器范围内，所有元素的和，需要容器中元素类型实现 + 操作</li>
+<li>equal: 比较两个序列中元素值是否完全相同，它接受三个参数，前两个表示一个容器的迭代器范围。最后一个参数代表第二个容器的起始位置</li>
+</ol>
+<p>一般来说对于只读取而不改变元素的算法，通常最好使用cbegin和cend 获取const版本的迭代器。</p>
+<p>那些只接受一个单一迭代器来表示第二个序列的算法，都假定第二个序列至少与第一个序列一样长。</p>
+<h3 id="写容器元素的算法">写容器元素的算法</h3>
+<p>这类算法需要确保，容器原大小不能小于我们要求算法写入的元素数目。由于算法不会执行容器操作，因此它们自己不可能改变容器大小</p>
+<p>一种保证算法有足够元素空间来容纳输出数据的方式是使用插入迭代器，插入迭代器是一种向容器中添加元素的迭代器</p>
+<p>拷贝算法接受3个迭代器，前两个表示一个源容器的范围，第三个迭代器是目的容器的起始位置的迭代器。同样的源容器的长度不能超过目的容器的长度</p>
+<h2 id="定制操作">定制操作</h2>
+<p>很多算法都会比较输入序列中的元素，默认情况下，这类算法使用元素类型的&lt; 或者 == 运算符来完成比较操作。标准库还为这些算法定义了额外的版本，允许我们提供自已定义的操作来代替默认运算符。例如sort 算法默认使用元素类型的 &lt; 运算符，但是可以使用sort的重载版本，额外定义比较的规则</p>
+<h3 id="向算法传递参数">向算法传递参数</h3>
+<p>标准库中可以接受的比较函数一般返回一个bool值，表示是否小于或者是否相等。函数接受一个参数或者两个参数。在c++新标准中将这个函数叫做谓词，接受一个参数的函数被成为一元谓词，接受两个参数的函数叫做二元谓词。</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="n">vector</span><span class="o">&lt;</span><span class="n">string</span><span class="o">&gt;</span> <span class="n">words</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="c1">//初始化 words
+</span></span></span><span class="line"><span class="cl"><span class="c1">//......
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>
+</span></span><span class="line"><span class="cl"><span class="kt">bool</span> <span class="nf">isShorter</span><span class="p">(</span><span class="k">const</span> <span class="n">string</span><span class="o">&amp;</span> <span class="n">s1</span><span class="p">,</span> <span class="k">const</span> <span class="n">string</span><span class="o">&amp;</span> <span class="n">s2</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="n">s1</span><span class="p">.</span><span class="n">size</span><span class="p">()</span> <span class="o">&lt;</span> <span class="n">s2</span><span class="p">.</span><span class="n">size</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">sort</span><span class="p">(</span><span class="n">words</span><span class="p">.</span><span class="n">cbegin</span><span class="p">(),</span> <span class="n">words</span><span class="p">.</span><span class="n">cend</span><span class="p">(),</span> <span class="n">isShorter</span><span class="p">);</span>
+</span></span></code></pre></div><h3 id="lambda-表达式">lambda 表达式</h3>
+<p>在介绍lambda 表达式之前，需要先介绍可调用对象这个概念
+可调用对象：对于一个对象或者一个表达式，如果可以对其使用调用运算符，则称它是可调用的；例如，e是一个可调用对象，则我们可以编写代码e(args) ，其中args是一个逗号分割的一个或者多个参数的列表</p>
+<p>到目前为止，我们只接触了函数和函数指针这两类可调用对象，还有其他两种可调用对象：重载了函数调用运算符的类，以及lambda表达式。</p>
+<p>一个lambda 表达式表示一个可调用的代码单元。我们可以将其理解为一个未命名的内联函数，定义形式如下
+[capture list](parameter list) -&gt; return type {function body}</p>
+<p>capture list 捕获列表，是一个lambda 所在函数中定义的局部变量的列表。
+parameter list 函数的参数列表
+return type 是函数返回值类型
+function body 是函数体，需要执行的具体代码段</p>
+<p>与普通函数不同的是 lambda 必须使用尾置返回来指定返回类型</p>
+<p>我们可以忽略参数列表和返回值,但是必须包含捕获列表和函数体</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="k">auto</span> <span class="n">f</span> <span class="o">=</span> <span class="p">[]</span> <span class="p">{</span><span class="k">return</span> <span class="mi">42</span><span class="p">;};</span>
+</span></span></code></pre></div><p>如果lambda 表达式中没有明确指定返回类型，函数体中包含任何单一 return 语句之外的内容，则返回void
+lambda 的调用方式和普通函数的调用方式一样，都是调用运算符</p>
+<pre tabindex="0"><code class="language-cppp" data-lang="cppp">cout &lt;&lt; f() &lt;&lt; endl;
+</code></pre><p>lambda 表达式不能有默认参数</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="p">[]</span> <span class="p">(</span><span class="k">const</span> <span class="n">string</span><span class="o">&amp;</span> <span class="n">str1</span><span class="p">,</span> <span class="k">const</span> <span class="n">string</span><span class="o">&amp;</span> <span class="n">s2</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="n">s1</span><span class="p">.</span><span class="n">size</span><span class="p">()</span> <span class="o">&lt;</span> <span class="n">s2</span><span class="p">.</span><span class="n">size</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl"><span class="p">};</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">vector</span><span class="o">&lt;</span><span class="n">string</span><span class="o">&gt;</span> <span class="n">words</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">stable_sort</span><span class="p">(</span><span class="n">words</span><span class="p">.</span><span class="n">begin</span><span class="p">(),</span> <span class="n">words</span><span class="p">.</span><span class="n">end</span><span class="p">(),</span> <span class="p">[](</span><span class="k">const</span> <span class="n">string</span><span class="o">&amp;</span> <span class="n">s1</span><span class="p">,</span> <span class="k">const</span> <span class="n">string</span><span class="o">&amp;</span> <span class="n">s2</span><span class="p">){</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="n">s1</span><span class="p">.</span><span class="n">size</span><span class="p">()</span> <span class="o">&lt;</span> <span class="n">s2</span><span class="p">.</span><span class="n">size</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl"><span class="p">});</span>
+</span></span></code></pre></div><p>lambda 表达式一般出现在一个函数中，使用其局部变量，但是它只能访问那些明确指明的变量。一个lambda通过将局部变量包含在其捕获列表中来指明将会使用这些变量。捕获列表指引lambda 在其内部包含访问局部变量所需的信息</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="p">[</span><span class="n">sz</span><span class="p">](</span><span class="k">const</span> <span class="n">string</span><span class="o">&amp;</span> <span class="n">s</span><span class="p">){</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="n">a</span><span class="p">.</span><span class="n">size</span><span class="p">()</span> <span class="o">&gt;=</span> <span class="n">sz</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><h3 id="lambda-捕获和返回">lambda 捕获和返回</h3>
+<p>与参数传递类似，变量捕获的方式可以是值或者引用。</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="kt">void</span> <span class="nf">func1</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">size_t</span> <span class="n">v1</span><span class="o">=</span> <span class="mi">42</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="k">auto</span> <span class="n">f</span> <span class="o">=</span> <span class="p">[</span><span class="n">v1</span><span class="p">]{</span><span class="k">return</span> <span class="n">v1</span><span class="p">;};</span>
+</span></span><span class="line"><span class="cl">    <span class="n">v1</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="k">auto</span> <span class="n">j</span> <span class="o">=</span> <span class="n">f</span><span class="p">();</span> <span class="c1">//j 是42， 因为在定义lambda的时候传入的是v1的拷贝，后续v1 的改变不影响捕获中v1 的值
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">}</span>
+</span></span></code></pre></div><p>被捕获变量的值是在lambda创建时拷贝，因此随后对其修改不会影响到lambda内对应的值</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="kt">void</span> <span class="nf">func2</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">size_t</span> <span class="n">v1</span> <span class="o">=</span> <span class="mi">42</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="k">auto</span> <span class="n">f</span> <span class="o">=</span> <span class="p">[</span><span class="o">&amp;</span><span class="n">v1</span><span class="p">](){</span><span class="k">return</span> <span class="n">v1</span><span class="p">;};</span>
+</span></span><span class="line"><span class="cl">    <span class="n">v1</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="k">auto</span> <span class="n">j</span> <span class="o">=</span> <span class="n">f</span><span class="p">();</span> <span class="c1">//j 是0，f保存v1的引用，而非拷贝
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">}</span>
+</span></span></code></pre></div><p>引用捕获与返回引用有着相同的限制，必须保证调用在调用lambda表达式时，是存在的。捕获的都是函数的局部变量，如果lambda 在函数结束之后执行，捕获的引用指向的局部变量已经消失。</p>
+<p>可以在函数中返回一个lambda表达式，此时返回的lambda 中不应该包含引用捕获</p>
+<p>使用引用捕获的时候需要注意，在一次或者多次调用lambda表达式的时候应该保证引用的对象仍然有效，同时需要保证对象的值是我们所期待的。因此在使用lambda的时候尽量减少捕获变量的数量，同时尽量不使用引用捕获</p>
+<p>除了显式列出我们希望使用的所来自所在函数的变量外，还可以让编译器根据lambda体中的代码来推断我们要使用哪些变量。为了指示编译器推断捕获列表，应在捕获列表中写一个&amp;或者=，表示采用引用捕获或者值捕获</p>
+<p>我们也可以混合使用隐式捕获和显式捕获，混合使用时，捕获列表的第一个元素必须是一个&amp;或者=。</p>
+<p>当混合使用了显式捕获和隐式捕获时。显式捕获的变量必须与使用隐式捕获不同的方式。</p>
+<p>当使用值捕获的时候，默认情况下lambda表达式是不能改变其值的，如果希望改变一个被捕获的变量的值，就必须在参数列表后加上关键字 <code>mutable</code></p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="kt">void</span> <span class="nf">f3</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">size_t</span> <span class="n">v1</span> <span class="o">=</span> <span class="mi">42</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="k">auto</span> <span class="n">f</span> <span class="o">=</span> <span class="p">[</span><span class="n">v1</span><span class="p">]</span> <span class="p">()</span><span class="k">mutable</span><span class="p">{</span><span class="k">return</span> <span class="o">++</span><span class="n">v1</span><span class="p">;};</span>
+</span></span><span class="line"><span class="cl">    <span class="n">v1</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="k">auto</span> <span class="n">j</span> <span class="o">=</span> <span class="n">f</span><span class="p">();</span> <span class="c1">// j = 43
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">}</span>
+</span></span></code></pre></div><p>一个引用捕获的变量是否可以修改依赖于此引用指向的是一个const 类型还是一个非const类型</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="kt">void</span> <span class="nf">fnc4</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">size_t</span> <span class="n">v1</span> <span class="o">=</span> <span class="mi">42</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="k">auto</span> <span class="n">f2</span> <span class="o">=</span> <span class="p">[</span><span class="o">&amp;</span><span class="n">v1</span><span class="p">]{</span><span class="k">return</span> <span class="o">++</span><span class="n">v1</span><span class="p">;};</span>
+</span></span><span class="line"><span class="cl">    <span class="n">v1</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="k">auto</span> <span class="n">j</span> <span class="o">=</span> <span class="n">f2</span><span class="p">();</span> <span class="c1">//j = 1
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">}</span>
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="c1">// 错误，由于有除return之外的其他语句，因此编译器推断lambda 表达式返回void，但是返回了具体值
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="n">transform</span><span class="p">(</span><span class="n">v1</span><span class="p">.</span><span class="n">begin</span><span class="p">(),</span> <span class="n">v1</span><span class="p">.</span><span class="n">end</span><span class="p">(),</span> <span class="n">vi</span><span class="p">.</span><span class="n">begin</span><span class="p">(),</span> <span class="p">[](</span><span class="kt">int</span> <span class="n">i</span><span class="p">){</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span><span class="p">(</span><span class="n">i</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="o">-</span><span class="n">i</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="k">else</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="n">i</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">});</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">//正确，只有return语句，编译器可以推断出返回int类型
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="n">transform</span><span class="p">(</span><span class="n">v1</span><span class="p">.</span><span class="n">begin</span><span class="p">(),</span> <span class="n">v1</span><span class="p">.</span><span class="n">end</span><span class="p">(),</span> <span class="n">vi</span><span class="p">.</span><span class="n">begin</span><span class="p">(),</span> <span class="p">[](</span><span class="kt">int</span> <span class="n">i</span><span class="p">){</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="p">(</span><span class="n">i</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span><span class="o">?</span> <span class="o">-</span><span class="nl">i</span> <span class="p">:</span> <span class="n">i</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">});</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">//正确，明确指定了返回int类型
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="n">transform</span><span class="p">(</span><span class="n">v1</span><span class="p">.</span><span class="n">begin</span><span class="p">(),</span> <span class="n">v1</span><span class="p">.</span><span class="n">end</span><span class="p">(),</span> <span class="n">vi</span><span class="p">.</span><span class="n">begin</span><span class="p">(),</span> <span class="p">[](</span><span class="kt">int</span> <span class="n">i</span><span class="p">)</span><span class="o">-&gt;</span><span class="kt">int</span><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span><span class="p">(</span><span class="n">i</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="o">-</span><span class="n">i</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="k">else</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="n">i</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">});</span>
+</span></span></code></pre></div><h3 id="参数绑定">参数绑定</h3>
+<p>lambda 表达式适用于只在一两个地方使用的简单操作，如果多个地方都需要使用到相同的操作，就需要写上相同的lambda表达式。这个时候最好的办法是定义一个函数。</p>
+<p>在需要进行捕获的情况下使用函数就不是那么容易了。例如有的泛型算法只传递一个参数，但是我们在函数中需要两个参数。这种情况下就需要用到参数绑定</p>
+<p>标准库中定义了一个bind函数。可以将bind作为一个函数适配器。它接受一个可调用对象，生成一个新的可调用对象来适应原对象的参数列表</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="k">auto</span> <span class="n">newCaller</span> <span class="o">=</span> <span class="n">bind</span><span class="p">(</span><span class="n">callable</span><span class="p">,</span> <span class="n">arg_list</span><span class="p">);</span>
+</span></span></code></pre></div><p>其中 callable 是一个可调用对象，返回的newCaller 是一个新的可调用对象，而<code>arg_list</code> 中的参数可能包含形如 <code>_n</code> 的名字，其中n是一个整数。这些参数是“占位符”。表示 newCaller 的参数。它们占据了传递给newCaller的参数位置。数值n表示生成的可调用对象中参数的位置。_1为newCaller的第一个参数，_2 为第二个参数。以此类推</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="k">auto</span> <span class="n">wc</span> <span class="o">=</span> <span class="n">find_if</span><span class="p">(</span><span class="n">words</span><span class="p">.</span><span class="n">begin</span><span class="p">(),</span> <span class="n">words</span><span class="p">.</span><span class="n">end</span><span class="p">(),</span> <span class="n">bind</span><span class="p">(</span><span class="n">check_size</span><span class="p">,</span> <span class="n">_1</span><span class="p">,</span> <span class="n">sz</span><span class="p">));</span>
+</span></span></code></pre></div><p>此时调用生成一个可调用对象，将check_size 的第二个参数绑定到sz的值，当find_if 对words中的string调用这个对象的时候，这些对象会调用check_size 将给定的string 和 sz 传递给它，因此 find_if 可以有效的对输入序列中的每一个string调用check_size 实现string与 sz的比较</p>
+<p>_n 都定义在一个名为 placeholders 的命名空间中，而这个命名空间本身定义在std命名空间中。每次在使用_n 这样的名字时，都需要声明这个命名空间。</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="k">using</span> <span class="n">std</span><span class="o">::</span><span class="n">placeholders</span><span class="o">::</span><span class="n">_1</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="k">using</span> <span class="n">std</span><span class="o">::</span><span class="n">placeholders</span><span class="o">::</span><span class="n">_2</span><span class="p">;</span>
+</span></span></code></pre></div><p>每个占位符都必须提供单独的using声明，这样比较麻烦。可以使用另一种不同形式的 using 语句</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="k">using</span> <span class="k">namespace</span> <span class="n">std</span><span class="o">::</span><span class="n">placeholders</span><span class="p">;</span>
+</span></span></code></pre></div><p>我们可以使用bind 给可调用对象中参数重新排序，例如f是一个可调用对象，它有5个参数</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="k">auto</span> <span class="n">g</span> <span class="o">=</span> <span class="n">bind</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">_2</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">_1</span><span class="p">);</span>
+</span></span></code></pre></div><p>生成的新的可调用对象g接受两个参数，分别是 <code>_2</code>, <code>_1</code>。在调用g时相当于</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="kt">void</span> <span class="nf">g</span><span class="p">(</span><span class="n">_1</span><span class="p">,</span> <span class="n">_2</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">f</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">_2</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">_1</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p>当我们执行 g(x, y) 最终会执行 f(a, b, y, c, x)</p>
+<p>在执行时会将 bind 中传入的参数拷贝到原来的函数参数中，如果想向原函数传递引用，可以使用标准库中的 ref函数</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="k">auto</span> <span class="n">g</span> <span class="o">=</span> <span class="n">bind</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">ref</span><span class="p">(</span><span class="n">a</span><span class="p">),</span> <span class="n">b</span><span class="p">,</span> <span class="n">_2</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">_1</span><span class="p">)</span>
+</span></span></code></pre></div><p>上述代码中，在执行g的时候会向f中拷贝a的引用。<code>_1</code>, <code>_2</code> 本身在传值的时候可以传入引用</p>
+<h2 id="再谈迭代器">再谈迭代器</h2>
+<p>除了之前介绍的迭代器，标准库还定义了几种额外的迭代器：</p>
+<ol>
+<li>插入迭代器：这些迭代器被绑定到一个容器上，可以用来向容器插入元素</li>
+<li>流迭代器：这些迭代器绑定到流中，可以用来遍历所有关联的IO流</li>
+<li>反向迭代器：这些迭代器向后而不是向前移动，除了 forward_list 之外的标准库容器都有迭代器</li>
+<li>移动迭代器：这些专用迭代器不是拷贝其中的元素，而是移动它们。</li>
+</ol>
+<h3 id="插入迭代器">插入迭代器</h3>
+<p>插入迭代器是一种迭代器适配器，它接受一个容器，生成一个迭代器，能实现向给定容器添加元素。</p>
+<p>插入迭代器有三种类型，差异在于元素插入的位置:</p>
+<ol>
+<li>back_iterator: 创建一个使用push_back 的迭代器</li>
+<li>front_iterator: 创建一个使用push_front 的迭代器</li>
+<li>inserter: 创建一个使用insert 的迭代器</li>
+</ol>
+<h3 id="iostream-迭代器">iostream 迭代器</h3>
+<p>虽然iostream并不是容器，但是标准库定义了可以用于这些IO类型对象的迭代器。istream_iterator 读取输入流，ostream_iterator 向一个输出流写数据。这些迭代器将它们对应的流当作一个特定类型的元素序列来处理。通过使用流迭代器，我们可以使用泛型算法从流对象读取数据以及向其写入数据。</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="n">istream_iterator</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span> <span class="n">in</span><span class="p">(</span><span class="n">cin</span><span class="p">),</span> <span class="n">eof</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="n">accumulate</span><span class="p">(</span><span class="n">in</span><span class="p">,</span> <span class="n">eof</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span> <span class="c1">// 从标准输入中读取整数，并计算它们的和
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">ostream_iterator</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span> <span class="n">out</span><span class="p">(</span><span class="n">cout</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="n">copy</span><span class="p">(</span><span class="n">vec</span><span class="p">.</span><span class="n">begin</span><span class="p">(),</span> <span class="n">vec</span><span class="p">.</span><span class="n">end</span><span class="p">(),</span> <span class="n">out</span><span class="p">);</span> <span class="c1">//将vector中的数据拷贝到ostream流中，也就是输出vector 中的元素
+</span></span></span></code></pre></div><p>istream_iterator 允许使用懒惰求值，即只在需要时进行数据读取</p>
+<h2 id="泛型算法结构">泛型算法结构</h2>
+<p>任何算法最基本的特性是它要求其迭代器提供哪些操作。算法要求的迭代器操作可以分为5个迭代器类型：</p>
+<ol>
+<li>输入迭代器：只读不写；单遍扫描，只能递增</li>
+<li>输出迭代器：只写不读；单遍扫描，只能递增</li>
+<li>前向迭代器：可读写，多遍扫描，只能递增</li>
+<li>双向迭代器：可读写，多遍扫描，可递增递减</li>
+<li>随机访问迭代器：可读写，多变扫描，支持全部迭代器运算</li>
+</ol>
+<h3 id="5-类迭代器">5 类迭代器</h3>
+<p>类似容器，迭代器也定义了一组公共操作。一些操作所有迭代器都支持，另外一些只有特定类别的迭代器才支持。</p>
+<p>输入迭代器可以读取序列中的元素。一个输入迭代器必须支持：</p>
+<ol>
+<li>用于比较两个迭代器的相等和不想等运算符</li>
+<li>用于推进迭代器的前置和后置递增运算符</li>
+<li>用于读取元素的解引用运算符，解引用只会出现在赋值运算符的右侧</li>
+<li>箭头运算符</li>
+</ol>
+<p>输出迭代器可以看作是输入迭代器功能上的补集，只写而不读元素，输出迭代器必须支持</p>
+<ol>
+<li>用于推进迭代器的前置和后置递增运算</li>
+<li>解引用运算符，只出现在赋值运算符的左侧</li>
+</ol>
+<p>前向迭代器可以读写元素，这类迭代器只能在序列中沿一个方向移动。前向迭代器支持所有输入和输出迭代器的操作。</p>
+<p>双向迭代器可以正向/反向读写序列中的元素。除了支持所有前向迭代器的操作之外，双向迭代器还支持前置和后置的递减运算符。</p>
+<p>随机访问迭代器提供在常量时间内访问序列中任意元素的能力。除了支持双向迭代器的所有功能外，还支持：</p>
+<ol>
+<li>用于比较两个迭代器相对位置关系的运算符 (&lt;、&lt;=、&gt;和&gt;=)</li>
+<li>迭代器和一个整数值的加减运算(+、+=、-、-=)，计算结果是迭代器在序列中前进或者后退给定整数个元素后的位置</li>
+<li>用于两个迭代器上的减法运算符，得到两个迭代器的距离</li>
+<li>下标运算符 iter[n] 与 *(iter[n]) 等价</li>
+</ol>
+<h3 id="算法形参模式">算法形参模式</h3>
+<p>大多数算法具有如下4种形式之一：</p>
+<ul>
+<li>alg(beg, end, other, args)</li>
+<li>alg(beg, end, dest, other, args)</li>
+<li>alg(beg, end, beg2, other, args)</li>
+<li>alg(beg, end, beg2, end2, other, args)</li>
+</ul>
+<p>其中alg 是算法名字，beg和 end表示算法所操作的输入范围，几乎所有算法都接受一个输入范围。是否有其他参数依赖于要执行的操作。</p>
+<p>dest参数表示算法可以写入的目的位置的迭代器。算法假定按其需要写入数据，不管写入多少个元素都是安全的。如果dest是一个直接指向容器的迭代器，那么算法将输出数据写到容器中已经存在的元素内。更常见的情况是，dest被绑定到一个插入迭代器或者是一个ostream_iterator。</p>
+<p>接受单独的beg2 或者 beg2和end2的算法用这些迭代器表示第二个输入范围，这些算法通常使用第二个范围中的元素与第一个输入范围结合来进行一些运算</p>
+<h3 id="算法命名规范">算法命名规范</h3>
+<p>除了参数规范，算法还遵循一套命名和重载。这些规则处理诸如：如何提供一个操作代替默认的 &lt; 或者 == 运算以及算法是将输出数据写入到一个序列还是一个分离的目的位置等问题</p>
+<p>接受谓词参数来代替 &lt; 或者== 运算符的算法，以及那些不接受额外参数的算法，通常都是重载的函数。一个版本用元素自身的运算符来比较元素，另一版本接受一个额外的谓词参数来代替 &lt;或者==</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="n">unique</span><span class="p">(</span><span class="n">beg</span><span class="p">,</span> <span class="n">end</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="n">unique</span><span class="p">(</span><span class="n">beg</span><span class="p">,</span> <span class="n">end</span><span class="p">,</span> <span class="n">comp</span><span class="p">);</span> <span class="c1">//使用comp函数比较元素
+</span></span></span></code></pre></div><p>接受一个元素值的算法通常有另一个不同名版本，该版本接受一个谓词，代替元素值，接受谓词参数的算法都有附加的_if 后缀</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="n">find</span><span class="p">(</span><span class="n">beg</span><span class="p">,</span> <span class="n">end</span><span class="p">,</span> <span class="n">val</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="n">find_if</span><span class="p">(</span><span class="n">beg</span><span class="p">,</span> <span class="n">end</span><span class="p">,</span> <span class="n">pred</span><span class="p">);</span> <span class="c1">//pred 是一个函数，查找第一个令pred返回真的元素
+</span></span></span></code></pre></div><p>默认情况下，重排元素的算法将重排后的元素写回给指定的输入序列。这些算法还提供了另一个版本，将元素写到一个指定的输出目的位置。这类算法都在名字后加一个_copy</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="n">reverse</span><span class="p">(</span><span class="n">beg</span><span class="p">,</span><span class="n">end</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="n">reverse</span><span class="p">(</span><span class="n">beg</span><span class="p">,</span><span class="n">end</span><span class="p">,</span><span class="n">dest</span><span class="p">);</span> <span class="c1">//将元素按逆序拷贝到dest
+</span></span></span></code></pre></div><p>一些算法还提供_copy和_if 版本，这些版本接受一个目的位置迭代器和一个谓词</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="n">remove_if</span><span class="p">(</span><span class="n">v1</span><span class="p">.</span><span class="n">beg</span><span class="p">(),</span> <span class="n">v1</span><span class="p">.</span><span class="n">end</span><span class="p">(),</span> <span class="p">[](</span><span class="kt">int</span> <span class="n">i</span><span class="p">){</span><span class="k">return</span> <span class="n">i</span> <span class="o">%</span> <span class="mi">2</span><span class="p">});</span>
+</span></span><span class="line"><span class="cl"><span class="n">remove_if</span><span class="p">(</span><span class="n">v1</span><span class="p">.</span><span class="n">beg</span><span class="p">(),</span> <span class="n">v1</span><span class="p">.</span><span class="n">end</span><span class="p">(),</span> <span class="n">back_inserter</span><span class="p">(</span><span class="n">v2</span><span class="p">),</span> <span class="p">[](</span><span class="kt">int</span> <span class="n">i</span><span class="p">){</span><span class="k">return</span> <span class="n">i</span> <span class="o">%</span> <span class="mi">2</span><span class="p">});</span>
+</span></span></code></pre></div><h3 id="特定容器算法">特定容器算法</h3>
+<p>与其他容器不同，链表定义了几个成语啊函数形式的算法。，它们定义了独有的sort、merge、remove、reverse和unique。这些链表中定义的算法的性能比通用版本要高的多。</p>
+<p>与通用版本中的不同，链表中的特有操作会改变容器。</p>
+<!-- raw HTML omitted -->
+</div><div class="post-footer" id="post-footer">
+    <div class="post-info">
+        <div class="post-info-line">
+            <div class="post-info-mod">
+                <span>Updated on 2021-05-06</span>
+            </div></div>
+        <div class="post-info-line">
+            <div class="post-info-md"></div>
+            <div class="post-info-share">
+                <span><a href="javascript:void(0);" title="Share on Twitter" data-sharer="twitter" data-url="http://HaiLateBoy.github.io/posts/cpp-base-9/" data-title="泛型算法" data-hashtags="C&#43;&#43;,语法,基础,c&#43;&#43;11"><i class="fab fa-twitter fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Facebook" data-sharer="facebook" data-url="http://HaiLateBoy.github.io/posts/cpp-base-9/" data-hashtag="C&#43;&#43;"><i class="fab fa-facebook-square fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Hacker News" data-sharer="hackernews" data-url="http://HaiLateBoy.github.io/posts/cpp-base-9/" data-title="泛型算法"><i class="fab fa-hacker-news fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Line" data-sharer="line" data-url="http://HaiLateBoy.github.io/posts/cpp-base-9/" data-title="泛型算法"><i data-svg-src="https://cdn.jsdelivr.net/npm/simple-icons@7.3.0/icons/line.svg" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on 微博" data-sharer="weibo" data-url="http://HaiLateBoy.github.io/posts/cpp-base-9/" data-title="泛型算法"><i class="fab fa-weibo fa-fw" aria-hidden="true"></i></a></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="post-info-more">
+        <section class="post-tags"><i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/c&#43;&#43;/">C&#43;&#43;</a>,&nbsp;<a href="/tags/%E8%AF%AD%E6%B3%95/">语法</a>,&nbsp;<a href="/tags/%E5%9F%BA%E7%A1%80/">基础</a>,&nbsp;<a href="/tags/c&#43;&#43;11/">c&#43;&#43;11</a></section>
+        <section>
+            <span><a href="javascript:void(0);" onclick="window.history.back();">Back</a></span>&nbsp;|&nbsp;<span><a href="/">Home</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav"><a href="/posts/cpp-base-8/" class="prev" rel="prev" title="顺序容器"><i class="fas fa-angle-left fa-fw" aria-hidden="true"></i>顺序容器</a>
+            <a href="/posts/cpp-base-10/" class="next" rel="next" title="关联容器">关联容器<i class="fas fa-angle-right fa-fw" aria-hidden="true"></i></a></div>
+</div>
+</article></div>
+            </main><footer class="footer">
+        <div class="footer-container"><div class="footer-line">Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener noreffer" title="Hugo 0.121.2">Hugo</a> | Theme - <a href="https://github.com/dillonzq/LoveIt" target="_blank" rel="noopener noreffer" title="LoveIt 0.2.11"><i class="far fa-kiss-wink-heart fa-fw" aria-hidden="true"></i> LoveIt</a>
+                </div><div class="footer-line" itemscope itemtype="http://schema.org/CreativeWork"><i class="far fa-copyright fa-fw" aria-hidden="true"></i><span itemprop="copyrightYear">2022 - 2024</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="https://www.masimaro.xyz" target="_blank">Masimaro</a></span></div>
+        </div>
+    </footer></div>
+
+        <div id="fixed-buttons"><a href="#" id="back-to-top" class="fixed-button" title="Back to Top">
+                <i class="fas fa-arrow-up fa-fw" aria-hidden="true"></i>
+            </a><a href="#" id="view-comments" class="fixed-button" title="View Comments">
+                <i class="fas fa-comment fa-fw" aria-hidden="true"></i>
+            </a>
+        </div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.css"><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/autocomplete.js@0.38.1/dist/autocomplete.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lunr@2.3.9/lunr.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lazysizes@5.3.2/lazysizes.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/clipboard@2.0.11/dist/clipboard.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/sharer.js@0.5.1/sharer.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/auto-render.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/copy-tex.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/mhchem.min.js"></script><script type="text/javascript">window.config={"code":{"copyTitle":"Copy to clipboard","maxShownLines":50},"comment":{},"math":{"delimiters":[{"display":true,"left":"$$","right":"$$"},{"display":true,"left":"\\[","right":"\\]"},{"display":true,"left":"\\begin{equation}","right":"\\end{equation}"},{"display":true,"left":"\\begin{equation*}","right":"\\end{equation*}"},{"display":true,"left":"\\begin{align}","right":"\\end{align}"},{"display":true,"left":"\\begin{align*}","right":"\\end{align*}"},{"display":true,"left":"\\begin{alignat}","right":"\\end{alignat}"},{"display":true,"left":"\\begin{alignat*}","right":"\\end{alignat*}"},{"display":true,"left":"\\begin{gather}","right":"\\end{gather}"},{"display":true,"left":"\\begin{CD}","right":"\\end{CD}"},{"display":false,"left":"$","right":"$"},{"display":false,"left":"\\(","right":"\\)"}],"strict":false},"search":{"highlightTag":"em","maxResultLength":10,"noResultsFound":"No results found","snippetLength":50}};</script><script type="text/javascript" src="/js/theme.min.js"></script></body>
+</html>

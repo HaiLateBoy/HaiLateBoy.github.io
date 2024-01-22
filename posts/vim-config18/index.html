@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="robots" content="noodp" />
+        <title>从零开始配置 vim(18)——终端模式 - Masimaro&#39;s blog</title><meta name="Description" content="这是我用于记录日常和学习的小站"><meta property="og:title" content="从零开始配置 vim(18)——终端模式" />
+<meta property="og:description" content="在进入下一个配置之前，先了解一下如何在 neovim 中使用它内置的终端。 我们之前说过在命令模式中可以使用 !来执行shell命令。但是终归来说，执行和使用" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://HaiLateBoy.github.io/posts/vim-config18/" /><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2022-08-30T10:14:21+08:00" />
+<meta property="article:modified_time" content="2022-08-30T10:14:21+08:00" /><meta property="og:site_name" content="Masimaro&#39;s blog" />
+
+<meta name="twitter:card" content="summary"/><meta name="twitter:title" content="从零开始配置 vim(18)——终端模式"/>
+<meta name="twitter:description" content="在进入下一个配置之前，先了解一下如何在 neovim 中使用它内置的终端。 我们之前说过在命令模式中可以使用 !来执行shell命令。但是终归来说，执行和使用"/>
+<meta name="application-name" content="My cool site">
+<meta name="apple-mobile-web-app-title" content="My cool site"><meta name="theme-color" content="#ffffff"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="manifest" href="/site.webmanifest"><link rel="canonical" href="http://HaiLateBoy.github.io/posts/vim-config18/" /><link rel="prev" href="http://HaiLateBoy.github.io/posts/vim-config17/" /><link rel="next" href="http://HaiLateBoy.github.io/posts/vim-config19/" /><link rel="stylesheet" href="/css/style.min.css"><link rel="preload" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css"></noscript><link rel="preload" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css"></noscript><script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "BlogPosting",
+        "headline": "从零开始配置 vim(18)——终端模式",
+        "inLanguage": "zh-CN",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "http:\/\/HaiLateBoy.github.io\/posts\/vim-config18\/"
+        },"genre": "posts","keywords": "vim, 编辑工具, 文本处理, lua, 编辑器","wordcount":  2099 ,
+        "url": "http:\/\/HaiLateBoy.github.io\/posts\/vim-config18\/","datePublished": "2022-08-30T10:14:21+08:00","dateModified": "2022-08-30T10:14:21+08:00","publisher": {
+            "@type": "Organization",
+            "name": ""},"author": {
+                "@type": "Person",
+                "name": "Masimaro"
+            },"description": ""
+    }
+    </script></head>
+    <body data-header-desktop="fixed" data-header-mobile="auto"><script type="text/javascript">(window.localStorage && localStorage.getItem('theme') ? localStorage.getItem('theme') === 'dark' : ('auto' === 'auto' ? window.matchMedia('(prefers-color-scheme: dark)').matches : 'auto' === 'dark')) && document.body.setAttribute('theme', 'dark');</script>
+
+        <div id="mask"></div><div class="wrapper"><header class="desktop" id="header-desktop">
+    <div class="header-wrapper">
+        <div class="header-title">
+            <a href="/" title="Masimaro&#39;s blog">My cool site</a>
+        </div>
+        <div class="menu">
+            <div class="menu-inner"><a class="menu-item" href="/posts/" title="文章列表"> 文章 </a><a class="menu-item" href="/tags/" title="标签"> 标签 </a><a class="menu-item" href="/categories/" title="分类"> 分类 </a><a class="menu-item" href="/about" title="关于本站"> 关于 </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-desktop">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-desktop" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-desktop" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-desktop">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </span><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                    <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+                </a></div>
+        </div>
+    </div>
+</header><header class="mobile" id="header-mobile">
+    <div class="header-container">
+        <div class="header-wrapper">
+            <div class="header-title">
+                <a href="/" title="Masimaro&#39;s blog">My cool site</a>
+            </div>
+            <div class="menu-toggle" id="menu-toggle-mobile">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+        <div class="menu" id="menu-mobile"><div class="search-wrapper">
+                    <div class="search mobile" id="search-mobile">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-mobile">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-mobile" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-mobile" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-mobile">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </div>
+                    <a href="javascript:void(0);" class="search-cancel" id="search-cancel-mobile">
+                        Cancel
+                    </a>
+                </div><a class="menu-item" href="/posts/" title="文章列表">文章</a><a class="menu-item" href="/tags/" title="标签">标签</a><a class="menu-item" href="/categories/" title="分类">分类</a><a class="menu-item" href="/about" title="关于本站">关于</a><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+            </a></div>
+    </div>
+</header><div class="search-dropdown desktop">
+        <div id="search-dropdown-desktop"></div>
+    </div>
+    <div class="search-dropdown mobile">
+        <div id="search-dropdown-mobile"></div>
+    </div><main class="main">
+                <div class="container"><div class="toc" id="toc-auto">
+            <h2 class="toc-title">Contents</h2>
+            <div class="toc-content" id="toc-content-auto"></div>
+        </div><article class="page single"><h1 class="single-title animate__animated animate__flipInX">从零开始配置 vim(18)——终端模式</h1><div class="post-meta">
+            <div class="post-meta-line"><span class="post-author"><a href="https://www.masimaro.xyz" title="Author" target="_blank" rel="noopener noreffer author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Masimaro</a></span>&nbsp;<span class="post-category">included in <a href="/categories/vim-%E9%85%8D%E7%BD%AE/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>vim 配置</a></span></div>
+            <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw" aria-hidden="true"></i>&nbsp;<time datetime="2022-08-30">2022-08-30</time>&nbsp;<i class="fas fa-pencil-alt fa-fw" aria-hidden="true"></i>&nbsp;2099 words&nbsp;
+                <i class="far fa-clock fa-fw" aria-hidden="true"></i>&nbsp;5 minutes&nbsp;</div>
+        </div><div class="details toc" id="toc-static"  data-kept="true">
+                <div class="details-summary toc-title">
+                    <span>Contents</span>
+                    <span><i class="details-icon fas fa-angle-right" aria-hidden="true"></i></span>
+                </div>
+                <div class="details-content toc-content" id="toc-content-static"><nav id="TableOfContents">
+  <ul>
+    <li><a href="#基本用法">基本用法</a></li>
+    <li><a href="#终端相关配置">终端相关配置</a>
+      <ul>
+        <li><a href="#快速打开关闭终端">快速打开关闭终端</a></li>
+        <li><a href="#窗口间跳转">窗口间跳转</a></li>
+        <li><a href="#使用自动命令组对终端进行配置">使用自动命令组对终端进行配置</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav></div>
+            </div><div class="content" id="content"><p>在进入下一个配置之前，先了解一下如何在 <code>neovim</code> 中使用它内置的终端。
+我们之前说过在命令模式中可以使用 !来执行<code>shell</code>命令。但是终归来说，执行和使用上不是那么方便，特别是混合使用 <code>vim</code> 命令和 <code>shell</code> 命令的时候。两个揉在一起显得那么混乱。好在从早期的 <code>neovim</code>和 8.0以后版本的<code>vim</code>已经内置了一个终端。</p>
+<h2 id="基本用法">基本用法</h2>
+<p>首先我们可以使用 <code>:echo has('terminal')</code> 来查看当前版本是否有对应的终端，返回1则代表已经内置了一个终端。但是我的 <code>neovim</code> 本身是有终端的，这个命令在我这边执行的结果是0。具体原因我也不太清楚。有知道的小伙伴欢迎给我留言或者在评论区给出。</p>
+<p>我们可以输入 <code>:term bash</code> 来启动一个 <code>bash</code> 的 <code>shell</code> 环境。<code>term</code> 命令用来启动一个终端，当然我们也可以使用 <code>:term zsh</code> 或者 <code>:term fish</code> 来启动不同类型的 <code>shell</code> 环境
+<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://img-blog.csdnimg.cn/8f63b59ca7ba4efa8db5eb815e3dcaa1.gif#pic_center"
+        data-srcset="https://img-blog.csdnimg.cn/8f63b59ca7ba4efa8db5eb815e3dcaa1.gif#pic_center, https://img-blog.csdnimg.cn/8f63b59ca7ba4efa8db5eb815e3dcaa1.gif#pic_center 1.5x, https://img-blog.csdnimg.cn/8f63b59ca7ba4efa8db5eb815e3dcaa1.gif#pic_center 2x"
+        data-sizes="auto"
+        alt="https://img-blog.csdnimg.cn/8f63b59ca7ba4efa8db5eb815e3dcaa1.gif#pic_center"
+        title="在这里插入图片描述" /></p>
+<p>我们发现，刚启动的终端仿佛至于普通模式中一般，可以使用诸如 <code>h、j、k、l</code> 等键来移动光标，使用 <code>a、i</code> 等来进入插入模式，此时左下角显示了一个 <code>terminal</code> 的字样，表示我们已经进入到了终端模式</p>
+<p>除了这种方式，我们还可以使用 <code>:term cmd</code>来创建终端执行终端命令。这种方式仅仅打开一个一次性终端，执行完输入命令之后，终端就结束了。而第一种方式能打开一个交互式终端。这种方式合适执行那种一次性的命令，例如编译当前程序这种命令
+<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://img-blog.csdnimg.cn/b72fa1126a384d509ee7129dae3ec3b3.gif#pic_center"
+        data-srcset="https://img-blog.csdnimg.cn/b72fa1126a384d509ee7129dae3ec3b3.gif#pic_center, https://img-blog.csdnimg.cn/b72fa1126a384d509ee7129dae3ec3b3.gif#pic_center 1.5x, https://img-blog.csdnimg.cn/b72fa1126a384d509ee7129dae3ec3b3.gif#pic_center 2x"
+        data-sizes="auto"
+        alt="https://img-blog.csdnimg.cn/b72fa1126a384d509ee7129dae3ec3b3.gif#pic_center"
+        title="在这里插入图片描述" />
+它其实是打开了一个新的缓冲区，并在这个新缓冲区中渲染并模拟终端操作。我们可以在打开终端后，使用 <code>:ls</code> 来查看，此时它已经有了两个缓冲区</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://img-blog.csdnimg.cn/61cfa16bf7654ef1914f7e977824dc5c.png#pic_center"
+        data-srcset="https://img-blog.csdnimg.cn/61cfa16bf7654ef1914f7e977824dc5c.png#pic_center, https://img-blog.csdnimg.cn/61cfa16bf7654ef1914f7e977824dc5c.png#pic_center 1.5x, https://img-blog.csdnimg.cn/61cfa16bf7654ef1914f7e977824dc5c.png#pic_center 2x"
+        data-sizes="auto"
+        alt="https://img-blog.csdnimg.cn/61cfa16bf7654ef1914f7e977824dc5c.png#pic_center"
+        title="在这里插入图片描述" /></p>
+<p>我们之前介绍缓冲区的时候说过，<code>:ls</code> 命令可以查看缓冲区名称，而名称则是缓冲区所绑定的文件名。vim可以使用 <code>:vsplit</code> 或者 <code>:edit</code> 来创建新的缓冲区。结合这个逻辑，我们可以使用 <code>:vsplit</code> 在竖直位置创建新的终端。这里我们不需要输入那么长的一段直接使用 <code>:vsplit term://zsh</code>即可
+<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://img-blog.csdnimg.cn/5743f67289a94c679d80964a56caef83.gif#pic_center"
+        data-srcset="https://img-blog.csdnimg.cn/5743f67289a94c679d80964a56caef83.gif#pic_center, https://img-blog.csdnimg.cn/5743f67289a94c679d80964a56caef83.gif#pic_center 1.5x, https://img-blog.csdnimg.cn/5743f67289a94c679d80964a56caef83.gif#pic_center 2x"
+        data-sizes="auto"
+        alt="https://img-blog.csdnimg.cn/5743f67289a94c679d80964a56caef83.gif#pic_center"
+        title="在这里插入图片描述" />
+在普通的缓冲区中，可以使用 <code>&lt;ESC&gt;</code> 键从插入模式退出到普通模式，但是在终端的这个缓冲中，我们无法这么做，我们可以使用 <code>&lt;C-\&gt;&lt;C-n&gt;</code> 来回到该缓冲区的普通模式，当然我们可以映射，只是这个时候模式我们应该使用 <code>t</code> 代表终端模式</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-lua" data-lang="lua"><span class="line"><span class="cl"><span class="n">vim.api</span><span class="p">.</span><span class="n">nvim_set_keymap</span><span class="p">(</span><span class="s2">&#34;t&#34;</span><span class="p">,</span> <span class="s2">&#34;&lt;ESC&gt;&#34;</span><span class="p">,</span> <span class="s2">&#34;&lt;C-</span><span class="se">\\</span><span class="s2">&gt;&lt;C-n&gt;&#34;</span><span class="p">,</span> <span class="p">{</span><span class="n">noremap</span> <span class="o">=</span> <span class="kc">true</span><span class="p">,</span> <span class="n">silent</span> <span class="o">=</span> <span class="kc">true</span><span class="p">})</span>
+</span></span></code></pre></div><p>退回到普通模式之后，我们就可以将它当做一个普通的缓冲区来进行处理。包括关闭和跳转窗口。在后面设置快捷键的时候都可以用到这个先退回到普通模式，然后执行普通模式的操作</p>
+<h2 id="终端相关配置">终端相关配置</h2>
+<p>到现在为止，我们已经了解了该如何打开、使用、并关闭终端。我们还是希望对它进行一些简单的配置，以便我们可以更方便的使用。</p>
+<h3 id="快速打开关闭终端">快速打开关闭终端</h3>
+<p>每次打开都要输入命令 <code>:term</code> 而且每次关闭都要先退出再关闭，我们希望它能够像<code>vs code</code>那样用一个快捷键快速打卡和关闭终端。我们先来实现快速打开的功能。我们只需要在普通模式下映射一个快捷键</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-lua" data-lang="lua"><span class="line"><span class="cl"><span class="n">vim.api</span><span class="p">.</span><span class="n">nvim_set_keymap</span><span class="p">(</span><span class="s2">&#34;n&#34;</span><span class="p">,</span> <span class="s2">&#34;&lt;A-=&gt;&#34;</span><span class="p">,</span> <span class="s2">&#34;:split term://zsh&lt;CR&gt;&#34;</span><span class="p">,</span> <span class="p">{</span><span class="n">noremap</span> <span class="o">=</span> <span class="kc">true</span><span class="p">,</span> <span class="n">silent</span> <span class="o">=</span> <span class="kc">true</span><span class="p">})</span>
+</span></span></code></pre></div><p>我们再试着定义一个关闭终端的快捷键，我这里的实现思路是在终端模式中，先退回到普通模式，然后按照普通模式的思路来退出一个 <code>buffer</code></p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-lua" data-lang="lua"><span class="line"><span class="cl"><span class="n">vim.api</span><span class="p">.</span><span class="n">nvim_set_keymap</span><span class="p">(</span><span class="s2">&#34;t&#34;</span><span class="p">,</span> <span class="s2">&#34;&lt;A-=&gt;&#34;</span><span class="p">,</span> <span class="s2">&#34;&lt;C-</span><span class="se">\\</span><span class="s2">&gt;&lt;C-n&gt;:bdelete! %&lt;CR&gt;&#34;</span><span class="p">,</span> <span class="p">,</span> <span class="p">{</span><span class="n">noremap</span> <span class="o">=</span> <span class="kc">true</span><span class="p">,</span> <span class="n">silent</span> <span class="o">=</span> <span class="kc">true</span><span class="p">})</span>
+</span></span></code></pre></div><p>因为终端的缓冲区是一个只读的缓冲区，这里我们结束时需要使用 <code>!</code> 来强制结束</p>
+<h3 id="窗口间跳转">窗口间跳转</h3>
+<p>我们发现在打开终端之后，我们的 <code>bufferline</code> 插件为它分配了一个新的标签，我们还是沿用原先的使用 <code>leader</code> 的思路</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-lua" data-lang="lua"><span class="line"><span class="cl"><span class="n">vim.api</span><span class="p">.</span><span class="n">nvim_set_keymap</span><span class="p">(</span><span class="s2">&#34;t&#34;</span><span class="p">,</span> <span class="s2">&#34;&lt;leader&gt;1&#34;</span><span class="p">,</span> <span class="s2">&#34;&lt;C-</span><span class="se">\\</span><span class="s2">&gt;&lt;C-n&gt;:BufferLineGoToBuffer 1&lt;CR&gt;&#34;</span><span class="p">,</span> <span class="p">{</span><span class="n">noremap</span> <span class="o">=</span> <span class="kc">true</span><span class="p">,</span> <span class="n">silent</span> <span class="o">=</span> <span class="kc">true</span><span class="p">})</span>
+</span></span><span class="line"><span class="cl"><span class="n">vim.api</span><span class="p">.</span><span class="n">nvim_set_keymap</span><span class="p">(</span><span class="s2">&#34;t&#34;</span><span class="p">,</span> <span class="s2">&#34;&lt;leader&gt;2&#34;</span><span class="p">,</span> <span class="s2">&#34;&lt;C-</span><span class="se">\\</span><span class="s2">&gt;&lt;C-n&gt;:BufferLineGoToBuffer 1&lt;CR&gt;&#34;</span><span class="p">,</span> <span class="p">{</span><span class="n">noremap</span> <span class="o">=</span> <span class="kc">true</span><span class="p">,</span> <span class="n">silent</span> <span class="o">=</span> <span class="kc">true</span><span class="p">})</span>
+</span></span><span class="line"><span class="cl"><span class="n">vim.api</span><span class="p">.</span><span class="n">nvim_set_keymap</span><span class="p">(</span><span class="s2">&#34;t&#34;</span><span class="p">,</span> <span class="s2">&#34;&lt;leader&gt;3&#34;</span><span class="p">,</span> <span class="s2">&#34;&lt;C-</span><span class="se">\\</span><span class="s2">&gt;&lt;C-n&gt;:BufferLineGoToBuffer 1&lt;CR&gt;&#34;</span><span class="p">,</span> <span class="p">{</span><span class="n">noremap</span> <span class="o">=</span> <span class="kc">true</span><span class="p">,</span> <span class="n">silent</span> <span class="o">=</span> <span class="kc">true</span><span class="p">})</span>
+</span></span><span class="line"><span class="cl"><span class="n">vim.api</span><span class="p">.</span><span class="n">nvim_set_keymap</span><span class="p">(</span><span class="s2">&#34;t&#34;</span><span class="p">,</span> <span class="s2">&#34;&lt;leader&gt;4&#34;</span><span class="p">,</span> <span class="s2">&#34;&lt;C-</span><span class="se">\\</span><span class="s2">&gt;&lt;C-n&gt;:BufferLineGoToBuffer 1&lt;CR&gt;&#34;</span><span class="p">,</span> <span class="p">{</span><span class="n">noremap</span> <span class="o">=</span> <span class="kc">true</span><span class="p">,</span> <span class="n">silent</span> <span class="o">=</span> <span class="kc">true</span><span class="p">})</span>
+</span></span><span class="line"><span class="cl"><span class="n">vim.api</span><span class="p">.</span><span class="n">nvim_set_keymap</span><span class="p">(</span><span class="s2">&#34;t&#34;</span><span class="p">,</span> <span class="s2">&#34;&lt;leader&gt;5&#34;</span><span class="p">,</span> <span class="s2">&#34;&lt;C-</span><span class="se">\\</span><span class="s2">&gt;&lt;C-n&gt;:BufferLineGoToBuffer 1&lt;CR&gt;&#34;</span><span class="p">,</span> <span class="p">{</span><span class="n">noremap</span> <span class="o">=</span> <span class="kc">true</span><span class="p">,</span> <span class="n">silent</span> <span class="o">=</span> <span class="kc">true</span><span class="p">})</span>
+</span></span><span class="line"><span class="cl"><span class="n">vim.api</span><span class="p">.</span><span class="n">nvim_set_keymap</span><span class="p">(</span><span class="s2">&#34;t&#34;</span><span class="p">,</span> <span class="s2">&#34;&lt;leader&gt;6&#34;</span><span class="p">,</span> <span class="s2">&#34;&lt;C-</span><span class="se">\\</span><span class="s2">&gt;&lt;C-n&gt;:BufferLineGoToBuffer 1&lt;CR&gt;&#34;</span><span class="p">,</span> <span class="p">{</span><span class="n">noremap</span> <span class="o">=</span> <span class="kc">true</span><span class="p">,</span> <span class="n">silent</span> <span class="o">=</span> <span class="kc">true</span><span class="p">})</span>
+</span></span><span class="line"><span class="cl"><span class="n">vim.api</span><span class="p">.</span><span class="n">nvim_set_keymap</span><span class="p">(</span><span class="s2">&#34;t&#34;</span><span class="p">,</span> <span class="s2">&#34;&lt;leader&gt;7&#34;</span><span class="p">,</span> <span class="s2">&#34;&lt;C-</span><span class="se">\\</span><span class="s2">&gt;&lt;C-n&gt;:BufferLineGoToBuffer 1&lt;CR&gt;&#34;</span><span class="p">,</span> <span class="p">{</span><span class="n">noremap</span> <span class="o">=</span> <span class="kc">true</span><span class="p">,</span> <span class="n">silent</span> <span class="o">=</span> <span class="kc">true</span><span class="p">})</span>
+</span></span><span class="line"><span class="cl"><span class="n">vim.api</span><span class="p">.</span><span class="n">nvim_set_keymap</span><span class="p">(</span><span class="s2">&#34;t&#34;</span><span class="p">,</span> <span class="s2">&#34;&lt;leader&gt;8&#34;</span><span class="p">,</span> <span class="s2">&#34;&lt;C-</span><span class="se">\\</span><span class="s2">&gt;&lt;C-n&gt;:BufferLineGoToBuffer 1&lt;CR&gt;&#34;</span><span class="p">,</span> <span class="p">{</span><span class="n">noremap</span> <span class="o">=</span> <span class="kc">true</span><span class="p">,</span> <span class="n">silent</span> <span class="o">=</span> <span class="kc">true</span><span class="p">})</span>
+</span></span><span class="line"><span class="cl"><span class="n">vim.api</span><span class="p">.</span><span class="n">nvim_set_keymap</span><span class="p">(</span><span class="s2">&#34;t&#34;</span><span class="p">,</span> <span class="s2">&#34;&lt;leader&gt;9&#34;</span><span class="p">,</span> <span class="s2">&#34;&lt;C-</span><span class="se">\\</span><span class="s2">&gt;&lt;C-n&gt;:BufferLineGoToBuffer 1&lt;CR&gt;&#34;</span><span class="p">,</span> <span class="p">{</span><span class="n">noremap</span> <span class="o">=</span> <span class="kc">true</span><span class="p">,</span> <span class="n">silent</span> <span class="o">=</span> <span class="kc">true</span><span class="p">})</span>
+</span></span><span class="line"><span class="cl"><span class="n">vim.api</span><span class="p">.</span><span class="n">nvim_set_keymap</span><span class="p">(</span><span class="s2">&#34;t&#34;</span><span class="p">,</span> <span class="s2">&#34;&lt;leader&gt;bg&#34;</span><span class="p">,</span> <span class="s2">&#34;&lt;C-</span><span class="se">\\</span><span class="s2">&gt;&lt;C-n&gt;:BufferLinePick&lt;CR&gt;&#34;</span><span class="p">,</span> <span class="p">{</span><span class="n">noremap</span> <span class="o">=</span> <span class="kc">true</span><span class="p">,</span> <span class="n">silent</span> <span class="o">=</span> <span class="kc">true</span><span class="p">})</span>
+</span></span></code></pre></div><p>在普通模式下，终端只是一个普通的 <code>buffer</code>，可以在命令模式下执行 <code>bufferline</code> 的跳转命令。我们这里定义了在处于终端中的插入模式时使用的快捷键，这里我们应该先让它从插入模式退回到普通模式，这样我们就可以使用 <code>bufferline</code> 相关的命令了</p>
+<p>另外我们再来定义一些在分屏状态下可以进行跳转的快捷键。还是沿用我们之前在普通缓冲区定义的那些快捷键</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-lua" data-lang="lua"><span class="line"><span class="cl"><span class="n">vim.api</span><span class="p">.</span><span class="n">nvim_set_keymap</span><span class="p">(</span><span class="s2">&#34;t&#34;</span><span class="p">,</span> <span class="s2">&#34;&lt;leader&gt;h&#34;</span><span class="p">,</span> <span class="s2">&#34;&lt;C-</span><span class="se">\\</span><span class="s2">&gt;&lt;C-n&gt;&lt;C-w&gt;h&#34;</span><span class="p">,</span> <span class="p">{</span><span class="n">noremap</span> <span class="o">=</span> <span class="kc">true</span><span class="p">,</span> <span class="n">silent</span> <span class="o">=</span> <span class="kc">true</span><span class="p">})</span>
+</span></span><span class="line"><span class="cl"><span class="n">vim.api</span><span class="p">.</span><span class="n">nvim_set_keymap</span><span class="p">(</span><span class="s2">&#34;t&#34;</span><span class="p">,</span> <span class="s2">&#34;&lt;leader&gt;l&#34;</span><span class="p">,</span> <span class="s2">&#34;&lt;C-</span><span class="se">\\</span><span class="s2">&gt;&lt;C-n&gt;&lt;C-w&gt;l&#34;</span><span class="p">,</span> <span class="p">{</span><span class="n">noremap</span> <span class="o">=</span> <span class="kc">true</span><span class="p">,</span> <span class="n">silent</span> <span class="o">=</span> <span class="kc">true</span><span class="p">})</span>
+</span></span><span class="line"><span class="cl"><span class="n">vim.api</span><span class="p">.</span><span class="n">nvim_set_keymap</span><span class="p">(</span><span class="s2">&#34;t&#34;</span><span class="p">,</span> <span class="s2">&#34;&lt;leader&gt;j&#34;</span><span class="p">,</span> <span class="s2">&#34;&lt;C-</span><span class="se">\\</span><span class="s2">&gt;&lt;C-n&gt;&lt;C-w&gt;j&#34;</span><span class="p">,</span> <span class="p">{</span><span class="n">noremap</span> <span class="o">=</span> <span class="kc">true</span><span class="p">,</span> <span class="n">silent</span> <span class="o">=</span> <span class="kc">true</span><span class="p">})</span>
+</span></span><span class="line"><span class="cl"><span class="n">vim.api</span><span class="p">.</span><span class="n">nvim_set_keymap</span><span class="p">(</span><span class="s2">&#34;t&#34;</span><span class="p">,</span> <span class="s2">&#34;&lt;leader&gt;k&#34;</span><span class="p">,</span> <span class="s2">&#34;&lt;C-</span><span class="se">\\</span><span class="s2">&gt;&lt;C-n&gt;&lt;C-w&gt;k&#34;</span><span class="p">,</span> <span class="p">{</span><span class="n">noremap</span> <span class="o">=</span> <span class="kc">true</span><span class="p">,</span> <span class="n">silent</span> <span class="o">=</span> <span class="kc">true</span><span class="p">})</span>
+</span></span></code></pre></div><p>这些主要用到的就是先退回到普通模式，然后执行普通模式的命令</p>
+<h3 id="使用自动命令组对终端进行配置">使用自动命令组对终端进行配置</h3>
+<p>关于终端模式，我们能使用的事件主要是以下几个:</p>
+<ul>
+<li>TermOpen: 当我们打开一个终端时产生该事件</li>
+<li>TermEnter: 当我们在终端buffer中进入插入模式时，触发该事件</li>
+<li>TermLevel: 当我们退出终端模式时，触发该事件</li>
+<li>TermClose: 当我们关闭终端所在 buffer时触发该事件</li>
+</ul>
+<p>我们可以通过如下的测试代码来体会它们各自触发的时机</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-lua" data-lang="lua"><span class="line"><span class="cl"><span class="n">vim.cmd</span><span class="s">[[
+</span></span></span><span class="line"><span class="cl"><span class="s">    augroup TERM_MODE
+</span></span></span><span class="line"><span class="cl"><span class="s">        autocmd!
+</span></span></span><span class="line"><span class="cl"><span class="s">        autocmd TermOpen * echom &#34;TermOpen Events&#34;
+</span></span></span><span class="line"><span class="cl"><span class="s">        autocmd TermEnter * echom &#34;TermEnter Events&#34;
+</span></span></span><span class="line"><span class="cl"><span class="s">        autocmd TermLeave * echom &#34;TermLeave Events&#34;
+</span></span></span><span class="line"><span class="cl"><span class="s">        autocmd TermClose * echom &#34;TermClose Events&#34;
+</span></span></span><span class="line"><span class="cl"><span class="s">    augroup END
+</span></span></span><span class="line"><span class="cl"><span class="s">]]</span>
+</span></span></code></pre></div><p>我们发现，执行 <code>:term</code> 打开终端 <code>buffer</code> 之后，会打印 <code>TermOpen Events</code> 字样。当我们使用 <code>i</code> 正式进入终端模式之后， <code>TermEnter Events</code> 会打印。使用 <code>&lt;ESC&gt;</code> 退出之后，<code>TermLeave</code> 会打印。而真正关闭该缓冲区之后， <code>TermClose Events</code>会被打印。</p>
+<p>从这个例子相信各位小伙伴能够理解这些事件触发的时机了。</p>
+<p>了解了这些之后，我们来利用它做一个小小的改变，每次打开终端总是要自己使用 <code>i</code> 或者 <code>a</code> 进入到插入模式才能开始在终端中输入命令，我想通过自动命令每次打开终端之后自动进入插入模式</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-lua" data-lang="lua"><span class="line"><span class="cl"><span class="c1">--打开终端后自动进入插入模式</span>
+</span></span><span class="line"><span class="cl"><span class="kd">local</span> <span class="n">term_mode</span> <span class="o">=</span> <span class="n">vim.api</span><span class="p">.</span><span class="n">nvim_create_augroup</span><span class="p">(</span><span class="s2">&#34;TERM_MODE&#34;</span><span class="p">,</span> <span class="p">{</span><span class="n">clear</span> <span class="o">=</span> <span class="kc">true</span><span class="p">})</span>
+</span></span><span class="line"><span class="cl"><span class="n">vim.api</span><span class="p">.</span><span class="n">nvim_create_autocmd</span><span class="p">({</span><span class="s2">&#34;TermOpen&#34;</span><span class="p">},</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">pattern</span> <span class="o">=</span> <span class="s2">&#34;*&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">group</span> <span class="o">=</span> <span class="n">term_mode</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">command</span> <span class="o">=</span> <span class="s">[[normal i]]</span>
+</span></span><span class="line"><span class="cl"><span class="p">})</span>
+</span></span></code></pre></div><p>需要注意的是这里 <code>command</code> 填入的命令模式下需要使用的指令，在命令模式下使用普通模式的指令需要使用 <code>normal</code> 作为前缀。</p>
+<p>到此位置我们主要介绍了终端模式中的一些基本操作，但是总会有那么一些不尽人意，例如无法以弹出式窗口的形式打开终端，无法轻松的自定义一些用于特定功能的终端，下一篇我们将要来介绍用插件来增强我们原始终端的能力，敬请期待！</p>
+</div><div class="post-footer" id="post-footer">
+    <div class="post-info">
+        <div class="post-info-line">
+            <div class="post-info-mod">
+                <span>Updated on 2022-08-30</span>
+            </div></div>
+        <div class="post-info-line">
+            <div class="post-info-md"></div>
+            <div class="post-info-share">
+                <span><a href="javascript:void(0);" title="Share on Twitter" data-sharer="twitter" data-url="http://HaiLateBoy.github.io/posts/vim-config18/" data-title="从零开始配置 vim(18)——终端模式" data-hashtags="vim,编辑工具,文本处理,lua,编辑器"><i class="fab fa-twitter fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Facebook" data-sharer="facebook" data-url="http://HaiLateBoy.github.io/posts/vim-config18/" data-hashtag="vim"><i class="fab fa-facebook-square fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Hacker News" data-sharer="hackernews" data-url="http://HaiLateBoy.github.io/posts/vim-config18/" data-title="从零开始配置 vim(18)——终端模式"><i class="fab fa-hacker-news fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Line" data-sharer="line" data-url="http://HaiLateBoy.github.io/posts/vim-config18/" data-title="从零开始配置 vim(18)——终端模式"><i data-svg-src="https://cdn.jsdelivr.net/npm/simple-icons@7.3.0/icons/line.svg" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on 微博" data-sharer="weibo" data-url="http://HaiLateBoy.github.io/posts/vim-config18/" data-title="从零开始配置 vim(18)——终端模式"><i class="fab fa-weibo fa-fw" aria-hidden="true"></i></a></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="post-info-more">
+        <section class="post-tags"><i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/vim/">vim</a>,&nbsp;<a href="/tags/%E7%BC%96%E8%BE%91%E5%B7%A5%E5%85%B7/">编辑工具</a>,&nbsp;<a href="/tags/%E6%96%87%E6%9C%AC%E5%A4%84%E7%90%86/">文本处理</a>,&nbsp;<a href="/tags/lua/">lua</a>,&nbsp;<a href="/tags/%E7%BC%96%E8%BE%91%E5%99%A8/">编辑器</a></section>
+        <section>
+            <span><a href="javascript:void(0);" onclick="window.history.back();">Back</a></span>&nbsp;|&nbsp;<span><a href="/">Home</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav"><a href="/posts/vim-config17/" class="prev" rel="prev" title="从零开始配置 vim(17)——快捷键提示"><i class="fas fa-angle-left fa-fw" aria-hidden="true"></i>从零开始配置 vim(17)——快捷键提示</a>
+            <a href="/posts/vim-config19/" class="next" rel="next" title="从零开始配置vim(19)——终端配置">从零开始配置vim(19)——终端配置<i class="fas fa-angle-right fa-fw" aria-hidden="true"></i></a></div>
+</div>
+</article></div>
+            </main><footer class="footer">
+        <div class="footer-container"><div class="footer-line">Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener noreffer" title="Hugo 0.121.2">Hugo</a> | Theme - <a href="https://github.com/dillonzq/LoveIt" target="_blank" rel="noopener noreffer" title="LoveIt 0.2.11"><i class="far fa-kiss-wink-heart fa-fw" aria-hidden="true"></i> LoveIt</a>
+                </div><div class="footer-line" itemscope itemtype="http://schema.org/CreativeWork"><i class="far fa-copyright fa-fw" aria-hidden="true"></i><span itemprop="copyrightYear">2022 - 2024</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="https://www.masimaro.xyz" target="_blank">Masimaro</a></span></div>
+        </div>
+    </footer></div>
+
+        <div id="fixed-buttons"><a href="#" id="back-to-top" class="fixed-button" title="Back to Top">
+                <i class="fas fa-arrow-up fa-fw" aria-hidden="true"></i>
+            </a><a href="#" id="view-comments" class="fixed-button" title="View Comments">
+                <i class="fas fa-comment fa-fw" aria-hidden="true"></i>
+            </a>
+        </div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.css"><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/autocomplete.js@0.38.1/dist/autocomplete.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lunr@2.3.9/lunr.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lazysizes@5.3.2/lazysizes.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/clipboard@2.0.11/dist/clipboard.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/sharer.js@0.5.1/sharer.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/auto-render.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/copy-tex.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/mhchem.min.js"></script><script type="text/javascript">window.config={"code":{"copyTitle":"Copy to clipboard","maxShownLines":50},"comment":{},"math":{"delimiters":[{"display":true,"left":"$$","right":"$$"},{"display":true,"left":"\\[","right":"\\]"},{"display":true,"left":"\\begin{equation}","right":"\\end{equation}"},{"display":true,"left":"\\begin{equation*}","right":"\\end{equation*}"},{"display":true,"left":"\\begin{align}","right":"\\end{align}"},{"display":true,"left":"\\begin{align*}","right":"\\end{align*}"},{"display":true,"left":"\\begin{alignat}","right":"\\end{alignat}"},{"display":true,"left":"\\begin{alignat*}","right":"\\end{alignat*}"},{"display":true,"left":"\\begin{gather}","right":"\\end{gather}"},{"display":true,"left":"\\begin{CD}","right":"\\end{CD}"},{"display":false,"left":"$","right":"$"},{"display":false,"left":"\\(","right":"\\)"}],"strict":false},"search":{"highlightTag":"em","maxResultLength":10,"noResultsFound":"No results found","snippetLength":50}};</script><script type="text/javascript" src="/js/theme.min.js"></script></body>
+</html>

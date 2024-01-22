@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="robots" content="noodp" />
+        <title>从0开始自制解释器——重构代码 - Masimaro&#39;s blog</title><meta name="Description" content="这是我用于记录日常和学习的小站"><meta property="og:title" content="从0开始自制解释器——重构代码" />
+<meta property="og:description" content="在上一篇文章中，完成了对括号的支持，这样整个程序就可以解析普通的算术表达式了。但是在解析两个括号的过程中发现有大量的地方需要进行索引的回退操" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://HaiLateBoy.github.io/posts/make-parser07/" /><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2023-04-08T10:34:28+08:00" />
+<meta property="article:modified_time" content="2023-04-08T10:34:28+08:00" /><meta property="og:site_name" content="Masimaro&#39;s blog" />
+
+<meta name="twitter:card" content="summary"/><meta name="twitter:title" content="从0开始自制解释器——重构代码"/>
+<meta name="twitter:description" content="在上一篇文章中，完成了对括号的支持，这样整个程序就可以解析普通的算术表达式了。但是在解析两个括号的过程中发现有大量的地方需要进行索引的回退操"/>
+<meta name="application-name" content="My cool site">
+<meta name="apple-mobile-web-app-title" content="My cool site"><meta name="theme-color" content="#ffffff"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="manifest" href="/site.webmanifest"><link rel="canonical" href="http://HaiLateBoy.github.io/posts/make-parser07/" /><link rel="prev" href="http://HaiLateBoy.github.io/posts/make-parser06/" /><link rel="next" href="http://HaiLateBoy.github.io/posts/2024-new-year-plan/" /><link rel="stylesheet" href="/css/style.min.css"><link rel="preload" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css"></noscript><link rel="preload" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css"></noscript><script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "BlogPosting",
+        "headline": "从0开始自制解释器——重构代码",
+        "inLanguage": "zh-CN",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "http:\/\/HaiLateBoy.github.io\/posts\/make-parser07\/"
+        },"genre": "posts","keywords": "编译原理, 编译器, c语言","wordcount":  1713 ,
+        "url": "http:\/\/HaiLateBoy.github.io\/posts\/make-parser07\/","datePublished": "2023-04-08T10:34:28+08:00","dateModified": "2023-04-08T10:34:28+08:00","publisher": {
+            "@type": "Organization",
+            "name": ""},"author": {
+                "@type": "Person",
+                "name": "Masimaro"
+            },"description": ""
+    }
+    </script></head>
+    <body data-header-desktop="fixed" data-header-mobile="auto"><script type="text/javascript">(window.localStorage && localStorage.getItem('theme') ? localStorage.getItem('theme') === 'dark' : ('auto' === 'auto' ? window.matchMedia('(prefers-color-scheme: dark)').matches : 'auto' === 'dark')) && document.body.setAttribute('theme', 'dark');</script>
+
+        <div id="mask"></div><div class="wrapper"><header class="desktop" id="header-desktop">
+    <div class="header-wrapper">
+        <div class="header-title">
+            <a href="/" title="Masimaro&#39;s blog">My cool site</a>
+        </div>
+        <div class="menu">
+            <div class="menu-inner"><a class="menu-item" href="/posts/" title="文章列表"> 文章 </a><a class="menu-item" href="/tags/" title="标签"> 标签 </a><a class="menu-item" href="/categories/" title="分类"> 分类 </a><a class="menu-item" href="/about" title="关于本站"> 关于 </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-desktop">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-desktop" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-desktop" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-desktop">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </span><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                    <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+                </a></div>
+        </div>
+    </div>
+</header><header class="mobile" id="header-mobile">
+    <div class="header-container">
+        <div class="header-wrapper">
+            <div class="header-title">
+                <a href="/" title="Masimaro&#39;s blog">My cool site</a>
+            </div>
+            <div class="menu-toggle" id="menu-toggle-mobile">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+        <div class="menu" id="menu-mobile"><div class="search-wrapper">
+                    <div class="search mobile" id="search-mobile">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-mobile">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-mobile" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-mobile" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-mobile">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </div>
+                    <a href="javascript:void(0);" class="search-cancel" id="search-cancel-mobile">
+                        Cancel
+                    </a>
+                </div><a class="menu-item" href="/posts/" title="文章列表">文章</a><a class="menu-item" href="/tags/" title="标签">标签</a><a class="menu-item" href="/categories/" title="分类">分类</a><a class="menu-item" href="/about" title="关于本站">关于</a><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+            </a></div>
+    </div>
+</header><div class="search-dropdown desktop">
+        <div id="search-dropdown-desktop"></div>
+    </div>
+    <div class="search-dropdown mobile">
+        <div id="search-dropdown-mobile"></div>
+    </div><main class="main">
+                <div class="container"><div class="toc" id="toc-auto">
+            <h2 class="toc-title">Contents</h2>
+            <div class="toc-content" id="toc-content-auto"></div>
+        </div><article class="page single"><h1 class="single-title animate__animated animate__flipInX">从0开始自制解释器——重构代码</h1><div class="post-meta">
+            <div class="post-meta-line"><span class="post-author"><a href="https://www.masimaro.xyz" title="Author" target="_blank" rel="noopener noreffer author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Masimaro</a></span>&nbsp;<span class="post-category">included in <a href="/categories/%E8%87%AA%E5%88%B6%E8%A7%A3%E9%87%8A%E5%99%A8/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>自制解释器</a></span></div>
+            <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw" aria-hidden="true"></i>&nbsp;<time datetime="2023-04-08">2023-04-08</time>&nbsp;<i class="fas fa-pencil-alt fa-fw" aria-hidden="true"></i>&nbsp;1713 words&nbsp;
+                <i class="far fa-clock fa-fw" aria-hidden="true"></i>&nbsp;4 minutes&nbsp;</div>
+        </div><div class="details toc" id="toc-static"  data-kept="true">
+                <div class="details-summary toc-title">
+                    <span>Contents</span>
+                    <span><i class="details-icon fas fa-angle-right" aria-hidden="true"></i></span>
+                </div>
+                <div class="details-content toc-content" id="toc-content-static"><nav id="TableOfContents">
+  <ul>
+    <li><a href="#基本架构">基本架构</a></li>
+    <li><a href="#详细的代码">详细的代码</a>
+      <ul>
+        <li><a href="#token-模块">Token 模块</a></li>
+        <li><a href="#lex-模块">lex 模块</a></li>
+        <li><a href="#interpreter-模块">interpreter 模块</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav></div>
+            </div><div class="content" id="content"><p>在上一篇文章中，完成了对括号的支持，这样整个程序就可以解析普通的算术表达式了。但是在解析两个括号的过程中发现有大量的地方需要进行索引的回退操作，索引的操作应该保证能得到争取的token，这个步骤应该放在词法分析的阶段，如果在语法分析阶段还要考虑下层词法分析的过程，就显得有些复杂了。而且随着后续支持的符号越来越多，可能又得在大量的地方进行这种索引变更的操作，代码将难以理解和维护。因此这里先停下来进行一次代码的重构。</p>
+<h2 id="基本架构">基本架构</h2>
+<p>这里的代码我按照教程里面的结构进行组织。将按照程序的逻辑分为3层，最底层负责操作字符串的索引保证下次获取token的时候索引能在正确的位置。第二层是词法分析部分，负责给字符串的每个部分都打上对应的token。第三个部分是语法分析的部分，它负责解析之前设计的BNF范式，并计算对应的结果。</p>
+<h2 id="详细的代码">详细的代码</h2>
+<p>上面给出模块划分的概要可能没怎么说清楚，下面将通过代码来进行详细的说明。</p>
+<h3 id="token-模块">Token 模块</h3>
+<p>为了支持这个设计，首先变更一下全局变量的定义，现在定义的全局变量如下所示</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="k">extern</span> <span class="n">Token</span> <span class="n">g_currentToken</span><span class="p">;</span> <span class="c1">//当前token
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="k">extern</span> <span class="kt">int</span> <span class="n">g_nPosition</span><span class="p">;</span> <span class="c1">//当前字符索引的位置
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="k">extern</span> <span class="kt">char</span> <span class="n">g_currentChar</span><span class="p">;</span> <span class="c1">//当前字符串
+</span></span></span></code></pre></div><p>之前通过 <code>get_next_char()</code> 来返回当前指向的token并变更索引的时候发现我们在任何时候想获取当前指向的字符时永远要变更索引，这样就不得不考虑在某些时候要进行索引的回退。比如在解析整数退出的时候，此时当前字符已经指向下一个字符了，但是我们在接下来解析其他符号的时候调用 <code>get_next_char()</code> 导致索引多增加了一个。这种情况经常出现，因此这里使用全局变量保存当前字符，只在需要进行索引增加的时候进行增加。另外我们不希望上层来直接操作这个索引，因此在最底层的Token模块提供一个名为 <code>advance()</code> 的函数用于将索引加一，并获取之后的字符。它的定义如下</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="kt">void</span> <span class="nf">advance</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">g_nPosition</span><span class="o">++</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">// 如果到达字符串尾部，索引不再增加
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="k">if</span> <span class="p">(</span><span class="n">g_nPosition</span> <span class="o">&gt;=</span> <span class="nf">strlen</span><span class="p">(</span><span class="n">g_pszUserBuf</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">g_currentChar</span> <span class="o">=</span> <span class="sc">&#39;\0&#39;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="k">else</span>
+</span></span><span class="line"><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">g_currentChar</span> <span class="o">=</span> <span class="n">g_pszUserBuf</span><span class="p">[</span><span class="n">g_nPosition</span><span class="p">];</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p>这样在对应需要用到当前字符的位置就不再使用 <code>get_next_char()</code> , 而是改用全局变量 <code>g_currentChar</code>。例如现在的 <code>skip_whitespace</code> 函数现在的定义如下</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="kt">void</span> <span class="nf">skip_whitespace</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">while</span> <span class="p">(</span><span class="nf">is_space</span><span class="p">(</span><span class="n">g_currentChar</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="nf">advance</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p>这样我们在获取下一个token的时候只在必要的时候进行索引的递增。</p>
+<h3 id="lex-模块">lex 模块</h3>
+<p>由于打标签的工作交个底层的Token模块了，该模块主要用来实现词法分析的功能，也就是给各个部分打上标签，根据之前Token部分提供的接口，需要对 <code>get_next_token</code> 函数进行修改。</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="kt">bool</span> <span class="nf">get_next_token</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">dyncstring_reset</span><span class="p">(</span><span class="o">&amp;</span><span class="n">g_currentToken</span><span class="p">.</span><span class="n">value</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="k">while</span> <span class="p">(</span><span class="n">g_currentChar</span> <span class="o">!=</span> <span class="sc">&#39;\0&#39;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="k">if</span> <span class="p">(</span><span class="nf">is_digit</span><span class="p">(</span><span class="n">g_currentChar</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl">        <span class="p">{</span>
+</span></span><span class="line"><span class="cl">            <span class="n">g_currentToken</span><span class="p">.</span><span class="n">type</span> <span class="o">=</span> <span class="n">CINT</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">            <span class="nf">parser_number</span><span class="p">(</span><span class="o">&amp;</span><span class="n">g_currentToken</span><span class="p">.</span><span class="n">value</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">            <span class="k">return</span> <span class="nb">true</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="p">}</span>
+</span></span><span class="line"><span class="cl">        <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="nf">is_space</span><span class="p">(</span><span class="n">g_currentChar</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl">        <span class="p">{</span>
+</span></span><span class="line"><span class="cl">            <span class="nf">skip_whitespace</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">        <span class="p">}</span>
+</span></span><span class="line"><span class="cl">        <span class="k">else</span>
+</span></span><span class="line"><span class="cl">        <span class="p">{</span>
+</span></span><span class="line"><span class="cl">            <span class="k">switch</span> <span class="p">(</span><span class="n">g_currentChar</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">            <span class="p">{</span>
+</span></span><span class="line"><span class="cl">                <span class="k">case</span> <span class="sc">&#39;+&#39;</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">                    <span class="n">g_currentToken</span><span class="p">.</span><span class="n">type</span> <span class="o">=</span> <span class="n">PLUS</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">                    <span class="nf">dyncstring_catch</span><span class="p">(</span><span class="o">&amp;</span><span class="n">g_currentToken</span><span class="p">.</span><span class="n">value</span><span class="p">,</span> <span class="sc">&#39;+&#39;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">                    <span class="nf">advance</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">                    <span class="k">break</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">                <span class="k">case</span> <span class="sc">&#39;-&#39;</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">                    <span class="n">g_currentToken</span><span class="p">.</span><span class="n">type</span> <span class="o">=</span> <span class="n">MINUS</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">                    <span class="nf">dyncstring_catch</span><span class="p">(</span><span class="o">&amp;</span><span class="n">g_currentToken</span><span class="p">.</span><span class="n">value</span><span class="p">,</span> <span class="sc">&#39;-&#39;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">                    <span class="nf">advance</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">                    <span class="k">break</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">                <span class="k">case</span> <span class="sc">&#39;*&#39;</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">                    <span class="n">g_currentToken</span><span class="p">.</span><span class="n">type</span> <span class="o">=</span> <span class="n">DIV</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">                    <span class="nf">dyncstring_catch</span><span class="p">(</span><span class="o">&amp;</span><span class="n">g_currentToken</span><span class="p">.</span><span class="n">value</span><span class="p">,</span> <span class="sc">&#39;*&#39;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">                    <span class="nf">advance</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">                    <span class="k">break</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">                <span class="k">case</span> <span class="sc">&#39;/&#39;</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">                    <span class="n">g_currentToken</span><span class="p">.</span><span class="n">type</span> <span class="o">=</span> <span class="n">MUL</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">                    <span class="nf">dyncstring_catch</span><span class="p">(</span><span class="o">&amp;</span><span class="n">g_currentToken</span><span class="p">.</span><span class="n">value</span><span class="p">,</span> <span class="sc">&#39;/&#39;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">                    <span class="nf">advance</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">                    <span class="k">break</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">                <span class="k">case</span> <span class="sc">&#39;(&#39;</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">                    <span class="n">g_currentToken</span><span class="p">.</span><span class="n">type</span> <span class="o">=</span> <span class="n">LPAREN</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">                    <span class="nf">dyncstring_catch</span><span class="p">(</span><span class="o">&amp;</span><span class="n">g_currentToken</span><span class="p">.</span><span class="n">value</span><span class="p">,</span> <span class="sc">&#39;(&#39;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">                    <span class="nf">advance</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">                    <span class="k">break</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">                <span class="k">case</span> <span class="sc">&#39;)&#39;</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">                    <span class="n">g_currentToken</span><span class="p">.</span><span class="n">type</span> <span class="o">=</span> <span class="n">RPAREN</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">                    <span class="nf">dyncstring_catch</span><span class="p">(</span><span class="o">&amp;</span><span class="n">g_currentToken</span><span class="p">.</span><span class="n">value</span><span class="p">,</span> <span class="sc">&#39;)&#39;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">                    <span class="nf">advance</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">                    <span class="k">break</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">                <span class="k">case</span> <span class="sc">&#39;\0&#39;</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">                    <span class="n">g_currentToken</span><span class="p">.</span><span class="n">type</span> <span class="o">=</span> <span class="n">END_OF_FILE</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">                    <span class="k">break</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">                <span class="k">default</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">                    <span class="k">return</span> <span class="nb">false</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">            <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">            <span class="k">return</span> <span class="nb">true</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="nb">true</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p>在这个函数中，将不再通过输出参数来返回当前的token，而是直接修改全局变量。同时也不再使用<code>get_next_char</code> 函数来获取当前指向的字符，而是直接使用全局变量。并且在适当的时机调用<code>advance</code> 来实现递增。</p>
+<p>另外在上层我们直接使用 <code>g_currentToken</code> 拿到当前的token，而在适当的时机调用新增的<code>eat()</code> 函数来实现更新token的操作。</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="kt">bool</span> <span class="nf">eat</span><span class="p">(</span><span class="n">LPTOKEN</span> <span class="n">pToken</span><span class="p">,</span> <span class="n">ETokenType</span> <span class="n">eType</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="p">(</span><span class="n">pToken</span><span class="o">-&gt;</span><span class="n">type</span> <span class="o">==</span> <span class="n">eType</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="nf">get_next_token</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="nb">true</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="nb">false</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p>该函数接受两个参数，第一个是当前token的值，第二个是我们期望当前token是何种类型。如果当前token的类型与期望的不符则报错，否则更新token。</p>
+<h3 id="interpreter-模块">interpreter 模块</h3>
+<p>该模块主要负责解析根据前面的BNF范式来完成计算并解析内容。这个模块提供三个函数<code>get_factor</code>、<code>get_term</code>、<code>expr</code>。这三个函数的功能没有变化，只是在实现上依靠<code>lex</code> 模块提供的功能。主要思路是直接使用 <code>g_currentToken</code> 这个全局变量来获得当前的token，使用 <code>eat()</code> 来更新并获得下一个token的值。这里我们以<code>get_factor()</code> 函数为例</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="kt">int</span> <span class="nf">get_factor</span><span class="p">(</span><span class="kt">bool</span><span class="o">*</span> <span class="n">pRet</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">int</span> <span class="n">value</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="p">(</span><span class="n">g_currentToken</span><span class="p">.</span><span class="n">type</span> <span class="o">==</span> <span class="n">CINT</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">value</span> <span class="o">=</span> <span class="nf">atoi</span><span class="p">(</span><span class="n">g_currentToken</span><span class="p">.</span><span class="n">value</span><span class="p">.</span><span class="n">pszBuf</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="o">*</span><span class="n">pRet</span> <span class="o">=</span> <span class="nf">eat</span><span class="p">(</span><span class="o">&amp;</span><span class="n">g_currentToken</span><span class="p">,</span> <span class="n">CINT</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="k">else</span>
+</span></span><span class="line"><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="k">if</span> <span class="p">(</span><span class="n">g_currentToken</span><span class="p">.</span><span class="n">type</span> <span class="o">==</span> <span class="n">LPAREN</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="p">{</span>
+</span></span><span class="line"><span class="cl">            <span class="kt">bool</span> <span class="n">bValid</span> <span class="o">=</span> <span class="nb">true</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">            <span class="n">bValid</span> <span class="o">=</span> <span class="nf">eat</span><span class="p">(</span><span class="o">&amp;</span><span class="n">g_currentToken</span><span class="p">,</span> <span class="n">LPAREN</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">            <span class="n">value</span> <span class="o">=</span> <span class="nf">expr</span><span class="p">(</span><span class="o">&amp;</span><span class="n">bValid</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">            <span class="n">bValid</span> <span class="o">=</span> <span class="nf">eat</span><span class="p">(</span><span class="o">&amp;</span><span class="n">g_currentToken</span><span class="p">,</span> <span class="n">RPAREN</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">            <span class="o">*</span><span class="n">pRet</span> <span class="o">=</span> <span class="n">bValid</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="n">value</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p>与前面分析的相同，该函数主要负责获取整数和计算括号中子表达式的值。在解析完整数和括号中的子表达式之后，需要调用eat分别跳过对应的值。只是在识别到括号之后需要跳过左右两个括号。</p>
+<p>这样就完成了对应的分层，每层只负责自己该做的事。不用在上层考虑修改索引的问题，结构也更加清晰，未来在添加功能的时候也更加方便。剩下几个函数就不再贴出代码了，感兴趣的小伙伴可以去<a href="https://github.com/aMonst/MMTCC" target="_blank" rel="noopener noreffer ">对应的GitHub仓库</a>上查阅相关代码。</p>
+</div><div class="post-footer" id="post-footer">
+    <div class="post-info">
+        <div class="post-info-line">
+            <div class="post-info-mod">
+                <span>Updated on 2023-04-08</span>
+            </div></div>
+        <div class="post-info-line">
+            <div class="post-info-md"></div>
+            <div class="post-info-share">
+                <span><a href="javascript:void(0);" title="Share on Twitter" data-sharer="twitter" data-url="http://HaiLateBoy.github.io/posts/make-parser07/" data-title="从0开始自制解释器——重构代码" data-hashtags="编译原理,编译器,c语言"><i class="fab fa-twitter fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Facebook" data-sharer="facebook" data-url="http://HaiLateBoy.github.io/posts/make-parser07/" data-hashtag="编译原理"><i class="fab fa-facebook-square fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Hacker News" data-sharer="hackernews" data-url="http://HaiLateBoy.github.io/posts/make-parser07/" data-title="从0开始自制解释器——重构代码"><i class="fab fa-hacker-news fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Line" data-sharer="line" data-url="http://HaiLateBoy.github.io/posts/make-parser07/" data-title="从0开始自制解释器——重构代码"><i data-svg-src="https://cdn.jsdelivr.net/npm/simple-icons@7.3.0/icons/line.svg" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on 微博" data-sharer="weibo" data-url="http://HaiLateBoy.github.io/posts/make-parser07/" data-title="从0开始自制解释器——重构代码"><i class="fab fa-weibo fa-fw" aria-hidden="true"></i></a></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="post-info-more">
+        <section class="post-tags"><i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/%E7%BC%96%E8%AF%91%E5%8E%9F%E7%90%86/">编译原理</a>,&nbsp;<a href="/tags/%E7%BC%96%E8%AF%91%E5%99%A8/">编译器</a>,&nbsp;<a href="/tags/c%E8%AF%AD%E8%A8%80/">C语言</a></section>
+        <section>
+            <span><a href="javascript:void(0);" onclick="window.history.back();">Back</a></span>&nbsp;|&nbsp;<span><a href="/">Home</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav"><a href="/posts/make-parser06/" class="prev" rel="prev" title="从0开始自制解释器——添加对括号的支持"><i class="fas fa-angle-left fa-fw" aria-hidden="true"></i>从0开始自制解释器——添加对括号的支持</a>
+            <a href="/posts/2024-new-year-plan/" class="next" rel="next" title="2023 年度回顾与2024 年展望">2023 年度回顾与2024 年展望<i class="fas fa-angle-right fa-fw" aria-hidden="true"></i></a></div>
+</div>
+</article></div>
+            </main><footer class="footer">
+        <div class="footer-container"><div class="footer-line">Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener noreffer" title="Hugo 0.121.2">Hugo</a> | Theme - <a href="https://github.com/dillonzq/LoveIt" target="_blank" rel="noopener noreffer" title="LoveIt 0.2.11"><i class="far fa-kiss-wink-heart fa-fw" aria-hidden="true"></i> LoveIt</a>
+                </div><div class="footer-line" itemscope itemtype="http://schema.org/CreativeWork"><i class="far fa-copyright fa-fw" aria-hidden="true"></i><span itemprop="copyrightYear">2022 - 2024</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="https://www.masimaro.xyz" target="_blank">Masimaro</a></span></div>
+        </div>
+    </footer></div>
+
+        <div id="fixed-buttons"><a href="#" id="back-to-top" class="fixed-button" title="Back to Top">
+                <i class="fas fa-arrow-up fa-fw" aria-hidden="true"></i>
+            </a><a href="#" id="view-comments" class="fixed-button" title="View Comments">
+                <i class="fas fa-comment fa-fw" aria-hidden="true"></i>
+            </a>
+        </div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.css"><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/autocomplete.js@0.38.1/dist/autocomplete.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lunr@2.3.9/lunr.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lazysizes@5.3.2/lazysizes.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/clipboard@2.0.11/dist/clipboard.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/sharer.js@0.5.1/sharer.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/auto-render.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/copy-tex.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/mhchem.min.js"></script><script type="text/javascript">window.config={"code":{"copyTitle":"Copy to clipboard","maxShownLines":50},"comment":{},"math":{"delimiters":[{"display":true,"left":"$$","right":"$$"},{"display":true,"left":"\\[","right":"\\]"},{"display":true,"left":"\\begin{equation}","right":"\\end{equation}"},{"display":true,"left":"\\begin{equation*}","right":"\\end{equation*}"},{"display":true,"left":"\\begin{align}","right":"\\end{align}"},{"display":true,"left":"\\begin{align*}","right":"\\end{align*}"},{"display":true,"left":"\\begin{alignat}","right":"\\end{alignat}"},{"display":true,"left":"\\begin{alignat*}","right":"\\end{alignat*}"},{"display":true,"left":"\\begin{gather}","right":"\\end{gather}"},{"display":true,"left":"\\begin{CD}","right":"\\end{CD}"},{"display":false,"left":"$","right":"$"},{"display":false,"left":"\\(","right":"\\)"}],"strict":false},"search":{"highlightTag":"em","maxResultLength":10,"noResultsFound":"No results found","snippetLength":50}};</script><script type="text/javascript" src="/js/theme.min.js"></script></body>
+</html>

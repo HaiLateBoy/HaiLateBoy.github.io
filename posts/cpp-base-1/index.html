@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="robots" content="noodp" />
+        <title>c&#43;&#43;基础之变量和基本类型 - Masimaro&#39;s blog</title><meta name="Description" content="这是我用于记录日常和学习的小站"><meta property="og:title" content="c&#43;&#43;基础之变量和基本类型" />
+<meta property="og:description" content="之前我写过一系列的c/c&#43;&#43; 从汇编上解释它如何实现的博文。从汇编层面上看，确实c/c&#43;&#43;的执行过程很清晰，甚至有的地方可以做相关优化。而c&#43;" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://HaiLateBoy.github.io/posts/cpp-base-1/" /><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2021-01-17T10:27:26+00:00" />
+<meta property="article:modified_time" content="2021-01-17T10:27:26+00:00" /><meta property="og:site_name" content="Masimaro&#39;s blog" />
+
+<meta name="twitter:card" content="summary"/><meta name="twitter:title" content="c&#43;&#43;基础之变量和基本类型"/>
+<meta name="twitter:description" content="之前我写过一系列的c/c&#43;&#43; 从汇编上解释它如何实现的博文。从汇编层面上看，确实c/c&#43;&#43;的执行过程很清晰，甚至有的地方可以做相关优化。而c&#43;"/>
+<meta name="application-name" content="My cool site">
+<meta name="apple-mobile-web-app-title" content="My cool site"><meta name="theme-color" content="#ffffff"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="manifest" href="/site.webmanifest"><link rel="canonical" href="http://HaiLateBoy.github.io/posts/cpp-base-1/" /><link rel="prev" href="http://HaiLateBoy.github.io/posts/memory-leak-debug/" /><link rel="next" href="http://HaiLateBoy.github.io/posts/2021-books/" /><link rel="stylesheet" href="/css/style.min.css"><link rel="preload" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css"></noscript><link rel="preload" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css"></noscript><script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "BlogPosting",
+        "headline": "c++基础之变量和基本类型",
+        "inLanguage": "zh-CN",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "http:\/\/HaiLateBoy.github.io\/posts\/cpp-base-1\/"
+        },"genre": "posts","keywords": "C\u002b\u002b, 语法, 基础, c\u002b\u002b11","wordcount":  9838 ,
+        "url": "http:\/\/HaiLateBoy.github.io\/posts\/cpp-base-1\/","datePublished": "2021-01-17T10:27:26+00:00","dateModified": "2021-01-17T10:27:26+00:00","publisher": {
+            "@type": "Organization",
+            "name": ""},"author": {
+                "@type": "Person",
+                "name": "Masimaro"
+            },"description": ""
+    }
+    </script></head>
+    <body data-header-desktop="fixed" data-header-mobile="auto"><script type="text/javascript">(window.localStorage && localStorage.getItem('theme') ? localStorage.getItem('theme') === 'dark' : ('auto' === 'auto' ? window.matchMedia('(prefers-color-scheme: dark)').matches : 'auto' === 'dark')) && document.body.setAttribute('theme', 'dark');</script>
+
+        <div id="mask"></div><div class="wrapper"><header class="desktop" id="header-desktop">
+    <div class="header-wrapper">
+        <div class="header-title">
+            <a href="/" title="Masimaro&#39;s blog">My cool site</a>
+        </div>
+        <div class="menu">
+            <div class="menu-inner"><a class="menu-item" href="/posts/" title="文章列表"> 文章 </a><a class="menu-item" href="/tags/" title="标签"> 标签 </a><a class="menu-item" href="/categories/" title="分类"> 分类 </a><a class="menu-item" href="/about" title="关于本站"> 关于 </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-desktop">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-desktop" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-desktop" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-desktop">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </span><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                    <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+                </a></div>
+        </div>
+    </div>
+</header><header class="mobile" id="header-mobile">
+    <div class="header-container">
+        <div class="header-wrapper">
+            <div class="header-title">
+                <a href="/" title="Masimaro&#39;s blog">My cool site</a>
+            </div>
+            <div class="menu-toggle" id="menu-toggle-mobile">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+        <div class="menu" id="menu-mobile"><div class="search-wrapper">
+                    <div class="search mobile" id="search-mobile">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-mobile">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-mobile" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-mobile" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-mobile">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </div>
+                    <a href="javascript:void(0);" class="search-cancel" id="search-cancel-mobile">
+                        Cancel
+                    </a>
+                </div><a class="menu-item" href="/posts/" title="文章列表">文章</a><a class="menu-item" href="/tags/" title="标签">标签</a><a class="menu-item" href="/categories/" title="分类">分类</a><a class="menu-item" href="/about" title="关于本站">关于</a><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+            </a></div>
+    </div>
+</header><div class="search-dropdown desktop">
+        <div id="search-dropdown-desktop"></div>
+    </div>
+    <div class="search-dropdown mobile">
+        <div id="search-dropdown-mobile"></div>
+    </div><main class="main">
+                <div class="container"><div class="toc" id="toc-auto">
+            <h2 class="toc-title">Contents</h2>
+            <div class="toc-content" id="toc-content-auto"></div>
+        </div><article class="page single"><h1 class="single-title animate__animated animate__flipInX">c++基础之变量和基本类型</h1><div class="post-meta">
+            <div class="post-meta-line"><span class="post-author"><a href="https://www.masimaro.xyz" title="Author" target="_blank" rel="noopener noreffer author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Masimaro</a></span>&nbsp;<span class="post-category">included in <a href="/categories/c++/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>C++</a></span></div>
+            <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw" aria-hidden="true"></i>&nbsp;<time datetime="2021-01-17">2021-01-17</time>&nbsp;<i class="fas fa-pencil-alt fa-fw" aria-hidden="true"></i>&nbsp;9838 words&nbsp;
+                <i class="far fa-clock fa-fw" aria-hidden="true"></i>&nbsp;20 minutes&nbsp;</div>
+        </div><div class="details toc" id="toc-static"  data-kept="true">
+                <div class="details-summary toc-title">
+                    <span>Contents</span>
+                    <span><i class="details-icon fas fa-angle-right" aria-hidden="true"></i></span>
+                </div>
+                <div class="details-content toc-content" id="toc-content-static"><nav id="TableOfContents">
+  <ul>
+    <li><a href="#背景介绍">背景介绍</a></li>
+    <li><a href="#gcc--g-使用">gcc / g++ 使用</a></li>
+    <li><a href="#基本数据类型与变量">基本数据类型与变量</a>
+      <ul>
+        <li><a href="#算术类型">算术类型</a></li>
+        <li><a href="#有符号数与无符号数">有符号数与无符号数</a></li>
+        <li><a href="#类型转化">类型转化</a></li>
+        <li><a href="#字面值常量">字面值常量</a></li>
+      </ul>
+    </li>
+    <li><a href="#变量">变量</a>
+      <ul>
+        <li><a href="#变量的定义与初始化">变量的定义与初始化</a></li>
+        <li><a href="#声明与定义的关系">声明与定义的关系</a></li>
+        <li><a href="#变量作用域">变量作用域</a></li>
+      </ul>
+    </li>
+    <li><a href="#复合类型">复合类型</a>
+      <ul>
+        <li><a href="#引用类型">引用类型</a></li>
+        <li><a href="#指针类型">指针类型</a></li>
+      </ul>
+    </li>
+    <li><a href="#const-限定符">const 限定符</a>
+      <ul>
+        <li><a href="#const-引用">const 引用</a></li>
+        <li><a href="#const与指针">const与指针</a></li>
+        <li><a href="#顶层const和底层const">顶层const和底层const</a></li>
+        <li><a href="#constexpr-和常量表达式">constexpr 和常量表达式</a></li>
+      </ul>
+    </li>
+    <li><a href="#类型处理">类型处理</a>
+      <ul>
+        <li><a href="#别名">别名</a></li>
+        <li><a href="#auto">auto</a></li>
+        <li><a href="#decltype">decltype</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav></div>
+            </div><div class="content" id="content"><p>之前我写过一系列的c/c++ 从汇编上解释它如何实现的博文。从汇编层面上看，确实c/c++的执行过程很清晰，甚至有的地方可以做相关优化。而c++有的地方就只是一个语法糖，或者说并没有转化到汇编中，而是直接在编译阶段做一个语法检查就完了。并没有生成汇编代码。也就是说之前写的c/c++不能涵盖它们的全部内容。而且抽象层次太低，在应用上很少会考虑它的汇编实现。而且从c++11开始，加入了很多新特性，给人的感觉就好像是一们新的编程语言一样。对于这块内容，我觉得自己的知识还是有欠缺了，因此我决定近期重新翻一翻很早以前买的《c++ primer》 学习一下，并整理学习笔记</p>
+<!-- raw HTML omitted -->
+<h2 id="背景介绍">背景介绍</h2>
+<p>为什么会想到再次重新学习c++的基础内容呢？目前来看我所掌握的并不是最新的c++标准，而是“c with class” 的内容，而且很明显最近在关注一些新的cpp库的时候，发现它的语法我很多地方都没见过，虽然可以根据它的写法来大致猜到它到底用了什么东西，或者说在实现什么功能，但是要自己写，可能无法写出这种语法。而且明显感觉到新的标准加入了很多现代编程语言才有的内容，比如正则表达式、lambda表达式等等。这些都让写c++变得容易，写出的代码更加易读，使其脱离了上古时期的烙印更像现代的编程语言，作为一名靠c++吃饭的程序员，这些东西必须得会的。</p>
+<p>看书、学编程总少不了写代码并编译运行它。这次我把我写代码的环境更换到了mac平台，在mac平台上使用 vim + g++的方式。这里要提一句，在mac 的shell中，g++和gcc默认使用的是4.8的版本，许多新的c++标准并不被支持，需要下载最新的编译器并使用替换环境中使用的默认编译器，使其更新到最新版本</p>
+<h2 id="gcc--g-使用">gcc / g++ 使用</h2>
+<p>在shell环境中，不再像visual studio开发环境中那样，只要点击build就一键帮你编译链接生成可执行程序了。shell中所有一切都需要你使用命令行来搞定，好在gcc/g++的使用并不复杂，记住几个常用参数就能解决日常80%的使用场景了，下面罗列一些常用的命令</p>
+<ul>
+<li>-o 指定生成目标文件位置和名称</li>
+<li>-l 指定连接库文件名称，一般库以lib开头但是在指定名称时不用加lib前缀，例如要链接libmath.o 可以写成-lmath</li>
+<li>-L 指定库所在目录</li>
+<li>-Wall 打印所有警告，一般编译时打开这个</li>
+<li>-E 仅做预处理，不进行编译</li>
+<li>-c 仅编译，不进行链接</li>
+<li>-static 编译为静态库</li>
+<li>-share 编译为动态库</li>
+<li>-Dname=definition 预定义一个值为definition的，名称为name的宏</li>
+<li>-ggdb -level 生成调试信息，level可以为1 2 3 默认为2</li>
+<li>-g -level 生成操作系统本地格式的调试信息 -g相比于-ggdb 来说会生成额外的信息</li>
+<li>-O0/O1/O2/O3 尝试优化</li>
+<li>-Os 对生成的文件大小进行优化</li>
+</ul>
+<p>常用的编译命令一般是 <code>g++ -Wall -o demo demo.cpp</code> 开启所有警告项，并编译demo.cpp 生成demo程序</p>
+<!-- raw HTML omitted -->
+<h2 id="基本数据类型与变量">基本数据类型与变量</h2>
+<h3 id="算术类型">算术类型</h3>
+<p>这里说的基本数据类型主要是算术类型，按占用内存空间从小到大排序 char、bool(这二者应该是相同的)、short、wchar_t、int、long、longlong、float、double、long double。当然它们有的还有有符号与无符号的区别，这里就不单独列出了</p>
+<p>一般来说，我们脑袋中记住的它们的大小好像是固定，比如wchar_t 占2个字节，int占4个字节。单实际上c++ 并没有给这些类型的大小都定义死，而是固定了一个最小尺寸，而具体大小究竟定义为多少，不同的编译器有不同的实现，比如我尝试的wchar_t 类型在vc 编译环境中占2个字节，而g++编译出来的占4一个字节。下面的表是c++ 规定的部分类型所占内存空间大小</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">类型</th>
+<th style="text-align:left">含义</th>
+<th style="text-align:left">最小尺寸</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">bool</td>
+<td style="text-align:left">布尔类型</td>
+<td style="text-align:left">未定义</td>
+</tr>
+<tr>
+<td style="text-align:left">char</td>
+<td style="text-align:left">字符</td>
+<td style="text-align:left">8位</td>
+</tr>
+<tr>
+<td style="text-align:left">wchar_t</td>
+<td style="text-align:left">宽字符</td>
+<td style="text-align:left">16位</td>
+</tr>
+<tr>
+<td style="text-align:left">char16_t</td>
+<td style="text-align:left">Unicode字符</td>
+<td style="text-align:left">16位</td>
+</tr>
+<tr>
+<td style="text-align:left">char32_t</td>
+<td style="text-align:left">Unicode字符</td>
+<td style="text-align:left">32位</td>
+</tr>
+<tr>
+<td style="text-align:left">short</td>
+<td style="text-align:left">短整型</td>
+<td style="text-align:left">16位</td>
+</tr>
+<tr>
+<td style="text-align:left">int</td>
+<td style="text-align:left">整型</td>
+<td style="text-align:left">32位</td>
+</tr>
+<tr>
+<td style="text-align:left">long</td>
+<td style="text-align:left">长整型</td>
+<td style="text-align:left">32位</td>
+</tr>
+<tr>
+<td style="text-align:left">longlong</td>
+<td style="text-align:left">长整型</td>
+<td style="text-align:left">64位</td>
+</tr>
+<tr>
+<td style="text-align:left">float</td>
+<td style="text-align:left">单精度浮点数</td>
+<td style="text-align:left">32位</td>
+</tr>
+<tr>
+<td style="text-align:left">double</td>
+<td style="text-align:left">双精度浮点数</td>
+<td style="text-align:left">64位</td>
+</tr>
+</tbody>
+</table>
+<p>另外c++的标准还规定 一个int类型至少和一个short一样大，long至少和int一样大、一个longlong至少和一个long一样大。</p>
+<h3 id="有符号数与无符号数">有符号数与无符号数</h3>
+<p>数字类型分为有符号和无符号的，默认上述都是有符号的，在这些类型中加入unsigned 表示无符号，而char分为 signed char、char、unsigned char 三种类型。但是实际使用是只能选有符号或者无符号的。根据编译器不同，char的表现不同。</p>
+<p>一般在使用这些数据类型的时候有如下原则</p>
+<ol>
+<li>明确知晓数值不可能为负的情况下使用unsigned 类型</li>
+<li>使用int进行算数运行，如果数值超过的int的表示范围则使用 longlong类型</li>
+<li>算术表达式中不要使用char或者bool类型</li>
+<li>如果需要使用一个不大的整数，必须指定是signed char 还是unsigned char</li>
+<li>执行浮点数运算时使用double</li>
+</ol>
+<h3 id="类型转化">类型转化</h3>
+<p>当在程序的某处我们使用了一种类型，而实际对象应该取另一种类型时，程序会自动进行类型转化，类型转化主要分为隐式类型转化和显示类型转化。</p>
+<p>数值类型进行类型转化时，一般遵循如下规则：</p>
+<ol>
+<li>把数字类型转化为bool类型时，0值会转化为false，其他值最后会被转化为true</li>
+<li>当把bool转化为非bool类型时，false会转化为0，true会被转化为1</li>
+<li>把浮点数转化为整型时，仅保留小数点前面的部分</li>
+<li>把整型转化为浮点数时，小数部分为0；如果整数的大小超过浮点数表示的范围，可能会损失精度</li>
+<li>当给无符号类型的整数赋值一个超过它表示范围的数时，会发生溢出。实际值是赋值的数对最大表示数取余数的结果</li>
+<li>当给有符号的类型一个超出它表示范围的值时，具体结果会根据编译器的不同而不同</li>
+<li>有符号数与无符号数混用时，结果会自动转化为无符号数 (使用小转大的原则,尽量不丢失精度)</li>
+</ol>
+<p><strong>由于bool转化为数字类型时非0即1，注意不要在算术表达式中使用bool类型进行运算</strong>
+下面是类型转化的具体例子</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="kt">bool</span> <span class="n">b</span> <span class="o">=</span> <span class="mi">42</span><span class="p">;</span> <span class="c1">// b = true
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="n">b</span><span class="p">;</span> <span class="c1">// i = 1
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="n">i</span> <span class="o">=</span> <span class="mf">3.14</span><span class="p">;</span> <span class="c1">// i = 3;
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kt">double</span> <span class="n">d</span> <span class="o">=</span> <span class="n">i</span><span class="p">;</span> <span class="c1">// d = 3.0
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kt">unsigned</span> <span class="kt">char</span> <span class="n">c</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span> <span class="c1">// c = 256
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kt">signed</span> <span class="kt">char</span> <span class="n">c2</span> <span class="o">=</span> <span class="n">c</span><span class="p">;</span> <span class="c1">// c2 = 0 gcc 中 255在内存中的表现形式为0xff，+1 变为0x00 并向高位溢出，所以结果为0
+</span></span></span></code></pre></div><p>上述代码的最后一个语句发生了溢出，<strong>对于像溢出这种情况下。不同的编译器有不同的处理方式，得到的结果可能不经相同，在编写代码时需要避免此类情况的出现</strong></p>
+<p>尽管我们知道不给一个无符号数赋一个负数，但是经常会在不经意间犯下这样的错误，例如当一个算术表达式中既有无符号数，又有有符号数的时候。例如下面的代码</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="kt">unsigned</span> <span class="n">u</span> <span class="o">=</span> <span class="mi">10</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="o">-</span><span class="mi">42</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="n">printf</span><span class="p">(</span><span class="s">&#34;%d</span><span class="se">\r\n</span><span class="s">&#34;</span><span class="p">,</span> <span class="n">u</span> <span class="o">+</span> <span class="n">i</span><span class="p">);</span> <span class="c1">// -32
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="n">printf</span><span class="p">(</span><span class="s">&#34;%u</span><span class="se">\r\n</span><span class="s">&#34;</span><span class="p">,</span> <span class="n">u</span> <span class="o">+</span> <span class="n">i</span><span class="p">);</span> <span class="c1">//4294967264
+</span></span></span></code></pre></div><p>那么该如何计算最后的结果呢，这里直接根据它们的二进制值来进行计算，然后再转化为具体的10进制数值，例如u = 0x0000000A，i = 0xffffffd6;二者相加得到 0xffffffEO， 如果转化为int类型，最高位是1，为负数，其余各位取反然后加一得到0x20，最终的结果就是-32，而无符号，最后的值为4294967264</p>
+<h3 id="字面值常量">字面值常量</h3>
+<p>一般明确写出来数值内容的称之为字面值常量，从汇编的角度来看，能直接写入代码段中数值。例如32、0xff、&ldquo;hello world&rdquo; 这样内容的数值</p>
+<h4 id="整数和浮点数的字面值">整数和浮点数的字面值</h4>
+<p>整数的字面值可以使用二进制、8进制、10进制、16进制的方式给出。而浮点数一般习惯上以科学计数法的形式给出</p>
+<ol>
+<li>二进制以 0b开头，八进制以0开头,十六进制以0x开头</li>
+<li>数值类型的字面值常量最终会以二进制的形式写入变量所在内存，如何解释由变量的类型决定，默认10进制是带符号的数值，其他的则是不带符号的</li>
+<li>十进制的字面值类型是int、long、longlong中占用空间最小的（前提是类型能容纳对应的数值）</li>
+<li>八进制、十六进制的字面值类型是int、unsigned int、long、unsigned long、longlong和unsigned longlong 中尺寸最小的一个（同样的要求对应类型能容纳对应的数值）</li>
+<li>浮点数的字面值用小数或者科学计数法表示、指数部分用e或者E标示</li>
+</ol>
+<h4 id="字符和字符串的字面值常量">字符和字符串的字面值常量</h4>
+<p>由单引号括起来的一个字符是char类型的字面值，双引号括起来的0个或者多个字符则构成字符串字面值常量。字符串实际上是一个字符数组，数组中的每个元素存储对应的字符。<strong>这个数组的大小等于字符串中字符个数加1，多出来一个用于存储结尾的\0</strong></p>
+<p>有两种类型的字符程序员是不能直接使用的，一类是不可打印的字符，如回车、换行、退格等格式控制字符，另一类是c/c++语言中有特殊用途的字符，例如单引号表示字符、双引号表示一个字符串，在这些情况下需要使用转义字符.</p>
+<ol>
+<li>转义以\开头，后面只转义仅接着的一个字符</li>
+<li>转义可以以字符开始，也可以以数字开始，数字在最后会被转化为对应的ASCII字符</li>
+<li>\x后面跟16进制数、\后面跟八进制数、八进制数只取后面的3个；十六进制数则只能取两个数值(最多表示一个字节)</li>
+</ol>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="sc">&#39;\\&#39;</span> <span class="c1">// 表示一个\字符
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="s">&#34;</span><span class="se">\&#34;</span><span class="s">&#34;</span> <span class="c1">//表示一个&#34;
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="s">&#34;</span><span class="se">\155</span><span class="s">&#34;</span> <span class="c1">//表示一个 155的8进制数，8进制的155转化为10进制为109 从acsii表中可以查到，109对应的是M
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="s">&#34;</span><span class="se">\x6D</span><span class="s">&#34;</span>
+</span></span></code></pre></div><p>一般来讲我们很难通过字面值常量知道它到底应该是具体的哪种类型，例如 15既可以表示short、int、long、也是是double等等类型。为了准确表达字面值常量的类型，我们可以加上特定的前缀或者后缀来修饰它们。常用的前缀和后缀如下表所示：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">前缀</th>
+<th style="text-align:left">含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">L''</td>
+<td style="text-align:left">宽字节</td>
+</tr>
+<tr>
+<td style="text-align:left">u8&quot;&quot;</td>
+<td style="text-align:left">utf-8字符串</td>
+</tr>
+<tr>
+<td style="text-align:left">42ULL</td>
+<td style="text-align:left">unsgined longlong</td>
+</tr>
+<tr>
+<td style="text-align:left">f</td>
+<td style="text-align:left">单精度浮点数</td>
+</tr>
+<tr>
+<td style="text-align:left">3L</td>
+<td style="text-align:left">long类型</td>
+</tr>
+<tr>
+<td style="text-align:left">3.14L</td>
+<td style="text-align:left">long double</td>
+</tr>
+<tr>
+<td style="text-align:left">3LL</td>
+<td style="text-align:left">longlong</td>
+</tr>
+<tr>
+<td style="text-align:left">u''</td>
+<td style="text-align:left">char16_t Unicode16字符</td>
+</tr>
+<tr>
+<td style="text-align:left">U''</td>
+<td style="text-align:left">char32_t Unicode32字符</td>
+</tr>
+</tbody>
+</table>
+<h2 id="变量">变量</h2>
+<p>变量为程序提供了有名的，可供程序操作的内存空间，变量都有具体的数据类型、所在内存的位置以及存储的具体值(即使是未初始化的变量，也有它的默认值)。变量的类型决定它所占内存的大小、如何解释对应内存中的值、以及它能参与的运算类型。在面向对象的语言中，变量和对象一般都可以替换使用</p>
+<h3 id="变量的定义与初始化">变量的定义与初始化</h3>
+<p>变量的定义一般格式是类型说明符其后紧随着一个或者多个变量名组成的列表，多个变量名使用逗号隔开。最后以分号结尾。</p>
+<p>一般在定义变量的同时赋值，叫做变量的初始化。而赋值语句结束之后，在其他地方使用赋值语句对其进行赋值，被称为赋值。从汇编的角度来看，变量的初始化是，在变量进入它的生命有效期时，对那块内存执行的内存拷贝操作。而赋值则需要分解为两条语句，一个寻址，一个值拷贝。</p>
+<p>c++11之后支持初始化列表进行初始化，在使用初始化列表进行初始化时如果出现初始值存在精度丢失的情况时会报错</p>
+<p>c++11之后的列表初始化语句，支持使用赋值运算幅、赋值运算符加上{}、或者直接使用{}、直接使用()</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mf">3.14</span><span class="p">;</span> <span class="c1">//正常
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kt">int</span> <span class="nf">i</span><span class="p">(</span><span class="mf">3.14</span><span class="p">);</span> <span class="c1">//正常
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kt">int</span> <span class="n">i</span><span class="p">{</span><span class="mf">3.14</span><span class="p">};</span> <span class="c1">//报错,使用初始化列表进行初始化时，由double到int可能会发生精度丢失
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kt">int</span> <span class="nf">i</span><span class="p">(</span><span class="mf">3.14</span><span class="p">);</span> <span class="c1">//正常
+</span></span></span></code></pre></div><p>如果变量在定义的时候未给定初始值，则会执行默认初始化操作，全局变量会被赋值为0，局部变量则是未初始化的状态；它的值是不确定的。这个所谓的默认初始化操作，其实并不是真的那个时候执行了什么初始化语句。全局变量被初始化为0，主要是因为，在程序加载之初，操作系统会将数据段的内存都初始化为0，而局部变量，则是在进入函数之后，初始化栈，具体初始化为何值，根据平台的不同而不同</p>
+<h3 id="声明与定义的关系">声明与定义的关系</h3>
+<p>为了允许把程序拆分为多个逻辑部分来编写，c++支持分离式编译机制，该机制允许将程序分割为若干个文件，每个文件可被独立编译。</p>
+<p>如果将程序分为多个文件，则需要一种在文件中共享代码的方法。c++中这种方法是将声明与定义区分开来。在我之前的博客中，有对应的说明。声明只是告诉编译器这个符号可以使用，它是什么类型，占多少空间，但前对它执行的这种操作是否合法。最终会生成一个符号表，在链接的时候根据具体地址，再转化为具体的二进制代码。而定义则是真正为它分配内存空间，以至于后续可以通过一个具体的地址访问它。</p>
+<p>声明只需要在定义语句的前面加上extern关键字。如果extern 关键字后面跟上了显式初始化语句，则认为该条语句是变量的定义语句。变量可以声明多次但是只能定义一次。另外在函数内部不允许初始化一个extern声明的变量</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="kt">int</span> <span class="nf">main</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">extern</span> <span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="c1">//错误
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p>一个好的规范是声明都在放在对应的头文件中，在其他地方使用时引入该头文件，后续要修改，只用修改头文件的一个地方。一个坏的规范是，想用了，就在cpp文件中使用extern声明，这样会导致声明有多份，修改定义，其他声明都得改，项目大了，想要找起来就不那么容易了。</p>
+<h3 id="变量作用域">变量作用域</h3>
+<p>变量的作用域始于声明语句，终结于声明语句所在作用域的末端</p>
+<ol>
+<li>局部变量在整个函数中有效</li>
+<li>普通全局变量在整个程序中都有效果</li>
+<li>花括号中定义的变量仅在这对花括号中有效</li>
+</ol>
+<p>作用域可以存在覆盖，并且以最新的定义的覆盖之前的</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">10</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="kt">void</span> <span class="nf">func</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">20</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">string</span> <span class="n">i</span> <span class="o">=</span> <span class="s">&#34;hello world&#34;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">i</span> <span class="o">&lt;&lt;</span><span class="n">endl</span><span class="p">;</span> <span class="c1">//输出 &#34;hello world&#34;
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">i</span> <span class="o">&lt;&lt;</span> <span class="n">endl</span><span class="p">;</span> <span class="c1">//输出 20
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">i</span> <span class="o">&lt;&lt;</span> <span class="n">endl</span><span class="p">;</span> <span class="c1">//输出 10
+</span></span></span></code></pre></div><h2 id="复合类型">复合类型</h2>
+<p>复合类型是基于其他类型定义的类型，c++中的复合类型主要有指针、引用、结构体、类、共用体等等。这里介绍指针和引用这两种</p>
+<h3 id="引用类型">引用类型</h3>
+<p>引用是对象的一个别名，从汇编的角度来看引用就是指针，但是使用引用比指针安全，也容易理解</p>
+<p>使用引用类型时需要注意以下几点：</p>
+<ol>
+<li>引用必须指向对象</li>
+<li>引用必须初始化</li>
+<li>引用一旦初始化后，后续不能修改它的指向</li>
+<li>引用本身不是对象，所以不能有指向引用的引用</li>
+<li>可以多个引用指向同一个对象</li>
+</ol>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="kt">int</span> <span class="o">&amp;</span><span class="n">j</span> <span class="o">=</span> <span class="n">i</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="kt">int</span> <span class="o">&amp;</span><span class="n">value</span><span class="p">;</span> <span class="c1">//错误，引用必须初始化
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kt">int</span> <span class="o">&amp;</span><span class="n">k</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="c1">//错误，引用必须与变量绑定
+</span></span></span></code></pre></div><h3 id="指针类型">指针类型</h3>
+<p>指针是一个特殊的类型，它本身是一个对象，对象中存储的值是另一个对象的地址。指针本身应该是一个无符号的整数，指针大小与程序中地址所占内存空间一致，32位程序中指针是4字节，64位程序，指针大小为8字节</p>
+<p>使用指针时的限制比引用要宽泛的多</p>
+<ol>
+<li>指针可以指向对象，也可以指向另一个指针</li>
+<li>指针不需要初始化，而且后续可以随意更改指向(当然必须指向同一数据类型)</li>
+<li>可以多个指针指向同一个对象</li>
+</ol>
+<p>指针只能指向对象，指针本身也是一个对象。基于这两点可以知道，不能有指向引用的指针，但是可以有指向指针的引用</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="kt">int</span> <span class="o">*</span><span class="n">pi</span> <span class="o">=</span> <span class="o">&amp;</span><span class="n">i</span><span class="p">;</span> <span class="c1">//定义一个指针指向i
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kt">int</span><span class="o">&amp;</span> <span class="n">ri</span> <span class="o">=</span> <span class="n">i</span><span class="p">;</span> <span class="c1">//定义一个引用指向i
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kt">int</span><span class="o">*</span> <span class="o">&amp;</span><span class="n">rp</span> <span class="o">=</span> <span class="n">pi</span><span class="p">;</span> <span class="c1">//定义一个引用，它指向一个指针
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kt">int</span><span class="o">&amp;</span> <span class="o">*</span><span class="n">pr</span> <span class="o">=</span> <span class="o">&amp;</span><span class="n">ri</span><span class="p">;</span> <span class="c1">//试图定义一个指向引用的指针，错误
+</span></span></span></code></pre></div><p>对于这种在变量定义中既有指针又有引用的情况下，想要知道它到底是指针还是引用，可以从右至左理解。例如rp中与变量名结合最紧密的是&amp;，它表明变量是一个引用，而引用所指向的对象类型是一个int* 也就是定义了一个引用，它所指向的对象是一个指针，该指针指向一个int类型的变量</p>
+<h2 id="const-限定符">const 限定符</h2>
+<p>有时候我们希望定义一种变量，它的值不能被改变。针对这种需求我们可以使用const关键字</p>
+<p>const修饰的变量无法被修改（但是只在语法层面上，可以通过类型转换的方式强制将其指针修改为非const的）</p>
+<p>const对象无法修改，所以const对象需要初始化</p>
+<p>默认状态下const 对象仅在该文件中有效:编译器在编译const对象时会在使用到const变量的位置直接用它的初始值进行替换。在多文件中，为了完成这一个操作，必须事先知道它的值，也就是在编译阶段知道它的值。但是编译阶段各个文件是独立的，换句话说在其他文件中定义的变量，在本文件被编译的过程中是只能根据声明知道它的类型，而不知道它的值。所以c++规定const类型变量各个文件是独立的。即使在多个文件出现多个const变量重复定义，也会被认定为不同的const变量</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="c1">//file1.cpp
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="k">const</span> <span class="kt">int</span> <span class="n">g_i</span> <span class="o">=</span> <span class="mi">10</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">//file2.cpp
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="k">const</span> <span class="kt">int</span> <span class="n">g_i</span> <span class="o">=</span> <span class="mi">20</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="kt">int</span> <span class="nf">main</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">g_i</span> <span class="o">&lt;&lt;</span> <span class="n">endl</span><span class="p">;</span> <span class="c1">//输出20
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">}</span>
+</span></span></code></pre></div><p>上述代码如果是使用普通变量则会报错，报重复定义的错误,但是const变量，每个文件独立一份，所以不会有问题</p>
+<p>如果想要定义的const变量在所有文件中都有效，不管在其定义还是声明语句前都加上extern关键字</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="c1">//1.cpp
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="k">extern</span> <span class="k">const</span> <span class="kt">int</span> <span class="n">g_i</span> <span class="o">=</span> <span class="mi">10</span><span class="p">;</span> <span class="c1">//在定义的同时也加上extern
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>
+</span></span><span class="line"><span class="cl"><span class="c1">//1.h
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="k">extern</span> <span class="k">const</span> <span class="kt">int</span> <span class="n">g_i</span><span class="p">;</span> <span class="c1">//在声明时也加上extern，后面需要使用时直接包含该头文件即可
+</span></span></span></code></pre></div><h3 id="const-引用">const 引用</h3>
+<p>指向const类型对象的引用被称之为const引用。</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="k">const</span> <span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">10</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="k">const</span> <span class="kt">int</span><span class="o">&amp;</span> <span class="n">ref</span> <span class="o">=</span><span class="n">i</span><span class="p">;</span>
+</span></span></code></pre></div><p>const引用可以指向非const类型的变量，使用const引用后，不能通过引用修改对象的值
+非const 引用无法指向const类型的变量</p>
+<h3 id="const与指针">const与指针</h3>
+<p>指向const 类型变量的指针是一个指向常量指针，它的本质还是一个普通的指针，只是它不允许通过指针修改变量的值, 这种类型的指针被称之为指针常量</p>
+<p>指向const类型变量的指针与const引用相似，也是可以指向非const类型变量，但是不允许普通指针指向const类型变量</p>
+<p>由于指针本身允许后续修改指向，所以针对指针本身也可以进行const修饰，这种一般称为const类型指针，这种情况下指针本身是const的，一旦指向一个变量，后续不允许修改指向，但是可以通过指针修改所指向的值。这种类型被称之为常量指针</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">10</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="k">const</span> <span class="kt">int</span> <span class="o">*</span><span class="n">p</span> <span class="o">=</span> <span class="o">&amp;</span><span class="n">i</span><span class="p">;</span> <span class="c1">//定义一个指向常量的指针
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kt">int</span> <span class="o">*</span> <span class="k">const</span> <span class="n">pi</span> <span class="o">=</span> <span class="o">&amp;</span><span class="n">i</span><span class="p">;</span> <span class="c1">//定一个常量指针
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="k">const</span> <span class="kt">int</span> <span class="o">*</span> <span class="k">const</span> <span class="n">pci</span> <span class="o">=</span> <span class="o">&amp;</span><span class="n">i</span><span class="p">;</span>  
+</span></span></code></pre></div><p>如何区分指针常量和常量指针呢，一般来说关注最后两个字，它表示的是const修饰的具体内容，常量指针最后两个字是指针，也就是说const修饰的是指针，指针本身是一个不能修改的const值；而指针常量，最后两个字是常量，也就说const修饰的是一个常量。指针指向的是一个常量。</p>
+<p>在阅读代码的时候，使用的方式仍然是从右到左的方式解读。比如上面代码中p 与之紧密结合的是*，表示它是一个指针，指向一个const int对象；与pi结合最紧密的是const，也就是说pi本身有const属性，是一个常量，后面的int*表示它是一个指向int型对象的指针；而与pci紧密结合的是const，表明它自身是const类型，后面就是对它类型的修饰，const int * 表示它是一个指针类型，指向的是一个int的常量对象。</p>
+<h3 id="顶层const和底层const">顶层const和底层const</h3>
+<p>顶层const 表示指针本身是一个常量，底层const表示所指向的对象是一个const。可以这样理解，指针指向的是一个对象，通过指针修改对象是隐式的修改，更加偏向底层。所以顶层则是对指针本身进行修饰，底层则是对它所指向的对象的修饰。</p>
+<ol>
+<li>指针既可以是顶层const也可以是底层const</li>
+<li>引用后续无法修改其指向，也就不存在顶层const</li>
+<li>底层const可以修饰const变量或者非const变量</li>
+<li>底层const后续无法通过指针或者引用来修改变量的值</li>
+<li>非底层const可以赋值给底层const，而底层const无法赋值称为非底层const</li>
+<li>在执行拷贝操作时，源对象可以是const或者非const、而目标对象只能是非const</li>
+</ol>
+<h3 id="constexpr-和常量表达式">constexpr 和常量表达式</h3>
+<p>常量表达式是指那些不用运行，在编译时期就能确定其值并且后续不会发生更改的表达式。</p>
+<p>一个表达式是否是常量表达式是根据它的类型和初始值共同决定。例如：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="k">const</span> <span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">10</span><span class="p">;</span> <span class="c1">//是常量表达式，字面值在编译时就能确定值，而const保证了后续变量值不会修改
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">10</span><span class="p">;</span> <span class="c1">//不是常量表达式，字面值在编译时就能确定，但是这里定义的是变量，后续可能会有代码对其进行修改
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>
+</span></span><span class="line"><span class="cl"><span class="k">const</span> <span class="kt">int</span> <span class="n">j</span> <span class="o">=</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">20</span><span class="p">;</span> <span class="c1">// 是常量表达式，根据前面的代码，i是常量表达式，这个表达式中的i会在编译时进行替换，也就说j在编译时也能确定初始值
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>
+</span></span><span class="line"><span class="cl"><span class="k">const</span> <span class="kt">int</span> <span class="n">sz</span> <span class="o">=</span> <span class="n">i</span> <span class="o">+</span> <span class="n">get_size</span><span class="p">();</span> <span class="c1">//虽然i是常量，但是函数只有运行时才能获取返回值，所以这里不是常量表达式
+</span></span></span></code></pre></div><p>上述代码都比较简单，比较好辨认处是否是常量表达式，但是在实际工程代码中，可能情况比较复杂，无法确定是否是常量表达式，我们可以在需要定义常量表达式的情况下使用 constexpr关键字，该关键字是用来修饰一个常量表达式，如果对应的语句不是一个常量表达式，编译器会报错，可以根据这个报错进行修改。</p>
+<p>指针中的constexpr只对指针本身有效，对它所指向的对象无效</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">10</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="k">const</span> <span class="kt">int</span> <span class="o">*</span><span class="n">p</span> <span class="o">=</span> <span class="o">&amp;</span><span class="n">i</span><span class="p">;</span> <span class="c1">//指向整型常量的指针
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="k">constexpr</span> <span class="kt">int</span> <span class="o">*</span><span class="n">p</span> <span class="o">=</span> <span class="k">nullptr</span><span class="p">;</span> <span class="c1">//指向整型的常量指针
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="k">constexpr</span> <span class="kt">int</span> <span class="o">*</span><span class="n">p</span> <span class="o">=</span> <span class="o">&amp;</span><span class="n">i</span> <span class="c1">//错误
+</span></span></span></code></pre></div><p><strong>constexpr类型的指针无法指向具体的局部变量，但是它可以指向全局变量</strong>， 常量表达式的要求之一就是要在编译期就知道它的具体值，局部变量是在函数开始执行的时候为它分配内存，也就是说局部变量无法在编译期就得到它的地址，而全局变量是在程序加载的时候得到它的内存地址，复合常量表达式的要求</p>
+<p>另外要注意，constexpr 不存在底层和顶层的现象，只能写在语句开头</p>
+<h2 id="类型处理">类型处理</h2>
+<p>随着程序越来约复杂，用到的数据类型也会越来约复杂，这个复杂主要体现在两个方面，一个是难以拼写，最典型的就是 类似于 <code>namespace1::namespace2::container&lt;namespacespace3::namespace4::type&gt; value;</code>, 甚至还有更加复杂的。另一种就是语句过于复杂，从语句上无法推断出它的返回到底该用哪种类型来接收。针对第一种，c++中定义了别名；针对第二种，定义auto和decltype关键字</p>
+<h3 id="别名">别名</h3>
+<p>类型别名就是给一个类型另外取一个名字，它让复杂的类型书写起来变得更加简单，易于理解和使用。</p>
+<p>在c语言中定义别名的方式一般是typedef，c++ 中新增加了using的方式</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="k">typedef</span> <span class="k">const</span> <span class="kt">char</span><span class="o">*</span> <span class="n">LPCSTR</span><span class="p">;</span> 
+</span></span><span class="line"><span class="cl"><span class="k">using</span> <span class="n">LPCSTR</span> <span class="o">=</span> <span class="k">const</span> <span class="kt">char</span><span class="o">*</span><span class="p">;</span> 
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">LPCSTR</span> <span class="n">lpStr</span> <span class="o">=</span> <span class="s">&#34;Hello World&#34;</span><span class="p">;</span>
+</span></span></code></pre></div><p>别名在与常量的使用中，需要额外注意，并不是简单的进行替换就行了，它修饰的其实是变量本身，例如</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="k">typedef</span> <span class="kt">char</span><span class="o">*</span> <span class="n">LPSTR</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="c1">// using LPSTR = char*
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>
+</span></span><span class="line"><span class="cl"><span class="k">const</span> <span class="n">LPSTR</span> <span class="n">str</span> <span class="o">=</span> <span class="s">&#34;hello world&#34;</span><span class="p">;</span>
+</span></span></code></pre></div><p>上述代码中const修饰的其实是str这个变量自身无法修改，也就是说这个const其实是一个顶层const。并不是简单的替换。</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="k">const</span> <span class="kt">char</span><span class="o">*</span> <span class="n">str</span><span class="p">;</span> <span class="c1">//错误理解，这里并不是简单的替换
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kt">char</span><span class="o">*</span> <span class="k">const</span> <span class="n">str</span><span class="p">;</span> <span class="c1">//这个才是正确的理解，它修饰的是变量本身
+</span></span></span></code></pre></div><h3 id="auto">auto</h3>
+<p>auto 关键字能根据表达式返回的值类型，自动推断变量的类型。</p>
+<p>有auto关键字并不能说明c++是动态类型的语言，动态类型是指，在运行过程中能随意改变变量所存储的数据的类型。例如在python中</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="n">s</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span> <span class="c1">#此时s存储的是int类型</span>
+</span></span><span class="line"><span class="cl"><span class="n">s</span> <span class="o">=</span> <span class="s2">&#34;hello&#34;</span> <span class="c1"># 这个时候s存储的是字符串类型，同一个变量可以随意更改它所存储的数据的类型</span>
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-c++" data-lang="c++"><span class="line"><span class="cl"><span class="k">auto</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span> <span class="c1">//根据表达式结果推断出i应该是int
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="n">i</span> <span class="o">=</span> <span class="s">&#34;hello world&#34;</span><span class="p">;</span> <span class="c1">//i是int，只能存储int类型的数据，不能存储字符串数据
+</span></span></span></code></pre></div><p>当初教科书上说的是在编译期就决定类型的是静态语言，运行期就决定类型的是动态语言。这个导致我理解有些偏差，我一直以为是明确给出变量类型的是静态。所以当初知道auto这个用法后，我一度以为c++要朝着动态类型语言这块发展。</p>
+<p>编译器推断出来的类型有时候跟初始值类型并不完全一样，编译器会适当的改变结果类型，时期更符合初始化规则。</p>
+<ol>
+<li>使用引用对象来给auto赋值时，auto会被推断为被引用的对象类型</li>
+<li>auto一般会忽略顶层const，而底层const则会保留下来。也就是说auto会自动忽略掉变量自身的const属性</li>
+</ol>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">10</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="k">const</span> <span class="kt">int</span> <span class="n">ci</span> <span class="o">=</span> <span class="n">i</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="k">const</span> <span class="kt">int</span><span class="o">&amp;</span> <span class="n">cr</span> <span class="o">=</span> <span class="n">ci</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">auto</span> <span class="n">b</span> <span class="o">=</span> <span class="n">i</span><span class="p">;</span> <span class="c1">// auto 类型为int
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="k">auto</span> <span class="n">c</span> <span class="o">=</span> <span class="n">cr</span><span class="p">;</span> <span class="c1">//auto 类型为 int (cr是ci的别名、此时应该使用ci的类型，而ci本身是一个顶层const，会被忽略掉)
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="k">auto</span> <span class="n">d</span> <span class="o">=</span> <span class="o">&amp;</span><span class="n">i</span><span class="p">;</span> <span class="c1">// auto类型为 int*
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="k">auto</span> <span class="n">e</span> <span class="o">=</span> <span class="o">&amp;</span><span class="n">ci</span><span class="p">;</span> <span class="c1">// auto类型为 const int* （ci 自身是一个const，所以指针指向的应该是一个int型常量，但是指针本身应该不带有const属性，所以类型应该是const int*）
+</span></span></span></code></pre></div><p>如果希望变量自身带有顶层const属性，可以在auto前加上一个const修饰变量</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="k">const</span> <span class="k">auto</span> <span class="n">f</span> <span class="o">=</span> <span class="o">&amp;</span><span class="n">ci</span><span class="p">;</span> <span class="c1">//此时f的类型为 const int const*
+</span></span></span></code></pre></div><h3 id="decltype">decltype</h3>
+<p>有了auto就可以很方便的推断出类型了，为什么还有整出一个新的关键字呢？auto有一个问题，那就是必须用表达式的值来初始化变量，但是有些时候我只想用这个表达式值的类型来决定我变量的类型，我不想用这个值来初始化我的变量。或者我不想对变量初始化。</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">10</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="k">auto</span> <span class="n">j</span> <span class="o">=</span> <span class="n">i</span><span class="p">;</span> <span class="c1">// 如果这个时候我不想用i的值来初始化，我想用其他的。
+</span></span></span></code></pre></div><p>基于这个需求，c++11标准提出了新的关键字 decltype ，编译器会分析表达式并得到它的类型，但是并不计算表达式的值，也不使用表达式的值对变量进行初始化</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">10</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="k">const</span> <span class="kt">int</span> <span class="n">j</span> <span class="o">=</span> <span class="mi">10</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="kt">int</span> <span class="nf">fn</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl"><span class="k">decltype</span><span class="p">(</span><span class="n">fn</span><span class="p">())</span> <span class="n">j</span><span class="p">;</span> <span class="c1">//这里可以不对j进行初始化
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kt">int</span><span class="o">&amp;</span> <span class="n">ri</span> <span class="o">=</span> <span class="n">i</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="k">decltype</span><span class="p">(</span><span class="n">ri</span><span class="p">)</span> <span class="n">rz</span><span class="p">;</span> <span class="c1">//错误 rz是一个引用，必须初始化
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="k">decltype</span><span class="p">(</span><span class="n">j</span><span class="p">)</span> <span class="n">k</span><span class="p">;</span> <span class="c1">//错误k 是一个const类型的变量，需要初始化
+</span></span></span></code></pre></div><p>decltype 在处理引用与 const的时候与auto不同</p>
+<ol>
+<li>auto 会自动忽略掉顶层const，而decltype 则会返回变量的完整类型，包括顶层const</li>
+<li>c++ 中的引用一般会被当作变量的同义词使用，使用引用的表达式可以自动替换成使用该变量，但是在decltype中例外，引用得到的也是引用类型</li>
+</ol>
+<p>在使用decltype中，需要注意括号中变量与表达式的区别</p>
+<ol>
+<li>decltype中如果是一个表达式，则类型是表达式计算结果的类型。</li>
+<li>如果变量又额外用括号括起来了，编译器会将其作为一个表达式，得到的结果是一个引用。多层括号的结果永远是引用类型</li>
+<li>表达式如果是解引用操作，得到的也是引用</li>
+</ol>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="k">const</span> <span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">10</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="k">decltype</span><span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">10</span><span class="p">)</span> <span class="n">j</span><span class="p">;</span> <span class="c1">//由于i + 10 得到的是一个int类型，所以这里j也是int类型
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="k">const</span> <span class="kt">int</span> <span class="o">*</span><span class="n">p</span> <span class="o">=</span> <span class="o">&amp;</span><span class="n">i</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="k">decltype</span><span class="p">(</span><span class="o">*</span><span class="n">p</span><span class="p">)</span> <span class="n">k</span><span class="p">;</span> <span class="c1">//错误,k的类型为const int&amp; ，是一个引用类型，需要初始化 
+</span></span></span></code></pre></div></div><div class="post-footer" id="post-footer">
+    <div class="post-info">
+        <div class="post-info-line">
+            <div class="post-info-mod">
+                <span>Updated on 2021-01-17</span>
+            </div></div>
+        <div class="post-info-line">
+            <div class="post-info-md"></div>
+            <div class="post-info-share">
+                <span><a href="javascript:void(0);" title="Share on Twitter" data-sharer="twitter" data-url="http://HaiLateBoy.github.io/posts/cpp-base-1/" data-title="c&#43;&#43;基础之变量和基本类型" data-hashtags="C&#43;&#43;,语法,基础,c&#43;&#43;11"><i class="fab fa-twitter fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Facebook" data-sharer="facebook" data-url="http://HaiLateBoy.github.io/posts/cpp-base-1/" data-hashtag="C&#43;&#43;"><i class="fab fa-facebook-square fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Hacker News" data-sharer="hackernews" data-url="http://HaiLateBoy.github.io/posts/cpp-base-1/" data-title="c&#43;&#43;基础之变量和基本类型"><i class="fab fa-hacker-news fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Line" data-sharer="line" data-url="http://HaiLateBoy.github.io/posts/cpp-base-1/" data-title="c&#43;&#43;基础之变量和基本类型"><i data-svg-src="https://cdn.jsdelivr.net/npm/simple-icons@7.3.0/icons/line.svg" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on 微博" data-sharer="weibo" data-url="http://HaiLateBoy.github.io/posts/cpp-base-1/" data-title="c&#43;&#43;基础之变量和基本类型"><i class="fab fa-weibo fa-fw" aria-hidden="true"></i></a></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="post-info-more">
+        <section class="post-tags"><i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/c&#43;&#43;/">C&#43;&#43;</a>,&nbsp;<a href="/tags/%E8%AF%AD%E6%B3%95/">语法</a>,&nbsp;<a href="/tags/%E5%9F%BA%E7%A1%80/">基础</a>,&nbsp;<a href="/tags/c&#43;&#43;11/">c&#43;&#43;11</a></section>
+        <section>
+            <span><a href="javascript:void(0);" onclick="window.history.back();">Back</a></span>&nbsp;|&nbsp;<span><a href="/">Home</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav"><a href="/posts/memory-leak-debug/" class="prev" rel="prev" title="记一次内存泄露调试"><i class="fas fa-angle-left fa-fw" aria-hidden="true"></i>记一次内存泄露调试</a>
+            <a href="/posts/2021-books/" class="next" rel="next" title="2021阅读清单">2021阅读清单<i class="fas fa-angle-right fa-fw" aria-hidden="true"></i></a></div>
+</div>
+</article></div>
+            </main><footer class="footer">
+        <div class="footer-container"><div class="footer-line">Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener noreffer" title="Hugo 0.121.2">Hugo</a> | Theme - <a href="https://github.com/dillonzq/LoveIt" target="_blank" rel="noopener noreffer" title="LoveIt 0.2.11"><i class="far fa-kiss-wink-heart fa-fw" aria-hidden="true"></i> LoveIt</a>
+                </div><div class="footer-line" itemscope itemtype="http://schema.org/CreativeWork"><i class="far fa-copyright fa-fw" aria-hidden="true"></i><span itemprop="copyrightYear">2022 - 2024</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="https://www.masimaro.xyz" target="_blank">Masimaro</a></span></div>
+        </div>
+    </footer></div>
+
+        <div id="fixed-buttons"><a href="#" id="back-to-top" class="fixed-button" title="Back to Top">
+                <i class="fas fa-arrow-up fa-fw" aria-hidden="true"></i>
+            </a><a href="#" id="view-comments" class="fixed-button" title="View Comments">
+                <i class="fas fa-comment fa-fw" aria-hidden="true"></i>
+            </a>
+        </div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.css"><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/autocomplete.js@0.38.1/dist/autocomplete.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lunr@2.3.9/lunr.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lazysizes@5.3.2/lazysizes.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/clipboard@2.0.11/dist/clipboard.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/sharer.js@0.5.1/sharer.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/auto-render.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/copy-tex.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/mhchem.min.js"></script><script type="text/javascript">window.config={"code":{"copyTitle":"Copy to clipboard","maxShownLines":50},"comment":{},"math":{"delimiters":[{"display":true,"left":"$$","right":"$$"},{"display":true,"left":"\\[","right":"\\]"},{"display":true,"left":"\\begin{equation}","right":"\\end{equation}"},{"display":true,"left":"\\begin{equation*}","right":"\\end{equation*}"},{"display":true,"left":"\\begin{align}","right":"\\end{align}"},{"display":true,"left":"\\begin{align*}","right":"\\end{align*}"},{"display":true,"left":"\\begin{alignat}","right":"\\end{alignat}"},{"display":true,"left":"\\begin{alignat*}","right":"\\end{alignat*}"},{"display":true,"left":"\\begin{gather}","right":"\\end{gather}"},{"display":true,"left":"\\begin{CD}","right":"\\end{CD}"},{"display":false,"left":"$","right":"$"},{"display":false,"left":"\\(","right":"\\)"}],"strict":false},"search":{"highlightTag":"em","maxResultLength":10,"noResultsFound":"No results found","snippetLength":50}};</script><script type="text/javascript" src="/js/theme.min.js"></script></body>
+</html>

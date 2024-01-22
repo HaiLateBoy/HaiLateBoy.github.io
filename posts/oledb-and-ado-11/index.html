@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="robots" content="noodp" />
+        <title>OLEDB存取BLOB型数据 - Masimaro&#39;s blog</title><meta name="Description" content="这是我用于记录日常和学习的小站"><meta property="og:title" content="OLEDB存取BLOB型数据" />
+<meta property="og:description" content="现代数据库系统除了支持一些标准的通用数据类型以外，大多数还支持一种称之为BLOB型的数据。 BLOB全称为big large object bytes, 大二进制对象类型，这种类" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://HaiLateBoy.github.io/posts/oledb-and-ado-11/" /><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2018-04-20T20:49:37+00:00" />
+<meta property="article:modified_time" content="2018-04-20T20:49:37+00:00" /><meta property="og:site_name" content="Masimaro&#39;s blog" />
+
+<meta name="twitter:card" content="summary"/><meta name="twitter:title" content="OLEDB存取BLOB型数据"/>
+<meta name="twitter:description" content="现代数据库系统除了支持一些标准的通用数据类型以外，大多数还支持一种称之为BLOB型的数据。 BLOB全称为big large object bytes, 大二进制对象类型，这种类"/>
+<meta name="application-name" content="My cool site">
+<meta name="apple-mobile-web-app-title" content="My cool site"><meta name="theme-color" content="#ffffff"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="manifest" href="/site.webmanifest"><link rel="canonical" href="http://HaiLateBoy.github.io/posts/oledb-and-ado-11/" /><link rel="prev" href="http://HaiLateBoy.github.io/posts/oledb-and-ado-10/" /><link rel="next" href="http://HaiLateBoy.github.io/posts/oledb-and-ado-12/" /><link rel="stylesheet" href="/css/style.min.css"><link rel="preload" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css"></noscript><link rel="preload" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css"></noscript><script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "BlogPosting",
+        "headline": "OLEDB存取BLOB型数据",
+        "inLanguage": "zh-CN",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "http:\/\/HaiLateBoy.github.io\/posts\/oledb-and-ado-11\/"
+        },"genre": "posts","keywords": "OLEDB, 数据库编程, VC\u002b\u002b, 数据库, BLOB型数据","wordcount":  4915 ,
+        "url": "http:\/\/HaiLateBoy.github.io\/posts\/oledb-and-ado-11\/","datePublished": "2018-04-20T20:49:37+00:00","dateModified": "2018-04-20T20:49:37+00:00","publisher": {
+            "@type": "Organization",
+            "name": ""},"author": {
+                "@type": "Person",
+                "name": "Masimaro"
+            },"description": ""
+    }
+    </script></head>
+    <body data-header-desktop="fixed" data-header-mobile="auto"><script type="text/javascript">(window.localStorage && localStorage.getItem('theme') ? localStorage.getItem('theme') === 'dark' : ('auto' === 'auto' ? window.matchMedia('(prefers-color-scheme: dark)').matches : 'auto' === 'dark')) && document.body.setAttribute('theme', 'dark');</script>
+
+        <div id="mask"></div><div class="wrapper"><header class="desktop" id="header-desktop">
+    <div class="header-wrapper">
+        <div class="header-title">
+            <a href="/" title="Masimaro&#39;s blog">My cool site</a>
+        </div>
+        <div class="menu">
+            <div class="menu-inner"><a class="menu-item" href="/posts/" title="文章列表"> 文章 </a><a class="menu-item" href="/tags/" title="标签"> 标签 </a><a class="menu-item" href="/categories/" title="分类"> 分类 </a><a class="menu-item" href="/about" title="关于本站"> 关于 </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-desktop">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-desktop" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-desktop" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-desktop">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </span><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                    <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+                </a></div>
+        </div>
+    </div>
+</header><header class="mobile" id="header-mobile">
+    <div class="header-container">
+        <div class="header-wrapper">
+            <div class="header-title">
+                <a href="/" title="Masimaro&#39;s blog">My cool site</a>
+            </div>
+            <div class="menu-toggle" id="menu-toggle-mobile">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+        <div class="menu" id="menu-mobile"><div class="search-wrapper">
+                    <div class="search mobile" id="search-mobile">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-mobile">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-mobile" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-mobile" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-mobile">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </div>
+                    <a href="javascript:void(0);" class="search-cancel" id="search-cancel-mobile">
+                        Cancel
+                    </a>
+                </div><a class="menu-item" href="/posts/" title="文章列表">文章</a><a class="menu-item" href="/tags/" title="标签">标签</a><a class="menu-item" href="/categories/" title="分类">分类</a><a class="menu-item" href="/about" title="关于本站">关于</a><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+            </a></div>
+    </div>
+</header><div class="search-dropdown desktop">
+        <div id="search-dropdown-desktop"></div>
+    </div>
+    <div class="search-dropdown mobile">
+        <div id="search-dropdown-mobile"></div>
+    </div><main class="main">
+                <div class="container"><div class="toc" id="toc-auto">
+            <h2 class="toc-title">Contents</h2>
+            <div class="toc-content" id="toc-content-auto"></div>
+        </div><article class="page single"><h1 class="single-title animate__animated animate__flipInX">OLEDB存取BLOB型数据</h1><div class="post-meta">
+            <div class="post-meta-line"><span class="post-author"><a href="https://www.masimaro.xyz" title="Author" target="_blank" rel="noopener noreffer author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Masimaro</a></span>&nbsp;<span class="post-category">included in <a href="/categories/windows-%E6%95%B0%E6%8D%AE%E5%BA%93%E7%BC%96%E7%A8%8B/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>windows 数据库编程</a></span></div>
+            <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw" aria-hidden="true"></i>&nbsp;<time datetime="2018-04-20">2018-04-20</time>&nbsp;<i class="fas fa-pencil-alt fa-fw" aria-hidden="true"></i>&nbsp;4915 words&nbsp;
+                <i class="far fa-clock fa-fw" aria-hidden="true"></i>&nbsp;10 minutes&nbsp;</div>
+        </div><div class="details toc" id="toc-static"  data-kept="true">
+                <div class="details-summary toc-title">
+                    <span>Contents</span>
+                    <span><i class="details-icon fas fa-angle-right" aria-hidden="true"></i></span>
+                </div>
+                <div class="details-content toc-content" id="toc-content-static"><nav id="TableOfContents">
+  <ul>
+    <li><a href="#使用blob型数据的利弊">使用BLOB型数据的利弊</a></li>
+    <li><a href="#操作blob型数据的一般方法">操作BLOB型数据的一般方法</a>
+      <ul>
+        <li><a href="#判断一个列是否是blob型数据">判断一个列是否是BLOB型数据</a></li>
+        <li><a href="#blog型数据的绑定">BLOG型数据的绑定</a></li>
+      </ul>
+    </li>
+    <li><a href="#读取blob数据">读取BLOB数据</a></li>
+    <li><a href="#blob数据的写入">BLOB数据的写入:</a></li>
+  </ul>
+</nav></div>
+            </div><div class="content" id="content"><p>现代数据库系统除了支持一些标准的通用数据类型以外，大多数还支持一种称之为BLOB型的数据。
+BLOB全称为big large object bytes, 大二进制对象类型，这种类型的数据通常用于存储文档、图片、音频等文件，这些文件一般体积较大，保存这些文件可以很方便的管理和检索这类信息。在MS SQLSERVER中常见的BLOB数据类型有text、ntext(n表示unicode)、image、nvarchar、varchar、varbinary等。其中image基本可以用来保存一切二进制文件，比如word、Excel、音频、视频等等类型。
+针对BLOB型数据，OLEDB也提供了对它的支持</p>
+<!-- raw HTML omitted -->
+<h2 id="使用blob型数据的利弊">使用BLOB型数据的利弊</h2>
+<p>一般数据库对BLOB型数据有特殊的处理方式，比如压缩等等，在数据库中存储BLOB数据可以方便的进行检索，展示，备份等操作。但是由于BLOB型数据本身比较大，存储量太大时数据量太大容易拖慢数据库性能，所以一般的说法都是尽量不要在数据库中存储这类信息。特别是图片，音视频。针对这类文件一般的做法是将其保存在系统的某个路径钟中，而在数据库中存储对应的路径</p>
+<h2 id="操作blob型数据的一般方法">操作BLOB型数据的一般方法</h2>
+<p>一般针对BLOB不能像普通数据那样操作，而需要一些特殊的操作，在OLEDB中通过设置绑定结构中的一些特殊值最终指定获取BLOB型数据的一个ISequentialStream接口指针,最终会通过这个接口来进行BLOB型数据的读写操作</p>
+<h3 id="判断一个列是否是blob型数据">判断一个列是否是BLOB型数据</h3>
+<p>判断某个列是否是BLOB型数据一般通过如下两个条件：</p>
+<ol>
+<li>pColumnInfo[i].wType == DBTYPE_IUNKNOW ： 包含当列信息的DBCOLUMNSINFO 结构体对象的wType值为DBTYPE_IUNKNOW，该列的类型为DBTYPE_IUNKNOW，该条件也被称为列类型判定</li>
+<li>pColumnInfo[i].dwFlags &amp; DBCOLUMNFLAGS_ISLONG ：当列信息中的dwFlag值为DBCOLUMNFLAGS_ISLONG,也就是说该列的标识中包含DBCOLUMNFLAGS_ISLONG属性，该判定条件也被称之为列标识判定
+当这两个条件之一成立之时，我们就可以断定这列为BLOB型数据</li>
+</ol>
+<h3 id="blog型数据的绑定">BLOG型数据的绑定</h3>
+<p>在进行BLOB型数据的绑定也有特殊要求，主要体现在下面几点：</p>
+<ol>
+<li>绑定结构的cbMaxLength 需要设置为0</li>
+<li>绑定结构的wType设置为DBTYPE_IUNKNOW</li>
+<li>为结构的pObject指针分配内存，大小等于DBOBJECT结构的大小</li>
+<li>指定pObject的成员
+pObject-&gt;iid = IID_ISequentialStream
+pObject-&gt;dwFlags = STGM_READ</li>
+<li>为行缓冲长度加上一个IStream指针的长度，此时数据源不再提供查询到的数据而提供一个接口指针，后续对BLOB数据的操作都使用该指针进行
+最后使用完后记得释放pObject所指向的内存空间</li>
+</ol>
+<h2 id="读取blob数据">读取BLOB数据</h2>
+<p>根据前面所说的创建绑定结构，并为绑定结构赋值，最终可以从结果集中获取到一个ISequentialStream接口指针。调用接口的Read方法可以读取到BLOB列中的数据，而BLOB数据的长度存储在绑定时指定的数据长度内存偏移处,这与普通列的长度存放返回方式是一样的，一般BLOB数据都比较长，这个时候就需要分段读取。
+在使用ISequentialStream接口操作BLOB型数据时需要注意的一个问题是，有的数据库不支持在一个访问器中访问多个BLOB数据列。一般BLOB数据列及其的消耗资源，并且数据库鼓励我们在设计数据库表结构的时候做到一行只有一列BLOB数据，因此很多数据库并不支持在一个访问器中读取多个BLOB数据。
+要判断数据库是否支持在一个访问器中读取多个BLOB数据，可以获取DBPROP_MULTIPLESTORAGEOBJECTS属性，该属性属于属性集DBPROPSET_ROWSET，它是一个只读属性，如果该属性的值为TRUE表示支持，为FALSE表示不支持。
+下面是一个读取BLOB型数据的例子,数据库中的表结构为：id(int)、text(image)、png(image)、jpg(image)</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="kt">void</span> <span class="nf">ReadBLOB</span><span class="p">(</span><span class="n">IRowset</span> <span class="o">*</span><span class="n">pIRowset</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">	<span class="n">COM_DECLARE_INTERFACE</span><span class="p">(</span><span class="n">IColumnsInfo</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="n">COM_DECLARE_INTERFACE</span><span class="p">(</span><span class="n">IAccessor</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="n">DBORDINAL</span> <span class="n">cColumns</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">DBCOLUMNINFO</span><span class="o">*</span> <span class="n">rgColumnsInfo</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">LPOLESTR</span> <span class="n">lpszColumnsName</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">DBBINDING</span><span class="o">*</span> <span class="n">rgBindings</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">DBBINDING</span><span class="o">**</span> <span class="n">ppBindings</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span> <span class="c1">//绑定结构数组
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="n">DWORD</span> <span class="o">*</span><span class="n">puDataLen</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span> <span class="c1">//当前访问器所需内存大小
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="n">DWORD</span> <span class="o">*</span><span class="n">pulColCnt</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span> <span class="c1">//当前访问器中包含的项
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="n">ULONG</span> <span class="n">ulBindCnt</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="c1">//访问器的数量
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="n">ULONG</span> <span class="n">uBlob</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="c1">//当前有多少blob数据
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="n">HACCESSOR</span><span class="o">*</span> <span class="n">phAccessor</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">HROW</span><span class="o">*</span> <span class="n">hRow</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">DBCOUNTITEM</span> <span class="n">ulGetRows</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">ULONG</span> <span class="n">uCols</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="n">PVOID</span> <span class="n">pData1</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span> <span class="c1">//第1个访问器中数据的缓冲
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="n">PVOID</span> <span class="n">pData2</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span> <span class="c1">//第2个访问器中数据的缓冲
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="n">PVOID</span> <span class="n">pData3</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span> <span class="c1">//第3个访问器中数据的缓冲
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>
+</span></span><span class="line"><span class="cl">	<span class="n">HRESULT</span> <span class="n">hRes</span> <span class="o">=</span> <span class="n">pIRowset</span><span class="o">-&gt;</span><span class="n">QueryInterface</span><span class="p">(</span><span class="n">IID_IColumnsInfo</span><span class="p">,</span> <span class="p">(</span><span class="kt">void</span><span class="o">**</span><span class="p">)</span><span class="o">&amp;</span><span class="n">pIColumnsInfo</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="n">COM_SUCCESS</span><span class="p">(</span><span class="n">hRes</span><span class="p">,</span> <span class="n">_T</span><span class="p">(</span><span class="s">&#34;查询接口pIColumnsInfo失败，错误码为:%08x</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">),</span> <span class="n">hRes</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="n">hRes</span> <span class="o">=</span> <span class="n">pIColumnsInfo</span><span class="o">-&gt;</span><span class="n">GetColumnInfo</span><span class="p">(</span><span class="o">&amp;</span><span class="n">cColumns</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">rgColumnsInfo</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">lpszColumnsName</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="n">COM_SUCCESS</span><span class="p">(</span><span class="n">hRes</span><span class="p">,</span> <span class="n">_T</span><span class="p">(</span><span class="s">&#34;获取结果集列信息失败，错误码为:%08x</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">),</span> <span class="n">hRes</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="n">ppBindings</span> <span class="o">=</span> <span class="p">(</span><span class="n">DBBINDING</span><span class="o">**</span><span class="p">)</span><span class="n">COM_ALLOC</span><span class="p">(</span><span class="k">sizeof</span><span class="p">(</span><span class="n">DBBINDING</span><span class="o">*</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">	<span class="n">rgBindings</span> <span class="o">=</span> <span class="p">(</span><span class="n">DBBINDING</span><span class="o">*</span><span class="p">)</span><span class="n">COM_ALLOC</span><span class="p">(</span><span class="k">sizeof</span><span class="p">(</span><span class="n">DBBINDING</span><span class="p">)</span> <span class="o">*</span> <span class="n">cColumns</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="n">pulColCnt</span> <span class="o">=</span> <span class="p">(</span><span class="n">DWORD</span><span class="o">*</span><span class="p">)</span><span class="n">COM_ALLOC</span><span class="p">(</span><span class="k">sizeof</span><span class="p">(</span><span class="n">DWORD</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">	<span class="n">puDataLen</span> <span class="o">=</span>  <span class="p">(</span><span class="n">DWORD</span><span class="o">*</span><span class="p">)</span><span class="n">COM_ALLOC</span><span class="p">(</span><span class="k">sizeof</span><span class="p">(</span><span class="n">DWORD</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">	<span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">cColumns</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">	<span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">//如果当前访问器对应的绑定结构的数组的首地址为空，将当前绑定结构指针作为绑定结构数组的首地址
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>		<span class="k">if</span> <span class="p">(</span><span class="nb">NULL</span> <span class="o">==</span> <span class="n">ppBindings</span><span class="p">[</span><span class="n">ulBindCnt</span><span class="p">])</span>
+</span></span><span class="line"><span class="cl">		<span class="p">{</span>
+</span></span><span class="line"><span class="cl">			<span class="n">ppBindings</span><span class="p">[</span><span class="n">ulBindCnt</span><span class="p">]</span> <span class="o">=</span> <span class="o">&amp;</span><span class="n">rgBindings</span><span class="p">[</span><span class="n">i</span><span class="p">];</span>
+</span></span><span class="line"><span class="cl">		<span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">		<span class="o">++</span><span class="n">pulColCnt</span><span class="p">[</span><span class="n">ulBindCnt</span><span class="p">];</span>
+</span></span><span class="line"><span class="cl">		<span class="n">rgBindings</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">bPrecision</span> <span class="o">=</span> <span class="n">rgColumnsInfo</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">bPrecision</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">		<span class="n">rgBindings</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">bScale</span> <span class="o">=</span> <span class="n">rgBindings</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">bScale</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">		<span class="n">rgBindings</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">cbMaxLen</span> <span class="o">=</span> <span class="mi">10</span> <span class="o">*</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">WCHAR</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">		<span class="n">rgBindings</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">dwMemOwner</span> <span class="o">=</span> <span class="n">DBMEMOWNER_CLIENTOWNED</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">		<span class="n">rgBindings</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">dwPart</span> <span class="o">=</span> <span class="n">DBPART_LENGTH</span> <span class="o">|</span> <span class="n">DBPART_STATUS</span> <span class="o">|</span> <span class="n">DBPART_VALUE</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">		<span class="n">rgBindings</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">eParamIO</span> <span class="o">=</span> <span class="n">DBPARAMIO_NOTPARAM</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">		<span class="n">rgBindings</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">iOrdinal</span> <span class="o">=</span> <span class="n">rgColumnsInfo</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">iOrdinal</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">		<span class="n">rgBindings</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">obStatus</span> <span class="o">=</span> <span class="n">puDataLen</span><span class="p">[</span><span class="n">ulBindCnt</span><span class="p">];</span>
+</span></span><span class="line"><span class="cl">		<span class="n">rgBindings</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">obLength</span> <span class="o">=</span> <span class="n">puDataLen</span><span class="p">[</span><span class="n">ulBindCnt</span><span class="p">]</span> <span class="o">+</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">DBSTATUS</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">		<span class="n">rgBindings</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">obValue</span> <span class="o">=</span> <span class="n">rgBindings</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">obLength</span> <span class="o">+</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">ULONG</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">		<span class="n">rgBindings</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">wType</span> <span class="o">=</span> <span class="n">DBTYPE_WSTR</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">		<span class="k">if</span> <span class="p">(</span><span class="n">rgColumnsInfo</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">wType</span> <span class="o">==</span> <span class="n">DBTYPE_IUNKNOWN</span> <span class="o">||</span>
+</span></span><span class="line"><span class="cl">			<span class="n">rgColumnsInfo</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">dwFlags</span> <span class="o">&amp;</span> <span class="n">DBCOLUMNFLAGS_ISLONG</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">		<span class="p">{</span>
+</span></span><span class="line"><span class="cl">			<span class="n">rgBindings</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">cbMaxLen</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">			<span class="n">rgBindings</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">wType</span> <span class="o">=</span> <span class="n">DBTYPE_IUNKNOWN</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">			<span class="n">rgBindings</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">pObject</span> <span class="o">=</span> <span class="p">(</span><span class="n">DBOBJECT</span><span class="o">*</span><span class="p">)</span><span class="n">COM_ALLOC</span><span class="p">(</span><span class="k">sizeof</span><span class="p">(</span><span class="n">DBOBJECT</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">			<span class="n">rgBindings</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">pObject</span><span class="o">-&gt;</span><span class="n">iid</span> <span class="o">=</span> <span class="n">IID_ISequentialStream</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">			<span class="n">rgBindings</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">pObject</span><span class="o">-&gt;</span><span class="n">dwFlags</span> <span class="o">=</span> <span class="n">STGM_READ</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">			<span class="n">uBlob</span><span class="o">++</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">		<span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">		<span class="c1">//记录下每个访问器所需内存的大小
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>		<span class="n">puDataLen</span><span class="p">[</span><span class="n">ulBindCnt</span><span class="p">]</span> <span class="o">=</span> <span class="n">rgBindings</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">obValue</span> <span class="o">+</span> <span class="n">rgBindings</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">cbMaxLen</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">		<span class="k">if</span> <span class="p">(</span><span class="n">rgBindings</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">wType</span> <span class="o">==</span> <span class="n">DBTYPE_IUNKNOWN</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">		<span class="p">{</span>
+</span></span><span class="line"><span class="cl">			<span class="n">puDataLen</span><span class="p">[</span><span class="n">ulBindCnt</span><span class="p">]</span> <span class="o">=</span> <span class="n">rgBindings</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">obValue</span> <span class="o">+</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">ISequentialStream</span><span class="o">*</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">		<span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">		<span class="n">puDataLen</span><span class="p">[</span><span class="n">ulBindCnt</span><span class="p">]</span> <span class="o">=</span> <span class="n">UPGROUND</span><span class="p">(</span><span class="n">puDataLen</span><span class="p">[</span><span class="n">ulBindCnt</span><span class="p">]);</span>
+</span></span><span class="line"><span class="cl">		<span class="c1">//判断当前是否需要创建单独的访问器
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>		<span class="k">if</span> <span class="p">((</span><span class="n">uBlob</span> <span class="o">||</span> <span class="n">rgBindings</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">iOrdinal</span> <span class="o">==</span> <span class="mi">0</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl">		<span class="p">{</span>
+</span></span><span class="line"><span class="cl">			<span class="n">ulBindCnt</span><span class="o">++</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">			<span class="n">ppBindings</span> <span class="o">=</span> <span class="p">(</span><span class="n">DBBINDING</span><span class="o">**</span><span class="p">)</span><span class="n">COM_REALLOC</span><span class="p">(</span><span class="n">ppBindings</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">DBBINDING</span><span class="o">*</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">ulBindCnt</span> <span class="o">+</span> <span class="mi">1</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">			<span class="n">puDataLen</span> <span class="o">=</span> <span class="p">(</span><span class="n">DWORD</span><span class="o">*</span><span class="p">)</span><span class="n">COM_REALLOC</span><span class="p">(</span><span class="n">puDataLen</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">DWORD</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">ulBindCnt</span> <span class="o">+</span> <span class="mi">1</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">			<span class="n">pulColCnt</span> <span class="o">=</span> <span class="p">(</span><span class="n">DWORD</span><span class="o">*</span><span class="p">)</span><span class="n">COM_REALLOC</span><span class="p">(</span><span class="n">pulColCnt</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">DWORD</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">ulBindCnt</span> <span class="o">+</span> <span class="mi">1</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">		<span class="p">}</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="c1">//创建访问器
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="n">phAccessor</span> <span class="o">=</span> <span class="p">(</span><span class="n">HACCESSOR</span><span class="o">*</span><span class="p">)</span><span class="n">COM_ALLOC</span><span class="p">(</span> <span class="p">(</span><span class="n">ulBindCnt</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">HACCESSOR</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">	<span class="n">hRes</span> <span class="o">=</span> <span class="n">pIRowset</span><span class="o">-&gt;</span><span class="n">QueryInterface</span><span class="p">(</span><span class="n">IID_IAccessor</span><span class="p">,</span> <span class="p">(</span><span class="kt">void</span><span class="o">**</span><span class="p">)</span><span class="o">&amp;</span><span class="n">pIAccessor</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="n">COM_SUCCESS</span><span class="p">(</span><span class="n">hRes</span><span class="p">,</span> <span class="n">_T</span><span class="p">(</span><span class="s">&#34;查询IAccessor接口失败，错误码为:%08x</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">),</span> <span class="n">hRes</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">ulBindCnt</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">	<span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="n">hRes</span> <span class="o">=</span> <span class="n">pIAccessor</span><span class="o">-&gt;</span><span class="n">CreateAccessor</span><span class="p">(</span><span class="n">DBACCESSOR_ROWDATA</span><span class="p">,</span> <span class="n">pulColCnt</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">ppBindings</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="mi">0</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">phAccessor</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="nb">NULL</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">		<span class="n">COM_SUCCESS</span><span class="p">(</span><span class="n">hRes</span><span class="p">,</span> <span class="n">_T</span><span class="p">(</span><span class="s">&#34;创建访问器失败，错误码为:%08x</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">),</span> <span class="n">hRes</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="c1">//读取其中的一行数据
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="n">hRes</span> <span class="o">=</span> <span class="n">pIRowset</span><span class="o">-&gt;</span><span class="n">GetNextRows</span><span class="p">(</span><span class="n">DB_NULL_HCHAPTER</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">ulGetRows</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">hRow</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="n">COM_SUCCESS</span><span class="p">(</span><span class="n">hRes</span><span class="p">,</span> <span class="n">_T</span><span class="p">(</span><span class="s">&#34;读取行数据失败，错误码为:%08x</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">),</span> <span class="n">hRes</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="c1">//读取第一个绑定结构中的信息
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="n">pData1</span> <span class="o">=</span> <span class="n">COM_ALLOC</span><span class="p">(</span><span class="n">puDataLen</span><span class="p">[</span><span class="mi">0</span><span class="p">]);</span>
+</span></span><span class="line"><span class="cl">	<span class="n">hRes</span> <span class="o">=</span> <span class="n">pIRowset</span><span class="o">-&gt;</span><span class="n">GetData</span><span class="p">(</span><span class="n">hRow</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">phAccessor</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">pData1</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="k">for</span><span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">pulColCnt</span><span class="p">[</span><span class="mi">0</span><span class="p">];</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">	<span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="k">if</span> <span class="p">(</span><span class="n">ppBindings</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="n">i</span><span class="p">].</span><span class="n">wType</span> <span class="o">==</span> <span class="n">DBTYPE_IUNKNOWN</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">		<span class="p">{</span>
+</span></span><span class="line"><span class="cl">			<span class="n">DBSTATUS</span> <span class="n">dbStatus</span> <span class="o">=</span> <span class="o">*</span><span class="p">(</span><span class="n">DBSTATUS</span><span class="o">*</span><span class="p">)((</span><span class="n">BYTE</span><span class="o">*</span><span class="p">)</span><span class="n">pData1</span> <span class="o">+</span> <span class="n">ppBindings</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="n">i</span><span class="p">].</span><span class="n">obStatus</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">			<span class="k">if</span> <span class="p">(</span><span class="n">dbStatus</span> <span class="o">==</span> <span class="n">DBSTATUS_S_OK</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">			<span class="p">{</span>
+</span></span><span class="line"><span class="cl">				<span class="n">ULONG</span> <span class="n">uFileLen</span> <span class="o">=</span> <span class="o">*</span><span class="p">(</span><span class="n">ULONG</span><span class="o">*</span><span class="p">)((</span><span class="n">BYTE</span><span class="o">*</span><span class="p">)</span><span class="n">pData1</span> <span class="o">+</span> <span class="n">ppBindings</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="n">i</span><span class="p">].</span><span class="n">obLength</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">				<span class="k">if</span> <span class="p">(</span><span class="n">uFileLen</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">				<span class="p">{</span>
+</span></span><span class="line"><span class="cl">					<span class="n">DWORD</span> <span class="n">dwReaded</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">					<span class="n">PVOID</span> <span class="n">pFileData</span> <span class="o">=</span> <span class="n">COM_ALLOC</span><span class="p">(</span><span class="n">uFileLen</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">					<span class="n">ZeroMemory</span><span class="p">(</span><span class="n">pFileData</span><span class="p">,</span> <span class="n">uFileLen</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">					<span class="n">ISequentialStream</span>  <span class="o">*</span><span class="n">pSeqStream</span> <span class="o">=</span> <span class="o">*</span><span class="p">(</span><span class="n">ISequentialStream</span><span class="o">**</span><span class="p">)((</span><span class="n">BYTE</span><span class="o">*</span><span class="p">)</span><span class="n">pData1</span> <span class="o">+</span> <span class="n">ppBindings</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="n">i</span><span class="p">].</span><span class="n">obValue</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">					<span class="n">pSeqStream</span><span class="o">-&gt;</span><span class="n">Read</span><span class="p">(</span><span class="n">pFileData</span><span class="p">,</span> <span class="n">uFileLen</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">dwReaded</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">					<span class="n">WriteFileData</span><span class="p">(</span><span class="n">_T</span><span class="p">(</span><span class="s">&#34;1.txt&#34;</span><span class="p">),</span> <span class="n">pFileData</span><span class="p">,</span> <span class="n">dwReaded</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">				<span class="p">}</span>
+</span></span><span class="line"><span class="cl">			<span class="p">}</span>
+</span></span><span class="line"><span class="cl">		<span class="p">}</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="c1">//后续的部分就不再写出来了,写法与上面的代码类似
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="n">pIRowset</span><span class="o">-&gt;</span><span class="n">ReleaseRows</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">hRow</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="nl">__CLEAR_UP</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">  <span class="c1">//后面是清理的代码
+</span></span></span></code></pre></div><p>由于我们事先知道数据表的结构，它有3个BLOB型数据，所以这里直接定义了3个缓冲用来接收3个BLOB型数据。为了方便检测，我们另外写了一个的函数，将读取出来的BLOB数据写入到文件中，事后以文件显示是否正确来测试这段代码
+首先还是与以前一样，获取数据表的结构，然后进行绑定，注意这里由于使用的是SQL Server，它不支持一个访问器中访问多个BLOB，所以这里没有判断直接绑定不同的访问器。
+在绑定的时候使用ulBindCnt作为当前访问器的数量，在循环里面有一个判断当(uBlob || rgBindings[i].iOrdinal == 0) &amp;&amp; (ulBindCnt != cColumns - 1)条件成立时将访问器的数量加1，该条件表示之前已经有blob型数据（之前SQL不支持一个访问器访问多个BLOB，如果之前已经有BLOB数据了，就需要另外创建访问器）或者当前是第0行（因为第0行只允许读，所以将其作为与BLOB型数据一样处理），当这些条件成立时会新增一个访问器，而随着访问器的增加，需要改变ppBindings数组中的元素，该数组存储的是访问器对应的绑定结构开始的指针。数组puDataLen表示的是当前访问器所需内存的大小，pulColCnt表示当前访问器中共有多少列，针对这个表最终这些结构的内容大致如下图：
+<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="/oledb-and-ado-11/1.png"
+        data-srcset="/oledb-and-ado-11/1.png, /oledb-and-ado-11/1.png 1.5x, /oledb-and-ado-11/1.png 2x"
+        data-sizes="auto"
+        alt="/oledb-and-ado-11/1.png"
+        title="各个数组元素图" />
+绑定完成之后，后面就是根据数组中的内容创建对应的访问器，然后绑定、读取数据，针对BLOB数据，我们还是一样从对应缓冲的obValue偏移处得到接口指针，然后调用接口的Read方法读取，最后写入文件</p>
+<h2 id="blob数据的写入">BLOB数据的写入:</h2>
+<p>要写入BLOB型数据也需要使用ISequentialStream接口,但是它不像之前可以直接使用接口的Write方法，写入的对象必须要自己从ISequentialStream接口派生，并指定一段内存作为缓冲，以便供OLEDB组件调用写方法时作为数据缓冲。这段缓冲必须要保证分配在COM堆上，也就是要使用CoTaskMemory分配内存。
+这里涉及到的对象主要有IStream、ISequentialStream、IStorage、ILockBytes，同样，并不是所有数据源都支持这4类对象，具体支持哪些可以查询DBPROPSET_DATASOURCEINFO属性集中的DBPROP_STRUCTUREDSTORAGE属性来判定，目前SQL Server中支持ISequentialStream接口。
+虽然我们可以使用这种方式来实现读写BLOB，但是每种数据源支持的程度不同，而且有的数据源甚至不支持这种方式，为了查询对读写BLOB数据支持到何种程度，可以查询DBPROPSET_DATASOURCEINFO属性集合的DBPROP_OLEOBJECTS属性来判定
+通常有以下几种支持方式(DBPROP_OLEOBJECTS属性的值,按位设置):</p>
+<ol>
+<li>DBPROPVAL_OO_BLOB: 就是之前介绍的接口方式，使用接口的方式来读写BLOB数据
+DBPROPVAL_OO_DIRECTBIND: 可以直接绑定在行中,通过行访问器像普通列一样访问，也就是说它不需要获取专门的指针来操作，他可以就像操作普通数据那样，分配对应内存就可以访问，但是要注意分配内存的大小，每行中对应列中BLOB的数据长度差别可能会很明显，比如有的可能是一部长达2小时的电影文件，而有的可能是一部短视频，它们之间的差距可能会达到上G，而按照最小的来可能会发生截断，按最大的分配可能会发生多达好几个G的内存浪费
+DBPROPVAL_OO_IPERSIST:通过IPersistStream, IPersistStreamInit, or IPersistStorage三个接口的Persist对象访问
+DBPROPVAL_OO_ROWOBJECT: 支持整行作为一个对象来访问,通过结果集对象的IGetRow接口来获得行对象，但是这种模式会破坏第三范式，所以一般数据库都不支持
+DBPROPVAL_OO_SCOPED: 通过IScopedOperations接口来暴露行对象,通过这个接口可以暴露一个树形的结果集对象
+DBPROPVAL_OO_SINGLETON: 直接通过ICommand::Execute和IOpenRowset::OpenRowset来打开行对象
+下面是插入BLOB数据的一个实例</li>
+</ol>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="c1">//自定义一个
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="k">class</span> <span class="nc">CSeqStream</span> <span class="o">:</span> <span class="k">public</span> <span class="n">ISequentialStream</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl"><span class="k">public</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">	<span class="c1">// Constructors
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="n">CSeqStream</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">	<span class="k">virtual</span> <span class="o">~</span><span class="n">CSeqStream</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl"><span class="k">public</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">	<span class="k">virtual</span> <span class="n">BOOL</span> <span class="n">Seek</span><span class="p">(</span><span class="n">ULONG</span> <span class="n">iPos</span><span class="p">);</span> <span class="c1">//将当前内存指针偏移到指定位置
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="k">virtual</span> <span class="n">BOOL</span> <span class="nf">CompareData</span><span class="p">(</span><span class="kt">void</span><span class="o">*</span> <span class="n">pBuffer</span><span class="p">);</span> <span class="c1">//比较两段内存中的值
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="k">virtual</span> <span class="n">ULONG</span> <span class="nf">Length</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">	<span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="k">return</span> <span class="n">m_cBufSize</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="p">};</span>
+</span></span><span class="line"><span class="cl">	<span class="k">virtual</span> <span class="k">operator</span> <span class="kt">void</span><span class="o">*</span> <span class="nf">const</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">	<span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="k">return</span> <span class="n">m_pBuffer</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="p">};</span>
+</span></span><span class="line"><span class="cl"><span class="k">public</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">	<span class="n">STDMETHODIMP_</span><span class="p">(</span><span class="n">ULONG</span><span class="p">)</span> <span class="n">AddRef</span><span class="p">(</span><span class="kt">void</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="n">STDMETHODIMP_</span><span class="p">(</span><span class="n">ULONG</span><span class="p">)</span> <span class="n">Release</span><span class="p">(</span><span class="kt">void</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="n">STDMETHODIMP</span> <span class="nf">QueryInterface</span><span class="p">(</span><span class="n">REFIID</span> <span class="n">riid</span><span class="p">,</span> <span class="n">LPVOID</span> <span class="o">*</span><span class="n">ppv</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="c1">//读写内存的操作，这些是必须实现的函数
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="n">STDMETHODIMP</span> <span class="nf">Read</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">		<span class="cm">/* [out] */</span> <span class="kt">void</span> <span class="n">__RPC_FAR</span> <span class="o">*</span><span class="n">pv</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">		<span class="cm">/* [in]  */</span> <span class="n">ULONG</span> <span class="n">cb</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">		<span class="cm">/* [out] */</span> <span class="n">ULONG</span> <span class="n">__RPC_FAR</span> <span class="o">*</span><span class="n">pcbRead</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="n">STDMETHODIMP</span> <span class="nf">Write</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">		<span class="cm">/* [in] */</span> <span class="k">const</span> <span class="kt">void</span> <span class="n">__RPC_FAR</span> <span class="o">*</span><span class="n">pv</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">		<span class="cm">/* [in] */</span> <span class="n">ULONG</span> <span class="n">cb</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">		<span class="cm">/* [out]*/</span> <span class="n">ULONG</span> <span class="n">__RPC_FAR</span> <span class="o">*</span><span class="n">pcbWritten</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="k">private</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">	<span class="n">ULONG</span> <span class="n">m_cRef</span><span class="p">;</span>       <span class="c1">// reference count
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="kt">void</span><span class="o">*</span> <span class="n">m_pBuffer</span><span class="p">;</span>    <span class="c1">// buffer
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="n">ULONG</span> <span class="n">m_cBufSize</span><span class="p">;</span>   <span class="c1">// buffer size
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="n">ULONG</span> <span class="n">m_iPos</span><span class="p">;</span>       <span class="c1">// current index position in the buffer
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">};</span>
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="c1">//插入数据第一列BLOB数据
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="c1">//这里由于已经事先知道每列的数据结构，因此采用偷懒的方法，一行行的插入
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="n">pData1</span> <span class="o">=</span> <span class="n">HeapAlloc</span><span class="p">(</span><span class="n">GetProcessHeap</span><span class="p">(),</span> <span class="n">HEAP_ZERO_MEMORY</span><span class="p">,</span> <span class="n">pdwDataLen</span><span class="p">[</span><span class="n">nCol</span><span class="p">]);</span>
+</span></span><span class="line"><span class="cl">	<span class="k">for</span><span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">pulColCnt</span><span class="p">[</span><span class="n">nCol</span><span class="p">];</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">	<span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="k">if</span> <span class="p">(</span><span class="n">DBTYPE_IUNKNOWN</span> <span class="o">==</span> <span class="n">ppBindings</span><span class="p">[</span><span class="n">nCol</span><span class="p">][</span><span class="n">i</span><span class="p">].</span><span class="n">wType</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">		<span class="p">{</span>
+</span></span><span class="line"><span class="cl">			<span class="o">*</span><span class="p">(</span><span class="n">DBSTATUS</span><span class="o">*</span><span class="p">)((</span><span class="n">BYTE</span><span class="o">*</span><span class="p">)</span><span class="n">pData1</span> <span class="o">+</span> <span class="n">ppBindings</span><span class="p">[</span><span class="n">nCol</span><span class="p">][</span><span class="n">i</span><span class="p">].</span><span class="n">obStatus</span><span class="p">)</span> <span class="o">=</span> <span class="n">DBSTATUS_S_OK</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">			<span class="n">CSeqStream</span> <span class="o">*</span><span class="n">pSeqStream</span> <span class="o">=</span> <span class="k">new</span> <span class="n">CSeqStream</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">			<span class="n">GetFileData</span><span class="p">(</span><span class="n">_T</span><span class="p">(</span><span class="s">&#34;test.txt&#34;</span><span class="p">),</span> <span class="n">dwFileLen</span><span class="p">,</span> <span class="n">pFileData</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">			<span class="n">pSeqStream</span><span class="o">-&gt;</span><span class="n">Write</span><span class="p">(</span><span class="n">pFileData</span><span class="p">,</span> <span class="n">dwFileLen</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">dwWritten</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">			<span class="n">pSeqStream</span><span class="o">-&gt;</span><span class="n">Seek</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span> <span class="c1">//写这个操作将缓存的指针偏移到了最后，需要调整一下，以便OLEDB组件在插入BLOB数据时从缓存中读取
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>			<span class="n">HeapFree</span><span class="p">(</span><span class="n">GetProcessHeap</span><span class="p">(),</span> <span class="mi">0</span><span class="p">,</span> <span class="n">pFileData</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">			<span class="o">*</span><span class="p">(</span><span class="n">ULONG</span><span class="o">*</span><span class="p">)((</span><span class="n">BYTE</span><span class="o">*</span><span class="p">)</span><span class="n">pData1</span> <span class="o">+</span> <span class="n">ppBindings</span><span class="p">[</span><span class="n">nCol</span><span class="p">][</span><span class="n">i</span><span class="p">].</span><span class="n">obLength</span><span class="p">)</span> <span class="o">=</span> <span class="n">dwFileLen</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">			<span class="o">*</span><span class="p">(</span><span class="n">ISequentialStream</span><span class="o">**</span><span class="p">)((</span><span class="n">BYTE</span><span class="o">*</span><span class="p">)</span><span class="n">pData1</span> <span class="o">+</span> <span class="n">ppBindings</span><span class="p">[</span><span class="n">nCol</span><span class="p">][</span><span class="n">i</span><span class="p">].</span><span class="n">obValue</span><span class="p">)</span> <span class="o">=</span> <span class="n">pSeqStream</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">			<span class="c1">//此处不用release pSeqStream，COM组件会自动释放
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>		<span class="p">}</span><span class="k">else</span>
+</span></span><span class="line"><span class="cl">		<span class="p">{</span>
+</span></span><span class="line"><span class="cl">			<span class="c1">//根据数据库定义，此处应该为ID
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>			<span class="o">*</span><span class="p">(</span><span class="n">ULONG</span><span class="o">*</span><span class="p">)((</span><span class="n">BYTE</span><span class="o">*</span><span class="p">)</span><span class="n">pData1</span> <span class="o">+</span> <span class="n">ppBindings</span><span class="p">[</span><span class="n">nCol</span><span class="p">][</span><span class="n">i</span><span class="p">].</span><span class="n">obLength</span><span class="p">)</span> <span class="o">=</span> <span class="mi">10</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">			<span class="k">if</span> <span class="p">(</span><span class="n">DBTYPE_WSTR</span> <span class="o">==</span> <span class="n">ppBindings</span><span class="p">[</span><span class="n">nCol</span><span class="p">][</span><span class="n">i</span><span class="p">].</span><span class="n">wType</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">			<span class="p">{</span>
+</span></span><span class="line"><span class="cl">				<span class="n">StringCchCopy</span><span class="p">((</span><span class="n">LPOLESTR</span><span class="p">)((</span><span class="n">BYTE</span><span class="o">*</span><span class="p">)</span><span class="n">pData1</span> <span class="o">+</span> <span class="n">ppBindings</span><span class="p">[</span><span class="n">nCol</span><span class="p">][</span><span class="n">i</span><span class="p">].</span><span class="n">obValue</span><span class="p">),</span> <span class="mi">10</span><span class="p">,</span> <span class="n">SysAllocString</span><span class="p">(</span><span class="n">OLESTR</span><span class="p">(</span><span class="s">&#34;1&#34;</span><span class="p">)));</span>
+</span></span><span class="line"><span class="cl">			<span class="p">}</span>
+</span></span><span class="line"><span class="cl">		<span class="p">}</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="n">hRes</span> <span class="o">=</span> <span class="n">pIRowsetChange</span><span class="o">-&gt;</span><span class="n">InsertRow</span><span class="p">(</span><span class="n">DB_NULL_HCHAPTER</span><span class="p">,</span> <span class="n">phAccessor</span><span class="p">[</span><span class="n">nCol</span><span class="p">],</span> <span class="n">pData1</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">hNewRow</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="n">COM_SUCCESS</span><span class="p">(</span><span class="n">hRes</span><span class="p">,</span> <span class="n">_T</span><span class="p">(</span><span class="s">&#34;插入第1列BLOB数据失败，错误码为:%08x</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">),</span> <span class="n">hRes</span><span class="p">);</span>
+</span></span></code></pre></div><p>在上面的代码中首先定义一个派生类，用来进行BLOB数据的读写，然后在后面的代码中演示了如何使用它
+在后面的一段代码中，基本步骤和之前一样，经过连接数据源、创建回话对象，打开表，然后绑定，获取行访问器，这里由于代码基本不变，为了节约篇幅所以省略它们，只贴出最重要的部分。
+在插入的代码中，首先查找访问器中的各个列的属性，如果是BLOB数据就采用BLOB数据的插入办法，否则用一般数据的插入办法。插入BLOB数据时，首先创建一个派生类的对象，注意此处由于后续要交给OLEDB组件调用，所以不能用栈内存。我们先调用类的Write方法将内存写入对应的缓冲中，然后调用Seek函数将内存指针偏移到缓冲的首地址，这个指针的作用就相当于文件的文件指针，COM组件在调用对应函数将它插入数据库时会采用这个内存的指针，所以必须将其置到首地址处。让后将对象的指针放入到对应的obvalues偏移中，设置对应的数据大小为BLOB数据的大小，最后只要像普通数据类型那样调用对应的更新方法即可实现BLOB数据的插入</p>
+<p>最后贴上两个例子的详细代码地址
+<a href="https://gitee.com/masimaro/codes/tcesnrul0g2yi76bam5dj19#Read-BLOB" target="_blank" rel="noopener noreffer ">示例1:BLOB数据的读取</a>
+<a href="https://gitee.com/masimaro/codes/tcesnrul0g2yi76bam5dj19#InsertBlob" target="_blank" rel="noopener noreffer ">示例2:BLOB数据的插入</a></p>
+</div><div class="post-footer" id="post-footer">
+    <div class="post-info">
+        <div class="post-info-line">
+            <div class="post-info-mod">
+                <span>Updated on 2018-04-20</span>
+            </div></div>
+        <div class="post-info-line">
+            <div class="post-info-md"></div>
+            <div class="post-info-share">
+                <span><a href="javascript:void(0);" title="Share on Twitter" data-sharer="twitter" data-url="http://HaiLateBoy.github.io/posts/oledb-and-ado-11/" data-title="OLEDB存取BLOB型数据" data-hashtags="OLEDB,数据库编程,VC&#43;&#43;,数据库,BLOB型数据"><i class="fab fa-twitter fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Facebook" data-sharer="facebook" data-url="http://HaiLateBoy.github.io/posts/oledb-and-ado-11/" data-hashtag="OLEDB"><i class="fab fa-facebook-square fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Hacker News" data-sharer="hackernews" data-url="http://HaiLateBoy.github.io/posts/oledb-and-ado-11/" data-title="OLEDB存取BLOB型数据"><i class="fab fa-hacker-news fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Line" data-sharer="line" data-url="http://HaiLateBoy.github.io/posts/oledb-and-ado-11/" data-title="OLEDB存取BLOB型数据"><i data-svg-src="https://cdn.jsdelivr.net/npm/simple-icons@7.3.0/icons/line.svg" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on 微博" data-sharer="weibo" data-url="http://HaiLateBoy.github.io/posts/oledb-and-ado-11/" data-title="OLEDB存取BLOB型数据"><i class="fab fa-weibo fa-fw" aria-hidden="true"></i></a></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="post-info-more">
+        <section class="post-tags"><i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/oledb/">OLEDB</a>,&nbsp;<a href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93%E7%BC%96%E7%A8%8B/">数据库编程</a>,&nbsp;<a href="/tags/vc&#43;&#43;/">VC&#43;&#43;</a>,&nbsp;<a href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93/">数据库</a>,&nbsp;<a href="/tags/blob%E5%9E%8B%E6%95%B0%E6%8D%AE/">BLOB型数据</a></section>
+        <section>
+            <span><a href="javascript:void(0);" onclick="window.history.back();">Back</a></span>&nbsp;|&nbsp;<span><a href="/">Home</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav"><a href="/posts/oledb-and-ado-10/" class="prev" rel="prev" title="OLEDB不使用SQL语句直接打开数据表"><i class="fas fa-angle-left fa-fw" aria-hidden="true"></i>OLEDB不使用SQL语句直接打开数据表</a>
+            <a href="/posts/oledb-and-ado-12/" class="next" rel="next" title="OLEDB 静态绑定和数据转化接口">OLEDB 静态绑定和数据转化接口<i class="fas fa-angle-right fa-fw" aria-hidden="true"></i></a></div>
+</div>
+</article></div>
+            </main><footer class="footer">
+        <div class="footer-container"><div class="footer-line">Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener noreffer" title="Hugo 0.121.2">Hugo</a> | Theme - <a href="https://github.com/dillonzq/LoveIt" target="_blank" rel="noopener noreffer" title="LoveIt 0.2.11"><i class="far fa-kiss-wink-heart fa-fw" aria-hidden="true"></i> LoveIt</a>
+                </div><div class="footer-line" itemscope itemtype="http://schema.org/CreativeWork"><i class="far fa-copyright fa-fw" aria-hidden="true"></i><span itemprop="copyrightYear">2022 - 2024</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="https://www.masimaro.xyz" target="_blank">Masimaro</a></span></div>
+        </div>
+    </footer></div>
+
+        <div id="fixed-buttons"><a href="#" id="back-to-top" class="fixed-button" title="Back to Top">
+                <i class="fas fa-arrow-up fa-fw" aria-hidden="true"></i>
+            </a><a href="#" id="view-comments" class="fixed-button" title="View Comments">
+                <i class="fas fa-comment fa-fw" aria-hidden="true"></i>
+            </a>
+        </div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.css"><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/autocomplete.js@0.38.1/dist/autocomplete.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lunr@2.3.9/lunr.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lazysizes@5.3.2/lazysizes.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/clipboard@2.0.11/dist/clipboard.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/sharer.js@0.5.1/sharer.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/auto-render.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/copy-tex.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/mhchem.min.js"></script><script type="text/javascript">window.config={"code":{"copyTitle":"Copy to clipboard","maxShownLines":50},"comment":{},"math":{"delimiters":[{"display":true,"left":"$$","right":"$$"},{"display":true,"left":"\\[","right":"\\]"},{"display":true,"left":"\\begin{equation}","right":"\\end{equation}"},{"display":true,"left":"\\begin{equation*}","right":"\\end{equation*}"},{"display":true,"left":"\\begin{align}","right":"\\end{align}"},{"display":true,"left":"\\begin{align*}","right":"\\end{align*}"},{"display":true,"left":"\\begin{alignat}","right":"\\end{alignat}"},{"display":true,"left":"\\begin{alignat*}","right":"\\end{alignat*}"},{"display":true,"left":"\\begin{gather}","right":"\\end{gather}"},{"display":true,"left":"\\begin{CD}","right":"\\end{CD}"},{"display":false,"left":"$","right":"$"},{"display":false,"left":"\\(","right":"\\)"}],"strict":false},"search":{"highlightTag":"em","maxResultLength":10,"noResultsFound":"No results found","snippetLength":50}};</script><script type="text/javascript" src="/js/theme.min.js"></script></body>
+</html>

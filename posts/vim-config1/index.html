@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="robots" content="noodp" />
+        <title>从零开始匹配vim(1)——选项设置 - Masimaro&#39;s blog</title><meta name="Description" content="这是我用于记录日常和学习的小站"><meta property="og:title" content="从零开始匹配vim(1)——选项设置" />
+<meta property="og:description" content="前面我们算是对 vimscript 做了一个入门，并且实现了一个 输出 hello world 的语句。现在我们继续进行 vimscript 的学习。 set语句 之前在介绍 vim 基础的时候，我们说要开启或者关闭" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://HaiLateBoy.github.io/posts/vim-config1/" /><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2022-07-11T14:42:42+08:00" />
+<meta property="article:modified_time" content="2022-07-11T14:42:42+08:00" /><meta property="og:site_name" content="Masimaro&#39;s blog" />
+
+<meta name="twitter:card" content="summary"/><meta name="twitter:title" content="从零开始匹配vim(1)——选项设置"/>
+<meta name="twitter:description" content="前面我们算是对 vimscript 做了一个入门，并且实现了一个 输出 hello world 的语句。现在我们继续进行 vimscript 的学习。 set语句 之前在介绍 vim 基础的时候，我们说要开启或者关闭"/>
+<meta name="application-name" content="My cool site">
+<meta name="apple-mobile-web-app-title" content="My cool site"><meta name="theme-color" content="#ffffff"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="manifest" href="/site.webmanifest"><link rel="canonical" href="http://HaiLateBoy.github.io/posts/vim-config1/" /><link rel="prev" href="http://HaiLateBoy.github.io/posts/vim-config0/" /><link rel="next" href="http://HaiLateBoy.github.io/posts/vim-config2/" /><link rel="stylesheet" href="/css/style.min.css"><link rel="preload" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css"></noscript><link rel="preload" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css"></noscript><script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "BlogPosting",
+        "headline": "从零开始匹配vim(1)——选项设置",
+        "inLanguage": "zh-CN",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "http:\/\/HaiLateBoy.github.io\/posts\/vim-config1\/"
+        },"genre": "posts","keywords": "vim, 编辑工具, 文本处理, lua, 编辑器","wordcount":  1405 ,
+        "url": "http:\/\/HaiLateBoy.github.io\/posts\/vim-config1\/","datePublished": "2022-07-11T14:42:42+08:00","dateModified": "2022-07-11T14:42:42+08:00","publisher": {
+            "@type": "Organization",
+            "name": ""},"author": {
+                "@type": "Person",
+                "name": "Masimaro"
+            },"description": ""
+    }
+    </script></head>
+    <body data-header-desktop="fixed" data-header-mobile="auto"><script type="text/javascript">(window.localStorage && localStorage.getItem('theme') ? localStorage.getItem('theme') === 'dark' : ('auto' === 'auto' ? window.matchMedia('(prefers-color-scheme: dark)').matches : 'auto' === 'dark')) && document.body.setAttribute('theme', 'dark');</script>
+
+        <div id="mask"></div><div class="wrapper"><header class="desktop" id="header-desktop">
+    <div class="header-wrapper">
+        <div class="header-title">
+            <a href="/" title="Masimaro&#39;s blog">My cool site</a>
+        </div>
+        <div class="menu">
+            <div class="menu-inner"><a class="menu-item" href="/posts/" title="文章列表"> 文章 </a><a class="menu-item" href="/tags/" title="标签"> 标签 </a><a class="menu-item" href="/categories/" title="分类"> 分类 </a><a class="menu-item" href="/about" title="关于本站"> 关于 </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-desktop">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-desktop" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-desktop" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-desktop">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </span><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                    <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+                </a></div>
+        </div>
+    </div>
+</header><header class="mobile" id="header-mobile">
+    <div class="header-container">
+        <div class="header-wrapper">
+            <div class="header-title">
+                <a href="/" title="Masimaro&#39;s blog">My cool site</a>
+            </div>
+            <div class="menu-toggle" id="menu-toggle-mobile">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+        <div class="menu" id="menu-mobile"><div class="search-wrapper">
+                    <div class="search mobile" id="search-mobile">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-mobile">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-mobile" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-mobile" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-mobile">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </div>
+                    <a href="javascript:void(0);" class="search-cancel" id="search-cancel-mobile">
+                        Cancel
+                    </a>
+                </div><a class="menu-item" href="/posts/" title="文章列表">文章</a><a class="menu-item" href="/tags/" title="标签">标签</a><a class="menu-item" href="/categories/" title="分类">分类</a><a class="menu-item" href="/about" title="关于本站">关于</a><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+            </a></div>
+    </div>
+</header><div class="search-dropdown desktop">
+        <div id="search-dropdown-desktop"></div>
+    </div>
+    <div class="search-dropdown mobile">
+        <div id="search-dropdown-mobile"></div>
+    </div><main class="main">
+                <div class="container"><div class="toc" id="toc-auto">
+            <h2 class="toc-title">Contents</h2>
+            <div class="toc-content" id="toc-content-auto"></div>
+        </div><article class="page single"><h1 class="single-title animate__animated animate__flipInX">从零开始匹配vim(1)——选项设置</h1><div class="post-meta">
+            <div class="post-meta-line"><span class="post-author"><a href="https://www.masimaro.xyz" title="Author" target="_blank" rel="noopener noreffer author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Masimaro</a></span>&nbsp;<span class="post-category">included in <a href="/categories/vim-%E9%85%8D%E7%BD%AE/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>vim 配置</a></span></div>
+            <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw" aria-hidden="true"></i>&nbsp;<time datetime="2022-07-11">2022-07-11</time>&nbsp;<i class="fas fa-pencil-alt fa-fw" aria-hidden="true"></i>&nbsp;1405 words&nbsp;
+                <i class="far fa-clock fa-fw" aria-hidden="true"></i>&nbsp;3 minutes&nbsp;</div>
+        </div><div class="details toc" id="toc-static"  data-kept="true">
+                <div class="details-summary toc-title">
+                    <span>Contents</span>
+                    <span><i class="details-icon fas fa-angle-right" aria-hidden="true"></i></span>
+                </div>
+                <div class="details-content toc-content" id="toc-content-static"><nav id="TableOfContents">
+  <ul>
+    <li><a href="#set语句">set语句</a>
+      <ul>
+        <li><a href="#设置布尔值">设置布尔值</a></li>
+        <li><a href="#设置键值对">设置键值对</a></li>
+      </ul>
+    </li>
+    <li><a href="#使用-lua-设置vim属性">使用 lua 设置vim属性</a>
+      <ul>
+        <li><a href="#使用neovim提供的全局函数进行设置">使用neovim提供的全局函数进行设置</a></li>
+        <li><a href="#使用元访问器进行设置">使用元访问器进行设置</a></li>
+      </ul>
+    </li>
+    <li><a href="#总结">总结</a></li>
+  </ul>
+</nav></div>
+            </div><div class="content" id="content"><p>前面我们算是对 <code>vimscript</code> 做了一个入门，并且实现了一个 输出 <code>hello world</code> 的语句。现在我们继续进行 <code>vimscript</code> 的学习。</p>
+<h2 id="set语句">set语句</h2>
+<p>之前在介绍 <code>vim</code> 基础的时候，我们说要开启或者关闭某个属性，并且给出了相关的配置代码。那个时候已经接触了 <code>set</code> 语句了。例如我们使用 <code>set number</code> 来显示行号。这里我们可以知道 set的第一个用法：</p>
+<pre tabindex="0"><code class="language-vimscript" data-lang="vimscript">set attribute
+</code></pre><p>其中这个 <code>attribute</code> 是一个属性名称，用于开启/关闭属性。</p>
+<h3 id="设置布尔值">设置布尔值</h3>
+<p>一般在程序设计中将开启或者关闭某个特性的变量设置为 <code>bool</code> 值。在 <code>vim</code> 中也是如此，但是它的特殊性在于它并不是将这个变量设置为 <code>true</code> 或者 <code>false</code> 而是设置为 <code>name</code> 或者 <code>noname</code> 的样子。举个例子，设置显示行号使用 <code>set number</code> 设置不显示行号使用 <code>set nonumber</code> 。</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://img-blog.csdnimg.cn/6fcd4033606a4623a030b13d623fb98f.gif#pic_center"
+        data-srcset="https://img-blog.csdnimg.cn/6fcd4033606a4623a030b13d623fb98f.gif#pic_center, https://img-blog.csdnimg.cn/6fcd4033606a4623a030b13d623fb98f.gif#pic_center 1.5x, https://img-blog.csdnimg.cn/6fcd4033606a4623a030b13d623fb98f.gif#pic_center 2x"
+        data-sizes="auto"
+        alt="https://img-blog.csdnimg.cn/6fcd4033606a4623a030b13d623fb98f.gif#pic_center"
+        title="在这里插入图片描述" />
+另外对于 <code>bool</code> 类型的属性值还可以使用 <code>!</code> 来对现有值进行取反，使用 <code>?</code> 来查看当前使用的值。例如，如果当前不显示行号 <code>set number!</code> 会显示行号，再次执行则 <code>:set number!</code> 则不会执行。我们可以使用 <code>set number?</code> 来查看当前是否显示行号
+<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://img-blog.csdnimg.cn/eba5c86e2ceb4a139b1313b84a4a61b1.gif#pic_center"
+        data-srcset="https://img-blog.csdnimg.cn/eba5c86e2ceb4a139b1313b84a4a61b1.gif#pic_center, https://img-blog.csdnimg.cn/eba5c86e2ceb4a139b1313b84a4a61b1.gif#pic_center 1.5x, https://img-blog.csdnimg.cn/eba5c86e2ceb4a139b1313b84a4a61b1.gif#pic_center 2x"
+        data-sizes="auto"
+        alt="https://img-blog.csdnimg.cn/eba5c86e2ceb4a139b1313b84a4a61b1.gif#pic_center"
+        title="在这里插入图片描述" />
+下面我们来执行这么一个例子</p>
+<pre tabindex="0"><code class="language-vimscript" data-lang="vimscript">set number
+set number?
+set number!
+set number?
+</code></pre><p>第一个 <code>set number?</code> 应该会返回 <code>number</code> 而第二个应该会返回 <code>nonumber</code></p>
+<h3 id="设置键值对">设置键值对</h3>
+<p>有些值是属于 <code>bool</code> 类型，我们只需要 <code>set</code> 某一选项即可。但是有些属性并不适合设计成 <code>bool</code> 类型，例如窗口宽度、高度等等。他们更适合做成一个键值对的形式。针对这种形式的属性，我们直接使用 <code>set key=value</code> 的形式。例如 <code>set columns=80</code> 。对于这种类型的属性仍然可以使用 <code>?</code> 来显示当前的值。例如 <code>set columns?</code> 来显示当前每行的最大字符长度。
+<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://img-blog.csdnimg.cn/bc45300b727c4490957efa923b4ccd3b.gif#pic_center"
+        data-srcset="https://img-blog.csdnimg.cn/bc45300b727c4490957efa923b4ccd3b.gif#pic_center, https://img-blog.csdnimg.cn/bc45300b727c4490957efa923b4ccd3b.gif#pic_center 1.5x, https://img-blog.csdnimg.cn/bc45300b727c4490957efa923b4ccd3b.gif#pic_center 2x"
+        data-sizes="auto"
+        alt="https://img-blog.csdnimg.cn/bc45300b727c4490957efa923b4ccd3b.gif#pic_center"
+        title="在这里插入图片描述" />
+当然，与其他编程语言类似，我们也可以使用 <code>set</code> 语句，一次性给多个属性进行赋值，例如</p>
+<pre tabindex="0"><code class="language-vimscript" data-lang="vimscript">set number columns=80
+</code></pre><p>只是一般编程语言多个变量的赋值使用 <code>,</code> 作为分割，但是 <code>vimscript</code> 中使用 空格。</p>
+<h2 id="使用-lua-设置vim属性">使用 lua 设置vim属性</h2>
+<p>作为一门更加规范的编程语言，<code>lua</code> 提供了多种方式来对这些变量进行赋值。目前有如下办法能对这些属性进行赋值。</p>
+<h3 id="使用neovim提供的全局函数进行设置">使用neovim提供的全局函数进行设置</h3>
+<p><code>neovim</code> 中提供了一组函数来设置这些属性。常见的分为三类：</p>
+<ol>
+<li>设置全局属性
+a.  <code>vim.api.nvim_set_option()</code> ：设置值
+b.  <code>vim.api.nvim_get_option()</code> : 获取值</li>
+<li>设置窗口相关属性
+a.  <code>vim.api.nvim_win_set_option()</code> : 设置值
+b.  <code>vim.api.nvim_win_get_option()</code>: 获取值</li>
+<li>设置缓冲区相关属性
+a. <code>vim.api.nvim_buf_set_option()</code> ：设置值
+b. <code>vim.api.nvim_buf_set_option()</code> : 获取值</li>
+</ol>
+<p>例如我们可以使用 <code>vim.api.nvim_set_option('number', true)</code> 来设置 显示行号。使用这些函数时需要严格区分对应属性是 <code>bool</code>、数字或者字符串类型。在 <code>vimscript</code> 中则没有这么严格的区分。</p>
+<h3 id="使用元访问器进行设置">使用元访问器进行设置</h3>
+<p><code>neovim</code> 的接口针对上述这些函数进行了一定的封装，提供了一组元访问器，以便我们能够像使用普通变量一样使用这些属性值。至于什么是元访问器暂时不用关心，只需要知道我们可以像使用变量一样来设置和获得这些属性，但是本质上还是在调用上述那些函数。</p>
+<p>针对上述函数，我们可以使用如下几种访问对象：</p>
+<ol>
+<li>vim.o: 全局属性，我们可以利用 options来记忆</li>
+<li>vim.bo:   缓冲区属性，我们可以利用 buffer-option来记忆</li>
+<li>vim.wo: 窗口属性, 我们可以利用 window-option来记忆</li>
+</ol>
+<p>例如我们可以使用 <code>vim.o.number = true</code> 或者 <code>vim.o.columns = 80</code> 来设置对应选项。等效于 <code>vim.api.nvim_set_option(&quot;number&quot;, true)</code> 和 <code>vim.api.nvim_set_option(&quot;columns&quot;, 80)</code></p>
+<h2 id="总结">总结</h2>
+<p>通过这篇文章，我们讨论了使用 <code>set</code> 来设置一些选项，并且给出了对应的使用 <code>lua</code> 来设置的方法。下面小伙伴们要做的就是读一下 <code>vim</code> 的用户手册，根据自己的喜好尝试着设置一些其他选项。
+例如我喜欢的基本配置如下:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-lua" data-lang="lua"><span class="line"><span class="cl"><span class="n">vim.o</span><span class="p">.</span><span class="n">syntax</span> <span class="o">=</span> <span class="s2">&#34;enable&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="n">vim.o</span><span class="p">.</span><span class="n">relativenumber</span> <span class="o">=</span> <span class="kc">true</span>
+</span></span><span class="line"><span class="cl"><span class="n">vim.o</span><span class="p">.</span><span class="n">number</span> <span class="o">=</span> <span class="kc">true</span>
+</span></span><span class="line"><span class="cl"><span class="n">vim.o</span><span class="p">.</span><span class="n">wrap</span> <span class="o">=</span> <span class="kc">true</span>
+</span></span><span class="line"><span class="cl"><span class="n">vim.o</span><span class="p">.</span><span class="n">ruler</span> <span class="o">=</span> <span class="kc">true</span>
+</span></span><span class="line"><span class="cl"><span class="n">vim.o</span><span class="p">.</span><span class="n">incsearch</span> <span class="o">=</span> <span class="kc">true</span>
+</span></span><span class="line"><span class="cl"><span class="n">vim.o</span><span class="p">.</span><span class="n">softtabstop</span> <span class="o">=</span> <span class="mi">4</span>
+</span></span><span class="line"><span class="cl"><span class="n">vim.o</span><span class="p">.</span><span class="n">shiftwidth</span> <span class="o">=</span> <span class="mi">4</span>
+</span></span><span class="line"><span class="cl"><span class="n">vim.o</span><span class="p">.</span><span class="n">expandtab</span> <span class="o">=</span> <span class="kc">true</span>
+</span></span></code></pre></div><p>如果是vim可能需要的配置更多，但是 <code>neovim</code> 没有历史包袱，默认的已经很好用了</p>
+<p>最后，目前教程采取这种 <code>vimscript</code> 穿插着 <code>lua</code> 的方式进行讲解，后续配置虽然主要以 <code>lua</code> 为主，但是有时候又离不开 <code>vimscript</code>，<code>neovim</code>并没有完全开放 <code>vim</code> 的内置功能，有些功能只能使用 <code>vimscript</code> 来实现。</p>
+<p>目前我不太确定是继续采用这种 <code>vimscript</code> 穿插着 <code>lua</code> 进行讲解还是采用将 <code>vimscript</code> 和 <code>lua</code> 分开进行讲述。各位小伙伴觉得哪种方式更能接受呢？</p>
+</div><div class="post-footer" id="post-footer">
+    <div class="post-info">
+        <div class="post-info-line">
+            <div class="post-info-mod">
+                <span>Updated on 2022-07-11</span>
+            </div></div>
+        <div class="post-info-line">
+            <div class="post-info-md"></div>
+            <div class="post-info-share">
+                <span><a href="javascript:void(0);" title="Share on Twitter" data-sharer="twitter" data-url="http://HaiLateBoy.github.io/posts/vim-config1/" data-title="从零开始匹配vim(1)——选项设置" data-hashtags="vim,编辑工具,文本处理,lua,编辑器"><i class="fab fa-twitter fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Facebook" data-sharer="facebook" data-url="http://HaiLateBoy.github.io/posts/vim-config1/" data-hashtag="vim"><i class="fab fa-facebook-square fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Hacker News" data-sharer="hackernews" data-url="http://HaiLateBoy.github.io/posts/vim-config1/" data-title="从零开始匹配vim(1)——选项设置"><i class="fab fa-hacker-news fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Line" data-sharer="line" data-url="http://HaiLateBoy.github.io/posts/vim-config1/" data-title="从零开始匹配vim(1)——选项设置"><i data-svg-src="https://cdn.jsdelivr.net/npm/simple-icons@7.3.0/icons/line.svg" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on 微博" data-sharer="weibo" data-url="http://HaiLateBoy.github.io/posts/vim-config1/" data-title="从零开始匹配vim(1)——选项设置"><i class="fab fa-weibo fa-fw" aria-hidden="true"></i></a></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="post-info-more">
+        <section class="post-tags"><i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/vim/">vim</a>,&nbsp;<a href="/tags/%E7%BC%96%E8%BE%91%E5%B7%A5%E5%85%B7/">编辑工具</a>,&nbsp;<a href="/tags/%E6%96%87%E6%9C%AC%E5%A4%84%E7%90%86/">文本处理</a>,&nbsp;<a href="/tags/lua/">lua</a>,&nbsp;<a href="/tags/%E7%BC%96%E8%BE%91%E5%99%A8/">编辑器</a></section>
+        <section>
+            <span><a href="javascript:void(0);" onclick="window.history.back();">Back</a></span>&nbsp;|&nbsp;<span><a href="/">Home</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav"><a href="/posts/vim-config0/" class="prev" rel="prev" title="从零开始匹配vim(0)——vimscript 简介"><i class="fas fa-angle-left fa-fw" aria-hidden="true"></i>从零开始匹配vim(0)——vimscript 简介</a>
+            <a href="/posts/vim-config2/" class="next" rel="next" title="从零开始匹配vim(2)——快捷键绑定">从零开始匹配vim(2)——快捷键绑定<i class="fas fa-angle-right fa-fw" aria-hidden="true"></i></a></div>
+</div>
+</article></div>
+            </main><footer class="footer">
+        <div class="footer-container"><div class="footer-line">Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener noreffer" title="Hugo 0.121.2">Hugo</a> | Theme - <a href="https://github.com/dillonzq/LoveIt" target="_blank" rel="noopener noreffer" title="LoveIt 0.2.11"><i class="far fa-kiss-wink-heart fa-fw" aria-hidden="true"></i> LoveIt</a>
+                </div><div class="footer-line" itemscope itemtype="http://schema.org/CreativeWork"><i class="far fa-copyright fa-fw" aria-hidden="true"></i><span itemprop="copyrightYear">2022 - 2024</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="https://www.masimaro.xyz" target="_blank">Masimaro</a></span></div>
+        </div>
+    </footer></div>
+
+        <div id="fixed-buttons"><a href="#" id="back-to-top" class="fixed-button" title="Back to Top">
+                <i class="fas fa-arrow-up fa-fw" aria-hidden="true"></i>
+            </a><a href="#" id="view-comments" class="fixed-button" title="View Comments">
+                <i class="fas fa-comment fa-fw" aria-hidden="true"></i>
+            </a>
+        </div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.css"><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/autocomplete.js@0.38.1/dist/autocomplete.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lunr@2.3.9/lunr.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lazysizes@5.3.2/lazysizes.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/clipboard@2.0.11/dist/clipboard.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/sharer.js@0.5.1/sharer.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/auto-render.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/copy-tex.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/mhchem.min.js"></script><script type="text/javascript">window.config={"code":{"copyTitle":"Copy to clipboard","maxShownLines":50},"comment":{},"math":{"delimiters":[{"display":true,"left":"$$","right":"$$"},{"display":true,"left":"\\[","right":"\\]"},{"display":true,"left":"\\begin{equation}","right":"\\end{equation}"},{"display":true,"left":"\\begin{equation*}","right":"\\end{equation*}"},{"display":true,"left":"\\begin{align}","right":"\\end{align}"},{"display":true,"left":"\\begin{align*}","right":"\\end{align*}"},{"display":true,"left":"\\begin{alignat}","right":"\\end{alignat}"},{"display":true,"left":"\\begin{alignat*}","right":"\\end{alignat*}"},{"display":true,"left":"\\begin{gather}","right":"\\end{gather}"},{"display":true,"left":"\\begin{CD}","right":"\\end{CD}"},{"display":false,"left":"$","right":"$"},{"display":false,"left":"\\(","right":"\\)"}],"strict":false},"search":{"highlightTag":"em","maxResultLength":10,"noResultsFound":"No results found","snippetLength":50}};</script><script type="text/javascript" src="/js/theme.min.js"></script></body>
+</html>

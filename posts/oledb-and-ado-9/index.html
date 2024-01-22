@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="robots" content="noodp" />
+        <title>OLEDB 枚举数据源 - Masimaro&#39;s blog</title><meta name="Description" content="这是我用于记录日常和学习的小站"><meta property="og:title" content="OLEDB 枚举数据源" />
+<meta property="og:description" content="在之前的程序中，可以看到有这样一个功能，弹出一个对话框让用户选择需要连接的数据源，并输入用户名和密码，最后连接；而且在一些数据库管理软件中也" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://HaiLateBoy.github.io/posts/oledb-and-ado-9/" /><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2018-04-08T20:31:39+00:00" />
+<meta property="article:modified_time" content="2018-04-08T20:31:39+00:00" /><meta property="og:site_name" content="Masimaro&#39;s blog" />
+
+<meta name="twitter:card" content="summary"/><meta name="twitter:title" content="OLEDB 枚举数据源"/>
+<meta name="twitter:description" content="在之前的程序中，可以看到有这样一个功能，弹出一个对话框让用户选择需要连接的数据源，并输入用户名和密码，最后连接；而且在一些数据库管理软件中也"/>
+<meta name="application-name" content="My cool site">
+<meta name="apple-mobile-web-app-title" content="My cool site"><meta name="theme-color" content="#ffffff"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="manifest" href="/site.webmanifest"><link rel="canonical" href="http://HaiLateBoy.github.io/posts/oledb-and-ado-9/" /><link rel="prev" href="http://HaiLateBoy.github.io/posts/oledb-and-ado-8/" /><link rel="next" href="http://HaiLateBoy.github.io/posts/cpp-inherit/" /><link rel="stylesheet" href="/css/style.min.css"><link rel="preload" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css"></noscript><link rel="preload" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css"></noscript><script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "BlogPosting",
+        "headline": "OLEDB 枚举数据源",
+        "inLanguage": "zh-CN",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "http:\/\/HaiLateBoy.github.io\/posts\/oledb-and-ado-9\/"
+        },"genre": "posts","keywords": "OLEDB, 数据库编程, VC\u002b\u002b, 数据库","wordcount":  2913 ,
+        "url": "http:\/\/HaiLateBoy.github.io\/posts\/oledb-and-ado-9\/","datePublished": "2018-04-08T20:31:39+00:00","dateModified": "2018-04-08T20:31:39+00:00","publisher": {
+            "@type": "Organization",
+            "name": ""},"author": {
+                "@type": "Person",
+                "name": "Masimaro"
+            },"description": ""
+    }
+    </script></head>
+    <body data-header-desktop="fixed" data-header-mobile="auto"><script type="text/javascript">(window.localStorage && localStorage.getItem('theme') ? localStorage.getItem('theme') === 'dark' : ('auto' === 'auto' ? window.matchMedia('(prefers-color-scheme: dark)').matches : 'auto' === 'dark')) && document.body.setAttribute('theme', 'dark');</script>
+
+        <div id="mask"></div><div class="wrapper"><header class="desktop" id="header-desktop">
+    <div class="header-wrapper">
+        <div class="header-title">
+            <a href="/" title="Masimaro&#39;s blog">My cool site</a>
+        </div>
+        <div class="menu">
+            <div class="menu-inner"><a class="menu-item" href="/posts/" title="文章列表"> 文章 </a><a class="menu-item" href="/tags/" title="标签"> 标签 </a><a class="menu-item" href="/categories/" title="分类"> 分类 </a><a class="menu-item" href="/about" title="关于本站"> 关于 </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-desktop">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-desktop" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-desktop" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-desktop">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </span><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                    <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+                </a></div>
+        </div>
+    </div>
+</header><header class="mobile" id="header-mobile">
+    <div class="header-container">
+        <div class="header-wrapper">
+            <div class="header-title">
+                <a href="/" title="Masimaro&#39;s blog">My cool site</a>
+            </div>
+            <div class="menu-toggle" id="menu-toggle-mobile">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+        <div class="menu" id="menu-mobile"><div class="search-wrapper">
+                    <div class="search mobile" id="search-mobile">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-mobile">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-mobile" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-mobile" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-mobile">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </div>
+                    <a href="javascript:void(0);" class="search-cancel" id="search-cancel-mobile">
+                        Cancel
+                    </a>
+                </div><a class="menu-item" href="/posts/" title="文章列表">文章</a><a class="menu-item" href="/tags/" title="标签">标签</a><a class="menu-item" href="/categories/" title="分类">分类</a><a class="menu-item" href="/about" title="关于本站">关于</a><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+            </a></div>
+    </div>
+</header><div class="search-dropdown desktop">
+        <div id="search-dropdown-desktop"></div>
+    </div>
+    <div class="search-dropdown mobile">
+        <div id="search-dropdown-mobile"></div>
+    </div><main class="main">
+                <div class="container"><div class="toc" id="toc-auto">
+            <h2 class="toc-title">Contents</h2>
+            <div class="toc-content" id="toc-content-auto"></div>
+        </div><article class="page single"><h1 class="single-title animate__animated animate__flipInX">OLEDB 枚举数据源</h1><div class="post-meta">
+            <div class="post-meta-line"><span class="post-author"><a href="https://www.masimaro.xyz" title="Author" target="_blank" rel="noopener noreffer author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Masimaro</a></span>&nbsp;<span class="post-category">included in <a href="/categories/windows-%E6%95%B0%E6%8D%AE%E5%BA%93%E7%BC%96%E7%A8%8B/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>windows 数据库编程</a></span></div>
+            <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw" aria-hidden="true"></i>&nbsp;<time datetime="2018-04-08">2018-04-08</time>&nbsp;<i class="fas fa-pencil-alt fa-fw" aria-hidden="true"></i>&nbsp;2913 words&nbsp;
+                <i class="far fa-clock fa-fw" aria-hidden="true"></i>&nbsp;6 minutes&nbsp;</div>
+        </div><div class="details toc" id="toc-static"  data-kept="true">
+                <div class="details-summary toc-title">
+                    <span>Contents</span>
+                    <span><i class="details-icon fas fa-angle-right" aria-hidden="true"></i></span>
+                </div>
+                <div class="details-content toc-content" id="toc-content-static"><nav id="TableOfContents">
+  <ul>
+    <li><a href="#oledb提供者结果集">OLEDB提供者结果集</a></li>
+    <li><a href="#如果根据名称创建子枚举器">如果根据名称创建子枚举器</a></li>
+  </ul>
+</nav></div>
+            </div><div class="content" id="content"><p>在之前的程序中，可以看到有这样一个功能，弹出一个对话框让用户选择需要连接的数据源，并输入用户名和密码，最后连接；而且在一些数据库管理软件中也提供这种功能——能够自己枚举出系统中存在的数据源，同时还可以枚举出能够连接的SQL Server数据库的实例。其实这个功能是OLEDB提供的高级功能之一。</p>
+<!-- raw HTML omitted -->
+<p>枚举对象用于搜寻可用的数据源和其它的枚举对象(层次式)，枚举出来的对象是一个树形结构。在程序中提供一个枚举对象就可以枚举里面的所有数据源，如果没有指定所使用的的上层枚举对象，则可以使用顶层枚举对象来枚举可用的OLEDB提供程序，其实我们使用枚举对象枚举数据源时它也是在注册表的对应位置进行搜索，所以我们可以直接利用操作注册表的方式来获取数据源对象，但是注册表中的信息过于复杂，而且系统对注册表的依赖比较严重，所以并不推荐使用这种方式。
+枚举对象的原型如下:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="n">CoType</span> <span class="n">TEnumerator</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">   <span class="p">[</span><span class="n">mandatory</span><span class="p">]</span>   <span class="n">IParseDisplayName</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">   <span class="p">[</span><span class="n">mandatory</span><span class="p">]</span>   <span class="n">ISourcesRowset</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">   <span class="p">[</span><span class="n">optional</span><span class="p">]</span>    <span class="n">IDBInitialize</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">   <span class="p">[</span><span class="n">optional</span><span class="p">]</span>    <span class="n">IDBProperties</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">   <span class="p">[</span><span class="n">optional</span><span class="p">]</span>    <span class="n">ISupportErrorInfo</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><h1 id="顶层枚举对象的获取和遍历">顶层枚举对象的获取和遍历</h1>
+<p>要利用数据源枚举功能，第一个要获取的枚举对象就是顶层枚举对象。或者称之为根枚举器，根枚举器对象的CLSID是CLSID_OLEDB_ENUMNRATOR，顶层枚举对象可以使用标准的COM对象创建方式来创建，之后可以使用ISourceRowset对象的GetSourcesRowset,得到数据源组合成的结果集。接着可以根据行集中的行类型来判断是否是一个子枚举对象或者数据源对象。如果是子枚举对象，可以利用名字对象的方法创建一个新的子枚举对象，然后根据这个枚举对象来枚举其中的数据源对象。
+一般来说这颗数结构只有两层。</p>
+<h2 id="oledb提供者结果集">OLEDB提供者结果集</h2>
+<p>在上面我们说可以根据结果集中的行类型来判断是否是一个子枚举对象或者数据源对象，那么怎么获取这个行类型呢？这里需要了解返回的行集的结构。</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">字段名称</th>
+<th style="text-align:left">类型</th>
+<th style="text-align:left">最大长度</th>
+<th style="text-align:left">含义描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">SOURCES_NAME</td>
+<td style="text-align:left">DBTYPE_WSTR</td>
+<td style="text-align:left">128</td>
+<td style="text-align:left">枚举对象或数据源名称</td>
+</tr>
+<tr>
+<td style="text-align:left">SOURCES_PARSENAME</td>
+<td style="text-align:left">DBTYPE_WSTR</td>
+<td style="text-align:left">128</td>
+<td style="text-align:left">可以传递给IParseDisplayName接口并得到一个moniker对象的字符串(枚举对象或数据源的moniker)</td>
+</tr>
+<tr>
+<td style="text-align:left">SOURCES_DESCRIPTION</td>
+<td style="text-align:left">DBTYPE_WSTR</td>
+<td style="text-align:left">128</td>
+<td style="text-align:left">枚举对象或数据源的描述</td>
+</tr>
+<tr>
+<td style="text-align:left">SOURCES_TYPE</td>
+<td style="text-align:left">DBTYPE_UI2</td>
+<td style="text-align:left">2(单位字节)</td>
+<td style="text-align:left">枚举对象或实例的类型,有下列值:<!-- raw HTML omitted -->DBSOURCETYPE_BINDER (=4)- URL<!-- raw HTML omitted -->DBSOURCETYPE_DATASOURCE_MDP (=3) - OLAP提供者<!-- raw HTML omitted -->DBSOURCETYPE_DATASOURCE_TDP (=1) - 关系型或表格型数据源<!-- raw HTML omitted -->DBSOURCETYPE_ENUMERATOR (=2) - 子枚举对象</td>
+</tr>
+<tr>
+<td style="text-align:left">SOURCES_ISPARENT</td>
+<td style="text-align:left">DBTYPE_BOOL</td>
+<td style="text-align:left">2(单位字节)</td>
+<td style="text-align:left">是否是父枚举器</td>
+</tr>
+<tr>
+<td style="text-align:left">在枚举时根据SOURCES_TYPE字段来判断是否是子枚举对象，如果是则使用第二列的数据获取子枚举器的对象。</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h2 id="如果根据名称创建子枚举器">如果根据名称创建子枚举器</h2>
+<p>这里需要使用IMoniker接口。
+名字对象(moniker)的创建方法,是一种标准的以名字解析方法创建一个COM对象及接口的方法。相比于直接使用CoCreateInstance来说是一种更加高级的方法。
+这是标准的COM 对象的创建方式，其原理就是通过一个全局唯一的名称在注册表中搜索得到对应的CLSID，然后根据ID调用CoCreateInstance来创建对象。具体搜索过程可以参考<a href="https://blog.csdn.net/lanuage/article/details/78266784" target="_blank" rel="noopener noreffer ">COM基础系列</a>
+在数据源枚举的应用中，先从ISourcesRowset对象中Query出IParseDisplayName接口，再调用该接口的ParseDisplayName方法传入上述表格中SOURCES_PARSENAME的值，得到IMoniker接口，最后调用全局函数BindMinker传递IMoniker接口指针并指定需要创建的接口ID。</p>
+<h1 id="具体例子">具体例子</h1>
+<p>最后是一个具体的例子
+这个例子中创建了一个MFC应用程序，最后效果类似于前面几个例子中的OLEDB的数据源选择对话框。
+在例子中最主要的代码有两段：IDBSourceDlg对话框的EnumDataSource方法，和IDBConnectDlg方法Initialize。这两个分别用来枚举系统中存在的数据源对象和数据源对象中对应的数据库实例。当用户根据界面的提示选择了对应的选项后点击测试连接按钮来尝试连接。
+这里展示的代码主要是3段，枚举数据源，枚举数据源中对应的数据库实例，以及根据选择的实例生成对应的数据源对象接口并测试连接。</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="kt">void</span> <span class="n">IDBSourceDlg</span><span class="o">::</span><span class="n">EnumDataSource</span><span class="p">(</span><span class="n">ISourcesRowset</span> <span class="o">*</span><span class="n">pISourceRowset</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">	<span class="n">COM_DECLARE_INTERFACE</span><span class="p">(</span><span class="n">IRowset</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="n">COM_DECLARE_INTERFACE</span><span class="p">(</span><span class="n">IAccessor</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="n">COM_DECLARE_INTERFACE</span><span class="p">(</span><span class="n">IMoniker</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="n">COM_DECLARE_INTERFACE</span><span class="p">(</span><span class="n">IParseDisplayName</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="n">HROW</span> <span class="o">*</span><span class="n">rgRows</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">HACCESSOR</span> <span class="n">hAccessor</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">ULONG</span> <span class="n">cRows</span> <span class="o">=</span> <span class="mi">10</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">DWORD</span> <span class="n">dwOffset</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">PVOID</span> <span class="n">pData</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">PVOID</span> <span class="n">pCurrentData</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">DBCOUNTITEM</span> <span class="n">cRowsObtained</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">LPOLESTR</span> <span class="n">lpParamName</span> <span class="o">=</span> <span class="n">OLESTR</span><span class="p">(</span><span class="s">&#34;&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="c1">//利用顶层枚举对象来枚举系统中存在的数据源
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="n">HRESULT</span> <span class="n">hRes</span> <span class="o">=</span> <span class="n">pISourceRowset</span><span class="o">-&gt;</span><span class="n">GetSourcesRowset</span><span class="p">(</span><span class="nb">NULL</span><span class="p">,</span> <span class="n">IID_IRowset</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">,</span> <span class="p">(</span><span class="n">IUnknown</span><span class="o">**</span><span class="p">)</span><span class="o">&amp;</span><span class="n">pIRowset</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="n">ISourcesRowset</span> <span class="o">*</span><span class="n">pSubSourceRowset</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">ULONG</span> <span class="n">ulEaten</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="k">if</span> <span class="p">(</span><span class="n">FAILED</span><span class="p">(</span><span class="n">hRes</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl">	<span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="n">ComMessageBox</span><span class="p">(</span><span class="nb">NULL</span><span class="p">,</span> <span class="n">_T</span><span class="p">(</span><span class="s">&#34;OLEDB 错误&#34;</span><span class="p">),</span> <span class="n">MB_OK</span><span class="p">,</span> <span class="n">__T</span><span class="p">(</span><span class="s">&#34;创建接口ISourcesRowset失败,错误码：%08x</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">),</span> <span class="n">hRes</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">		<span class="k">goto</span> <span class="n">__CLEAR_UP</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="n">DBBINDING</span> <span class="n">rgBinding</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="mi">0</span><span class="p">};</span> <span class="c1">//这里只关心我们需要的列，不需要获取所有的列
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="mi">3</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">	<span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="n">rgBinding</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">bPrecision</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">		<span class="n">rgBinding</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">bScale</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">		<span class="n">rgBinding</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">cbMaxLen</span> <span class="o">=</span> <span class="mi">128</span> <span class="o">*</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">WCHAR</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">		<span class="n">rgBinding</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">dwMemOwner</span> <span class="o">=</span> <span class="n">DBMEMOWNER_CLIENTOWNED</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">		<span class="n">rgBinding</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">dwPart</span> <span class="o">=</span> <span class="n">DBPART_VALUE</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">		<span class="n">rgBinding</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">eParamIO</span> <span class="o">=</span> <span class="n">DBPARAMIO_NOTPARAM</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">		<span class="n">rgBinding</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">wType</span> <span class="o">=</span> <span class="n">DBTYPE_WSTR</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">		<span class="n">rgBinding</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">obLength</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">		<span class="n">rgBinding</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">obStatus</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">		<span class="n">rgBinding</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">obValue</span> <span class="o">=</span> <span class="n">dwOffset</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">		<span class="n">dwOffset</span> <span class="o">+=</span> <span class="n">rgBinding</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">cbMaxLen</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="cl">	<span class="n">rgBinding</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">iOrdinal</span> <span class="o">=</span> <span class="mi">3</span><span class="p">;</span> <span class="c1">//第三项是数据源或者枚举器的描述信息,用于显示
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="n">rgBinding</span><span class="p">[</span><span class="mi">1</span><span class="p">].</span><span class="n">wType</span> <span class="o">=</span> <span class="n">DBTYPE_UI2</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">rgBinding</span><span class="p">[</span><span class="mi">1</span><span class="p">].</span><span class="n">iOrdinal</span> <span class="o">=</span> <span class="mi">4</span><span class="p">;</span> <span class="c1">//第四列是枚举出来的类型信息,用于判断是否需要递归
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="n">rgBinding</span><span class="p">[</span><span class="mi">2</span><span class="p">].</span><span class="n">iOrdinal</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span> <span class="c1">//第一列是枚举出来的类型信息，用于获取子枚举器
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>
+</span></span><span class="line"><span class="cl">	<span class="n">hRes</span> <span class="o">=</span> <span class="n">pIRowset</span><span class="o">-&gt;</span><span class="n">QueryInterface</span><span class="p">(</span><span class="n">IID_IAccessor</span><span class="p">,</span> <span class="p">(</span><span class="kt">void</span><span class="o">**</span><span class="p">)</span><span class="o">&amp;</span><span class="n">pIAccessor</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="k">if</span> <span class="p">(</span><span class="n">FAILED</span><span class="p">(</span><span class="n">hRes</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl">	<span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="n">ComMessageBox</span><span class="p">(</span><span class="nb">NULL</span><span class="p">,</span> <span class="n">_T</span><span class="p">(</span><span class="s">&#34;OLEDB 错误&#34;</span><span class="p">),</span> <span class="n">MB_OK</span><span class="p">,</span> <span class="n">__T</span><span class="p">(</span><span class="s">&#34;查询接口pIAccessor失败,错误码：%08x</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">),</span> <span class="n">hRes</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">		<span class="k">goto</span> <span class="n">__CLEAR_UP</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="cl">	<span class="n">hRes</span> <span class="o">=</span> <span class="n">pIAccessor</span><span class="o">-&gt;</span><span class="n">CreateAccessor</span><span class="p">(</span><span class="n">DBACCESSOR_ROWDATA</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">rgBinding</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">hAccessor</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="k">if</span> <span class="p">(</span><span class="n">FAILED</span><span class="p">(</span><span class="n">hRes</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl">	<span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="n">ComMessageBox</span><span class="p">(</span><span class="nb">NULL</span><span class="p">,</span> <span class="n">_T</span><span class="p">(</span><span class="s">&#34;OLEDB 错误&#34;</span><span class="p">),</span> <span class="n">MB_OK</span><span class="p">,</span> <span class="n">__T</span><span class="p">(</span><span class="s">&#34;创建访问器失败,错误码：%08x</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">),</span> <span class="n">hRes</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">		<span class="k">goto</span> <span class="n">__CLEAR_UP</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="cl">	<span class="n">pData</span> <span class="o">=</span> <span class="n">MALLOC</span><span class="p">(</span><span class="n">dwOffset</span> <span class="o">*</span> <span class="n">cRows</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="k">while</span> <span class="p">(</span><span class="n">TRUE</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">	<span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="n">hRes</span> <span class="o">=</span> <span class="n">pIRowset</span><span class="o">-&gt;</span><span class="n">GetNextRows</span><span class="p">(</span><span class="n">DB_NULL_HCHAPTER</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">cRows</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">cRowsObtained</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">rgRows</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">		<span class="k">if</span><span class="p">(</span><span class="n">S_OK</span> <span class="o">!=</span> <span class="n">hRes</span> <span class="o">&amp;&amp;</span> <span class="n">cRowsObtained</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">		<span class="p">{</span>
+</span></span><span class="line"><span class="cl">			<span class="k">break</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">		<span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">		<span class="n">ZeroMemory</span><span class="p">(</span><span class="n">pData</span><span class="p">,</span> <span class="n">dwOffset</span> <span class="o">*</span> <span class="n">cRows</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">		<span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">cRowsObtained</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">		<span class="p">{</span>
+</span></span><span class="line"><span class="cl">			<span class="n">pCurrentData</span> <span class="o">=</span> <span class="p">(</span><span class="n">BYTE</span><span class="o">*</span><span class="p">)</span><span class="n">pData</span> <span class="o">+</span> <span class="n">dwOffset</span> <span class="o">*</span> <span class="n">i</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">			<span class="n">pIRowset</span><span class="o">-&gt;</span><span class="n">GetData</span><span class="p">(</span><span class="n">rgRows</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">hAccessor</span><span class="p">,</span> <span class="n">pCurrentData</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">			<span class="n">DATASOURCE_ENUM_INFO</span> <span class="n">dbei</span> <span class="o">=</span> <span class="p">{</span><span class="mi">0</span><span class="p">};</span> <span class="c1">//将枚举到的相关信息存储到对应的结构中
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>			<span class="n">dbei</span><span class="p">.</span><span class="n">csSourceName</span> <span class="o">=</span> <span class="p">(</span><span class="n">LPCTSTR</span><span class="p">)((</span><span class="n">BYTE</span><span class="o">*</span><span class="p">)</span><span class="n">pCurrentData</span> <span class="o">+</span> <span class="n">rgBinding</span><span class="p">[</span><span class="mi">2</span><span class="p">].</span><span class="n">obValue</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">			<span class="n">dbei</span><span class="p">.</span><span class="n">csDisplayName</span> <span class="o">=</span> <span class="p">(</span><span class="n">LPCTSTR</span><span class="p">)((</span><span class="n">BYTE</span><span class="o">*</span><span class="p">)</span><span class="n">pCurrentData</span> <span class="o">+</span> <span class="n">rgBinding</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">obValue</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">			<span class="n">dbei</span><span class="p">.</span><span class="n">dbTypeEnum</span> <span class="o">=</span> <span class="o">*</span><span class="p">(</span><span class="n">DBTYPEENUM</span><span class="o">*</span><span class="p">)((</span><span class="n">BYTE</span><span class="o">*</span><span class="p">)</span><span class="n">pCurrentData</span> <span class="o">+</span> <span class="n">rgBinding</span><span class="p">[</span><span class="mi">1</span><span class="p">].</span><span class="n">obValue</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">			<span class="n">m_DataSourceList</span><span class="p">.</span><span class="n">AddString</span><span class="p">(</span><span class="n">dbei</span><span class="p">.</span><span class="n">csDisplayName</span><span class="p">);</span> <span class="c1">//显示数据源信息
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>			<span class="n">g_DataSources</span><span class="p">.</span><span class="n">push_back</span><span class="p">(</span><span class="n">dbei</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">		<span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">		<span class="n">pIRowset</span><span class="o">-&gt;</span><span class="n">ReleaseRows</span><span class="p">(</span><span class="n">cRowsObtained</span><span class="p">,</span> <span class="n">rgRows</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="n">pIAccessor</span><span class="o">-&gt;</span><span class="n">ReleaseAccessor</span><span class="p">(</span><span class="n">hAccessor</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="nl">__CLEAR_UP</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">	<span class="n">FREE</span><span class="p">(</span><span class="n">pData</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="n">CoTaskMemFree</span><span class="p">(</span><span class="n">rgRows</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="n">COM_SAFE_RELEASE</span><span class="p">(</span><span class="n">pIRowset</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="n">COM_SAFE_RELEASE</span><span class="p">(</span><span class="n">pIAccessor</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="kt">void</span> <span class="n">IDBConnectDlg</span><span class="o">::</span><span class="n">Initialize</span><span class="p">(</span><span class="k">const</span> <span class="n">CStringW</span><span class="o">&amp;</span> <span class="n">csSelected</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">	<span class="n">BSTR</span> <span class="n">lpOleName</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">ULONG</span> <span class="n">uEaten</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="k">for</span> <span class="p">(</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">DATASOURCE_ENUM_INFO</span><span class="o">&gt;::</span><span class="n">iterator</span> <span class="n">it</span> <span class="o">=</span> <span class="n">g_DataSources</span><span class="p">.</span><span class="n">begin</span><span class="p">();</span> <span class="n">it</span> <span class="o">!=</span> <span class="n">g_DataSources</span><span class="p">.</span><span class="n">end</span><span class="p">();</span> <span class="n">it</span><span class="o">++</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">	<span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="k">if</span> <span class="p">(</span><span class="n">it</span><span class="o">-&gt;</span><span class="n">csDisplayName</span> <span class="o">==</span> <span class="n">csSelected</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">		<span class="p">{</span>
+</span></span><span class="line"><span class="cl">			<span class="n">lpOleName</span> <span class="o">=</span> <span class="n">it</span><span class="o">-&gt;</span><span class="n">csSourceName</span><span class="p">.</span><span class="n">AllocSysString</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">		<span class="p">}</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="n">COM_DECLARE_INTERFACE</span><span class="p">(</span><span class="n">ISourcesRowset</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="n">COM_DECLARE_INTERFACE</span><span class="p">(</span><span class="n">IParseDisplayName</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="n">COM_DECLARE_INTERFACE</span><span class="p">(</span><span class="n">IMoniker</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="n">CoCreateInstance</span><span class="p">(</span><span class="n">CLSID_OLEDB_ENUMERATOR</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">,</span> <span class="n">CLSCTX_INPROC_SERVER</span><span class="p">,</span> <span class="n">IID_ISourcesRowset</span><span class="p">,</span> <span class="p">(</span><span class="kt">void</span><span class="o">**</span><span class="p">)</span><span class="o">&amp;</span><span class="n">pISourcesRowset</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="n">pISourcesRowset</span><span class="o">-&gt;</span><span class="n">QueryInterface</span><span class="p">(</span><span class="n">IID_IParseDisplayName</span><span class="p">,</span> <span class="p">(</span><span class="kt">void</span><span class="o">**</span><span class="p">)</span><span class="o">&amp;</span><span class="n">pIParseDisplayName</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="n">pIParseDisplayName</span><span class="o">-&gt;</span><span class="n">ParseDisplayName</span><span class="p">(</span><span class="nb">NULL</span><span class="p">,</span> <span class="n">lpOleName</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">uEaten</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">pIMoniker</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="k">if</span> <span class="p">(</span><span class="n">lpOleName</span> <span class="o">!=</span> <span class="nb">NULL</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">	<span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="n">SysFreeString</span><span class="p">(</span><span class="n">lpOleName</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="n">HRESULT</span> <span class="n">hRes</span> <span class="o">=</span> <span class="n">BindMoniker</span><span class="p">(</span><span class="n">pIMoniker</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">IID_ISourcesRowset</span><span class="p">,</span> <span class="p">(</span><span class="kt">void</span><span class="o">**</span><span class="p">)</span><span class="o">&amp;</span><span class="n">m_pConnSourceRowset</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="n">COM_SAFE_RELEASE</span><span class="p">(</span><span class="n">pIMoniker</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="n">COM_SAFE_RELEASE</span><span class="p">(</span><span class="n">pIParseDisplayName</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="k">if</span> <span class="p">(</span><span class="n">FAILED</span><span class="p">(</span><span class="n">hRes</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl">	<span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="n">COM_SAFE_RELEASE</span><span class="p">(</span><span class="n">m_pConnSourceRowset</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">		<span class="k">return</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="n">COM_DECLARE_INTERFACE</span><span class="p">(</span><span class="n">IRowset</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">	<span class="n">hRes</span> <span class="o">=</span> <span class="n">m_pConnSourceRowset</span><span class="o">-&gt;</span><span class="n">GetSourcesRowset</span><span class="p">(</span><span class="nb">NULL</span><span class="p">,</span> <span class="n">IID_IRowset</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">,</span> <span class="p">(</span><span class="n">IUnknown</span><span class="o">**</span><span class="p">)</span><span class="o">&amp;</span><span class="n">pIRowset</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="k">if</span> <span class="p">(</span><span class="n">FAILED</span><span class="p">(</span><span class="n">hRes</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl">	<span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="k">return</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="n">DBBINDING</span> <span class="n">rgBind</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="mi">0</span><span class="p">};</span>
+</span></span><span class="line"><span class="cl">	<span class="n">rgBind</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">bPrecision</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">rgBind</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">bScale</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">rgBind</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">cbMaxLen</span> <span class="o">=</span> <span class="mi">128</span> <span class="o">*</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">WCHAR</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="n">rgBind</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">dwMemOwner</span> <span class="o">=</span> <span class="n">DBMEMOWNER_CLIENTOWNED</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">rgBind</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">dwPart</span> <span class="o">=</span> <span class="n">DBPART_VALUE</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">rgBind</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">eParamIO</span> <span class="o">=</span> <span class="n">DBPARAMIO_NOTPARAM</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">rgBind</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">iOrdinal</span> <span class="o">=</span> <span class="mi">2</span><span class="p">;</span> <span class="c1">//绑定第二项，用于展示数据源
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="n">rgBind</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">obLength</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">rgBind</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">obStatus</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">rgBind</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">obValue</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">rgBind</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">wType</span> <span class="o">=</span> <span class="n">DBTYPE_WSTR</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="n">HACCESSOR</span> <span class="n">hAccessor</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">HROW</span> <span class="o">*</span><span class="n">rghRows</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">PVOID</span> <span class="n">pData</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">PVOID</span> <span class="n">pCurrData</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">ULONG</span> <span class="n">cRows</span> <span class="o">=</span> <span class="mi">10</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">COM_DECLARE_INTERFACE</span><span class="p">(</span><span class="n">IAccessor</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="n">hRes</span> <span class="o">=</span> <span class="n">pIRowset</span><span class="o">-&gt;</span><span class="n">QueryInterface</span><span class="p">(</span><span class="n">IID_IAccessor</span><span class="p">,</span> <span class="p">(</span><span class="kt">void</span><span class="o">**</span><span class="p">)</span><span class="o">&amp;</span><span class="n">pIAccessor</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="k">if</span> <span class="p">(</span><span class="n">FAILED</span><span class="p">(</span><span class="n">hRes</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl">	<span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="n">COM_SAFE_RELEASE</span><span class="p">(</span><span class="n">pIRowset</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">		<span class="k">return</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="n">hRes</span> <span class="o">=</span> <span class="n">pIAccessor</span><span class="o">-&gt;</span><span class="n">CreateAccessor</span><span class="p">(</span><span class="n">DBACCESSOR_ROWDATA</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">rgBind</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">hAccessor</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="n">DBCOUNTITEM</span> <span class="n">cRowsObtained</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="k">if</span> <span class="p">(</span><span class="n">FAILED</span><span class="p">(</span><span class="n">hRes</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl">	<span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="n">COM_SAFE_RELEASE</span><span class="p">(</span><span class="n">pIRowset</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">		<span class="n">COM_SAFE_RELEASE</span><span class="p">(</span><span class="n">pIAccessor</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">		<span class="k">return</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="n">pData</span> <span class="o">=</span> <span class="n">MALLOC</span><span class="p">(</span><span class="n">rgBind</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">cbMaxLen</span> <span class="o">*</span> <span class="n">cRows</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="k">while</span> <span class="p">(</span><span class="n">TRUE</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">	<span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="n">hRes</span> <span class="o">=</span> <span class="n">pIRowset</span><span class="o">-&gt;</span><span class="n">GetNextRows</span><span class="p">(</span><span class="n">DB_NULL_HCHAPTER</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">cRows</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">cRowsObtained</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">rghRows</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">		<span class="k">if</span> <span class="p">(</span><span class="n">S_OK</span> <span class="o">!=</span> <span class="n">hRes</span> <span class="o">&amp;&amp;</span> <span class="n">cRowsObtained</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">		<span class="p">{</span>
+</span></span><span class="line"><span class="cl">			<span class="k">break</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">		<span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">		<span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">cRowsObtained</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">		<span class="p">{</span>
+</span></span><span class="line"><span class="cl">			<span class="n">pCurrData</span> <span class="o">=</span> <span class="p">(</span><span class="n">BYTE</span><span class="o">*</span><span class="p">)</span><span class="n">pData</span> <span class="o">+</span> <span class="n">rgBind</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">cbMaxLen</span> <span class="o">*</span> <span class="n">i</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">			<span class="n">pIRowset</span><span class="o">-&gt;</span><span class="n">GetData</span><span class="p">(</span><span class="n">rghRows</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">hAccessor</span><span class="p">,</span> <span class="n">pCurrData</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">			<span class="n">m_ComboDataSource</span><span class="p">.</span><span class="n">AddString</span><span class="p">((</span><span class="n">LPOLESTR</span><span class="p">)</span><span class="n">pCurrData</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">		<span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">		<span class="n">pIRowset</span><span class="o">-&gt;</span><span class="n">ReleaseRows</span><span class="p">(</span><span class="n">cRowsObtained</span><span class="p">,</span> <span class="n">rghRows</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="n">FREE</span><span class="p">(</span><span class="n">pData</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="n">pIAccessor</span><span class="o">-&gt;</span><span class="n">ReleaseAccessor</span><span class="p">(</span><span class="n">hAccessor</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="kt">void</span> <span class="n">IDBConnectDlg</span><span class="o">::</span><span class="n">OnBnClickedBtnConnectTest</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">	<span class="c1">// TODO: 在此添加控件通知处理程序代码
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="n">CStringW</span> <span class="n">csSelected</span> <span class="o">=</span> <span class="n">_T</span><span class="p">(</span><span class="s">&#34;&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="n">ULONG</span> <span class="n">chEaten</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">m_ComboDataSource</span><span class="p">.</span><span class="n">GetWindowText</span><span class="p">(</span><span class="n">csSelected</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="n">COM_DECLARE_INTERFACE</span><span class="p">(</span><span class="n">IParseDisplayName</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="n">COM_DECLARE_INTERFACE</span><span class="p">(</span><span class="n">IMoniker</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="k">if</span> <span class="p">(</span><span class="n">m_pConnSourceRowset</span> <span class="o">==</span> <span class="nb">NULL</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">	<span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="n">MessageBox</span><span class="p">(</span><span class="n">_T</span><span class="p">(</span><span class="s">&#34;连接失败&#34;</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">		<span class="k">return</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="n">HRESULT</span> <span class="n">hRes</span> <span class="o">=</span> <span class="n">m_pConnSourceRowset</span><span class="o">-&gt;</span><span class="n">QueryInterface</span><span class="p">(</span><span class="n">IID_IParseDisplayName</span><span class="p">,</span> <span class="p">(</span><span class="kt">void</span><span class="o">**</span><span class="p">)</span><span class="o">&amp;</span><span class="n">pIParseDisplayName</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="k">if</span> <span class="p">(</span><span class="n">FAILED</span><span class="p">(</span><span class="n">hRes</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl">	<span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="k">return</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="n">hRes</span> <span class="o">=</span> <span class="n">pIParseDisplayName</span><span class="o">-&gt;</span><span class="n">ParseDisplayName</span><span class="p">(</span><span class="nb">NULL</span><span class="p">,</span> <span class="n">csSelected</span><span class="p">.</span><span class="n">AllocSysString</span><span class="p">(),</span> <span class="o">&amp;</span><span class="n">chEaten</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">pIMoniker</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="n">COM_SAFE_RELEASE</span><span class="p">(</span><span class="n">pIParseDisplayName</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="k">if</span> <span class="p">(</span><span class="n">FAILED</span><span class="p">(</span><span class="n">hRes</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl">	<span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="n">MessageBox</span><span class="p">(</span><span class="n">_T</span><span class="p">(</span><span class="s">&#34;连接失败&#34;</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">		<span class="k">return</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="n">COM_DECLARE_INTERFACE</span><span class="p">(</span><span class="n">IDBProperties</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="n">hRes</span> <span class="o">=</span> <span class="n">BindMoniker</span><span class="p">(</span><span class="n">pIMoniker</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">IID_IDBProperties</span><span class="p">,</span> <span class="p">(</span><span class="kt">void</span><span class="o">**</span><span class="p">)</span><span class="o">&amp;</span><span class="n">pIDBProperties</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="n">COM_SAFE_RELEASE</span><span class="p">(</span><span class="n">pIMoniker</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="k">if</span> <span class="p">(</span><span class="n">FAILED</span><span class="p">(</span><span class="n">hRes</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl">	<span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="n">MessageBox</span><span class="p">(</span><span class="n">_T</span><span class="p">(</span><span class="s">&#34;连接失败&#34;</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">		<span class="k">return</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="c1">//获取用户输入
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="n">CStringW</span> <span class="n">csDB</span> <span class="o">=</span> <span class="n">_T</span><span class="p">(</span><span class="s">&#34;&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="n">CStringW</span> <span class="n">csUser</span> <span class="o">=</span> <span class="n">_T</span><span class="p">(</span><span class="s">&#34;&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="n">CStringW</span> <span class="n">csPasswd</span> <span class="o">=</span> <span class="n">_T</span><span class="p">(</span><span class="s">&#34;&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="n">GetDlgItemText</span><span class="p">(</span><span class="n">IDC_EDIT_USERNAME</span><span class="p">,</span> <span class="n">csUser</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="n">GetDlgItemText</span><span class="p">(</span><span class="n">IDC_EDIT_PASSWORD</span><span class="p">,</span> <span class="n">csPasswd</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="n">GetDlgItemText</span><span class="p">(</span><span class="n">IDC_EDIT_DATABASE</span><span class="p">,</span> <span class="n">csDB</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="c1">//设置链接属性
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="n">DBPROP</span> <span class="n">connProp</span><span class="p">[</span><span class="mi">5</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="mi">0</span><span class="p">};</span>
+</span></span><span class="line"><span class="cl">	<span class="n">DBPROPSET</span> <span class="n">connPropset</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="mi">0</span><span class="p">};</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="n">connProp</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">colid</span> <span class="o">=</span> <span class="n">DB_NULLID</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">connProp</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">dwOptions</span> <span class="o">=</span> <span class="n">DBPROPOPTIONS_REQUIRED</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">connProp</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">dwPropertyID</span> <span class="o">=</span> <span class="n">DBPROP_INIT_DATASOURCE</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">connProp</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">vValue</span><span class="p">.</span><span class="n">vt</span> <span class="o">=</span> <span class="n">VT_BSTR</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">connProp</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">vValue</span><span class="p">.</span><span class="n">bstrVal</span> <span class="o">=</span> <span class="n">csSelected</span><span class="p">.</span><span class="n">AllocSysString</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="n">connProp</span><span class="p">[</span><span class="mi">1</span><span class="p">].</span><span class="n">colid</span> <span class="o">=</span> <span class="n">DB_NULLID</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">connProp</span><span class="p">[</span><span class="mi">1</span><span class="p">].</span><span class="n">dwOptions</span> <span class="o">=</span> <span class="n">DBPROPOPTIONS_REQUIRED</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">connProp</span><span class="p">[</span><span class="mi">1</span><span class="p">].</span><span class="n">dwPropertyID</span> <span class="o">=</span> <span class="n">DBPROP_INIT_CATALOG</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">connProp</span><span class="p">[</span><span class="mi">1</span><span class="p">].</span><span class="n">vValue</span><span class="p">.</span><span class="n">vt</span> <span class="o">=</span> <span class="n">VT_BSTR</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">connProp</span><span class="p">[</span><span class="mi">1</span><span class="p">].</span><span class="n">vValue</span><span class="p">.</span><span class="n">bstrVal</span> <span class="o">=</span> <span class="n">csDB</span><span class="p">.</span><span class="n">AllocSysString</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="n">connProp</span><span class="p">[</span><span class="mi">2</span><span class="p">].</span><span class="n">colid</span> <span class="o">=</span> <span class="n">DB_NULLID</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">connProp</span><span class="p">[</span><span class="mi">2</span><span class="p">].</span><span class="n">dwOptions</span> <span class="o">=</span> <span class="n">DBPROPOPTIONS_REQUIRED</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">connProp</span><span class="p">[</span><span class="mi">2</span><span class="p">].</span><span class="n">dwPropertyID</span> <span class="o">=</span> <span class="n">DBPROP_AUTH_USERID</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">connProp</span><span class="p">[</span><span class="mi">2</span><span class="p">].</span><span class="n">vValue</span><span class="p">.</span><span class="n">vt</span> <span class="o">=</span> <span class="n">VT_BSTR</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">connProp</span><span class="p">[</span><span class="mi">2</span><span class="p">].</span><span class="n">vValue</span><span class="p">.</span><span class="n">bstrVal</span> <span class="o">=</span> <span class="n">csUser</span><span class="p">.</span><span class="n">AllocSysString</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="n">connProp</span><span class="p">[</span><span class="mi">3</span><span class="p">].</span><span class="n">colid</span> <span class="o">=</span> <span class="n">DB_NULLID</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">connProp</span><span class="p">[</span><span class="mi">3</span><span class="p">].</span><span class="n">dwOptions</span> <span class="o">=</span> <span class="n">DBPROPOPTIONS_REQUIRED</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">connProp</span><span class="p">[</span><span class="mi">3</span><span class="p">].</span><span class="n">dwPropertyID</span> <span class="o">=</span> <span class="n">DBPROP_AUTH_PASSWORD</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">connProp</span><span class="p">[</span><span class="mi">3</span><span class="p">].</span><span class="n">vValue</span><span class="p">.</span><span class="n">vt</span> <span class="o">=</span> <span class="n">VT_BSTR</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">connProp</span><span class="p">[</span><span class="mi">3</span><span class="p">].</span><span class="n">vValue</span><span class="p">.</span><span class="n">bstrVal</span> <span class="o">=</span> <span class="n">csPasswd</span><span class="p">.</span><span class="n">AllocSysString</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="n">connPropset</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">cProperties</span> <span class="o">=</span> <span class="mi">4</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">connPropset</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">guidPropertySet</span> <span class="o">=</span> <span class="n">DBPROPSET_DBINIT</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">connPropset</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">rgProperties</span> <span class="o">=</span> <span class="n">connProp</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="n">hRes</span> <span class="o">=</span> <span class="n">pIDBProperties</span><span class="o">-&gt;</span><span class="n">SetProperties</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">connPropset</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="k">if</span> <span class="p">(</span><span class="n">FAILED</span><span class="p">(</span><span class="n">hRes</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl">	<span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="n">COM_SAFE_RELEASE</span><span class="p">(</span><span class="n">pIDBProperties</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">		<span class="k">return</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="n">COM_DECLARE_INTERFACE</span><span class="p">(</span><span class="n">IDBInitialize</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="n">hRes</span> <span class="o">=</span> <span class="n">pIDBProperties</span> <span class="o">-&gt;</span><span class="n">QueryInterface</span><span class="p">(</span><span class="n">IID_IDBInitialize</span><span class="p">,</span> <span class="p">(</span><span class="kt">void</span><span class="o">**</span><span class="p">)</span><span class="o">&amp;</span><span class="n">pIDBInitialize</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="n">COM_SAFE_RELEASE</span><span class="p">(</span><span class="n">pIDBProperties</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="k">if</span> <span class="p">(</span><span class="n">FAILED</span><span class="p">(</span><span class="n">hRes</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl">	<span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="k">return</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="n">hRes</span> <span class="o">=</span> <span class="n">pIDBInitialize</span><span class="o">-&gt;</span><span class="n">Initialize</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">	<span class="k">if</span> <span class="p">(</span><span class="n">FAILED</span><span class="p">(</span><span class="n">hRes</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl">	<span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="n">MessageBox</span><span class="p">(</span><span class="n">_T</span><span class="p">(</span><span class="s">&#34;连接失败&#34;</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span><span class="k">else</span>
+</span></span><span class="line"><span class="cl">	<span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="n">MessageBox</span><span class="p">(</span><span class="n">_T</span><span class="p">(</span><span class="s">&#34;连接成功&#34;</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="n">pIDBInitialize</span><span class="o">-&gt;</span><span class="n">Uninitialize</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">	<span class="n">COM_SAFE_RELEASE</span><span class="p">(</span><span class="n">pIDBInitialize</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p>最后，这次由于是一个MFC的程序，涉及到的代码文件比较多，因此就不像之前那样以代码片段的方式方上来了，这次我将其以项目的方式放到GitHub上供大家参考。
+<a href="https://github.com/aMonst/EnumDataSource.git" target="_blank" rel="noopener noreffer ">项目地址</a></p>
+<!-- raw HTML omitted -->
+</div><div class="post-footer" id="post-footer">
+    <div class="post-info">
+        <div class="post-info-line">
+            <div class="post-info-mod">
+                <span>Updated on 2018-04-08</span>
+            </div></div>
+        <div class="post-info-line">
+            <div class="post-info-md"></div>
+            <div class="post-info-share">
+                <span><a href="javascript:void(0);" title="Share on Twitter" data-sharer="twitter" data-url="http://HaiLateBoy.github.io/posts/oledb-and-ado-9/" data-title="OLEDB 枚举数据源" data-hashtags="OLEDB,数据库编程,VC&#43;&#43;,数据库"><i class="fab fa-twitter fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Facebook" data-sharer="facebook" data-url="http://HaiLateBoy.github.io/posts/oledb-and-ado-9/" data-hashtag="OLEDB"><i class="fab fa-facebook-square fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Hacker News" data-sharer="hackernews" data-url="http://HaiLateBoy.github.io/posts/oledb-and-ado-9/" data-title="OLEDB 枚举数据源"><i class="fab fa-hacker-news fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Line" data-sharer="line" data-url="http://HaiLateBoy.github.io/posts/oledb-and-ado-9/" data-title="OLEDB 枚举数据源"><i data-svg-src="https://cdn.jsdelivr.net/npm/simple-icons@7.3.0/icons/line.svg" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on 微博" data-sharer="weibo" data-url="http://HaiLateBoy.github.io/posts/oledb-and-ado-9/" data-title="OLEDB 枚举数据源"><i class="fab fa-weibo fa-fw" aria-hidden="true"></i></a></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="post-info-more">
+        <section class="post-tags"><i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/oledb/">OLEDB</a>,&nbsp;<a href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93%E7%BC%96%E7%A8%8B/">数据库编程</a>,&nbsp;<a href="/tags/vc&#43;&#43;/">VC&#43;&#43;</a>,&nbsp;<a href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93/">数据库</a></section>
+        <section>
+            <span><a href="javascript:void(0);" onclick="window.history.back();">Back</a></span>&nbsp;|&nbsp;<span><a href="/">Home</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav"><a href="/posts/oledb-and-ado-8/" class="prev" rel="prev" title="OLEDB 调用存储过程"><i class="fas fa-angle-left fa-fw" aria-hidden="true"></i>OLEDB 调用存储过程</a>
+            <a href="/posts/cpp-inherit/" class="next" rel="next" title="C&#43;&#43; 继承分析">C++ 继承分析<i class="fas fa-angle-right fa-fw" aria-hidden="true"></i></a></div>
+</div>
+</article></div>
+            </main><footer class="footer">
+        <div class="footer-container"><div class="footer-line">Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener noreffer" title="Hugo 0.121.2">Hugo</a> | Theme - <a href="https://github.com/dillonzq/LoveIt" target="_blank" rel="noopener noreffer" title="LoveIt 0.2.11"><i class="far fa-kiss-wink-heart fa-fw" aria-hidden="true"></i> LoveIt</a>
+                </div><div class="footer-line" itemscope itemtype="http://schema.org/CreativeWork"><i class="far fa-copyright fa-fw" aria-hidden="true"></i><span itemprop="copyrightYear">2022 - 2024</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="https://www.masimaro.xyz" target="_blank">Masimaro</a></span></div>
+        </div>
+    </footer></div>
+
+        <div id="fixed-buttons"><a href="#" id="back-to-top" class="fixed-button" title="Back to Top">
+                <i class="fas fa-arrow-up fa-fw" aria-hidden="true"></i>
+            </a><a href="#" id="view-comments" class="fixed-button" title="View Comments">
+                <i class="fas fa-comment fa-fw" aria-hidden="true"></i>
+            </a>
+        </div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.css"><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/autocomplete.js@0.38.1/dist/autocomplete.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lunr@2.3.9/lunr.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lazysizes@5.3.2/lazysizes.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/clipboard@2.0.11/dist/clipboard.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/sharer.js@0.5.1/sharer.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/auto-render.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/copy-tex.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/mhchem.min.js"></script><script type="text/javascript">window.config={"code":{"copyTitle":"Copy to clipboard","maxShownLines":50},"comment":{},"math":{"delimiters":[{"display":true,"left":"$$","right":"$$"},{"display":true,"left":"\\[","right":"\\]"},{"display":true,"left":"\\begin{equation}","right":"\\end{equation}"},{"display":true,"left":"\\begin{equation*}","right":"\\end{equation*}"},{"display":true,"left":"\\begin{align}","right":"\\end{align}"},{"display":true,"left":"\\begin{align*}","right":"\\end{align*}"},{"display":true,"left":"\\begin{alignat}","right":"\\end{alignat}"},{"display":true,"left":"\\begin{alignat*}","right":"\\end{alignat*}"},{"display":true,"left":"\\begin{gather}","right":"\\end{gather}"},{"display":true,"left":"\\begin{CD}","right":"\\end{CD}"},{"display":false,"left":"$","right":"$"},{"display":false,"left":"\\(","right":"\\)"}],"strict":false},"search":{"highlightTag":"em","maxResultLength":10,"noResultsFound":"No results found","snippetLength":50}};</script><script type="text/javascript" src="/js/theme.min.js"></script></body>
+</html>

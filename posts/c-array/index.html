@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="robots" content="noodp" />
+        <title>c语言数组剖析 - Masimaro&#39;s blog</title><meta name="Description" content="这是我用于记录日常和学习的小站"><meta property="og:title" content="c语言数组剖析" />
+<meta property="og:description" content="C语言中数组是十分重要的一种结构，数组采用的是连续存储的方式，下面通过反汇编的方式来解析编译器对数组的操作。 数组作为局部变量 在任意一个函数当" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://HaiLateBoy.github.io/posts/c-array/" /><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2018-01-25T21:07:04+00:00" />
+<meta property="article:modified_time" content="2018-01-25T21:07:04+00:00" /><meta property="og:site_name" content="Masimaro&#39;s blog" />
+
+<meta name="twitter:card" content="summary"/><meta name="twitter:title" content="c语言数组剖析"/>
+<meta name="twitter:description" content="C语言中数组是十分重要的一种结构，数组采用的是连续存储的方式，下面通过反汇编的方式来解析编译器对数组的操作。 数组作为局部变量 在任意一个函数当"/>
+<meta name="application-name" content="My cool site">
+<meta name="apple-mobile-web-app-title" content="My cool site"><meta name="theme-color" content="#ffffff"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="manifest" href="/site.webmanifest"><link rel="canonical" href="http://HaiLateBoy.github.io/posts/c-array/" /><link rel="prev" href="http://HaiLateBoy.github.io/posts/c-access-variant/" /><link rel="next" href="http://HaiLateBoy.github.io/posts/oledb-and-ado4/" /><link rel="stylesheet" href="/css/style.min.css"><link rel="preload" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css"></noscript><link rel="preload" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css"></noscript><script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "BlogPosting",
+        "headline": "c语言数组剖析",
+        "inLanguage": "zh-CN",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "http:\/\/HaiLateBoy.github.io\/posts\/c-array\/"
+        },"genre": "posts","keywords": "VC\u002b\u002b, 反汇编, C\u002b\u002b实现原理","wordcount":  2467 ,
+        "url": "http:\/\/HaiLateBoy.github.io\/posts\/c-array\/","datePublished": "2018-01-25T21:07:04+00:00","dateModified": "2018-01-25T21:07:04+00:00","publisher": {
+            "@type": "Organization",
+            "name": ""},"author": {
+                "@type": "Person",
+                "name": "Masimaro"
+            },"description": ""
+    }
+    </script></head>
+    <body data-header-desktop="fixed" data-header-mobile="auto"><script type="text/javascript">(window.localStorage && localStorage.getItem('theme') ? localStorage.getItem('theme') === 'dark' : ('auto' === 'auto' ? window.matchMedia('(prefers-color-scheme: dark)').matches : 'auto' === 'dark')) && document.body.setAttribute('theme', 'dark');</script>
+
+        <div id="mask"></div><div class="wrapper"><header class="desktop" id="header-desktop">
+    <div class="header-wrapper">
+        <div class="header-title">
+            <a href="/" title="Masimaro&#39;s blog">My cool site</a>
+        </div>
+        <div class="menu">
+            <div class="menu-inner"><a class="menu-item" href="/posts/" title="文章列表"> 文章 </a><a class="menu-item" href="/tags/" title="标签"> 标签 </a><a class="menu-item" href="/categories/" title="分类"> 分类 </a><a class="menu-item" href="/about" title="关于本站"> 关于 </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-desktop">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-desktop" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-desktop" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-desktop">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </span><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                    <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+                </a></div>
+        </div>
+    </div>
+</header><header class="mobile" id="header-mobile">
+    <div class="header-container">
+        <div class="header-wrapper">
+            <div class="header-title">
+                <a href="/" title="Masimaro&#39;s blog">My cool site</a>
+            </div>
+            <div class="menu-toggle" id="menu-toggle-mobile">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+        <div class="menu" id="menu-mobile"><div class="search-wrapper">
+                    <div class="search mobile" id="search-mobile">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-mobile">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-mobile" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-mobile" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-mobile">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </div>
+                    <a href="javascript:void(0);" class="search-cancel" id="search-cancel-mobile">
+                        Cancel
+                    </a>
+                </div><a class="menu-item" href="/posts/" title="文章列表">文章</a><a class="menu-item" href="/tags/" title="标签">标签</a><a class="menu-item" href="/categories/" title="分类">分类</a><a class="menu-item" href="/about" title="关于本站">关于</a><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+            </a></div>
+    </div>
+</header><div class="search-dropdown desktop">
+        <div id="search-dropdown-desktop"></div>
+    </div>
+    <div class="search-dropdown mobile">
+        <div id="search-dropdown-mobile"></div>
+    </div><main class="main">
+                <div class="container"><div class="toc" id="toc-auto">
+            <h2 class="toc-title">Contents</h2>
+            <div class="toc-content" id="toc-content-auto"></div>
+        </div><article class="page single"><h1 class="single-title animate__animated animate__flipInX">c语言数组剖析</h1><div class="post-meta">
+            <div class="post-meta-line"><span class="post-author"><a href="https://www.masimaro.xyz" title="Author" target="_blank" rel="noopener noreffer author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Masimaro</a></span>&nbsp;<span class="post-category">included in <a href="/categories/vc++%E5%8F%8D%E6%B1%87%E7%BC%96%E5%88%86%E6%9E%90/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>VC++反汇编分析</a></span></div>
+            <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw" aria-hidden="true"></i>&nbsp;<time datetime="2018-01-25">2018-01-25</time>&nbsp;<i class="fas fa-pencil-alt fa-fw" aria-hidden="true"></i>&nbsp;2467 words&nbsp;
+                <i class="far fa-clock fa-fw" aria-hidden="true"></i>&nbsp;5 minutes&nbsp;</div>
+        </div><div class="details toc" id="toc-static"  data-kept="true">
+                <div class="details-summary toc-title">
+                    <span>Contents</span>
+                    <span><i class="details-icon fas fa-angle-right" aria-hidden="true"></i></span>
+                </div>
+                <div class="details-content toc-content" id="toc-content-static"><nav id="TableOfContents"></nav></div>
+            </div><div class="content" id="content"><p>C语言中数组是十分重要的一种结构，数组采用的是连续存储的方式，下面通过反汇编的方式来解析编译器对数组的操作。</p>
+<!-- raw HTML omitted -->
+<h1 id="数组作为局部变量">数组作为局部变量</h1>
+<p>在任意一个函数当中定义的变量都会被当做局部变量，它们的生命周期与函数的调用有关，下面是一个例子：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="kt">int</span> <span class="nf">main</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">int</span> <span class="n">nArray</span><span class="p">[</span><span class="mi">5</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">};</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">int</span> <span class="n">num1</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">int</span> <span class="n">num2</span> <span class="o">=</span> <span class="mi">2</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">int</span> <span class="n">num3</span> <span class="o">=</span> <span class="mi">3</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">int</span> <span class="n">num4</span> <span class="o">=</span> <span class="mi">4</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">int</span> <span class="n">num5</span> <span class="o">=</span> <span class="mi">5</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="nf">printf</span><span class="p">(</span><span class="s">&#34;%d</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">,</span> <span class="n">num1</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">printf</span><span class="p">(</span><span class="s">&#34;%d</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">,</span> <span class="n">nArray</span><span class="p">[</span><span class="mi">0</span><span class="p">]);</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">printf</span><span class="p">(</span><span class="s">&#34;%d</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">,</span> <span class="n">nArray</span><span class="p">[</span><span class="mi">1</span><span class="p">]);</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p>下面是它对应的反汇编代码</p>
+<pre tabindex="0"><code>00401268   mov         dword ptr [ebp-14h],1
+0040126F   mov         dword ptr [ebp-10h],2
+00401276   mov         dword ptr [ebp-0Ch],3
+...
+10:       int num1 = 1;
+0040128B   mov         dword ptr [ebp-18h],1
+11:       int num2 = 2;
+00401292   mov         dword ptr [ebp-1Ch],2
+12:       int num3 = 3;
+...
+16:       printf(&#34;%d\n&#34;, num1);
+004012AE   mov         eax,dword ptr [ebp-18h]
+004012B1   push        eax
+...
+17:       printf(&#34;%d\n&#34;, nArray[0]);
+004012BF   mov         ecx,dword ptr [ebp-14h]
+004012C2   push        ecx
+...
+18:       printf(&#34;%d\n&#34;, nArray[1]);
+004012D0   mov         edx,dword ptr [ebp-10h]
+004012D3   push        edx
+...
+</code></pre><p>为了节省篇幅，上面的汇编代码只截取了部分有代表性的内容，从上面的部分可以看到，数组采用连续的存储方式，在内存中从低地址部分到高地址部分依次存储，而普通的局部变量则是先定义的在高地址部分。在使用上也都是采用寄存器间接寻址的方式。在初始化时数组是从第0项开始依次向后赋值。但是如果我们将所有的数组成员都赋值为相同值时会怎样？</p>
+<pre tabindex="0"><code>9:        int nArray[5] = {1};
+00401268   mov         dword ptr [ebp-14h],1
+0040126F   xor         eax,eax
+00401271   mov         dword ptr [ebp-10h],eax
+00401274   mov         dword ptr [ebp-0Ch],eax
+00401277   mov         dword ptr [ebp-8],eax
+0040127A   mov         dword ptr [ebp-4],eax
+</code></pre><p>从上面的汇编代码可以看到，当初始化的值相同的时候，仍是采用依次赋值的方式。下面再来看看字符数组的初始化。</p>
+<pre tabindex="0"><code>0040126E   mov         eax,[string &#34;Hello World!&#34; (0042e01c)]
+00401273   mov         dword ptr [ebp-100h],eax
+00401279   mov         ecx,dword ptr [string &#34;Hello World!&#34;+4 (0042e020)]
+0040127F   mov         dword ptr [ebp-0FCh],ecx
+00401285   mov         edx,dword ptr [string &#34;Hello World!&#34;+8 (0042e024)]
+0040128B   mov         dword ptr [ebp-0F8h],edx
+00401291   mov         al,[string &#34;Hello World!&#34;+0Ch (0042e028)]
+00401296   mov         byte ptr [ebp-0F4h],al
+0040129C   mov         ecx,3Ch
+004012A1   xor         eax,eax
+004012A3   lea         edi,[ebp-0F3h]
+004012A9   rep stos    dword ptr [edi]
+004012AB   stos        word ptr [edi]
+10:       char *pszBuf = &#34;Hello World!&#34;;
+004012AD   mov         dword ptr [ebp-104h],offset string &#34;Hello World!&#34; (0042e01c)
+</code></pre><p>字符串是特殊的字符数组，约定字符串的最后一个值为NULL。上面的代码显示出，对于字符串的初始化采用的是用寄存器的方式依次赋值4个字节的内容，而对于字符指针，在初始化的时候在程序的全局变量中存储了一个字符串，并将这个字符串的首地址赋值给对应的变量，这个字符串是位于常量内存区，所以只能寻址，而不能更改它。</p>
+<h1 id="数组作为函数的参数">数组作为函数的参数</h1>
+<p>当数组作为函数参数时传递的是数组的首地址，而不会拷贝整个内存区，这点许多人容易搞错。下面通过反汇编的方式来说明：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="kt">void</span> <span class="nf">ShowArray</span><span class="p">(</span><span class="kt">int</span> <span class="n">a</span><span class="p">[</span><span class="mi">5</span><span class="p">])</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="mi">5</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="nf">printf</span><span class="p">(</span><span class="s">&#34;%d</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">,</span> <span class="n">a</span><span class="p">[</span><span class="n">i</span><span class="p">]);</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kt">int</span> <span class="nf">main</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">int</span> <span class="n">nArray</span><span class="p">[</span><span class="mi">5</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">};</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">ShowArray</span><span class="p">(</span><span class="n">nArray</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><pre tabindex="0"><code>19:       ShowArray(nArray);
+004012FB   lea         eax,[ebp-14h];取[ebp - 14h]的地址
+004012FE   push        eax
+004012FF   call        @ILT+0(ShowArray) (00401005)
+00401304   add         esp,4
+
+;ShowArray函数
+00401268   mov         dword ptr [ebp-4],0;初始化i = 0
+0040126F   jmp         ShowArray+2Ah (0040127a)
+00401271   mov         eax,dword ptr [ebp-4]
+00401274   add         eax,1
+00401277   mov         dword ptr [ebp-4],eax
+0040127A   cmp         dword ptr [ebp-4],5 ;比较 i 与 5
+0040127E   jge         ShowArray+49h (00401299);当i &gt;= 5时跳出循环
+11:       {
+12:           printf(&#34;%d\n&#34;, a[i]);
+00401280   mov         ecx,dword ptr [ebp-4] ;ecx = i
+00401283   mov         edx,dword ptr [ebp+8] ;edx = 数组的首地址
+00401286   mov         eax,dword ptr [edx+ecx*4];寻址数组中的第i个元素
+00401289   push        eax
+</code></pre><p>从上面的反汇编代码可以看出，在传值时只是将数组的首地址作为参数传入，而在函数的使用中直接通过传入的首地址来寻址数组中的各个元素，如果再函数的代码中添加一句sizeof来求这个数组的长度，那么返回的一定是4，而不是20。由于数组作为函数参数时函数不会记录数组的长度，那么为了防止越界，需要通过某种方式告知函数内部数组的长度，一般有两种方式，一种是想字符串那样规定一个结束标记，当到达这个结束标记时不再访问其下一个元素，二是通过传入一个参数表示数组的长度。
+另外数组作为返回值时与数组作为参数相同，都是通过指针的方式返回，但是需要牢记的一点是不要返回局部变量的地址或者引用。</p>
+<h1 id="数组的成员的访问方式">数组的成员的访问方式</h1>
+<p>数组成员可以采用下标访问方式，也可以采用指针寻址方式，指针寻址不仅没有下标寻址方便，效率也没有下标寻址方式高。下面来看这两种方式的具体差距。</p>
+<pre tabindex="0"><code>11:       int nArray[5] = {1, 2, 3, 4, 5};
+00401268   mov         dword ptr [ebp-14h],1
+...
+12:       int *p = nArray;
+0040128B   lea         eax,[ebp-14h]
+0040128E   mov         dword ptr [ebp-18h],eax
+13:       printf(&#34;%d\n&#34;, nArray[3]);
+00401291   mov         ecx,dword ptr [ebp-8]
+00401294   push        ecx
+...
+14:       printf(&#34;%d\n&#34;, p + 3);
+004012A2   mov         edx,dword ptr [ebp-18h]
+004012A5   add         edx,0Ch
+004012A8   push        edx
+</code></pre><p>从上面的代码可以看出，指针寻址会另外开辟一个4字节的内存空间用来存储这个指针变量，同时使用指针也需要进行地址变换，首先通过指针p的地址找到p的值，然后通过p存储的值再次间接寻址找到对应的值。而数组下标法寻址，只通过直接寻址找到对应的元素并取出即可。如果下标中是整型变量，则直接通过公式addr + sizeof(type) * n(其中addr为数组的首地址，type为数组元素的值，n为下标值)来寻址，而下标为整型表达式，则先计算表达式的值，然后在通过这一公式来寻址。</p>
+<h1 id="多维数组">多维数组</h1>
+<p>多维数组，我们主要来说明二维数组</p>
+<pre tabindex="0"><code>11:       int nArray[2][3] = {{1, 2, 3}, {4, 5, 6}};
+00401268   mov         dword ptr [ebp-18h],1
+0040126F   mov         dword ptr [ebp-14h],2
+00401276   mov         dword ptr [ebp-10h],3
+0040127D   mov         dword ptr [ebp-0Ch],4
+00401284   mov         dword ptr [ebp-8],5
+0040128B   mov         dword ptr [ebp-4],6
+</code></pre><p>通过汇编代码，对于多维数组在内存中存储的方式仍然为线性存储方式，对于多维数组会转化为一维数组数组，然后再依次存储各个一维数组的值，例如上面的例子中将二维数组转化为两个一维数组，然后分别在内存中对它们进行初始化。对于多维数组的寻址，例如int nArray[2][3]这样的数组，首先拆分为2个有3个元素的一维数组，在寻址时首先找到对应的一维数组的首地址，然后在对应的一维数组中寻址找到对应元素的值。这样对于多维数组都是转化为多个低一级的多维数组最终转化为一维数组的方式来解决。虽说多维数组是采用线性存储的方式来存储数据，但是在理解上我们可以将高维数组看成存储多个低维数组的特殊一维数组，比如int a[4][5] 可以看成一个有四个元素的一维数组，每一一维数组都存储了一个5个整型元素的一维数组，通过图来表示就是这样：
+<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="http://img.blog.csdn.net/20160426203830072"
+        data-srcset="http://img.blog.csdn.net/20160426203830072, http://img.blog.csdn.net/20160426203830072 1.5x, http://img.blog.csdn.net/20160426203830072 2x"
+        data-sizes="auto"
+        alt="http://img.blog.csdn.net/20160426203830072"
+        title="这里写图片描述" />
+上述的数组看做一个一维数组，这个一维数组有4个成员，每个成员都存储了一个5个一维数组的数组名，这样就可以很好的理解a 表示的是二维数组的首地址，而a[0]则表示的是第一个元素的首地址，同时也可以很好理解为何定义二维数组的指针时为何需要第二个下标，因为二维数组存储的是一维数组，它的类型就是多个一维数组，所以需要将一维数组的大小作为类型值来定义指针。</p>
+<h1 id="函数指针">函数指针</h1>
+<p>函数指针的定义格式如下type (*pname)（args）；
+函数的内容存储在代码段中，函数指针指向的就是函数的第一句代码所在的内存位置，而在调用函数需要知道函数的返回值，以及函数的参数列表，特别是参数列表，只有知道这些信息，在通过函数指针调用时才能知道其栈环境是如何配置的，函数类型其实是函数的返回值加上其参数列表，所以在定义函数时需要知道这些信息。
+在使用函数指针的时候跟普通函数一样使用，通过函数指针调用函数的过程与调用普通函数的过程相同。具体的过程可以参考本人之前关于C函数的博客。</p>
+<!-- raw HTML omitted -->
+</div><div class="post-footer" id="post-footer">
+    <div class="post-info">
+        <div class="post-info-line">
+            <div class="post-info-mod">
+                <span>Updated on 2018-01-25</span>
+            </div></div>
+        <div class="post-info-line">
+            <div class="post-info-md"></div>
+            <div class="post-info-share">
+                <span><a href="javascript:void(0);" title="Share on Twitter" data-sharer="twitter" data-url="http://HaiLateBoy.github.io/posts/c-array/" data-title="c语言数组剖析" data-hashtags="VC&#43;&#43;,反汇编,C&#43;&#43;实现原理"><i class="fab fa-twitter fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Facebook" data-sharer="facebook" data-url="http://HaiLateBoy.github.io/posts/c-array/" data-hashtag="VC&#43;&#43;"><i class="fab fa-facebook-square fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Hacker News" data-sharer="hackernews" data-url="http://HaiLateBoy.github.io/posts/c-array/" data-title="c语言数组剖析"><i class="fab fa-hacker-news fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Line" data-sharer="line" data-url="http://HaiLateBoy.github.io/posts/c-array/" data-title="c语言数组剖析"><i data-svg-src="https://cdn.jsdelivr.net/npm/simple-icons@7.3.0/icons/line.svg" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on 微博" data-sharer="weibo" data-url="http://HaiLateBoy.github.io/posts/c-array/" data-title="c语言数组剖析"><i class="fab fa-weibo fa-fw" aria-hidden="true"></i></a></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="post-info-more">
+        <section class="post-tags"><i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/vc&#43;&#43;/">VC&#43;&#43;</a>,&nbsp;<a href="/tags/%E5%8F%8D%E6%B1%87%E7%BC%96/">反汇编</a>,&nbsp;<a href="/tags/c&#43;&#43;%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86/">C&#43;&#43;实现原理</a></section>
+        <section>
+            <span><a href="javascript:void(0);" onclick="window.history.back();">Back</a></span>&nbsp;|&nbsp;<span><a href="/">Home</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav"><a href="/posts/c-access-variant/" class="prev" rel="prev" title="C语言中不同变量的访问方式"><i class="fas fa-angle-left fa-fw" aria-hidden="true"></i>C语言中不同变量的访问方式</a>
+            <a href="/posts/oledb-and-ado4/" class="next" rel="next" title="SQL语句执行与结果集的获取">SQL语句执行与结果集的获取<i class="fas fa-angle-right fa-fw" aria-hidden="true"></i></a></div>
+</div>
+</article></div>
+            </main><footer class="footer">
+        <div class="footer-container"><div class="footer-line">Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener noreffer" title="Hugo 0.121.2">Hugo</a> | Theme - <a href="https://github.com/dillonzq/LoveIt" target="_blank" rel="noopener noreffer" title="LoveIt 0.2.11"><i class="far fa-kiss-wink-heart fa-fw" aria-hidden="true"></i> LoveIt</a>
+                </div><div class="footer-line" itemscope itemtype="http://schema.org/CreativeWork"><i class="far fa-copyright fa-fw" aria-hidden="true"></i><span itemprop="copyrightYear">2022 - 2024</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="https://www.masimaro.xyz" target="_blank">Masimaro</a></span></div>
+        </div>
+    </footer></div>
+
+        <div id="fixed-buttons"><a href="#" id="back-to-top" class="fixed-button" title="Back to Top">
+                <i class="fas fa-arrow-up fa-fw" aria-hidden="true"></i>
+            </a><a href="#" id="view-comments" class="fixed-button" title="View Comments">
+                <i class="fas fa-comment fa-fw" aria-hidden="true"></i>
+            </a>
+        </div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.css"><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/autocomplete.js@0.38.1/dist/autocomplete.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lunr@2.3.9/lunr.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lazysizes@5.3.2/lazysizes.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/clipboard@2.0.11/dist/clipboard.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/sharer.js@0.5.1/sharer.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/auto-render.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/copy-tex.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/mhchem.min.js"></script><script type="text/javascript">window.config={"code":{"copyTitle":"Copy to clipboard","maxShownLines":50},"comment":{},"math":{"delimiters":[{"display":true,"left":"$$","right":"$$"},{"display":true,"left":"\\[","right":"\\]"},{"display":true,"left":"\\begin{equation}","right":"\\end{equation}"},{"display":true,"left":"\\begin{equation*}","right":"\\end{equation*}"},{"display":true,"left":"\\begin{align}","right":"\\end{align}"},{"display":true,"left":"\\begin{align*}","right":"\\end{align*}"},{"display":true,"left":"\\begin{alignat}","right":"\\end{alignat}"},{"display":true,"left":"\\begin{alignat*}","right":"\\end{alignat*}"},{"display":true,"left":"\\begin{gather}","right":"\\end{gather}"},{"display":true,"left":"\\begin{CD}","right":"\\end{CD}"},{"display":false,"left":"$","right":"$"},{"display":false,"left":"\\(","right":"\\)"}],"strict":false},"search":{"highlightTag":"em","maxResultLength":10,"noResultsFound":"No results found","snippetLength":50}};</script><script type="text/javascript" src="/js/theme.min.js"></script></body>
+</html>

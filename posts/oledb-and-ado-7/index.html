@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="robots" content="noodp" />
+        <title>OLEDB 参数化查询 - Masimaro&#39;s blog</title><meta name="Description" content="这是我用于记录日常和学习的小站"><meta property="og:title" content="OLEDB 参数化查询" />
+<meta property="og:description" content="一般情况下，SQL查询是相对固定的，一条语句变化的可能只是条件值，比如之前要求查询二年级学生信息，而后面需要查询三年级的信息，这样的查询一般" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://HaiLateBoy.github.io/posts/oledb-and-ado-7/" /><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2018-03-25T15:02:00+00:00" />
+<meta property="article:modified_time" content="2018-03-25T15:02:00+00:00" /><meta property="og:site_name" content="Masimaro&#39;s blog" />
+
+<meta name="twitter:card" content="summary"/><meta name="twitter:title" content="OLEDB 参数化查询"/>
+<meta name="twitter:description" content="一般情况下，SQL查询是相对固定的，一条语句变化的可能只是条件值，比如之前要求查询二年级学生信息，而后面需要查询三年级的信息，这样的查询一般"/>
+<meta name="application-name" content="My cool site">
+<meta name="apple-mobile-web-app-title" content="My cool site"><meta name="theme-color" content="#ffffff"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="manifest" href="/site.webmanifest"><link rel="canonical" href="http://HaiLateBoy.github.io/posts/oledb-and-ado-7/" /><link rel="prev" href="http://HaiLateBoy.github.io/posts/oledb-and-ado-6/" /><link rel="next" href="http://HaiLateBoy.github.io/posts/oledb-and-ado-8/" /><link rel="stylesheet" href="/css/style.min.css"><link rel="preload" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css"></noscript><link rel="preload" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css"></noscript><script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "BlogPosting",
+        "headline": "OLEDB 参数化查询",
+        "inLanguage": "zh-CN",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "http:\/\/HaiLateBoy.github.io\/posts\/oledb-and-ado-7\/"
+        },"genre": "posts","keywords": "OLEDB, 数据库编程, VC\u002b\u002b, 数据库","wordcount":  2111 ,
+        "url": "http:\/\/HaiLateBoy.github.io\/posts\/oledb-and-ado-7\/","datePublished": "2018-03-25T15:02:00+00:00","dateModified": "2018-03-25T15:02:00+00:00","publisher": {
+            "@type": "Organization",
+            "name": ""},"author": {
+                "@type": "Person",
+                "name": "Masimaro"
+            },"description": ""
+    }
+    </script></head>
+    <body data-header-desktop="fixed" data-header-mobile="auto"><script type="text/javascript">(window.localStorage && localStorage.getItem('theme') ? localStorage.getItem('theme') === 'dark' : ('auto' === 'auto' ? window.matchMedia('(prefers-color-scheme: dark)').matches : 'auto' === 'dark')) && document.body.setAttribute('theme', 'dark');</script>
+
+        <div id="mask"></div><div class="wrapper"><header class="desktop" id="header-desktop">
+    <div class="header-wrapper">
+        <div class="header-title">
+            <a href="/" title="Masimaro&#39;s blog">My cool site</a>
+        </div>
+        <div class="menu">
+            <div class="menu-inner"><a class="menu-item" href="/posts/" title="文章列表"> 文章 </a><a class="menu-item" href="/tags/" title="标签"> 标签 </a><a class="menu-item" href="/categories/" title="分类"> 分类 </a><a class="menu-item" href="/about" title="关于本站"> 关于 </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-desktop">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-desktop" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-desktop" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-desktop">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </span><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                    <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+                </a></div>
+        </div>
+    </div>
+</header><header class="mobile" id="header-mobile">
+    <div class="header-container">
+        <div class="header-wrapper">
+            <div class="header-title">
+                <a href="/" title="Masimaro&#39;s blog">My cool site</a>
+            </div>
+            <div class="menu-toggle" id="menu-toggle-mobile">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+        <div class="menu" id="menu-mobile"><div class="search-wrapper">
+                    <div class="search mobile" id="search-mobile">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-mobile">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-mobile" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-mobile" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-mobile">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </div>
+                    <a href="javascript:void(0);" class="search-cancel" id="search-cancel-mobile">
+                        Cancel
+                    </a>
+                </div><a class="menu-item" href="/posts/" title="文章列表">文章</a><a class="menu-item" href="/tags/" title="标签">标签</a><a class="menu-item" href="/categories/" title="分类">分类</a><a class="menu-item" href="/about" title="关于本站">关于</a><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+            </a></div>
+    </div>
+</header><div class="search-dropdown desktop">
+        <div id="search-dropdown-desktop"></div>
+    </div>
+    <div class="search-dropdown mobile">
+        <div id="search-dropdown-mobile"></div>
+    </div><main class="main">
+                <div class="container"><div class="toc" id="toc-auto">
+            <h2 class="toc-title">Contents</h2>
+            <div class="toc-content" id="toc-content-auto"></div>
+        </div><article class="page single"><h1 class="single-title animate__animated animate__flipInX">OLEDB 参数化查询</h1><div class="post-meta">
+            <div class="post-meta-line"><span class="post-author"><a href="https://www.masimaro.xyz" title="Author" target="_blank" rel="noopener noreffer author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Masimaro</a></span>&nbsp;<span class="post-category">included in <a href="/categories/windows-%E6%95%B0%E6%8D%AE%E5%BA%93%E7%BC%96%E7%A8%8B/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>windows 数据库编程</a></span></div>
+            <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw" aria-hidden="true"></i>&nbsp;<time datetime="2018-03-25">2018-03-25</time>&nbsp;<i class="fas fa-pencil-alt fa-fw" aria-hidden="true"></i>&nbsp;2111 words&nbsp;
+                <i class="far fa-clock fa-fw" aria-hidden="true"></i>&nbsp;5 minutes&nbsp;</div>
+        </div><div class="details toc" id="toc-static"  data-kept="true">
+                <div class="details-summary toc-title">
+                    <span>Contents</span>
+                    <span><i class="details-icon fas fa-angle-right" aria-hidden="true"></i></span>
+                </div>
+                <div class="details-content toc-content" id="toc-content-static"><nav id="TableOfContents">
+  <ul>
+    <li><a href="#科普sql注入和安全编程">科普SQL注入和安全编程</a></li>
+  </ul>
+</nav></div>
+            </div><div class="content" id="content"><p>一般情况下，SQL查询是相对固定的，一条语句变化的可能只是条件值，比如之前要求查询二年级学生信息，而后面需要查询三年级的信息，这样的查询一般查询的列不变，后面的条件只有值在变化，针对这种查询可以使用参数化查询的方式来提高效率，也可以时SQL操作更加安全，从根本上杜绝SQL注入的问题。</p>
+<!-- raw HTML omitted -->
+<h1 id="参数化查询的优势">参数化查询的优势：</h1>
+<ol>
+<li>提高效率：之前说过，数据库在执行SQL的过程中，每次都会经过SQL的解析，编译，调用对应的数据库组件，这样如果执行多次同样类型的SQL语句，解析，编译的过程明显是在浪费资源，而参数化查询就是使用编译好的过程（也就是提前告诉数据库要调用哪些数据库组件），这样就跳过了对SQL语句的解析，编译过程，提高了效率（这个过程我觉得有点类似于C/C++语言的编译执行与脚本语言的解释执行）。</li>
+<li>更加安全：从安全编程的角度来说，对于防范SQL注入方面，它比关键字过滤更有效，实现起来也更加方便。</li>
+</ol>
+<h2 id="科普sql注入和安全编程">科普SQL注入和安全编程</h2>
+<ul>
+<li>
+<p>什么是SQL注入：</p>
+<p>所谓SQL注入，就是通过把SQL命令插入到Web表单提交或输入域名或页面请求的查询字符串，最终达到欺骗服务器执行恶意的SQL命令。举个例子来说在用户登录时会输入用户名密码，这个时候在后台就可以执行这样的SQL语句</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-SQL" data-lang="SQL"><span class="line"><span class="cl"><span class="k">select</span><span class="w"> </span><span class="k">count</span><span class="p">(</span><span class="o">*</span><span class="p">)</span><span class="w"> </span><span class="k">from</span><span class="w"> </span><span class="k">user</span><span class="w"> </span><span class="k">where</span><span class="w"> </span><span class="n">username</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;haha&#39;</span><span class="w"> </span><span class="k">and</span><span class="w"> </span><span class="n">password</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;123456&#39;</span><span class="w">
+</span></span></span></code></pre></div><p>只有输入对了用户名和密码才能登录，但是如果没有对用户输入进行校验，当用户输入一些SQL中的语句，而后台直接将用户输入进行拼接并执行，就会发生注入，比如此时用户输入 *** &lsquo;haha&rsquo; or 1 = 1 &ndash; *** ,此时再后台执行的sql语句就变成了这样：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-SQL" data-lang="SQL"><span class="line"><span class="cl"><span class="k">select</span><span class="w"> </span><span class="k">count</span><span class="p">(</span><span class="o">*</span><span class="p">)</span><span class="w"> </span><span class="k">from</span><span class="w"> </span><span class="k">user</span><span class="w"> </span><span class="k">where</span><span class="w"> </span><span class="n">username</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;haha&#39;</span><span class="w"> </span><span class="k">or</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="c1">-- and password = &#39;&#39;
+</span></span></span></code></pre></div><p>这样用户就可以不用密码，直接使用用户名就登录了。而防范这类攻击，一般采用的是关键字过滤的方式，但是关键字过滤并不能杜绝这类工具，当一时疏忽忘记了过滤某个关键字仍然会产生这类问题。而且关键字过滤一般采用正则表达式，而正则表达式并不是一般人可以驾驭的。而防范SQL注入最简单也是最一劳永逸的方式就是参数化查询。</p>
+</li>
+<li>
+<p>为什么参数化查询能够从根本上解决SQL注入</p>
+<p>发生SQL注入一般的原因是程序将用户输入当做SQL语句的一部分进行执行，但是参数化查询它只是将用户输入当做参数，当做查询的条件，从数据库的层面上来说，它不对应于具体的数据库组件，它只是一组数据，而不会执行。这里可以简单的将传统的SQL拼接方式理解为C语言中的宏，宏也可以有参数，但是它不对参数进行校验，只是简单的进行替换，那么我可以使用一些指令作为参数传入，但是函数就不一样，函数的参数就是具体类型的变量或者常量。所以参数化查询从根本上解决的SQL注入的问题。</p>
+</li>
+</ul>
+<h1 id="参数化查询的使用">参数化查询的使用</h1>
+<p>前面说了这么多参数化查询的好处，那么到底怎么使用它呢？
+在Java等语言中内置了数据库操作，而对于C/C++来说，它并没有提供这方方面的标准。不同的平台有自己独特的一套机制，但是从总体来说，思想是共通的，只是语法上的不同，这里主要是说明OLEDB中的使用方式。</p>
+<ol>
+<li>使用“?”符将SQL语句中的条件值常量进行替换，组成一个新的SQL语句，比如上面登录的查询语句可以写成</li>
+</ol>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-SQL" data-lang="SQL"><span class="line"><span class="cl"><span class="k">select</span><span class="w"> </span><span class="k">count</span><span class="p">(</span><span class="o">*</span><span class="p">)</span><span class="w"> </span><span class="k">from</span><span class="w"> </span><span class="k">user</span><span class="w"> </span><span class="k">where</span><span class="w"> </span><span class="n">username</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="k">and</span><span class="w"> </span><span class="n">password</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">?</span><span class="w">
+</span></span></span></code></pre></div><ol start="2">
+<li>调用ICommandText的SetCommandText设置sql语句。</li>
+<li>调用ICommandParpare的Prepare方法对含有&quot;?&ldquo;的语句进行预处理</li>
+<li>调用ICommandWithParameters方法的GetParameterInfo方法获取参数详细信息的DBPARAMINFO结构（类似于DBCOLUMNINFO）</li>
+<li>分配对应大小的DBBINDING缓冲用来保存每个参数的绑定信息</li>
+<li>调用IAccessor的CreateAccessor方法创建对应的访问器</li>
+<li>为参数分配缓冲，设置合适的参数后准备DBPARAMS结构</li>
+<li>调用ICommandText的Execute方法并将DBPARAMS结构的指针作为参数传入。</li>
+<li>操作返回的结果集对象</li>
+</ol>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="k">typedef</span> <span class="k">struct</span> <span class="nc">tagDBPROPIDSET</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">   <span class="n">DBPROPID</span> <span class="o">*</span>   <span class="n">rgPropertyIDs</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">   <span class="n">ULONG</span>        <span class="n">cPropertyIDs</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">   <span class="n">GUID</span>         <span class="n">guidPropertySet</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span> <span class="n">DBPROPIDSET</span><span class="p">;</span>
+</span></span></code></pre></div><p>DBPARAMS结构的定义如下:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="k">typedef</span> <span class="k">struct</span> <span class="nc">tagDBPARAMS</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">void</span> <span class="o">*</span><span class="n">pData</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">DB_UPARAMS</span> <span class="n">cParamSets</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">HACCESSOR</span> <span class="n">hAccessor</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span> 	<span class="n">DBPARAMS</span><span class="p">;</span>
+</span></span></code></pre></div><ul>
+<li>pData是保存参数信息的缓冲；</li>
+<li>cParamSets: 表示又多少个参数</li>
+<li>hAccessor: 之前获取到的绑定结构的访问器句柄</li>
+</ul>
+<p>下面是一个使用的例子:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="n">BOOL</span> <span class="nf">QueryData</span><span class="p">(</span><span class="n">LPOLESTR</span> <span class="n">pQueryStr</span><span class="p">,</span> <span class="n">IOpenRowset</span><span class="o">*</span> <span class="n">pIOpenRowset</span><span class="p">,</span> <span class="n">IRowset</span><span class="o">*</span> <span class="o">&amp;</span><span class="n">pIRowset</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">	<span class="n">IAccessor</span> <span class="o">*</span><span class="n">pParamAccessor</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span> <span class="c1">//与参数化查询相关的访问器接口
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>
+</span></span><span class="line"><span class="cl">	<span class="n">LPOLESTR</span> <span class="n">pSql</span> <span class="o">=</span> <span class="n">_T</span><span class="p">(</span><span class="s">&#34;Select * From aa26 Where Left(aac031,2) = ?&#34;</span><span class="p">);</span> <span class="c1">//参数化查询语句
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="n">BOOL</span> <span class="n">bRet</span> <span class="o">=</span> <span class="n">FALSE</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">DB_UPARAMS</span> <span class="n">uParams</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">DBPARAMINFO</span><span class="o">*</span> <span class="n">rgParamInfo</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">LPOLESTR</span> <span class="n">pParamBuffer</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">DWORD</span> <span class="n">dwOffset</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">DBBINDING</span> <span class="o">*</span><span class="n">rgParamBinding</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">HACCESSOR</span> <span class="n">hAccessor</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">DBPARAMS</span> <span class="n">dbParams</span> <span class="o">=</span> <span class="p">{</span><span class="mi">0</span><span class="p">};</span>
+</span></span><span class="line"><span class="cl">	<span class="n">DBBINDSTATUS</span> <span class="o">*</span><span class="n">pdbBindStatus</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="c1">//设置SQL
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="n">hRes</span> <span class="o">=</span> <span class="n">pICommandText</span><span class="o">-&gt;</span><span class="n">SetCommandText</span><span class="p">(</span><span class="n">DBGUID_DEFAULT</span><span class="p">,</span> <span class="n">pSql</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="c1">//预处理SQL命令
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="n">pICommandPrepare</span><span class="o">-&gt;</span><span class="n">Prepare</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="n">hRes</span> <span class="o">=</span> <span class="n">pICommandText</span><span class="o">-&gt;</span><span class="n">QueryInterface</span><span class="p">(</span><span class="n">IID_ICommandPrepare</span><span class="p">,</span> <span class="p">(</span><span class="kt">void</span><span class="o">**</span><span class="p">)</span><span class="o">&amp;</span><span class="n">pICommandPrepare</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="c1">//获取参数信息
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="n">hRes</span> <span class="o">=</span> <span class="n">pICommandText</span><span class="o">-&gt;</span><span class="n">QueryInterface</span><span class="p">(</span><span class="n">IID_ICommandWithParameters</span><span class="p">,</span> <span class="p">(</span><span class="kt">void</span><span class="o">**</span><span class="p">)</span><span class="o">&amp;</span><span class="n">pICommandWithParameters</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="n">COM_SUCCESS</span><span class="p">(</span><span class="n">hRes</span><span class="p">,</span> <span class="n">_T</span><span class="p">(</span><span class="s">&#34;查询接口ICommandWithParameters失败，错误码为:%08x</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">),</span> <span class="n">hRes</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="n">hRes</span> <span class="o">=</span> <span class="n">pICommandWithParameters</span><span class="o">-&gt;</span><span class="n">GetParameterInfo</span><span class="p">(</span><span class="o">&amp;</span><span class="n">uParams</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">rgParamInfo</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">pParamBuffer</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="n">COM_SUCCESS</span><span class="p">(</span><span class="n">hRes</span><span class="p">,</span> <span class="n">_T</span><span class="p">(</span><span class="s">&#34;获取参数信息失败，错误码为:%08x</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">),</span> <span class="n">hRes</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="n">rgParamBinding</span> <span class="o">=</span> <span class="p">(</span><span class="n">DBBINDING</span><span class="o">*</span><span class="p">)</span><span class="n">MALLOC</span><span class="p">(</span><span class="k">sizeof</span><span class="p">(</span><span class="n">DBBINDING</span><span class="p">)</span> <span class="o">*</span> <span class="n">uParams</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="n">ZeroMemory</span><span class="p">(</span><span class="n">rgParamBinding</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">DBBINDING</span><span class="p">)</span> <span class="o">*</span> <span class="n">uParams</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="c1">//绑定参数信息
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">uParams</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">	<span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="n">rgParamBinding</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">bPrecision</span> <span class="o">=</span> <span class="n">rgParamInfo</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">bPrecision</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">		<span class="n">rgParamBinding</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">bScale</span> <span class="o">=</span> <span class="n">rgParamInfo</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">bScale</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">		<span class="n">rgParamBinding</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">cbMaxLen</span> <span class="o">=</span> <span class="mi">7</span> <span class="o">*</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">WCHAR</span><span class="p">);</span> <span class="c1">//行政区编号最大长度为6
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>		<span class="n">rgParamBinding</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">dwMemOwner</span> <span class="o">=</span> <span class="n">DBMEMOWNER_CLIENTOWNED</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">		<span class="n">rgParamBinding</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">dwPart</span> <span class="o">=</span> <span class="n">DBPART_LENGTH</span> <span class="o">|</span> <span class="n">DBPART_VALUE</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">		<span class="n">rgParamBinding</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">eParamIO</span> <span class="o">=</span> <span class="n">DBPARAMIO_INPUT</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">		<span class="n">rgParamBinding</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">iOrdinal</span> <span class="o">=</span> <span class="n">rgParamInfo</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">iOrdinal</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">		<span class="n">rgParamBinding</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">obLength</span> <span class="o">=</span> <span class="n">dwOffset</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">		<span class="n">rgParamBinding</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">obStatus</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">		<span class="n">rgParamBinding</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">obValue</span> <span class="o">=</span> <span class="n">dwOffset</span> <span class="o">+</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">ULONG</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">		<span class="n">rgParamBinding</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">wType</span> <span class="o">=</span> <span class="n">DBTYPE_WSTR</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">		<span class="n">dwOffset</span> <span class="o">=</span> <span class="n">dwOffset</span> <span class="o">+</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">ULONG</span><span class="p">)</span> <span class="o">+</span> <span class="n">rgParamBinding</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">cbMaxLen</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">		<span class="n">dwOffset</span> <span class="o">=</span> <span class="n">UPROUND</span><span class="p">(</span><span class="n">dwOffset</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="c1">//获取访问器
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="n">pdbBindStatus</span> <span class="o">=</span> <span class="p">(</span><span class="n">DBBINDSTATUS</span><span class="o">*</span><span class="p">)</span><span class="n">MALLOC</span><span class="p">(</span><span class="n">uParams</span> <span class="o">*</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">DBBINDSTATUS</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">	<span class="n">ZeroMemory</span><span class="p">(</span><span class="n">pdbBindStatus</span><span class="p">,</span> <span class="n">uParams</span> <span class="o">*</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">DBBINDSTATUS</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl">	<span class="n">pParamAccessor</span><span class="o">-&gt;</span><span class="n">CreateAccessor</span><span class="p">(</span><span class="n">DBACCESSOR_PARAMETERDATA</span><span class="p">,</span> <span class="n">uParams</span><span class="p">,</span> <span class="n">rgParamBinding</span><span class="p">,</span> <span class="n">dwOffset</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">hAccessor</span><span class="p">,</span> <span class="n">pdbBindStatus</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="n">COM_SUCCESS</span><span class="p">(</span><span class="n">hRes</span><span class="p">,</span> <span class="n">_T</span><span class="p">(</span><span class="s">&#34;获取参数访问器失败，错误码为:%08x</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">),</span> <span class="n">hRes</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="c1">//准备参数
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="n">dbParams</span><span class="p">.</span><span class="n">pData</span> <span class="o">=</span> <span class="n">MALLOC</span><span class="p">(</span><span class="n">dwOffset</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="n">ZeroMemory</span><span class="p">(</span><span class="n">dbParams</span><span class="p">.</span><span class="n">pData</span><span class="p">,</span> <span class="n">dwOffset</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="n">dbParams</span><span class="p">.</span><span class="n">cParamSets</span> <span class="o">=</span> <span class="n">uParams</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">dbParams</span><span class="p">.</span><span class="n">hAccessor</span> <span class="o">=</span> <span class="n">hAccessor</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">uParams</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">	<span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="o">*</span><span class="p">(</span><span class="n">ULONG</span><span class="o">*</span><span class="p">)((</span><span class="n">BYTE</span><span class="o">*</span><span class="p">)</span><span class="n">dbParams</span><span class="p">.</span><span class="n">pData</span> <span class="o">+</span> <span class="n">rgParamBinding</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">obLength</span><span class="p">)</span> <span class="o">=</span> <span class="n">_tcslen</span><span class="p">(</span><span class="n">pQueryStr</span><span class="p">)</span> <span class="o">*</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">WCHAR</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">		<span class="n">StringCchCopy</span><span class="p">((</span><span class="n">LPTSTR</span><span class="p">)((</span><span class="n">BYTE</span><span class="o">*</span><span class="p">)</span><span class="n">dbParams</span><span class="p">.</span><span class="n">pData</span> <span class="o">+</span> <span class="n">rgParamBinding</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">obValue</span><span class="p">),</span> <span class="n">_tcslen</span><span class="p">(</span><span class="n">pQueryStr</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">pQueryStr</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="c1">//执行SQL
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="n">hRes</span> <span class="o">=</span> <span class="n">pICommandText</span><span class="o">-&gt;</span><span class="n">Execute</span><span class="p">(</span><span class="nb">NULL</span><span class="p">,</span> <span class="n">IID_IRowset</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">dbParams</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">,</span> <span class="p">(</span><span class="n">IUnknown</span><span class="o">**</span><span class="p">)</span><span class="o">&amp;</span><span class="n">pIRowset</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="k">return</span> <span class="n">bRet</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p><a href="https://gitee.com/masimaro/codes/vypocjnkabdu6wz8gfh0m36#ParamQuery" target="_blank" rel="noopener noreffer ">完整代码</a></p>
+<!-- raw HTML omitted -->
+</div><div class="post-footer" id="post-footer">
+    <div class="post-info">
+        <div class="post-info-line">
+            <div class="post-info-mod">
+                <span>Updated on 2018-03-25</span>
+            </div></div>
+        <div class="post-info-line">
+            <div class="post-info-md"></div>
+            <div class="post-info-share">
+                <span><a href="javascript:void(0);" title="Share on Twitter" data-sharer="twitter" data-url="http://HaiLateBoy.github.io/posts/oledb-and-ado-7/" data-title="OLEDB 参数化查询" data-hashtags="OLEDB,数据库编程,VC&#43;&#43;,数据库"><i class="fab fa-twitter fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Facebook" data-sharer="facebook" data-url="http://HaiLateBoy.github.io/posts/oledb-and-ado-7/" data-hashtag="OLEDB"><i class="fab fa-facebook-square fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Hacker News" data-sharer="hackernews" data-url="http://HaiLateBoy.github.io/posts/oledb-and-ado-7/" data-title="OLEDB 参数化查询"><i class="fab fa-hacker-news fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Line" data-sharer="line" data-url="http://HaiLateBoy.github.io/posts/oledb-and-ado-7/" data-title="OLEDB 参数化查询"><i data-svg-src="https://cdn.jsdelivr.net/npm/simple-icons@7.3.0/icons/line.svg" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on 微博" data-sharer="weibo" data-url="http://HaiLateBoy.github.io/posts/oledb-and-ado-7/" data-title="OLEDB 参数化查询"><i class="fab fa-weibo fa-fw" aria-hidden="true"></i></a></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="post-info-more">
+        <section class="post-tags"><i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/oledb/">OLEDB</a>,&nbsp;<a href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93%E7%BC%96%E7%A8%8B/">数据库编程</a>,&nbsp;<a href="/tags/vc&#43;&#43;/">VC&#43;&#43;</a>,&nbsp;<a href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93/">数据库</a></section>
+        <section>
+            <span><a href="javascript:void(0);" onclick="window.history.back();">Back</a></span>&nbsp;|&nbsp;<span><a href="/">Home</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav"><a href="/posts/oledb-and-ado-6/" class="prev" rel="prev" title="多结果集IMultipleResult接口"><i class="fas fa-angle-left fa-fw" aria-hidden="true"></i>多结果集IMultipleResult接口</a>
+            <a href="/posts/oledb-and-ado-8/" class="next" rel="next" title="OLEDB 调用存储过程">OLEDB 调用存储过程<i class="fas fa-angle-right fa-fw" aria-hidden="true"></i></a></div>
+</div>
+</article></div>
+            </main><footer class="footer">
+        <div class="footer-container"><div class="footer-line">Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener noreffer" title="Hugo 0.121.2">Hugo</a> | Theme - <a href="https://github.com/dillonzq/LoveIt" target="_blank" rel="noopener noreffer" title="LoveIt 0.2.11"><i class="far fa-kiss-wink-heart fa-fw" aria-hidden="true"></i> LoveIt</a>
+                </div><div class="footer-line" itemscope itemtype="http://schema.org/CreativeWork"><i class="far fa-copyright fa-fw" aria-hidden="true"></i><span itemprop="copyrightYear">2022 - 2024</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="https://www.masimaro.xyz" target="_blank">Masimaro</a></span></div>
+        </div>
+    </footer></div>
+
+        <div id="fixed-buttons"><a href="#" id="back-to-top" class="fixed-button" title="Back to Top">
+                <i class="fas fa-arrow-up fa-fw" aria-hidden="true"></i>
+            </a><a href="#" id="view-comments" class="fixed-button" title="View Comments">
+                <i class="fas fa-comment fa-fw" aria-hidden="true"></i>
+            </a>
+        </div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.css"><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/autocomplete.js@0.38.1/dist/autocomplete.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lunr@2.3.9/lunr.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lazysizes@5.3.2/lazysizes.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/clipboard@2.0.11/dist/clipboard.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/sharer.js@0.5.1/sharer.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/auto-render.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/copy-tex.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/mhchem.min.js"></script><script type="text/javascript">window.config={"code":{"copyTitle":"Copy to clipboard","maxShownLines":50},"comment":{},"math":{"delimiters":[{"display":true,"left":"$$","right":"$$"},{"display":true,"left":"\\[","right":"\\]"},{"display":true,"left":"\\begin{equation}","right":"\\end{equation}"},{"display":true,"left":"\\begin{equation*}","right":"\\end{equation*}"},{"display":true,"left":"\\begin{align}","right":"\\end{align}"},{"display":true,"left":"\\begin{align*}","right":"\\end{align*}"},{"display":true,"left":"\\begin{alignat}","right":"\\end{alignat}"},{"display":true,"left":"\\begin{alignat*}","right":"\\end{alignat*}"},{"display":true,"left":"\\begin{gather}","right":"\\end{gather}"},{"display":true,"left":"\\begin{CD}","right":"\\end{CD}"},{"display":false,"left":"$","right":"$"},{"display":false,"left":"\\(","right":"\\)"}],"strict":false},"search":{"highlightTag":"em","maxResultLength":10,"noResultsFound":"No results found","snippetLength":50}};</script><script type="text/javascript" src="/js/theme.min.js"></script></body>
+</html>

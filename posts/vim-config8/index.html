@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="robots" content="noodp" />
+        <title>从零开始配置 vim(8)——文件类型检测 - Masimaro&#39;s blog</title><meta name="Description" content="这是我用于记录日常和学习的小站"><meta property="og:title" content="从零开始配置 vim(8)——文件类型检测" />
+<meta property="og:description" content="在上一章介绍自动命令的时候，我们提到可以使用 FileType来根据文件类型来触发事件，但是关于文件类型并没有深入的介绍，本篇我们来补充关于文" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://HaiLateBoy.github.io/posts/vim-config8/" /><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2022-08-05T10:15:14+08:00" />
+<meta property="article:modified_time" content="2022-08-05T10:15:14+08:00" /><meta property="og:site_name" content="Masimaro&#39;s blog" />
+
+<meta name="twitter:card" content="summary"/><meta name="twitter:title" content="从零开始配置 vim(8)——文件类型检测"/>
+<meta name="twitter:description" content="在上一章介绍自动命令的时候，我们提到可以使用 FileType来根据文件类型来触发事件，但是关于文件类型并没有深入的介绍，本篇我们来补充关于文"/>
+<meta name="application-name" content="My cool site">
+<meta name="apple-mobile-web-app-title" content="My cool site"><meta name="theme-color" content="#ffffff"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="manifest" href="/site.webmanifest"><link rel="canonical" href="http://HaiLateBoy.github.io/posts/vim-config8/" /><link rel="prev" href="http://HaiLateBoy.github.io/posts/vim-config7/" /><link rel="next" href="http://HaiLateBoy.github.io/posts/vim-config9/" /><link rel="stylesheet" href="/css/style.min.css"><link rel="preload" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css"></noscript><link rel="preload" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css"></noscript><script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "BlogPosting",
+        "headline": "从零开始配置 vim(8)——文件类型检测",
+        "inLanguage": "zh-CN",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "http:\/\/HaiLateBoy.github.io\/posts\/vim-config8\/"
+        },"genre": "posts","keywords": "vim, 编辑工具, 文本处理, lua, 编辑器","wordcount":  2143 ,
+        "url": "http:\/\/HaiLateBoy.github.io\/posts\/vim-config8\/","datePublished": "2022-08-05T10:15:14+08:00","dateModified": "2022-08-05T10:15:14+08:00","publisher": {
+            "@type": "Organization",
+            "name": ""},"author": {
+                "@type": "Person",
+                "name": "Masimaro"
+            },"description": ""
+    }
+    </script></head>
+    <body data-header-desktop="fixed" data-header-mobile="auto"><script type="text/javascript">(window.localStorage && localStorage.getItem('theme') ? localStorage.getItem('theme') === 'dark' : ('auto' === 'auto' ? window.matchMedia('(prefers-color-scheme: dark)').matches : 'auto' === 'dark')) && document.body.setAttribute('theme', 'dark');</script>
+
+        <div id="mask"></div><div class="wrapper"><header class="desktop" id="header-desktop">
+    <div class="header-wrapper">
+        <div class="header-title">
+            <a href="/" title="Masimaro&#39;s blog">My cool site</a>
+        </div>
+        <div class="menu">
+            <div class="menu-inner"><a class="menu-item" href="/posts/" title="文章列表"> 文章 </a><a class="menu-item" href="/tags/" title="标签"> 标签 </a><a class="menu-item" href="/categories/" title="分类"> 分类 </a><a class="menu-item" href="/about" title="关于本站"> 关于 </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-desktop">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-desktop" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-desktop" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-desktop">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </span><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                    <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+                </a></div>
+        </div>
+    </div>
+</header><header class="mobile" id="header-mobile">
+    <div class="header-container">
+        <div class="header-wrapper">
+            <div class="header-title">
+                <a href="/" title="Masimaro&#39;s blog">My cool site</a>
+            </div>
+            <div class="menu-toggle" id="menu-toggle-mobile">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+        <div class="menu" id="menu-mobile"><div class="search-wrapper">
+                    <div class="search mobile" id="search-mobile">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-mobile">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-mobile" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-mobile" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-mobile">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </div>
+                    <a href="javascript:void(0);" class="search-cancel" id="search-cancel-mobile">
+                        Cancel
+                    </a>
+                </div><a class="menu-item" href="/posts/" title="文章列表">文章</a><a class="menu-item" href="/tags/" title="标签">标签</a><a class="menu-item" href="/categories/" title="分类">分类</a><a class="menu-item" href="/about" title="关于本站">关于</a><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+            </a></div>
+    </div>
+</header><div class="search-dropdown desktop">
+        <div id="search-dropdown-desktop"></div>
+    </div>
+    <div class="search-dropdown mobile">
+        <div id="search-dropdown-mobile"></div>
+    </div><main class="main">
+                <div class="container"><div class="toc" id="toc-auto">
+            <h2 class="toc-title">Contents</h2>
+            <div class="toc-content" id="toc-content-auto"></div>
+        </div><article class="page single"><h1 class="single-title animate__animated animate__flipInX">从零开始配置 vim(8)——文件类型检测</h1><div class="post-meta">
+            <div class="post-meta-line"><span class="post-author"><a href="https://www.masimaro.xyz" title="Author" target="_blank" rel="noopener noreffer author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Masimaro</a></span>&nbsp;<span class="post-category">included in <a href="/categories/vim-%E9%85%8D%E7%BD%AE/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>vim 配置</a></span></div>
+            <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw" aria-hidden="true"></i>&nbsp;<time datetime="2022-08-05">2022-08-05</time>&nbsp;<i class="fas fa-pencil-alt fa-fw" aria-hidden="true"></i>&nbsp;2143 words&nbsp;
+                <i class="far fa-clock fa-fw" aria-hidden="true"></i>&nbsp;5 minutes&nbsp;</div>
+        </div><div class="details toc" id="toc-static"  data-kept="true">
+                <div class="details-summary toc-title">
+                    <span>Contents</span>
+                    <span><i class="details-icon fas fa-angle-right" aria-hidden="true"></i></span>
+                </div>
+                <div class="details-content toc-content" id="toc-content-static"><nav id="TableOfContents">
+  <ul>
+    <li><a href="#文件类型简介">文件类型简介</a></li>
+    <li><a href="#文件类型检测">文件类型检测</a></li>
+    <li><a href="#文件类型插件">文件类型插件</a></li>
+    <li><a href="#文件类型缩进">文件类型缩进</a></li>
+    <li><a href="#最后的结论">最后的结论</a></li>
+  </ul>
+</nav></div>
+            </div><div class="content" id="content"><p>在上一章介绍自动命令的时候，我们提到可以使用 FileType来根据文件类型来触发事件，但是关于文件类型并没有深入的介绍，本篇我们来补充关于文件类型相关的内容，让大家更好的理解，看不懂也没关系，你只需要知道vim能识别各种编程语言的文件并启用事先定义好的配置即可。</p>
+<p>事先做几点声明：</p>
+<ol>
+<li>跳过这篇文章对后面介绍的内容的理解不会有任何障碍，如果你不想看，直接拉到最后看结论即可</li>
+<li>本篇文章会针对 <code>neovim</code> 的部分代码进行简单的剖析以便深入讲解文件类型。涉及到的 <code>neovim</code> 版本为 <code>0.7.2</code>，如果你使用的是更早版本，代码可能会不太一样，但是重点代码应该是一样的</li>
+<li>里面的代码可能有些小伙伴并不能理解，但是我们只是通过代码来描述它的一些流程，不理解代码能理解这个流程也是OK的，再退一步即使不理解流程，也没关系，毕竟我们只需要知道它有这个功能，不需要知道它的细节，不理解细节完全不会阻碍我们使用并对它进行配置</li>
+</ol>
+<p>让我们进入相应的主题吧</p>
+<h2 id="文件类型简介">文件类型简介</h2>
+<p>在 <code>vim</code> 中可以使用 <code>filetype plugin indent on</code> 来打开文件类型检测，而在 <code>neovim</code> 中已经默认打开了这些属性，因此我们可以不设置这些。我们可以使用 <code>:filetype</code> 来查看打开的状态。它会返回如下的内容 <code>filetype detection:ON  plugin:ON  indent:ON</code> 我们发现它包含了三个部分。</p>
+<p>上述的设置语句我们可以将它拆分成3个部分：</p>
+<pre tabindex="0"><code class="language-vimscript" data-lang="vimscript">filetype on
+filetype plugin on
+filetype indent on
+</code></pre><p>它打开了三个东西，文件类型检测，针对文件类型相关的插件，针对文件类型相关的缩进和隐藏代码块的格式。下面我们依次来介绍这些东西</p>
+<h2 id="文件类型检测">文件类型检测</h2>
+<p><code>filetype on</code> 将打开文件类型检测。如果该项被打开，<code>vim</code> 在初始化的时候会读取脚本 <code>$VIMRUNTIME/filetype.vim</code> 和 <code>$VIMRUNTIME/filetype.lua</code> 的内容。这两个脚本用来识别文件类型。<code>$VIMRUNTIME</code> 是 <code>vim</code> 里面的环境变量与 <code>$MYVIMRC</code> 类似，我们可以通过使用 <code>:echo $VIMRUNTIME</code> 来查看具体的路径，也可以直接在命令模式中将它当做一个路径来使用</p>
+<p>我们先来阅读以下 <code>filetype.vim</code> 的内容，在这段脚本中，我们可以发现大量这样的语句</p>
+<pre tabindex="0"><code class="language-vimscript" data-lang="vimscript">au BufNewFile,BufRead *.cxx,*.c++,*.hh,*.hxx,*.hpp,*.ipp,*.moc,*.tcc,*.inl setf cpp
+au BufNewFile,BufRead $VIMRUNTIME/doc/*.txt setf help
+au BufNewFile,BufRead .htaccess,*/etc/httpd/*.conf              setf apache
+au BufNewFile,BufRead */etc/apache2/sites-*/*.com               setf apache
+</code></pre><p>结合我们之前学习的自动命令相关的内容可以知道，这些代码会根据文件路径和后缀来自动设置文件类型。</p>
+<p>从这写代码中可以看到，<code>vim</code> 也是靠命令来设置文件类型的。使用 <code>:setf</code> 或者 使用 <code>:set filetype=c</code> 或者使用它的简写形式 <code>set ft=c</code>来设置文件类型</p>
+<p>除了根据文件后缀，<code>vim</code> 也可以根据文件内容来判别文件类型。我们进入到 <code>filetype.lua</code> 中可以看到，真正根据文件内容来决定类型是通过文件 <code>script.vim</code> 。该文件中主要使用正则表达式来匹配对应的特征值从而确定该文件类型，例如脚本中有这么一些代码</p>
+<pre tabindex="0"><code class="language-vimscript" data-lang="vimscript">elseif s:line1 =~# &#39;&lt;?\s*xml.*?&gt;&#39;
+     set ft=xml
+
+&#34; XHTML (e.g.: PUBLIC &#34;-//W3C//DTD XHTML 1.0 Transitional//EN&#34;)
+elseif s:line1 =~# &#39;\&lt;DTD\s\+XHTML\s&#39;
+  set ft=xhtml
+
+&#34; HTML (e.g.: &lt;!DOCTYPE HTML PUBLIC &#34;-//W3C//DTD HTML 4.01//EN&#34;)
+&#34; Avoid &#34;doctype html&#34;, used by slim.
+elseif s:line1 =~? &#39;&lt;!DOCTYPE\s\+html\&gt;&#39;
+  set ft=html
+elseif s:line1 =~? &#39;-\*-.*C++.*-\*-&#39;
+  set ft=cpp
+</code></pre><p>如果我们的文件无法满足 <code>vim</code> 识别文件类型的要求，也可以在文件中添加注释来帮助 <code>vim</code> 进行识别
+例如使用如下注释来使<code>vim</code> 确定它是一个 <code>c</code> 的代码</p>
+<pre tabindex="0"><code class="language-vimscript" data-lang="vimscript">/* vim: ft=c */
+</code></pre><p>可以在注释中使用 <code>vim: ft=</code> 来设置文件类型。除了设置文件类型，这类注释还是设置像文件是否显示行号、列宽等等信息。更多信息可以查看 <code>:help modeline</code> 。</p>
+<h2 id="文件类型插件">文件类型插件</h2>
+<p>在得到文件类型之后，<code>vim</code> 会根据文件类型加载不同的文件插件。它也是一个脚本，该脚本为 <code>$VIMRUMTIME/ftplugin.vim</code> 。打开这个文件，我们需要重点关注这么几句代码</p>
+<pre tabindex="0"><code class="language-vimscript" data-lang="vimscript">for name in split(s, &#39;\.&#39;)
+    exe &#39;runtime! ftplugin/&#39; . name . &#39;.vim ftplugin/&#39; . name . &#39;_*.vim ftplugin/&#39; . name . &#39;/*.vim&#39;
+    &#34; Load lua ftplugins
+    exe printf(&#39;runtime! ftplugin/%s.lua ftplugin/%s_*.lua ftplugin/%s/*.lua&#39;, name, name, name)
+endfor
+</code></pre><p>其中 <code>s</code> 是一个字符串，它是一个包含了扩展名的文件名，在这里以 <code>.</code> 作为分割，读取它以.分割的所有内容。例如 <code>aaa.bbb</code> 会被分割为 <code>aaa</code> 和 <code>bbb</code>。然后根据 <code>aaa</code> 和 <code>bbb</code> 来分别执行下面的循环</p>
+<p><code>exe</code> 是用来执行对应文件内代码的语句。后面是一个字符串的拼接，假设当前打开的是一个<code>.py</code> 结尾的文件，对应的这句话就可以拼接为 <code>exe 'runtim! ftplugin/py.vim ftplugin/py__*.vim' ftplugin/py/*.vim</code> 。后面两句拼接的内容相似，只是一个是给<code>vim</code> 脚本用的，一个是给<code>lua</code> 脚本用的。这里我们以 lua脚本为例。</p>
+<p><code>runtime!</code> 你可以理解成 <code>python</code> 的 <code>import</code> 或者 <code>c/c++</code> 中的 <code>#include</code>，加载文件的路径一个是 <code>$VIMRUNTIME</code> 所在路径，我们可以在 <code>$VIMRUNTIME/ftplugin</code> 目录中找到很多语言预定义的设置，还有一个是配置文件所在的根目录。对于 <code>neovim</code> 来说，这个路径就是 <code>~/.config/nvim</code> 。</p>
+<p>这样我们就明白了，我们可以将对应文件类型的个性化配置放到 <code>~/.config/nvim/ftplugin</code> 目录中。以 <code>python</code> 为例来说的话。它会加载 <code>ftplugin/py.lua</code> ，<code>ftplugin/py_*.lua</code> (以<code>py</code> 开头，以 <code>.lua</code> 结尾的文件)， <code>ftplugin/py/*.lua</code>（py 目录下所有的lua文件）。</p>
+<p>这样以后针对不同语言的设置完全可以在 <code>ftplugin</code> 中以对应名字命名。从而更好的组织我们的目录结构。</p>
+<h2 id="文件类型缩进">文件类型缩进</h2>
+<p>文件类型缩进运行我们为不同类型的文件设置不同格式的缩进，例如有的习惯使用4空格缩进，有的习惯使用 2空格或者8空格缩进。定义缩进格式的脚本是 <code>$VIMRUNTIME/indent.vim</code> 。在这个文件中我们又见到了类似的写法</p>
+<pre tabindex="0"><code class="language-vimscript" data-lang="vimscript">for name in split(s, &#39;\.&#39;)
+    exe &#39;runtime! indent/&#39; . name . &#39;.vim&#39;
+    exe &#39;runtime! indent/&#39; . name . &#39;.lua&#39;
+endfor
+</code></pre><p>有了上面讲解的基础，理解这段代码就容易多了，它这里加载的主要是 <code>indent</code> 目录中以后缀命名的缩进文件。但是它默认加载的文件比较少。从代码上看<code>.py</code> 文件如果使用 <code>python.vim</code> 应该是不会被加载的，但是它默认的目录中针对 <code>python</code> 的缩进仍然是以 <code>python.vim</code> 命名，就证明它是可以被加载的。这里我还不理解为什么会被加载。有知道的小伙伴可以在评论区留言，大家一起交流学习。
+好了，本章内容就到这里了。前面分析了那么多内容，总结起来就很简单的几点</p>
+<h2 id="最后的结论">最后的结论</h2>
+<p><code>vim</code> 可以根据文件后缀和文件内容来决定文件类型。如果无法决定也可以使用 <code>set ft</code> 来设置，或者在文件头部添加注释 <code>vim: ft=</code> 来知名类型
+我们可以针对不同文件类型进行个性化配置，包括插件和缩进，插件的用户配置文件的路径在 <code>~/.config/nvim/ftplugin</code> 中，以类型名命名。缩进的配置在 <code>~/.config/nvim/indent</code> 目录中，以类型名命名。</p>
+</div><div class="post-footer" id="post-footer">
+    <div class="post-info">
+        <div class="post-info-line">
+            <div class="post-info-mod">
+                <span>Updated on 2022-08-05</span>
+            </div></div>
+        <div class="post-info-line">
+            <div class="post-info-md"></div>
+            <div class="post-info-share">
+                <span><a href="javascript:void(0);" title="Share on Twitter" data-sharer="twitter" data-url="http://HaiLateBoy.github.io/posts/vim-config8/" data-title="从零开始配置 vim(8)——文件类型检测" data-hashtags="vim,编辑工具,文本处理,lua,编辑器"><i class="fab fa-twitter fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Facebook" data-sharer="facebook" data-url="http://HaiLateBoy.github.io/posts/vim-config8/" data-hashtag="vim"><i class="fab fa-facebook-square fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Hacker News" data-sharer="hackernews" data-url="http://HaiLateBoy.github.io/posts/vim-config8/" data-title="从零开始配置 vim(8)——文件类型检测"><i class="fab fa-hacker-news fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Line" data-sharer="line" data-url="http://HaiLateBoy.github.io/posts/vim-config8/" data-title="从零开始配置 vim(8)——文件类型检测"><i data-svg-src="https://cdn.jsdelivr.net/npm/simple-icons@7.3.0/icons/line.svg" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on 微博" data-sharer="weibo" data-url="http://HaiLateBoy.github.io/posts/vim-config8/" data-title="从零开始配置 vim(8)——文件类型检测"><i class="fab fa-weibo fa-fw" aria-hidden="true"></i></a></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="post-info-more">
+        <section class="post-tags"><i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/vim/">vim</a>,&nbsp;<a href="/tags/%E7%BC%96%E8%BE%91%E5%B7%A5%E5%85%B7/">编辑工具</a>,&nbsp;<a href="/tags/%E6%96%87%E6%9C%AC%E5%A4%84%E7%90%86/">文本处理</a>,&nbsp;<a href="/tags/lua/">lua</a>,&nbsp;<a href="/tags/%E7%BC%96%E8%BE%91%E5%99%A8/">编辑器</a></section>
+        <section>
+            <span><a href="javascript:void(0);" onclick="window.history.back();">Back</a></span>&nbsp;|&nbsp;<span><a href="/">Home</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav"><a href="/posts/vim-config7/" class="prev" rel="prev" title="从零开始配置 vim(7)——自动命令"><i class="fas fa-angle-left fa-fw" aria-hidden="true"></i>从零开始配置 vim(7)——自动命令</a>
+            <a href="/posts/vim-config9/" class="next" rel="next" title="从零开始配置 vim(9)——初始配置">从零开始配置 vim(9)——初始配置<i class="fas fa-angle-right fa-fw" aria-hidden="true"></i></a></div>
+</div>
+</article></div>
+            </main><footer class="footer">
+        <div class="footer-container"><div class="footer-line">Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener noreffer" title="Hugo 0.121.2">Hugo</a> | Theme - <a href="https://github.com/dillonzq/LoveIt" target="_blank" rel="noopener noreffer" title="LoveIt 0.2.11"><i class="far fa-kiss-wink-heart fa-fw" aria-hidden="true"></i> LoveIt</a>
+                </div><div class="footer-line" itemscope itemtype="http://schema.org/CreativeWork"><i class="far fa-copyright fa-fw" aria-hidden="true"></i><span itemprop="copyrightYear">2022 - 2024</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="https://www.masimaro.xyz" target="_blank">Masimaro</a></span></div>
+        </div>
+    </footer></div>
+
+        <div id="fixed-buttons"><a href="#" id="back-to-top" class="fixed-button" title="Back to Top">
+                <i class="fas fa-arrow-up fa-fw" aria-hidden="true"></i>
+            </a><a href="#" id="view-comments" class="fixed-button" title="View Comments">
+                <i class="fas fa-comment fa-fw" aria-hidden="true"></i>
+            </a>
+        </div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.css"><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/autocomplete.js@0.38.1/dist/autocomplete.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lunr@2.3.9/lunr.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lazysizes@5.3.2/lazysizes.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/clipboard@2.0.11/dist/clipboard.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/sharer.js@0.5.1/sharer.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/auto-render.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/copy-tex.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/mhchem.min.js"></script><script type="text/javascript">window.config={"code":{"copyTitle":"Copy to clipboard","maxShownLines":50},"comment":{},"math":{"delimiters":[{"display":true,"left":"$$","right":"$$"},{"display":true,"left":"\\[","right":"\\]"},{"display":true,"left":"\\begin{equation}","right":"\\end{equation}"},{"display":true,"left":"\\begin{equation*}","right":"\\end{equation*}"},{"display":true,"left":"\\begin{align}","right":"\\end{align}"},{"display":true,"left":"\\begin{align*}","right":"\\end{align*}"},{"display":true,"left":"\\begin{alignat}","right":"\\end{alignat}"},{"display":true,"left":"\\begin{alignat*}","right":"\\end{alignat*}"},{"display":true,"left":"\\begin{gather}","right":"\\end{gather}"},{"display":true,"left":"\\begin{CD}","right":"\\end{CD}"},{"display":false,"left":"$","right":"$"},{"display":false,"left":"\\(","right":"\\)"}],"strict":false},"search":{"highlightTag":"em","maxResultLength":10,"noResultsFound":"No results found","snippetLength":50}};</script><script type="text/javascript" src="/js/theme.min.js"></script></body>
+</html>

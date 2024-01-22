@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="robots" content="noodp" />
+        <title>算法与数据结构(二)：链表 - Masimaro&#39;s blog</title><meta name="Description" content="这是我用于记录日常和学习的小站"><meta property="og:title" content="算法与数据结构(二)：链表" />
+<meta property="og:description" content="上一篇简单的开了一个头，简单介绍了一下所谓的时间复杂度与空间复杂度，从这篇开始将陆陆续续写一下常用的数据结构：链表、队列、栈、树等等。 链表当" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://HaiLateBoy.github.io/posts/list/" /><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2019-01-19T17:22:53+00:00" />
+<meta property="article:modified_time" content="2019-01-19T17:22:53+00:00" /><meta property="og:site_name" content="Masimaro&#39;s blog" />
+
+<meta name="twitter:card" content="summary"/><meta name="twitter:title" content="算法与数据结构(二)：链表"/>
+<meta name="twitter:description" content="上一篇简单的开了一个头，简单介绍了一下所谓的时间复杂度与空间复杂度，从这篇开始将陆陆续续写一下常用的数据结构：链表、队列、栈、树等等。 链表当"/>
+<meta name="application-name" content="My cool site">
+<meta name="apple-mobile-web-app-title" content="My cool site"><meta name="theme-color" content="#ffffff"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="manifest" href="/site.webmanifest"><link rel="canonical" href="http://HaiLateBoy.github.io/posts/list/" /><link rel="prev" href="http://HaiLateBoy.github.io/posts/data-structure/" /><link rel="next" href="http://HaiLateBoy.github.io/posts/queue/" /><link rel="stylesheet" href="/css/style.min.css"><link rel="preload" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css"></noscript><link rel="preload" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css"></noscript><script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "BlogPosting",
+        "headline": "算法与数据结构(二)：链表",
+        "inLanguage": "zh-CN",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "http:\/\/HaiLateBoy.github.io\/posts\/list\/"
+        },"genre": "posts","keywords": "算法与数据结构, C语言, 链表","wordcount":  3715 ,
+        "url": "http:\/\/HaiLateBoy.github.io\/posts\/list\/","datePublished": "2019-01-19T17:22:53+00:00","dateModified": "2019-01-19T17:22:53+00:00","publisher": {
+            "@type": "Organization",
+            "name": ""},"author": {
+                "@type": "Person",
+                "name": "Masimaro"
+            },"description": ""
+    }
+    </script></head>
+    <body data-header-desktop="fixed" data-header-mobile="auto"><script type="text/javascript">(window.localStorage && localStorage.getItem('theme') ? localStorage.getItem('theme') === 'dark' : ('auto' === 'auto' ? window.matchMedia('(prefers-color-scheme: dark)').matches : 'auto' === 'dark')) && document.body.setAttribute('theme', 'dark');</script>
+
+        <div id="mask"></div><div class="wrapper"><header class="desktop" id="header-desktop">
+    <div class="header-wrapper">
+        <div class="header-title">
+            <a href="/" title="Masimaro&#39;s blog">My cool site</a>
+        </div>
+        <div class="menu">
+            <div class="menu-inner"><a class="menu-item" href="/posts/" title="文章列表"> 文章 </a><a class="menu-item" href="/tags/" title="标签"> 标签 </a><a class="menu-item" href="/categories/" title="分类"> 分类 </a><a class="menu-item" href="/about" title="关于本站"> 关于 </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-desktop">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-desktop" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-desktop" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-desktop">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </span><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                    <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+                </a></div>
+        </div>
+    </div>
+</header><header class="mobile" id="header-mobile">
+    <div class="header-container">
+        <div class="header-wrapper">
+            <div class="header-title">
+                <a href="/" title="Masimaro&#39;s blog">My cool site</a>
+            </div>
+            <div class="menu-toggle" id="menu-toggle-mobile">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+        <div class="menu" id="menu-mobile"><div class="search-wrapper">
+                    <div class="search mobile" id="search-mobile">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-mobile">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-mobile" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-mobile" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-mobile">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </div>
+                    <a href="javascript:void(0);" class="search-cancel" id="search-cancel-mobile">
+                        Cancel
+                    </a>
+                </div><a class="menu-item" href="/posts/" title="文章列表">文章</a><a class="menu-item" href="/tags/" title="标签">标签</a><a class="menu-item" href="/categories/" title="分类">分类</a><a class="menu-item" href="/about" title="关于本站">关于</a><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+            </a></div>
+    </div>
+</header><div class="search-dropdown desktop">
+        <div id="search-dropdown-desktop"></div>
+    </div>
+    <div class="search-dropdown mobile">
+        <div id="search-dropdown-mobile"></div>
+    </div><main class="main">
+                <div class="container"><div class="toc" id="toc-auto">
+            <h2 class="toc-title">Contents</h2>
+            <div class="toc-content" id="toc-content-auto"></div>
+        </div><article class="page single"><h1 class="single-title animate__animated animate__flipInX">算法与数据结构(二)：链表</h1><div class="post-meta">
+            <div class="post-meta-line"><span class="post-author"><a href="https://www.masimaro.xyz" title="Author" target="_blank" rel="noopener noreffer author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Masimaro</a></span>&nbsp;<span class="post-category">included in <a href="/categories/%E7%AE%97%E6%B3%95%E4%B8%8E%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>算法与数据结构</a></span></div>
+            <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw" aria-hidden="true"></i>&nbsp;<time datetime="2019-01-19">2019-01-19</time>&nbsp;<i class="fas fa-pencil-alt fa-fw" aria-hidden="true"></i>&nbsp;3715 words&nbsp;
+                <i class="far fa-clock fa-fw" aria-hidden="true"></i>&nbsp;8 minutes&nbsp;</div>
+        </div><div class="details toc" id="toc-static"  data-kept="true">
+                <div class="details-summary toc-title">
+                    <span>Contents</span>
+                    <span><i class="details-icon fas fa-angle-right" aria-hidden="true"></i></span>
+                </div>
+                <div class="details-content toc-content" id="toc-content-static"><nav id="TableOfContents">
+  <ul>
+    <li><a href="#单向链表">单向链表</a>
+      <ul>
+        <li><a href="#单向链表的创建">单向链表的创建</a></li>
+        <li><a href="#链表的遍历">链表的遍历</a></li>
+        <li><a href="#链表的删除">链表的删除</a></li>
+        <li><a href="#删除单个节点">删除单个节点</a></li>
+        <li><a href="#任意位置插入节点">任意位置插入节点</a></li>
+      </ul>
+    </li>
+    <li><a href="#循环链表">循环链表</a>
+      <ul>
+        <li><a href="#判断链表是否为循环链表">判断链表是否为循环链表</a></li>
+      </ul>
+    </li>
+    <li><a href="#双向链表">双向链表</a>
+      <ul>
+        <li><a href="#删除节点">删除节点</a></li>
+        <li><a href="#插入节点">插入节点</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav></div>
+            </div><div class="content" id="content"><p>上一篇简单的开了一个头，简单介绍了一下所谓的时间复杂度与空间复杂度，从这篇开始将陆陆续续写一下常用的数据结构：链表、队列、栈、树等等。</p>
+<!-- raw HTML omitted -->
+<p>链表当初是我在学校时唯一死磕过的数据结构，那个时候自己还算是一个好学生，虽然上课没怎么听懂，但是课后还是根据仔细调试过老师给的代码，硬是自己给弄懂了，它是我离校时唯一能够写出实现的数据结构，现在回想起来应该是它比较简单，算法也比较直来直去吧。虽然它比较简单，很多朋友也都会链表。但是作为一个系列，如果仅仅因为它比较简单而不去理会，总觉得少了点什么，所以再这仍然将其列举出来。</p>
+<h2 id="单向链表">单向链表</h2>
+<p>单向链表是链表中的一种，它的特点是只有一个指向下一个节点的指针域，对单向链表的访问需要从头部开始，根据指针域依次访问下一个节点，单向链表的结构如下图所示
+<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="/list/list1.png"
+        data-srcset="/list/list1.png, /list/list1.png 1.5x, /list/list1.png 2x"
+        data-sizes="auto"
+        alt="/list/list1.png"
+        title="单向链表" /></p>
+<h3 id="单向链表的创建">单向链表的创建</h3>
+<p>单向链表的结构只需要一个数据域与指针域，这个数据域可以是一个结构体，也可以是多个基本数据类型；指针域是一个指向节点类型的指针，简单的定义如下:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="k">typedef</span> <span class="k">struct</span> <span class="nc">_LIST_NODE</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">	<span class="kt">int</span> <span class="n">nVal</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="k">struct</span> <span class="nc">_LIST_NODE</span> <span class="o">*</span><span class="n">pNext</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span><span class="n">LIST_NODE</span><span class="p">,</span> <span class="o">*</span><span class="n">LPLIST_NODE</span><span class="p">;</span>
+</span></span></code></pre></div><p>创建链表可以采用头插法或者尾插法来初始化一个有多个节点的链表</p>
+<p>头插法的示意图如下:
+<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="/list/CreateListHead.png"
+        data-srcset="/list/CreateListHead.png, /list/CreateListHead.png 1.5x, /list/CreateListHead.png 2x"
+        data-sizes="auto"
+        alt="/list/CreateListHead.png"
+        title="头插法" /></p>
+<p>它的过程就像示意图中展现的，首先使用新节点p的next指针指向当前的头节点把新节点加入到链表头，然后变更链表头指针，这样就在头部插入了一个节点，用代码来展示就是</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="n">p</span><span class="o">-&gt;</span><span class="n">next</span> <span class="o">=</span> <span class="n">head</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="n">head</span> <span class="o">=</span> <span class="n">p</span><span class="p">;</span>
+</span></span></code></pre></div><p>我们使用一个函数来封装就是</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="n">LPLIST_NODE</span> <span class="nf">CreateListHead</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">	  <span class="n">LPLIST_NODE</span> <span class="n">pHead</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  	<span class="k">while</span> <span class="p">(</span><span class="n">TRUE</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">	  <span class="p">{</span>
+</span></span><span class="line"><span class="cl">		    <span class="n">LPLIST_NODE</span> <span class="n">p</span> <span class="o">=</span> <span class="p">(</span><span class="n">LPLIST_NODE</span><span class="p">)</span><span class="n">malloc</span><span class="p">(</span><span class="k">sizeof</span><span class="p">(</span><span class="n">LIST_NODE</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">		    <span class="k">if</span> <span class="p">(</span><span class="nb">NULL</span> <span class="o">==</span> <span class="n">p</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">		    <span class="p">{</span>
+</span></span><span class="line"><span class="cl">			      <span class="k">break</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	    	<span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">		    <span class="n">memset</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="mh">0x00</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">LIST_NODE</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">		    <span class="n">printf</span><span class="p">(</span><span class="s">&#34;请输入节点值(为0时将退出创建节点):&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">		    <span class="n">scanf_s</span><span class="p">(</span><span class="s">&#34;%d&#34;</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">p</span><span class="o">-&gt;</span><span class="n">nVal</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">        <span class="c1">//这里不需要对链表为空单独讨论
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="c1">//当链表为空时pHead 的值为NULL, 这两句代码就变为
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="c1">//p-&gt;pNext = NULL;
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="c1">//pHead = p;
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>
+</span></span><span class="line"><span class="cl">		    <span class="n">p</span><span class="o">-&gt;</span><span class="n">pNext</span> <span class="o">=</span> <span class="n">pHead</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">			  <span class="n">pHead</span> <span class="o">=</span> <span class="n">p</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">		    <span class="k">if</span> <span class="p">(</span><span class="n">p</span><span class="o">-&gt;</span><span class="n">nVal</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">		    <span class="p">{</span>
+</span></span><span class="line"><span class="cl">		      	<span class="k">break</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">		    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">	  <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	  <span class="k">return</span> <span class="n">pHead</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p>采用尾插法的话，首先得获得链表的尾部 pTail, 然后使尾节点的next指针指向新节点，然后更新尾节点，用代码来表示就是</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="n">pTail</span><span class="o">-&gt;</span><span class="n">next</span> <span class="o">=</span> <span class="n">p</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="n">pTail</span> <span class="o">=</span> <span class="n">p</span><span class="p">;</span>
+</span></span></code></pre></div><p>下面的函数是采用尾插法来构建链表的例子</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="c1">//这个函数多定义了一个变量用来保存
+</span></span></span><span class="line"><span class="cl"><span class="c1">// 可以不需要这个变量，这样在插入之前需要遍历一遍链表，以便找到尾节点
+</span></span></span><span class="line"><span class="cl"><span class="c1">// 但是每次插入之前都需要遍历一遍，没有定义一个变量保存尾节点这种方式来的高效
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="n">LPLIST_NODE</span> <span class="nf">CreateListTail</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">  	<span class="n">LPLIST_NODE</span> <span class="n">pHead</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  	<span class="n">LPLIST_NODE</span> <span class="n">pTail</span> <span class="o">=</span> <span class="n">pHead</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  	<span class="k">while</span> <span class="p">(</span><span class="nb">NULL</span> <span class="o">!=</span> <span class="n">pTail</span> <span class="o">&amp;&amp;</span> <span class="nb">NULL</span> <span class="o">!=</span> <span class="n">pTail</span><span class="o">-&gt;</span><span class="n">pNext</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">  	<span class="p">{</span>
+</span></span><span class="line"><span class="cl">  		  <span class="n">pTail</span> <span class="o">=</span> <span class="n">pTail</span><span class="o">-&gt;</span><span class="n">pNext</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  	<span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  	<span class="k">while</span> <span class="p">(</span><span class="n">TRUE</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">  	<span class="p">{</span>
+</span></span><span class="line"><span class="cl">    		<span class="n">LPLIST_NODE</span> <span class="n">p</span> <span class="o">=</span> <span class="p">(</span><span class="n">LPLIST_NODE</span><span class="p">)</span><span class="n">malloc</span><span class="p">(</span><span class="k">sizeof</span><span class="p">(</span><span class="n">LIST_NODE</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">    		<span class="k">if</span> <span class="p">(</span><span class="nb">NULL</span> <span class="o">==</span> <span class="n">p</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    		<span class="p">{</span>
+</span></span><span class="line"><span class="cl">    			  <span class="k">break</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    		<span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    		<span class="n">memset</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="mh">0x00</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">LIST_NODE</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">    		<span class="n">printf</span><span class="p">(</span><span class="s">&#34;请输入节点值(为0时将退出创建节点):&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    		<span class="n">scanf_s</span><span class="p">(</span><span class="s">&#34;%d&#34;</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">p</span><span class="o">-&gt;</span><span class="n">nVal</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">        <span class="c1">//由于这种方法需要对尾节点的next域赋值，所以需要考虑链表为空的情况
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    		<span class="k">if</span> <span class="p">(</span><span class="nb">NULL</span> <span class="o">==</span> <span class="n">pTail</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    		<span class="p">{</span>
+</span></span><span class="line"><span class="cl">      			<span class="n">pHead</span> <span class="o">=</span> <span class="n">p</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">      			<span class="n">pTail</span> <span class="o">=</span> <span class="n">pHead</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    		<span class="p">}</span><span class="k">else</span>
+</span></span><span class="line"><span class="cl">    		<span class="p">{</span>
+</span></span><span class="line"><span class="cl">      			<span class="n">pTail</span><span class="o">-&gt;</span><span class="n">pNext</span> <span class="o">=</span> <span class="n">p</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">      			<span class="n">pTail</span> <span class="o">=</span> <span class="n">p</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    		<span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    		<span class="k">if</span> <span class="p">(</span><span class="n">p</span><span class="o">-&gt;</span><span class="n">nVal</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    		<span class="p">{</span>
+</span></span><span class="line"><span class="cl">    			  <span class="k">break</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    		<span class="p">}</span>
+</span></span><span class="line"><span class="cl">  	<span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  	<span class="k">return</span> <span class="n">pHead</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><h3 id="链表的遍历">链表的遍历</h3>
+<p>链表的每个节点在内存中不是连续的，所以它不能像数组那样根据下标来访问（当然可以利用C++中的运算符重载来实现使用下标访问），链表中的每一个节点都保存了下一个节点的地址，所以我们根据每个节点指向的下一个节点来依次访问每个节点，访问的代码如下:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="kt">void</span> <span class="nf">TraverseList</span><span class="p">(</span><span class="n">LPLIST_NODE</span> <span class="n">pHead</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">  	<span class="k">while</span> <span class="p">(</span><span class="nb">NULL</span> <span class="o">!=</span> <span class="n">pHead</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">  	<span class="p">{</span>
+</span></span><span class="line"><span class="cl">    		<span class="n">printf</span><span class="p">(</span><span class="s">&#34;%d</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">,</span> <span class="n">pHead</span><span class="o">-&gt;</span><span class="n">nVal</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    		<span class="n">pHead</span> <span class="o">=</span> <span class="n">pHead</span><span class="o">-&gt;</span><span class="n">pNext</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  	<span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><h3 id="链表的删除">链表的删除</h3>
+<p>链表的每个节点都是在堆上分配的，在不再使用的时候需要手工清除每个节点。清除时需要使用遍历的方法，一个个的删除，只是需要在遍历的指针移动到下一个节点前保存当前节点，以便能够删除当前节点，删除的函数如下</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="kt">void</span> <span class="nf">DestroyList</span><span class="p">(</span><span class="n">LPLIST_NODE</span> <span class="n">pHead</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">	<span class="n">LPLIST_NODE</span> <span class="n">pTmp</span> <span class="o">=</span> <span class="n">pHead</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="k">while</span> <span class="p">(</span><span class="nb">NULL</span> <span class="o">!=</span> <span class="n">pTmp</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">	<span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="n">pTmp</span> <span class="o">=</span> <span class="n">pHead</span><span class="o">-&gt;</span><span class="n">pNext</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">		<span class="k">delete</span> <span class="n">pHead</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">		<span class="n">pHead</span> <span class="o">=</span> <span class="n">pTmp</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><h3 id="删除单个节点">删除单个节点</h3>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="/list/DeleteNode.png"
+        data-srcset="/list/DeleteNode.png, /list/DeleteNode.png 1.5x, /list/DeleteNode.png 2x"
+        data-sizes="auto"
+        alt="/list/DeleteNode.png"
+        title="删除单个节点" /></p>
+<p>如上图所示，假设我们要删除q节点，那么首先需要遍历找到q的上一个节点p，将p的next指针指向q的下一个节点，也就是赋值为q的next指针的值,用代码表示就是</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="n">p</span><span class="o">-&gt;</span><span class="n">next</span> <span class="o">=</span> <span class="n">q</span><span class="o">-&gt;</span><span class="n">next</span><span class="p">;</span>
+</span></span></code></pre></div><p>删除节点的函数如下:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="kt">void</span> <span class="nf">DeleteNode</span><span class="p">(</span><span class="n">LPLIST_NODE</span><span class="o">*</span> <span class="n">ppHead</span><span class="p">,</span> <span class="kt">int</span> <span class="n">nValue</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">	<span class="k">if</span> <span class="p">(</span><span class="nb">NULL</span> <span class="o">==</span> <span class="n">ppHead</span> <span class="o">||</span> <span class="nb">NULL</span> <span class="o">==</span> <span class="o">*</span><span class="n">ppHead</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">	<span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="k">return</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="n">LPLIST_NODE</span> <span class="n">p</span><span class="p">,</span> <span class="n">q</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">p</span> <span class="o">=</span> <span class="o">*</span><span class="n">ppHead</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="k">while</span> <span class="p">(</span><span class="nb">NULL</span> <span class="o">!=</span> <span class="n">p</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">	<span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="k">if</span> <span class="p">(</span><span class="n">nValue</span> <span class="o">==</span> <span class="n">p</span><span class="o">-&gt;</span><span class="n">nVal</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">		<span class="p">{</span>
+</span></span><span class="line"><span class="cl">			<span class="k">if</span> <span class="p">(</span><span class="o">*</span><span class="n">ppHead</span> <span class="o">==</span> <span class="n">p</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">			<span class="p">{</span>
+</span></span><span class="line"><span class="cl">				<span class="o">*</span><span class="n">ppHead</span> <span class="o">=</span> <span class="n">p</span><span class="o">-&gt;</span><span class="n">pNext</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">				<span class="n">free</span><span class="p">(</span><span class="n">p</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">			<span class="p">}</span><span class="k">else</span>
+</span></span><span class="line"><span class="cl">			<span class="p">{</span>
+</span></span><span class="line"><span class="cl">				<span class="n">q</span><span class="o">-&gt;</span><span class="n">pNext</span> <span class="o">=</span> <span class="n">p</span><span class="o">-&gt;</span><span class="n">pNext</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">				<span class="n">free</span><span class="p">(</span><span class="n">p</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">			<span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">			<span class="n">p</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">			<span class="n">q</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">			<span class="k">break</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">		<span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">		<span class="n">q</span> <span class="o">=</span> <span class="n">p</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">		<span class="n">p</span> <span class="o">=</span> <span class="n">p</span><span class="o">-&gt;</span><span class="n">pNext</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p>在上述代码中首先来遍历链表，找到要删除的节点p和它的上一个节点q，由于头节点没有上一个节点，所以需要特别判断一下需要删除的是否为头节点，如果为头结点，则直接将头指针指向它的下一个节点，然后删除头结点即可，如果不是则采用之前的方法来删除。</p>
+<h3 id="任意位置插入节点">任意位置插入节点</h3>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="/list/InsertNode.png"
+        data-srcset="/list/InsertNode.png, /list/InsertNode.png 1.5x, /list/InsertNode.png 2x"
+        data-sizes="auto"
+        alt="/list/InsertNode.png"
+        title="任意位置插入节点" />
+如上图所示，如果需要在q节点之后插入p节点的话，需要两步，将q的next节点指向q，然后将q指向之前p的下一个节点，这个时候需要注意一下顺序，如果我们先执行q-&gt;next = p 的话，那么之前q的下一个节点的地址就被覆盖掉了，这个时候后面的节点都丢掉了，所以这里我们要先执行p-&gt;next = q-&gt;next 这条语句，然后在执行q-&gt;next = p</p>
+<p>下面是一个创建有序链表的例子，这个例子演示了在任意位置插入节点</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="n">LPLIST_NODE</span> <span class="nf">CreateSortedList</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">	<span class="n">LPLIST_NODE</span> <span class="n">pHead</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="k">while</span> <span class="p">(</span><span class="n">TRUE</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">	<span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="n">LPLIST_NODE</span> <span class="n">p</span> <span class="o">=</span> <span class="p">(</span><span class="n">LPLIST_NODE</span><span class="p">)</span><span class="n">malloc</span><span class="p">(</span><span class="k">sizeof</span><span class="p">(</span><span class="n">LIST_NODE</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">		<span class="k">if</span> <span class="p">(</span><span class="nb">NULL</span> <span class="o">==</span> <span class="n">p</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">		<span class="p">{</span>
+</span></span><span class="line"><span class="cl">			<span class="k">break</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">		<span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">		<span class="n">memset</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="mh">0x00</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">LIST_NODE</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">		<span class="n">printf</span><span class="p">(</span><span class="s">&#34;请输入节点值(为0时将退出创建节点):&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">		<span class="n">scanf_s</span><span class="p">(</span><span class="s">&#34;%d&#34;</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">p</span><span class="o">-&gt;</span><span class="n">nVal</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">		<span class="k">if</span> <span class="p">(</span><span class="nb">NULL</span> <span class="o">==</span> <span class="n">pHead</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">		<span class="p">{</span>
+</span></span><span class="line"><span class="cl">			<span class="n">pHead</span> <span class="o">=</span> <span class="n">p</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">		<span class="p">}</span><span class="k">else</span>
+</span></span><span class="line"><span class="cl">		<span class="p">{</span>
+</span></span><span class="line"><span class="cl">			<span class="k">if</span> <span class="p">(</span><span class="n">pHead</span><span class="o">-&gt;</span><span class="n">nVal</span> <span class="o">&gt;</span> <span class="n">p</span><span class="o">-&gt;</span><span class="n">nVal</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">			<span class="p">{</span>
+</span></span><span class="line"><span class="cl">				<span class="n">p</span><span class="o">-&gt;</span><span class="n">pNext</span> <span class="o">=</span> <span class="n">pHead</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">				<span class="n">pHead</span> <span class="o">=</span> <span class="n">p</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">			<span class="p">}</span><span class="k">else</span>
+</span></span><span class="line"><span class="cl">			<span class="p">{</span>
+</span></span><span class="line"><span class="cl">				<span class="n">LPLIST_NODE</span> <span class="n">q</span> <span class="o">=</span> <span class="n">pHead</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">				<span class="n">LPLIST_NODE</span> <span class="n">r</span> <span class="o">=</span> <span class="n">q</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">				<span class="n">q</span> <span class="o">=</span> <span class="n">q</span><span class="o">-&gt;</span><span class="n">pNext</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">				<span class="k">while</span> <span class="p">(</span><span class="nb">NULL</span> <span class="o">!=</span> <span class="n">q</span> <span class="o">&amp;&amp;</span> <span class="n">q</span><span class="o">-&gt;</span><span class="n">nVal</span> <span class="o">&lt;</span> <span class="n">p</span><span class="o">-&gt;</span><span class="n">nVal</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">				<span class="p">{</span>
+</span></span><span class="line"><span class="cl">					<span class="n">r</span> <span class="o">=</span> <span class="n">q</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">					<span class="n">q</span> <span class="o">=</span> <span class="n">q</span><span class="o">-&gt;</span><span class="n">pNext</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">				<span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">				<span class="n">p</span><span class="o">-&gt;</span><span class="n">pNext</span> <span class="o">=</span> <span class="n">r</span><span class="o">-&gt;</span><span class="n">pNext</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">				<span class="n">r</span><span class="o">-&gt;</span><span class="n">pNext</span> <span class="o">=</span> <span class="n">p</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">			<span class="p">}</span>
+</span></span><span class="line"><span class="cl">		<span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">		<span class="k">if</span> <span class="p">(</span><span class="n">p</span><span class="o">-&gt;</span><span class="n">nVal</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">		<span class="p">{</span>
+</span></span><span class="line"><span class="cl">			<span class="k">break</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">		<span class="p">}</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="k">return</span> <span class="n">pHead</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p>当确定新节点的值之后，首先遍历链表，直到找到比新节点中数值大的节点，那么这个新节点就是需要插入到该节点之前。在遍历的时候使用r来保存之前的节点。这里需要注意这些情况:</p>
+<ul>
+<li>链表为空：这种情况下，直接让头指针指向当前节点</li>
+<li>如果头节点本身就是大于新节点的值，这种情况下采用头插法，将新节点插入到头部</li>
+<li>如果链表中未找到比新节点的值更大的值，这种情况下直接采用尾插发</li>
+<li>在链表中找到比新节点值更大的节点，这种情况下，在链表中插入</li>
+</ul>
+<p>但是在代码中并没有考虑到尾部插入的情况，由于在尾部插入时，r等于尾节点，r-&gt;pNext 的值为NULL， 所以 <code>p-&gt;pNext = r-&gt;pNext;r-&gt;pNext = p;</code> 可以看成 <code>p-&gt;pNext = NULL; r-&gt;pNext = p;</code> 也就是将p的next指针指向空，让其作为尾节点，将之前的尾节点的next指针指向新节点。</p>
+<h2 id="循环链表">循环链表</h2>
+<p>循环链表是建立在单向链表的基础之上的，循环链表的尾节点并不指向空，而是指向其他的节点，可以是头结点，可以是自身，也可以是链表中的其他节点，为了方便操作，一般将循环链表的尾节点的next指针指向头节点，它的操作与单链表的操作类似，只需要将之前判断尾节点的条件变为 <code>pTail-&gt;pNext == pHead</code> 即可。这里就不再详细分析每种操作了，直接给出代码</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="n">LPLIST_NODE</span> <span class="nf">CreateLoopList</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">	<span class="n">LPLIST_NODE</span> <span class="n">pHead</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">LPLIST_NODE</span> <span class="n">pTail</span> <span class="o">=</span> <span class="n">pHead</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="k">while</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">	<span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="n">LPLIST_NODE</span> <span class="n">p</span> <span class="o">=</span> <span class="p">(</span><span class="n">LPLIST_NODE</span><span class="p">)</span><span class="n">malloc</span><span class="p">(</span><span class="k">sizeof</span><span class="p">(</span><span class="n">LIST_NODE</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">		<span class="k">if</span> <span class="p">(</span><span class="nb">NULL</span> <span class="o">==</span> <span class="n">p</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">		<span class="p">{</span>
+</span></span><span class="line"><span class="cl">			<span class="k">break</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">		<span class="p">}</span>
+</span></span><span class="line"><span class="cl">		<span class="n">memset</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="mh">0x00</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">LIST_NODE</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">		<span class="n">printf</span><span class="p">(</span><span class="s">&#34;请输入一个值:&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">		<span class="n">scanf_s</span><span class="p">(</span><span class="s">&#34;%d&#34;</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">p</span><span class="o">-&gt;</span><span class="n">nVal</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">		<span class="k">if</span> <span class="p">(</span><span class="nb">NULL</span> <span class="o">==</span> <span class="n">pHead</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">		<span class="p">{</span>
+</span></span><span class="line"><span class="cl">			<span class="n">pHead</span> <span class="o">=</span> <span class="n">p</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">			<span class="n">p</span><span class="o">-&gt;</span><span class="n">pNext</span> <span class="o">=</span> <span class="n">pHead</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">			<span class="n">pTail</span> <span class="o">=</span> <span class="n">pHead</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">		<span class="p">}</span><span class="k">else</span>
+</span></span><span class="line"><span class="cl">		<span class="p">{</span>
+</span></span><span class="line"><span class="cl">			<span class="n">pTail</span><span class="o">-&gt;</span><span class="n">pNext</span> <span class="o">=</span> <span class="n">p</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">			<span class="n">p</span><span class="o">-&gt;</span><span class="n">pNext</span> <span class="o">=</span> <span class="n">pHead</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">			<span class="n">pTail</span> <span class="o">=</span> <span class="n">p</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">		<span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">		<span class="k">if</span> <span class="p">(</span><span class="mi">0</span> <span class="o">==</span> <span class="n">p</span><span class="o">-&gt;</span><span class="n">nVal</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">		<span class="p">{</span>
+</span></span><span class="line"><span class="cl">			<span class="k">break</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">		<span class="p">}</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="k">return</span> <span class="n">pHead</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kt">void</span> <span class="nf">TraverseLoopList</span><span class="p">(</span><span class="n">LPLIST_NODE</span> <span class="n">pHead</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">	<span class="n">LPLIST_NODE</span> <span class="n">pTmp</span> <span class="o">=</span> <span class="n">pHead</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="k">if</span> <span class="p">(</span><span class="nb">NULL</span> <span class="o">==</span> <span class="n">pTmp</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">	<span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="k">return</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="k">do</span>
+</span></span><span class="line"><span class="cl">	<span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="n">printf</span><span class="p">(</span><span class="s">&#34;%d, &#34;</span><span class="p">,</span> <span class="n">pTmp</span><span class="o">-&gt;</span><span class="n">nVal</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">		<span class="n">pTmp</span> <span class="o">=</span> <span class="n">pTmp</span><span class="o">-&gt;</span><span class="n">pNext</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span> <span class="k">while</span> <span class="p">(</span><span class="n">pTmp</span> <span class="o">!=</span> <span class="n">pHead</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kt">void</span> <span class="nf">DestroyLoopList</span><span class="p">(</span><span class="n">LPLIST_NODE</span> <span class="n">pHead</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">	<span class="n">LPLIST_NODE</span> <span class="n">pTmp</span> <span class="o">=</span> <span class="n">pHead</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">LPLIST_NODE</span> <span class="n">pDestroy</span> <span class="o">=</span> <span class="n">pTmp</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="k">if</span> <span class="p">(</span><span class="nb">NULL</span> <span class="o">==</span> <span class="n">pTmp</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">	<span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="k">return</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="k">do</span>
+</span></span><span class="line"><span class="cl">	<span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="n">pTmp</span> <span class="o">=</span> <span class="n">pDestroy</span><span class="o">-&gt;</span><span class="n">pNext</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">		<span class="n">free</span><span class="p">(</span><span class="n">pDestroy</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">		<span class="n">pDestroy</span> <span class="o">=</span> <span class="n">pTmp</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span><span class="k">while</span> <span class="p">(</span><span class="n">pHead</span> <span class="o">!=</span> <span class="n">pTmp</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><h3 id="判断链表是否为循环链表">判断链表是否为循环链表</h3>
+<p>在上面说过，循环链表的尾指针不一定指向头节点，它可以指向任何节点，那么该怎么判断一个节点是否为循环链表呢？既然它可以指向任意的节点，那么肯定是找不到尾节点的，而且堆内存的分配是随机的，我们也不可能按照指针变量的大小来判断哪个节点在前哪个在后。</p>
+<p>回想一下在学校跑一千米的时候是不是回出现这样的情况，跑的块的会领先跑的慢的一周？根据这种情形我们可以考虑使用这样一种办法：定义两个指针，一个一次走两步也是就是p = p-&gt;next-&gt;next， 一个慢指针一次走一步，也就是q = q-&gt;next，如果是循环链表，那么快指针在某个时候一定会领先慢指针一周，也就是达到 p == q 这个条件，否则就是非循环链表。根据这个思路，可以考虑写下如下代码:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="kt">bool</span> <span class="nf">IsLoopList</span><span class="p">(</span><span class="n">LPLIST_NODE</span> <span class="n">pHead</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">	<span class="k">if</span> <span class="p">(</span><span class="nb">NULL</span> <span class="o">==</span> <span class="n">pHead</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">	<span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="k">return</span> <span class="nb">false</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="n">LPLIST_NODE</span> <span class="n">p</span> <span class="o">=</span> <span class="n">pHead</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">LPLIST_NODE</span> <span class="n">q</span> <span class="o">=</span> <span class="n">pHead</span><span class="o">-&gt;</span><span class="n">pNext</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="k">while</span> <span class="p">(</span><span class="nb">NULL</span> <span class="o">!=</span> <span class="n">p</span> <span class="o">&amp;&amp;</span> <span class="nb">NULL</span> <span class="o">!=</span> <span class="n">q</span> <span class="o">&amp;&amp;</span> <span class="nb">NULL</span> <span class="o">!=</span> <span class="n">q</span><span class="o">-&gt;</span><span class="n">pNext</span> <span class="o">&amp;&amp;</span> <span class="n">p</span> <span class="o">!=</span> <span class="n">q</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">	<span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="n">p</span> <span class="o">=</span> <span class="n">p</span><span class="o">-&gt;</span><span class="n">pNext</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">		<span class="n">q</span> <span class="o">=</span> <span class="n">q</span><span class="o">-&gt;</span><span class="n">pNext</span><span class="o">-&gt;</span><span class="n">pNext</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="k">if</span> <span class="p">(</span><span class="n">q</span> <span class="o">==</span> <span class="nb">NULL</span> <span class="o">||</span> <span class="nb">NULL</span> <span class="o">==</span> <span class="n">p</span> <span class="o">||</span> <span class="nb">NULL</span> <span class="o">==</span> <span class="n">q</span><span class="o">-&gt;</span><span class="n">pNext</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">	<span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="k">return</span> <span class="nb">false</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="k">return</span> <span class="nb">true</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><h2 id="双向链表">双向链表</h2>
+<p>之前在插入或者删除的时候，需要定义两个指针变量，让其中一个一直更在另一个的后面，单向链表有一个很大的问题，不能很方便的找到它的上一个节点，为了解决这一个问题，提出了双向链表，双向链表与单向相比，多了一个指针域，用来指向它的上一个节点，也就是如下图所示:</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="/list/double_list.png"
+        data-srcset="/list/double_list.png, /list/double_list.png 1.5x, /list/double_list.png 2x"
+        data-sizes="auto"
+        alt="/list/double_list.png"
+        title="双向链表" /></p>
+<p>双向链表的操作与单向链表的类似，只是多了一个指向前一个节点的指针域，它要考虑的情况与单向链表相似</p>
+<h3 id="删除节点">删除节点</h3>
+<p>删除节点的示意图如下:</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="/list/DeletDNode.png"
+        data-srcset="/list/DeletDNode.png, /list/DeletDNode.png 1.5x, /list/DeletDNode.png 2x"
+        data-sizes="auto"
+        alt="/list/DeletDNode.png"
+        title="删除节点" />
+假设删除的节点p，那么首先根据p的pre指针域，找到它的上一个节点q，采用与单向链表类似的操作:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="n">q</span><span class="o">-&gt;</span><span class="n">next</span> <span class="o">=</span> <span class="n">p</span><span class="o">-&gt;</span><span class="n">next</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="n">p</span><span class="o">-&gt;</span><span class="n">next</span><span class="o">-&gt;</span><span class="n">pre</span> <span class="o">=</span> <span class="n">q</span><span class="p">;</span>
+</span></span></code></pre></div><p>下面是删除节点的例子:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="kt">void</span> <span class="nf">DeleteDNode</span><span class="p">(</span><span class="n">LPDLIST_NODE</span><span class="o">*</span> <span class="n">ppHead</span><span class="p">,</span> <span class="kt">int</span> <span class="n">nValue</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">	<span class="k">if</span> <span class="p">(</span><span class="nb">NULL</span> <span class="o">==</span> <span class="n">ppHead</span> <span class="o">||</span> <span class="nb">NULL</span> <span class="o">==</span> <span class="o">*</span><span class="n">ppHead</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">	<span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="k">return</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="n">LPDLIST_NODE</span> <span class="n">p</span> <span class="o">=</span> <span class="o">*</span><span class="n">ppHead</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="k">while</span> <span class="p">(</span><span class="nb">NULL</span> <span class="o">!=</span> <span class="n">p</span> <span class="o">&amp;&amp;</span> <span class="n">p</span><span class="o">-&gt;</span><span class="n">nVal</span> <span class="o">!=</span> <span class="n">nValue</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">	<span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="n">p</span> <span class="o">=</span> <span class="n">p</span><span class="o">-&gt;</span><span class="n">pNext</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="k">if</span> <span class="p">(</span><span class="nb">NULL</span> <span class="o">==</span> <span class="n">p</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">	<span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="k">return</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="k">if</span> <span class="p">(</span><span class="o">*</span><span class="n">ppHead</span> <span class="o">==</span> <span class="n">p</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">	<span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="o">*</span><span class="n">ppHead</span> <span class="o">=</span> <span class="p">(</span><span class="o">*</span><span class="n">ppHead</span><span class="p">)</span><span class="o">-&gt;</span><span class="n">pNext</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">		<span class="n">p</span><span class="o">-&gt;</span><span class="n">pPre</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">		<span class="n">free</span><span class="p">(</span><span class="n">p</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="cl">	<span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="n">p</span><span class="o">-&gt;</span><span class="n">pNext</span> <span class="o">==</span> <span class="nb">NULL</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">	<span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="n">p</span><span class="o">-&gt;</span><span class="n">pPre</span><span class="o">-&gt;</span><span class="n">pNext</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">		<span class="n">free</span><span class="p">(</span><span class="n">p</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span><span class="k">else</span>
+</span></span><span class="line"><span class="cl">	<span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="n">p</span><span class="o">-&gt;</span><span class="n">pPre</span><span class="o">-&gt;</span><span class="n">pNext</span> <span class="o">=</span> <span class="n">p</span><span class="o">-&gt;</span><span class="n">pNext</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">		<span class="n">p</span><span class="o">-&gt;</span><span class="n">pNext</span><span class="o">-&gt;</span><span class="n">pPre</span> <span class="o">=</span> <span class="n">p</span><span class="o">-&gt;</span><span class="n">pPre</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><h3 id="插入节点">插入节点</h3>
+<p>插入节点的示意图如下:
+<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="/list/InsertDNode.png"
+        data-srcset="/list/InsertDNode.png, /list/InsertDNode.png 1.5x, /list/InsertDNode.png 2x"
+        data-sizes="auto"
+        alt="/list/InsertDNode.png"
+        title="插入节点" />
+假设新节点为p，插入的位置为q，则插入操作可以进行如下操作</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="n">p</span><span class="o">-&gt;</span><span class="n">next</span> <span class="o">=</span> <span class="n">q</span><span class="o">-&gt;</span><span class="n">next</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="n">p</span><span class="o">-&gt;</span><span class="n">pre</span> <span class="o">=</span> <span class="n">q</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="n">q</span><span class="o">-&gt;</span><span class="n">next</span><span class="o">-&gt;</span><span class="n">pre</span> <span class="o">=</span> <span class="n">p</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="n">q</span><span class="o">-&gt;</span><span class="n">next</span> <span class="o">=</span> <span class="n">p</span><span class="p">;</span>
+</span></span></code></pre></div><p>也是一样要考虑不能覆盖q的next指针域否则可能存在找不到原来链表中q的下一个节点的情况。所以这里先对p的next指针域进行操作
+下面也是采用创建有序列表的例子</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="n">LPDLIST_NODE</span> <span class="nf">CreateSortedDList</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">	<span class="n">LPDLIST_NODE</span> <span class="n">pHead</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="k">while</span> <span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">	<span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="n">LPDLIST_NODE</span> <span class="n">pNode</span> <span class="o">=</span> <span class="p">(</span><span class="n">LPDLIST_NODE</span><span class="p">)</span><span class="n">malloc</span><span class="p">(</span><span class="k">sizeof</span><span class="p">(</span><span class="n">DLIST_NODE</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">		<span class="k">if</span> <span class="p">(</span><span class="nb">NULL</span> <span class="o">==</span> <span class="n">pNode</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">		<span class="p">{</span>
+</span></span><span class="line"><span class="cl">			<span class="k">return</span> <span class="n">pHead</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">		<span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">		<span class="n">memset</span><span class="p">(</span><span class="n">pNode</span><span class="p">,</span> <span class="mh">0x00</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">DLIST_NODE</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">		<span class="n">printf</span><span class="p">(</span><span class="s">&#34;请输入一个整数:&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">		<span class="n">scanf_s</span><span class="p">(</span><span class="s">&#34;%d&#34;</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">pNode</span><span class="o">-&gt;</span><span class="n">nVal</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">		<span class="k">if</span><span class="p">(</span><span class="nb">NULL</span> <span class="o">==</span> <span class="n">pHead</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">		<span class="p">{</span>
+</span></span><span class="line"><span class="cl">			<span class="n">pHead</span> <span class="o">=</span> <span class="n">pNode</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">		<span class="p">}</span><span class="k">else</span>
+</span></span><span class="line"><span class="cl">		<span class="p">{</span>
+</span></span><span class="line"><span class="cl">			<span class="n">LPDLIST_NODE</span> <span class="n">q</span> <span class="o">=</span> <span class="n">pHead</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">			<span class="n">LPDLIST_NODE</span> <span class="n">r</span> <span class="o">=</span> <span class="n">q</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">			<span class="k">while</span> <span class="p">(</span><span class="nb">NULL</span> <span class="o">!=</span> <span class="n">q</span> <span class="o">&amp;&amp;</span> <span class="n">q</span><span class="o">-&gt;</span><span class="n">nVal</span> <span class="o">&lt;</span> <span class="n">pNode</span><span class="o">-&gt;</span><span class="n">nVal</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">			<span class="p">{</span>
+</span></span><span class="line"><span class="cl">				<span class="n">r</span> <span class="o">=</span> <span class="n">q</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">				<span class="n">q</span> <span class="o">=</span> <span class="n">q</span><span class="o">-&gt;</span><span class="n">pNext</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">			<span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">			<span class="k">if</span> <span class="p">(</span><span class="n">q</span> <span class="o">==</span> <span class="n">pHead</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">			<span class="p">{</span>
+</span></span><span class="line"><span class="cl">				<span class="n">pNode</span><span class="o">-&gt;</span><span class="n">pNext</span> <span class="o">=</span> <span class="n">pHead</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">				<span class="n">pHead</span><span class="o">-&gt;</span><span class="n">pPre</span> <span class="o">=</span> <span class="n">pNode</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">				<span class="n">pHead</span> <span class="o">=</span> <span class="n">pNode</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">			<span class="p">}</span><span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="nb">NULL</span> <span class="o">==</span> <span class="n">q</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">			<span class="p">{</span>
+</span></span><span class="line"><span class="cl">				<span class="n">r</span><span class="o">-&gt;</span><span class="n">pNext</span> <span class="o">=</span> <span class="n">pNode</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">				<span class="n">pNode</span><span class="o">-&gt;</span><span class="n">pPre</span> <span class="o">=</span> <span class="n">r</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">			<span class="p">}</span><span class="k">else</span>
+</span></span><span class="line"><span class="cl">			<span class="p">{</span>
+</span></span><span class="line"><span class="cl">				<span class="n">pNode</span><span class="o">-&gt;</span><span class="n">pPre</span> <span class="o">=</span> <span class="n">r</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">				<span class="n">pNode</span><span class="o">-&gt;</span><span class="n">pNext</span> <span class="o">=</span> <span class="n">q</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">				<span class="n">r</span><span class="o">-&gt;</span><span class="n">pNext</span> <span class="o">=</span> <span class="n">pNode</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">				<span class="n">q</span><span class="o">-&gt;</span><span class="n">pPre</span> <span class="o">=</span> <span class="n">pNode</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">			<span class="p">}</span>
+</span></span><span class="line"><span class="cl">		<span class="p">}</span>
+</span></span><span class="line"><span class="cl">		<span class="n">LPDLIST_NODE</span> <span class="n">q</span> <span class="o">=</span> <span class="n">pHead</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">		<span class="n">LPDLIST_NODE</span> <span class="n">r</span> <span class="o">=</span> <span class="n">q</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">		<span class="k">if</span> <span class="p">(</span><span class="mi">0</span> <span class="o">==</span> <span class="n">pNode</span><span class="o">-&gt;</span><span class="n">nVal</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">		<span class="p">{</span>
+</span></span><span class="line"><span class="cl">			<span class="k">break</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">		<span class="p">}</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="k">return</span> <span class="n">pHead</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p>链表还有一种是双向循环链表，对于这种链表主要是在双向链表的基础上，将头结点的pre指针指向某个节点，将尾节点的next节点指向某个节点，而且这两个指针可以指向同一个节点也可以指向不同的节点，一般在使用中都是head的pre节点指向尾节点，而tail的next节点指向头节点。这里就不再详细说明，这些链表只要掌握其中一种，剩下的很好掌握的。</p>
+<!-- raw HTML omitted -->
+</div><div class="post-footer" id="post-footer">
+    <div class="post-info">
+        <div class="post-info-line">
+            <div class="post-info-mod">
+                <span>Updated on 2019-01-19</span>
+            </div></div>
+        <div class="post-info-line">
+            <div class="post-info-md"></div>
+            <div class="post-info-share">
+                <span><a href="javascript:void(0);" title="Share on Twitter" data-sharer="twitter" data-url="http://HaiLateBoy.github.io/posts/list/" data-title="算法与数据结构(二)：链表" data-hashtags="算法与数据结构,C语言,链表"><i class="fab fa-twitter fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Facebook" data-sharer="facebook" data-url="http://HaiLateBoy.github.io/posts/list/" data-hashtag="算法与数据结构"><i class="fab fa-facebook-square fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Hacker News" data-sharer="hackernews" data-url="http://HaiLateBoy.github.io/posts/list/" data-title="算法与数据结构(二)：链表"><i class="fab fa-hacker-news fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Line" data-sharer="line" data-url="http://HaiLateBoy.github.io/posts/list/" data-title="算法与数据结构(二)：链表"><i data-svg-src="https://cdn.jsdelivr.net/npm/simple-icons@7.3.0/icons/line.svg" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on 微博" data-sharer="weibo" data-url="http://HaiLateBoy.github.io/posts/list/" data-title="算法与数据结构(二)：链表"><i class="fab fa-weibo fa-fw" aria-hidden="true"></i></a></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="post-info-more">
+        <section class="post-tags"><i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/%E7%AE%97%E6%B3%95%E4%B8%8E%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/">算法与数据结构</a>,&nbsp;<a href="/tags/c%E8%AF%AD%E8%A8%80/">C语言</a>,&nbsp;<a href="/tags/%E9%93%BE%E8%A1%A8/">链表</a></section>
+        <section>
+            <span><a href="javascript:void(0);" onclick="window.history.back();">Back</a></span>&nbsp;|&nbsp;<span><a href="/">Home</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav"><a href="/posts/data-structure/" class="prev" rel="prev" title="算法与数据结构(一)：时间复杂度与空间复杂度"><i class="fas fa-angle-left fa-fw" aria-hidden="true"></i>算法与数据结构(一)：时间复杂度与空间复杂度</a>
+            <a href="/posts/queue/" class="next" rel="next" title="算法与数据结构(二)：队列">算法与数据结构(二)：队列<i class="fas fa-angle-right fa-fw" aria-hidden="true"></i></a></div>
+</div>
+</article></div>
+            </main><footer class="footer">
+        <div class="footer-container"><div class="footer-line">Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener noreffer" title="Hugo 0.121.2">Hugo</a> | Theme - <a href="https://github.com/dillonzq/LoveIt" target="_blank" rel="noopener noreffer" title="LoveIt 0.2.11"><i class="far fa-kiss-wink-heart fa-fw" aria-hidden="true"></i> LoveIt</a>
+                </div><div class="footer-line" itemscope itemtype="http://schema.org/CreativeWork"><i class="far fa-copyright fa-fw" aria-hidden="true"></i><span itemprop="copyrightYear">2022 - 2024</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="https://www.masimaro.xyz" target="_blank">Masimaro</a></span></div>
+        </div>
+    </footer></div>
+
+        <div id="fixed-buttons"><a href="#" id="back-to-top" class="fixed-button" title="Back to Top">
+                <i class="fas fa-arrow-up fa-fw" aria-hidden="true"></i>
+            </a><a href="#" id="view-comments" class="fixed-button" title="View Comments">
+                <i class="fas fa-comment fa-fw" aria-hidden="true"></i>
+            </a>
+        </div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.css"><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/autocomplete.js@0.38.1/dist/autocomplete.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lunr@2.3.9/lunr.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lazysizes@5.3.2/lazysizes.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/clipboard@2.0.11/dist/clipboard.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/sharer.js@0.5.1/sharer.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/auto-render.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/copy-tex.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/mhchem.min.js"></script><script type="text/javascript">window.config={"code":{"copyTitle":"Copy to clipboard","maxShownLines":50},"comment":{},"math":{"delimiters":[{"display":true,"left":"$$","right":"$$"},{"display":true,"left":"\\[","right":"\\]"},{"display":true,"left":"\\begin{equation}","right":"\\end{equation}"},{"display":true,"left":"\\begin{equation*}","right":"\\end{equation*}"},{"display":true,"left":"\\begin{align}","right":"\\end{align}"},{"display":true,"left":"\\begin{align*}","right":"\\end{align*}"},{"display":true,"left":"\\begin{alignat}","right":"\\end{alignat}"},{"display":true,"left":"\\begin{alignat*}","right":"\\end{alignat*}"},{"display":true,"left":"\\begin{gather}","right":"\\end{gather}"},{"display":true,"left":"\\begin{CD}","right":"\\end{CD}"},{"display":false,"left":"$","right":"$"},{"display":false,"left":"\\(","right":"\\)"}],"strict":false},"search":{"highlightTag":"em","maxResultLength":10,"noResultsFound":"No results found","snippetLength":50}};</script><script type="text/javascript" src="/js/theme.min.js"></script></body>
+</html>

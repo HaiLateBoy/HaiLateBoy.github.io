@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="robots" content="noodp" />
+        <title>事务对象和命令对象 - Masimaro&#39;s blog</title><meta name="Description" content="这是我用于记录日常和学习的小站"><meta property="og:title" content="事务对象和命令对象" />
+<meta property="og:description" content="上次说到数据源对象，这次接着说事务对象和命令对象。 事务是一种对数据源的一系列更新进行分组或批处理以便当所有更新都成功时同时提交这些更新，或者" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://HaiLateBoy.github.io/posts/oledb-and-ado-3/" /><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2018-01-21T09:22:10+00:00" />
+<meta property="article:modified_time" content="2018-01-21T09:22:10+00:00" /><meta property="og:site_name" content="Masimaro&#39;s blog" />
+
+<meta name="twitter:card" content="summary"/><meta name="twitter:title" content="事务对象和命令对象"/>
+<meta name="twitter:description" content="上次说到数据源对象，这次接着说事务对象和命令对象。 事务是一种对数据源的一系列更新进行分组或批处理以便当所有更新都成功时同时提交这些更新，或者"/>
+<meta name="application-name" content="My cool site">
+<meta name="apple-mobile-web-app-title" content="My cool site"><meta name="theme-color" content="#ffffff"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="manifest" href="/site.webmanifest"><link rel="canonical" href="http://HaiLateBoy.github.io/posts/oledb-and-ado-3/" /><link rel="prev" href="http://HaiLateBoy.github.io/posts/talk-about-study/" /><link rel="next" href="http://HaiLateBoy.github.io/posts/c-access-variant/" /><link rel="stylesheet" href="/css/style.min.css"><link rel="preload" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css"></noscript><link rel="preload" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css"></noscript><script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "BlogPosting",
+        "headline": "事务对象和命令对象",
+        "inLanguage": "zh-CN",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "http:\/\/HaiLateBoy.github.io\/posts\/oledb-and-ado-3\/"
+        },"genre": "posts","keywords": "OLEDB, 数据库编程, VC\u002b\u002b, 数据库","wordcount":  1706 ,
+        "url": "http:\/\/HaiLateBoy.github.io\/posts\/oledb-and-ado-3\/","datePublished": "2018-01-21T09:22:10+00:00","dateModified": "2018-01-21T09:22:10+00:00","publisher": {
+            "@type": "Organization",
+            "name": ""},"author": {
+                "@type": "Person",
+                "name": "Masimaro"
+            },"description": ""
+    }
+    </script></head>
+    <body data-header-desktop="fixed" data-header-mobile="auto"><script type="text/javascript">(window.localStorage && localStorage.getItem('theme') ? localStorage.getItem('theme') === 'dark' : ('auto' === 'auto' ? window.matchMedia('(prefers-color-scheme: dark)').matches : 'auto' === 'dark')) && document.body.setAttribute('theme', 'dark');</script>
+
+        <div id="mask"></div><div class="wrapper"><header class="desktop" id="header-desktop">
+    <div class="header-wrapper">
+        <div class="header-title">
+            <a href="/" title="Masimaro&#39;s blog">My cool site</a>
+        </div>
+        <div class="menu">
+            <div class="menu-inner"><a class="menu-item" href="/posts/" title="文章列表"> 文章 </a><a class="menu-item" href="/tags/" title="标签"> 标签 </a><a class="menu-item" href="/categories/" title="分类"> 分类 </a><a class="menu-item" href="/about" title="关于本站"> 关于 </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-desktop">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-desktop" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-desktop" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-desktop">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </span><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                    <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+                </a></div>
+        </div>
+    </div>
+</header><header class="mobile" id="header-mobile">
+    <div class="header-container">
+        <div class="header-wrapper">
+            <div class="header-title">
+                <a href="/" title="Masimaro&#39;s blog">My cool site</a>
+            </div>
+            <div class="menu-toggle" id="menu-toggle-mobile">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+        <div class="menu" id="menu-mobile"><div class="search-wrapper">
+                    <div class="search mobile" id="search-mobile">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-mobile">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-mobile" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-mobile" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-mobile">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </div>
+                    <a href="javascript:void(0);" class="search-cancel" id="search-cancel-mobile">
+                        Cancel
+                    </a>
+                </div><a class="menu-item" href="/posts/" title="文章列表">文章</a><a class="menu-item" href="/tags/" title="标签">标签</a><a class="menu-item" href="/categories/" title="分类">分类</a><a class="menu-item" href="/about" title="关于本站">关于</a><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+            </a></div>
+    </div>
+</header><div class="search-dropdown desktop">
+        <div id="search-dropdown-desktop"></div>
+    </div>
+    <div class="search-dropdown mobile">
+        <div id="search-dropdown-mobile"></div>
+    </div><main class="main">
+                <div class="container"><div class="toc" id="toc-auto">
+            <h2 class="toc-title">Contents</h2>
+            <div class="toc-content" id="toc-content-auto"></div>
+        </div><article class="page single"><h1 class="single-title animate__animated animate__flipInX">事务对象和命令对象</h1><div class="post-meta">
+            <div class="post-meta-line"><span class="post-author"><a href="https://www.masimaro.xyz" title="Author" target="_blank" rel="noopener noreffer author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Masimaro</a></span>&nbsp;<span class="post-category">included in <a href="/categories/windows-%E6%95%B0%E6%8D%AE%E5%BA%93%E7%BC%96%E7%A8%8B/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>windows 数据库编程</a></span></div>
+            <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw" aria-hidden="true"></i>&nbsp;<time datetime="2018-01-21">2018-01-21</time>&nbsp;<i class="fas fa-pencil-alt fa-fw" aria-hidden="true"></i>&nbsp;1706 words&nbsp;
+                <i class="far fa-clock fa-fw" aria-hidden="true"></i>&nbsp;4 minutes&nbsp;</div>
+        </div><div class="details toc" id="toc-static"  data-kept="true">
+                <div class="details-summary toc-title">
+                    <span>Contents</span>
+                    <span><i class="details-icon fas fa-angle-right" aria-hidden="true"></i></span>
+                </div>
+                <div class="details-content toc-content" id="toc-content-static"><nav id="TableOfContents"></nav></div>
+            </div><div class="content" id="content"><p>上次说到数据源对象，这次接着说事务对象和命令对象。
+事务是一种对数据源的一系列更新进行分组或批处理以便当所有更新都成功时同时提交这些更新，或者如果任何一个更新失败则不提交任何更新并且回滚整个事务的方法.
+命令对象一般是用来执行sql语句并生成结果集的对象</p>
+<!-- raw HTML omitted -->
+<h1 id="会话对象">会话对象</h1>
+<p>在OLEDB中通过以下3中方式支持事务：</p>
+<ol>
+<li>ITransactionLocal::StartTransaction</li>
+<li>ITransaction::commit</li>
+<li>ITransaction::Abort</li>
+</ol>
+<p>OLEDB中定义事务和回话对象的接口如下：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="n">CoType</span> <span class="n">TSession</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">   <span class="p">[</span><span class="n">mandatory</span><span class="p">]</span>   <span class="n">interface</span> <span class="n">IGetDataSource</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">   <span class="p">[</span><span class="n">mandatory</span><span class="p">]</span>   <span class="n">interface</span> <span class="n">IOpenRowset</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">   <span class="p">[</span><span class="n">mandatory</span><span class="p">]</span>   <span class="n">interface</span> <span class="n">ISessionProperties</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">   <span class="p">[</span><span class="n">optional</span><span class="p">]</span>    <span class="n">interface</span> <span class="n">IAlterIndex</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">   <span class="p">[</span><span class="n">optional</span><span class="p">]</span>    <span class="n">interface</span> <span class="n">IAlterTable</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">   <span class="p">[</span><span class="n">optional</span><span class="p">]</span>    <span class="n">interface</span> <span class="n">IBindResource</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">   <span class="p">[</span><span class="n">optional</span><span class="p">]</span>    <span class="n">interface</span> <span class="n">ICreateRow</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">   <span class="p">[</span><span class="n">optional</span><span class="p">]</span>    <span class="n">interface</span> <span class="n">IDBCreateCommand</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">   <span class="p">[</span><span class="n">optional</span><span class="p">]</span>    <span class="n">interface</span> <span class="n">IDBSchemaRowset</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">   <span class="p">[</span><span class="n">optional</span><span class="p">]</span>    <span class="n">interface</span> <span class="n">IIndexDefinition</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">   <span class="p">[</span><span class="n">optional</span><span class="p">]</span>    <span class="n">interface</span> <span class="n">ISupportErrorInfo</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">   <span class="p">[</span><span class="n">optional</span><span class="p">]</span>    <span class="n">interface</span> <span class="n">ITableCreation</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">   <span class="p">[</span><span class="n">optional</span><span class="p">]</span>    <span class="n">interface</span> <span class="n">ITableDefinition</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">   <span class="p">[</span><span class="n">optional</span><span class="p">]</span>    <span class="n">interface</span> <span class="n">ITableDefinitionWithConstraints</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">   <span class="p">[</span><span class="n">optional</span><span class="p">]</span>    <span class="n">interface</span> <span class="n">ITransaction</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">   <span class="p">[</span><span class="n">optional</span><span class="p">]</span>    <span class="n">interface</span> <span class="n">ITransactionJoin</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">   <span class="p">[</span><span class="n">optional</span><span class="p">]</span>    <span class="n">interface</span> <span class="n">ITransactionLocal</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">   <span class="p">[</span><span class="n">optional</span><span class="p">]</span>    <span class="n">interface</span> <span class="n">ITransactionObject</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p>在创建了数据库连接之后使用QueryInterface 查询出IDBCreateSeesion对象，然后调用IDBCreateSession的CreateSession方法创建一个回话对象。
+需要注意的是，一个数据源连接可以创建多个回话对象，这里只能通过这种方式创建回话对象，而不能直接通过CoCreateInstance 来创建。一般来说应用中至少创建一个会话对象</p>
+<h1 id="command对象">Command对象</h1>
+<p>Command对象的定义如下：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="n">CoType</span> <span class="n">TCommand</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">   <span class="p">[</span><span class="n">mandatory</span><span class="p">]</span>   <span class="n">interface</span> <span class="n">IAccessor</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">   <span class="p">[</span><span class="n">mandatory</span><span class="p">]</span>   <span class="n">interface</span> <span class="n">IColumnsInfo</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">   <span class="p">[</span><span class="n">mandatory</span><span class="p">]</span>   <span class="n">interface</span> <span class="n">ICommand</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">   <span class="p">[</span><span class="n">mandatory</span><span class="p">]</span>   <span class="n">interface</span> <span class="n">ICommandProperties</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">   <span class="p">[</span><span class="n">mandatory</span><span class="p">]</span>   <span class="n">interface</span> <span class="n">ICommandText</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">   <span class="p">[</span><span class="n">mandatory</span><span class="p">]</span>   <span class="n">interface</span> <span class="n">IConvertType</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">   <span class="p">[</span><span class="n">optional</span><span class="p">]</span>    <span class="n">interface</span> <span class="n">IColumnsRowset</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">   <span class="p">[</span><span class="n">optional</span><span class="p">]</span>    <span class="n">interface</span> <span class="n">ICommandPersist</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">   <span class="p">[</span><span class="n">optional</span><span class="p">]</span>    <span class="n">interface</span> <span class="n">ICommandPrepare</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">   <span class="p">[</span><span class="n">optional</span><span class="p">]</span>    <span class="n">interface</span> <span class="n">ICommandWithParameters</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">   <span class="p">[</span><span class="n">optional</span><span class="p">]</span>    <span class="n">interface</span> <span class="n">ISupportErrorInfo</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">   <span class="p">[</span><span class="n">optional</span><span class="p">]</span>    <span class="n">interface</span> <span class="n">ICommandStream</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p>一般创建Command对象是通过Session对象Query出来一个IDBCreateCommand接口让后调用CreateCommand方法创建。
+与会话对象相似，一个会话对象可以创建多个命令对象，但是从上面会话对象的定义可以看出IDBCreateCommand接口是一个可选接口，并不是所有的数据库都支持，因此在创建命令对象的时候一定要注意判断是否支持。对于不支持的可以采用其他办法（一般采用直接打开数据库表的方式）。
+下面是一个演示例子：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="cp">#define CHECK_OLEDB_INTERFACE(I, iid)\
+</span></span></span><span class="line"><span class="cl"><span class="cp">    hRes = (I)-&gt;QueryInterface(IID_##iid, (void**)&amp;(p##iid));\
+</span></span></span><span class="line"><span class="cl"><span class="cp">    if(FAILED(hRes))\
+</span></span></span><span class="line"><span class="cl"><span class="cp">    {\
+</span></span></span><span class="line"><span class="cl"><span class="cp">        OLEDB_PRINTF(_T(&#34;不支持接口:%s\n&#34;), _T(#iid));\
+</span></span></span><span class="line"><span class="cl"><span class="cp">    }\
+</span></span></span><span class="line"><span class="cl"><span class="cp">    else\
+</span></span></span><span class="line"><span class="cl"><span class="cp">    {\
+</span></span></span><span class="line"><span class="cl"><span class="cp">        OLEDB_PRINTF(_T(&#34;支持接口:%s\n&#34;), _T(#iid));\
+</span></span></span><span class="line"><span class="cl"><span class="cp">    }
+</span></span></span><span class="line"><span class="cl"><span class="cp"></span>
+</span></span><span class="line"><span class="cl"><span class="n">BOOL</span> <span class="nf">CreateDBSession</span><span class="p">(</span><span class="n">IOpenRowset</span><span class="o">*</span> <span class="o">&amp;</span><span class="n">pIOpenRowset</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">DECLARE_BUFFER</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">    <span class="n">DECLARE_OLEDB_INTERFACE</span><span class="p">(</span><span class="n">IDBPromptInitialize</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">DECLARE_OLEDB_INTERFACE</span><span class="p">(</span><span class="n">IDBInitialize</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">DECLARE_OLEDB_INTERFACE</span><span class="p">(</span><span class="n">IDBCreateSession</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">BOOL</span> <span class="n">bRet</span> <span class="o">=</span> <span class="n">FALSE</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">HWND</span> <span class="n">hDesktop</span> <span class="o">=</span> <span class="n">GetDesktopWindow</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">    <span class="n">HRESULT</span> <span class="n">hRes</span> <span class="o">=</span> <span class="n">CoCreateInstance</span><span class="p">(</span><span class="n">CLSID_DataLinks</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">,</span> <span class="n">CLSCTX_INPROC_SERVER</span><span class="p">,</span> <span class="n">IID_IDBPromptInitialize</span><span class="p">,</span> <span class="p">(</span><span class="kt">void</span><span class="o">**</span><span class="p">)</span><span class="o">&amp;</span><span class="n">pIDBPromptInitialize</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">OLEDB_SUCCESS</span><span class="p">(</span><span class="n">hRes</span><span class="p">,</span> <span class="n">_T</span><span class="p">(</span><span class="s">&#34;创建接口IDBPromptInitialize失败，错误码:%08x</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">),</span> <span class="n">hRes</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="n">hRes</span> <span class="o">=</span> <span class="n">pIDBPromptInitialize</span><span class="o">-&gt;</span><span class="n">PromptDataSource</span><span class="p">(</span><span class="nb">NULL</span><span class="p">,</span> <span class="n">hDesktop</span><span class="p">,</span> <span class="n">DBPROMPTOPTIONS_WIZARDSHEET</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">,</span> <span class="n">IID_IDBInitialize</span><span class="p">,</span> <span class="p">(</span><span class="n">IUnknown</span><span class="o">**</span><span class="p">)</span><span class="o">&amp;</span><span class="n">pIDBInitialize</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">OLEDB_SUCCESS</span><span class="p">(</span><span class="n">hRes</span><span class="p">,</span> <span class="n">_T</span><span class="p">(</span><span class="s">&#34;弹出接口数据源配置对话框失败，错误码:%08x</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">),</span> <span class="n">hRes</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="n">hRes</span> <span class="o">=</span> <span class="n">pIDBInitialize</span><span class="o">-&gt;</span><span class="n">Initialize</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">    <span class="n">OLEDB_SUCCESS</span><span class="p">(</span><span class="n">hRes</span><span class="p">,</span> <span class="n">_T</span><span class="p">(</span><span class="s">&#34;链接数据库失败，错误码:%08x</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">),</span> <span class="n">hRes</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="n">hRes</span> <span class="o">=</span> <span class="n">pIDBInitialize</span><span class="o">-&gt;</span><span class="n">QueryInterface</span><span class="p">(</span><span class="n">IID_IDBCreateSession</span><span class="p">,</span> <span class="p">(</span><span class="kt">void</span><span class="o">**</span><span class="p">)</span><span class="o">&amp;</span><span class="n">pIDBCreateSession</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="n">OLEDB_SUCCESS</span><span class="p">(</span><span class="n">hRes</span><span class="p">,</span> <span class="n">_T</span><span class="p">(</span><span class="s">&#34;创建接口IDBCreateSession失败，错误码:%08x</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">),</span> <span class="n">hRes</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">hRes</span> <span class="o">=</span> <span class="n">pIDBCreateSession</span><span class="o">-&gt;</span><span class="n">CreateSession</span><span class="p">(</span><span class="nb">NULL</span><span class="p">,</span> <span class="n">IID_IOpenRowset</span><span class="p">,</span> <span class="p">(</span><span class="n">IUnknown</span><span class="o">**</span><span class="p">)</span><span class="o">&amp;</span><span class="n">pIOpenRowset</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">OLEDB_SUCCESS</span><span class="p">(</span><span class="n">hRes</span><span class="p">,</span> <span class="n">_T</span><span class="p">(</span><span class="s">&#34;创建接口IOpenRowset失败，错误码:%08x</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">),</span> <span class="n">hRes</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">bRet</span> <span class="o">=</span> <span class="n">TRUE</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="nl">__CLEAR_UP</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">    <span class="n">OLEDB_SAFE_RELEASE</span><span class="p">(</span><span class="n">pIDBPromptInitialize</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">OLEDB_SAFE_RELEASE</span><span class="p">(</span><span class="n">pIDBInitialize</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">OLEDB_SAFE_RELEASE</span><span class="p">(</span><span class="n">pIDBCreateSession</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="n">bRet</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kt">int</span> <span class="nf">_tmain</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="n">TCHAR</span> <span class="o">*</span><span class="n">argv</span><span class="p">[])</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">DECLARE_BUFFER</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">    <span class="n">DECLARE_OLEDB_INTERFACE</span><span class="p">(</span><span class="n">IOpenRowset</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">DECLARE_OLEDB_INTERFACE</span><span class="p">(</span><span class="n">IDBInitialize</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">DECLARE_OLEDB_INTERFACE</span><span class="p">(</span><span class="n">IDBCreateCommand</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="n">DECLARE_OLEDB_INTERFACE</span><span class="p">(</span><span class="n">IAccessor</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">DECLARE_OLEDB_INTERFACE</span><span class="p">(</span><span class="n">IColumnsInfo</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">DECLARE_OLEDB_INTERFACE</span><span class="p">(</span><span class="n">ICommand</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">DECLARE_OLEDB_INTERFACE</span><span class="p">(</span><span class="n">ICommandProperties</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">DECLARE_OLEDB_INTERFACE</span><span class="p">(</span><span class="n">ICommandText</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">DECLARE_OLEDB_INTERFACE</span><span class="p">(</span><span class="n">IConvertType</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">DECLARE_OLEDB_INTERFACE</span><span class="p">(</span><span class="n">IColumnsRowset</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">DECLARE_OLEDB_INTERFACE</span><span class="p">(</span><span class="n">ICommandPersist</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">DECLARE_OLEDB_INTERFACE</span><span class="p">(</span><span class="n">ICommandPrepare</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">DECLARE_OLEDB_INTERFACE</span><span class="p">(</span><span class="n">ICommandWithParameters</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">DECLARE_OLEDB_INTERFACE</span><span class="p">(</span><span class="n">ISupportErrorInfo</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">DECLARE_OLEDB_INTERFACE</span><span class="p">(</span><span class="n">ICommandStream</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="n">CoInitialize</span><span class="p">(</span><span class="nb">NULL</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">CreateDBSession</span><span class="p">(</span><span class="n">pIOpenRowset</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">OLEDB_PRINTF</span><span class="p">(</span><span class="n">_T</span><span class="p">(</span><span class="s">&#34;调用函数CreateDBSession失败，程序即将推出</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="n">HRESULT</span> <span class="n">hRes</span> <span class="o">=</span> <span class="n">pIOpenRowset</span><span class="o">-&gt;</span><span class="n">QueryInterface</span><span class="p">(</span><span class="n">IID_IDBCreateCommand</span><span class="p">,</span> <span class="p">(</span><span class="kt">void</span><span class="o">**</span><span class="p">)</span><span class="o">&amp;</span><span class="n">pIDBCreateCommand</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">OLEDB_SUCCESS</span><span class="p">(</span><span class="n">hRes</span><span class="p">,</span> <span class="n">_T</span><span class="p">(</span><span class="s">&#34;创建接口IDBCreateCommand失败，错误码:%08x</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">),</span> <span class="n">hRes</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="n">hRes</span> <span class="o">=</span> <span class="n">pIDBCreateCommand</span><span class="o">-&gt;</span><span class="n">CreateCommand</span><span class="p">(</span><span class="nb">NULL</span><span class="p">,</span> <span class="n">IID_IAccessor</span><span class="p">,</span> <span class="p">(</span><span class="n">IUnknown</span><span class="o">**</span><span class="p">)</span><span class="o">&amp;</span><span class="n">pIAccessor</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">OLEDB_SUCCESS</span><span class="p">(</span><span class="n">hRes</span><span class="p">,</span> <span class="n">_T</span><span class="p">(</span><span class="s">&#34;创建接口IAccessor失败，错误码:%08x</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">),</span> <span class="n">hRes</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="n">CHECK_OLEDB_INTERFACE</span><span class="p">(</span><span class="n">pIAccessor</span><span class="p">,</span> <span class="n">IColumnsInfo</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">CHECK_OLEDB_INTERFACE</span><span class="p">(</span><span class="n">pIAccessor</span><span class="p">,</span> <span class="n">ICommand</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">CHECK_OLEDB_INTERFACE</span><span class="p">(</span><span class="n">pIAccessor</span><span class="p">,</span> <span class="n">ICommandProperties</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">CHECK_OLEDB_INTERFACE</span><span class="p">(</span><span class="n">pIAccessor</span><span class="p">,</span> <span class="n">ICommandText</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">CHECK_OLEDB_INTERFACE</span><span class="p">(</span><span class="n">pIAccessor</span><span class="p">,</span> <span class="n">IConvertType</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">CHECK_OLEDB_INTERFACE</span><span class="p">(</span><span class="n">pIAccessor</span><span class="p">,</span> <span class="n">IColumnsRowset</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">CHECK_OLEDB_INTERFACE</span><span class="p">(</span><span class="n">pIAccessor</span><span class="p">,</span> <span class="n">ICommandPersist</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">CHECK_OLEDB_INTERFACE</span><span class="p">(</span><span class="n">pIAccessor</span><span class="p">,</span> <span class="n">ICommandPrepare</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">CHECK_OLEDB_INTERFACE</span><span class="p">(</span><span class="n">pIAccessor</span><span class="p">,</span> <span class="n">ICommandWithParameters</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">CHECK_OLEDB_INTERFACE</span><span class="p">(</span><span class="n">pIAccessor</span><span class="p">,</span> <span class="n">ISupportErrorInfo</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">CHECK_OLEDB_INTERFACE</span><span class="p">(</span><span class="n">pIAccessor</span><span class="p">,</span> <span class="n">ICommandStream</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="nl">__CLEAR_UP</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">    <span class="n">OLEDB_SAFE_RELEASE</span><span class="p">(</span><span class="n">pIOpenRowset</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">OLEDB_SAFE_RELEASE</span><span class="p">(</span><span class="n">pIDBInitialize</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">OLEDB_SAFE_RELEASE</span><span class="p">(</span><span class="n">pIDBCreateCommand</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="n">OLEDB_SAFE_RELEASE</span><span class="p">(</span><span class="n">pIAccessor</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">OLEDB_SAFE_RELEASE</span><span class="p">(</span><span class="n">pIColumnsInfo</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">OLEDB_SAFE_RELEASE</span><span class="p">(</span><span class="n">pICommand</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">OLEDB_SAFE_RELEASE</span><span class="p">(</span><span class="n">pICommandProperties</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">OLEDB_SAFE_RELEASE</span><span class="p">(</span><span class="n">pICommandText</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">OLEDB_SAFE_RELEASE</span><span class="p">(</span><span class="n">pIConvertType</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">OLEDB_SAFE_RELEASE</span><span class="p">(</span><span class="n">pIColumnsRowset</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">OLEDB_SAFE_RELEASE</span><span class="p">(</span><span class="n">pICommandPersist</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">OLEDB_SAFE_RELEASE</span><span class="p">(</span><span class="n">pICommandPrepare</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">OLEDB_SAFE_RELEASE</span><span class="p">(</span><span class="n">pICommandWithParameters</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">OLEDB_SAFE_RELEASE</span><span class="p">(</span><span class="n">pISupportErrorInfo</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">OLEDB_SAFE_RELEASE</span><span class="p">(</span><span class="n">pICommandStream</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">CoUninitialize</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p>在上述的例子中，首先定义了一个宏，用来判断是否支持对应的接口。
+同时定义了一个CreateDBSession方法来创建一个会话对象。在该函数中首先利用上一节的方法创建一个数据库连接，然后在数据源对象上调用QueryInterface来获取接口IDBCreateSeesion，接着利用IDBCreateSeesion接口的CreateSeesion方法创建一个会话对象，由于IDBCreateCommand接口并不是所有的数据源都支持，所以为了保证一定能创建会话对象，我们选择会话对象必须支持的接口IOpenRowset。
+在得到会话对象后，尝试创建IDBCreateSession对象，如果它不支持，那么程序直接退出。接着调用IDBCreateCommand接口来创建一个命令对象并尝试query命令对象的其他接口，得出数据源支持哪些接口。
+这个例子非常简单，只是为了演示如何创建会话对象和数据源对象罢了。
+<a href="https://github.com/aMonst/OLEDB_Demo/blob/master/SessionAndComand.cpp" target="_blank" rel="noopener noreffer ">本节例子代码</a></p>
+<!-- raw HTML omitted -->
+</div><div class="post-footer" id="post-footer">
+    <div class="post-info">
+        <div class="post-info-line">
+            <div class="post-info-mod">
+                <span>Updated on 2018-01-21</span>
+            </div></div>
+        <div class="post-info-line">
+            <div class="post-info-md"></div>
+            <div class="post-info-share">
+                <span><a href="javascript:void(0);" title="Share on Twitter" data-sharer="twitter" data-url="http://HaiLateBoy.github.io/posts/oledb-and-ado-3/" data-title="事务对象和命令对象" data-hashtags="OLEDB,数据库编程,VC&#43;&#43;,数据库"><i class="fab fa-twitter fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Facebook" data-sharer="facebook" data-url="http://HaiLateBoy.github.io/posts/oledb-and-ado-3/" data-hashtag="OLEDB"><i class="fab fa-facebook-square fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Hacker News" data-sharer="hackernews" data-url="http://HaiLateBoy.github.io/posts/oledb-and-ado-3/" data-title="事务对象和命令对象"><i class="fab fa-hacker-news fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Line" data-sharer="line" data-url="http://HaiLateBoy.github.io/posts/oledb-and-ado-3/" data-title="事务对象和命令对象"><i data-svg-src="https://cdn.jsdelivr.net/npm/simple-icons@7.3.0/icons/line.svg" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on 微博" data-sharer="weibo" data-url="http://HaiLateBoy.github.io/posts/oledb-and-ado-3/" data-title="事务对象和命令对象"><i class="fab fa-weibo fa-fw" aria-hidden="true"></i></a></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="post-info-more">
+        <section class="post-tags"><i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/oledb/">OLEDB</a>,&nbsp;<a href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93%E7%BC%96%E7%A8%8B/">数据库编程</a>,&nbsp;<a href="/tags/vc&#43;&#43;/">VC&#43;&#43;</a>,&nbsp;<a href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93/">数据库</a></section>
+        <section>
+            <span><a href="javascript:void(0);" onclick="window.history.back();">Back</a></span>&nbsp;|&nbsp;<span><a href="/">Home</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav"><a href="/posts/talk-about-study/" class="prev" rel="prev" title="谈谈我所理解的学习"><i class="fas fa-angle-left fa-fw" aria-hidden="true"></i>谈谈我所理解的学习</a>
+            <a href="/posts/c-access-variant/" class="next" rel="next" title="C语言中不同变量的访问方式">C语言中不同变量的访问方式<i class="fas fa-angle-right fa-fw" aria-hidden="true"></i></a></div>
+</div>
+</article></div>
+            </main><footer class="footer">
+        <div class="footer-container"><div class="footer-line">Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener noreffer" title="Hugo 0.121.2">Hugo</a> | Theme - <a href="https://github.com/dillonzq/LoveIt" target="_blank" rel="noopener noreffer" title="LoveIt 0.2.11"><i class="far fa-kiss-wink-heart fa-fw" aria-hidden="true"></i> LoveIt</a>
+                </div><div class="footer-line" itemscope itemtype="http://schema.org/CreativeWork"><i class="far fa-copyright fa-fw" aria-hidden="true"></i><span itemprop="copyrightYear">2022 - 2024</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="https://www.masimaro.xyz" target="_blank">Masimaro</a></span></div>
+        </div>
+    </footer></div>
+
+        <div id="fixed-buttons"><a href="#" id="back-to-top" class="fixed-button" title="Back to Top">
+                <i class="fas fa-arrow-up fa-fw" aria-hidden="true"></i>
+            </a><a href="#" id="view-comments" class="fixed-button" title="View Comments">
+                <i class="fas fa-comment fa-fw" aria-hidden="true"></i>
+            </a>
+        </div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.css"><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/autocomplete.js@0.38.1/dist/autocomplete.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lunr@2.3.9/lunr.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lazysizes@5.3.2/lazysizes.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/clipboard@2.0.11/dist/clipboard.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/sharer.js@0.5.1/sharer.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/auto-render.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/copy-tex.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/mhchem.min.js"></script><script type="text/javascript">window.config={"code":{"copyTitle":"Copy to clipboard","maxShownLines":50},"comment":{},"math":{"delimiters":[{"display":true,"left":"$$","right":"$$"},{"display":true,"left":"\\[","right":"\\]"},{"display":true,"left":"\\begin{equation}","right":"\\end{equation}"},{"display":true,"left":"\\begin{equation*}","right":"\\end{equation*}"},{"display":true,"left":"\\begin{align}","right":"\\end{align}"},{"display":true,"left":"\\begin{align*}","right":"\\end{align*}"},{"display":true,"left":"\\begin{alignat}","right":"\\end{alignat}"},{"display":true,"left":"\\begin{alignat*}","right":"\\end{alignat*}"},{"display":true,"left":"\\begin{gather}","right":"\\end{gather}"},{"display":true,"left":"\\begin{CD}","right":"\\end{CD}"},{"display":false,"left":"$","right":"$"},{"display":false,"left":"\\(","right":"\\)"}],"strict":false},"search":{"highlightTag":"em","maxResultLength":10,"noResultsFound":"No results found","snippetLength":50}};</script><script type="text/javascript" src="/js/theme.min.js"></script></body>
+</html>

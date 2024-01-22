@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="robots" content="noodp" />
+        <title>从零开始配置vim(20)——模糊查询 - Masimaro&#39;s blog</title><meta name="Description" content="这是我用于记录日常和学习的小站"><meta property="og:title" content="从零开始配置vim(20)——模糊查询" />
+<meta property="og:description" content="在讲解vim的基础功能的时候，介绍过了vim的各种查询技巧，在同一个文件中进行搜索的话，那些技巧很有用。在多个文件中我们介绍了使用vim自带" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://HaiLateBoy.github.io/posts/vim-config20/" /><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2022-09-01T17:50:44+08:00" />
+<meta property="article:modified_time" content="2022-09-01T17:50:44+08:00" /><meta property="og:site_name" content="Masimaro&#39;s blog" />
+
+<meta name="twitter:card" content="summary"/><meta name="twitter:title" content="从零开始配置vim(20)——模糊查询"/>
+<meta name="twitter:description" content="在讲解vim的基础功能的时候，介绍过了vim的各种查询技巧，在同一个文件中进行搜索的话，那些技巧很有用。在多个文件中我们介绍了使用vim自带"/>
+<meta name="application-name" content="My cool site">
+<meta name="apple-mobile-web-app-title" content="My cool site"><meta name="theme-color" content="#ffffff"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="manifest" href="/site.webmanifest"><link rel="canonical" href="http://HaiLateBoy.github.io/posts/vim-config20/" /><link rel="prev" href="http://HaiLateBoy.github.io/posts/vim-config19/" /><link rel="next" href="http://HaiLateBoy.github.io/posts/vim-config21/" /><link rel="stylesheet" href="/css/style.min.css"><link rel="preload" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css"></noscript><link rel="preload" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css"></noscript><script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "BlogPosting",
+        "headline": "从零开始配置vim(20)——模糊查询",
+        "inLanguage": "zh-CN",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "http:\/\/HaiLateBoy.github.io\/posts\/vim-config20\/"
+        },"genre": "posts","keywords": "vim, 编辑工具, 文本处理, lua, 编辑器","wordcount":  1286 ,
+        "url": "http:\/\/HaiLateBoy.github.io\/posts\/vim-config20\/","datePublished": "2022-09-01T17:50:44+08:00","dateModified": "2022-09-01T17:50:44+08:00","publisher": {
+            "@type": "Organization",
+            "name": ""},"author": {
+                "@type": "Person",
+                "name": "Masimaro"
+            },"description": ""
+    }
+    </script></head>
+    <body data-header-desktop="fixed" data-header-mobile="auto"><script type="text/javascript">(window.localStorage && localStorage.getItem('theme') ? localStorage.getItem('theme') === 'dark' : ('auto' === 'auto' ? window.matchMedia('(prefers-color-scheme: dark)').matches : 'auto' === 'dark')) && document.body.setAttribute('theme', 'dark');</script>
+
+        <div id="mask"></div><div class="wrapper"><header class="desktop" id="header-desktop">
+    <div class="header-wrapper">
+        <div class="header-title">
+            <a href="/" title="Masimaro&#39;s blog">My cool site</a>
+        </div>
+        <div class="menu">
+            <div class="menu-inner"><a class="menu-item" href="/posts/" title="文章列表"> 文章 </a><a class="menu-item" href="/tags/" title="标签"> 标签 </a><a class="menu-item" href="/categories/" title="分类"> 分类 </a><a class="menu-item" href="/about" title="关于本站"> 关于 </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-desktop">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-desktop" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-desktop" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-desktop">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </span><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                    <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+                </a></div>
+        </div>
+    </div>
+</header><header class="mobile" id="header-mobile">
+    <div class="header-container">
+        <div class="header-wrapper">
+            <div class="header-title">
+                <a href="/" title="Masimaro&#39;s blog">My cool site</a>
+            </div>
+            <div class="menu-toggle" id="menu-toggle-mobile">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+        <div class="menu" id="menu-mobile"><div class="search-wrapper">
+                    <div class="search mobile" id="search-mobile">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-mobile">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-mobile" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-mobile" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-mobile">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </div>
+                    <a href="javascript:void(0);" class="search-cancel" id="search-cancel-mobile">
+                        Cancel
+                    </a>
+                </div><a class="menu-item" href="/posts/" title="文章列表">文章</a><a class="menu-item" href="/tags/" title="标签">标签</a><a class="menu-item" href="/categories/" title="分类">分类</a><a class="menu-item" href="/about" title="关于本站">关于</a><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+            </a></div>
+    </div>
+</header><div class="search-dropdown desktop">
+        <div id="search-dropdown-desktop"></div>
+    </div>
+    <div class="search-dropdown mobile">
+        <div id="search-dropdown-mobile"></div>
+    </div><main class="main">
+                <div class="container"><div class="toc" id="toc-auto">
+            <h2 class="toc-title">Contents</h2>
+            <div class="toc-content" id="toc-content-auto"></div>
+        </div><article class="page single"><h1 class="single-title animate__animated animate__flipInX">从零开始配置vim(20)——模糊查询</h1><div class="post-meta">
+            <div class="post-meta-line"><span class="post-author"><a href="https://www.masimaro.xyz" title="Author" target="_blank" rel="noopener noreffer author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Masimaro</a></span>&nbsp;<span class="post-category">included in <a href="/categories/vim-%E9%85%8D%E7%BD%AE/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>vim 配置</a></span></div>
+            <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw" aria-hidden="true"></i>&nbsp;<time datetime="2022-09-01">2022-09-01</time>&nbsp;<i class="fas fa-pencil-alt fa-fw" aria-hidden="true"></i>&nbsp;1286 words&nbsp;
+                <i class="far fa-clock fa-fw" aria-hidden="true"></i>&nbsp;3 minutes&nbsp;</div>
+        </div><div class="details toc" id="toc-static"  data-kept="true">
+                <div class="details-summary toc-title">
+                    <span>Contents</span>
+                    <span><i class="details-icon fas fa-angle-right" aria-hidden="true"></i></span>
+                </div>
+                <div class="details-content toc-content" id="toc-content-static"><nav id="TableOfContents">
+  <ul>
+    <li><a href="#安装">安装</a></li>
+    <li><a href="#配置">配置</a></li>
+  </ul>
+</nav></div>
+            </div><div class="content" id="content"><p>在讲解vim的基础功能的时候，介绍过了vim的各种查询技巧，在同一个文件中进行搜索的话，那些技巧很有用。在多个文件中我们介绍了使用vim自带的 :grep命令进行搜索，使用quickfix 列表进行跳转，但是比起其他代码编辑器来说，总归有那么一些繁琐光是输入参数都已经很麻烦了，我想要像其他代码编辑器那样直接输入内容它就能基于工程来进行匹配。本篇文章我们将要来对它进行优化，达到这一目的。</p>
+<p>本次我们要介绍的是神级插件 <code>telescope</code>，一般只要介绍 <code>neovim</code> 配置的文章98%以上的都会推荐这个插件作为文件搜索和文本搜索的插件。我们自然也不能免俗，这里我也要介绍它，如果不介绍就显得有点不太专业了。虽然我也介绍，但是这个系列毕竟是从0开始配置vim，我会从安装到配置进行描述，希望能比其他的教程要详细一点。但是最详细的仍然是它的官方文档。</p>
+<h2 id="安装">安装</h2>
+<p>我们使用下面的代码进行安装</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-lua" data-lang="lua"><span class="line"><span class="cl"><span class="n">use</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="s1">&#39;nvim-telescope/telescope.nvim&#39;</span><span class="p">,</span> <span class="n">tag</span> <span class="o">=</span> <span class="s1">&#39;0.1.0&#39;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">  <span class="n">requires</span> <span class="o">=</span> <span class="p">{</span> <span class="p">{</span><span class="s1">&#39;nvim-lua/plenary.nvim&#39;</span><span class="p">}</span> <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p>为了更好的使用体验可以安装一个 <code>nvim-treesitter</code> 插件，它主要用于代码高亮，它采用语法分析的形式对代码进行高亮，相比于使用正则表达式来说效果更好，后面会详细的介绍如何进行配置，加上它之后 <code>telescope</code> 插件将会更加强大。这个时候我们的安装代码应该改为</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-lua" data-lang="lua"><span class="line"><span class="cl"><span class="n">use</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="s1">&#39;nvim-telescope/telescope.nvim&#39;</span><span class="p">,</span> <span class="n">tag</span> <span class="o">=</span> <span class="s1">&#39;0.1.0&#39;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">requires</span> <span class="o">=</span> <span class="p">{</span> <span class="p">{</span><span class="s1">&#39;nvim-lua/plenary.nvim&#39;</span><span class="p">}</span> <span class="p">,</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="s1">&#39;nvim-treesitter/nvim-treesitter&#39;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">run</span> <span class="o">=</span> <span class="kr">function</span><span class="p">()</span> <span class="n">require</span><span class="p">(</span><span class="s1">&#39;nvim-treesitter.install&#39;</span><span class="p">).</span><span class="n">update</span><span class="p">({</span> <span class="n">with_sync</span> <span class="o">=</span> <span class="kc">true</span> <span class="p">})</span> <span class="kr">end</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p>这里加上一个 <code>run</code> 的配置主要是安装 <code>nvim-treesitter</code> 插件之后，第一次会报错，后面是正常的，这句话是为了消除第一次加载时报错</p>
+<p>安装完成之后，我们就可以在命令中输入 <code>:Telescope find_files</code> 来按照名称搜索文件
+<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://img-blog.csdnimg.cn/b1a0210157d6446b8c868c48b23339ea.gif#pic_center"
+        data-srcset="https://img-blog.csdnimg.cn/b1a0210157d6446b8c868c48b23339ea.gif#pic_center, https://img-blog.csdnimg.cn/b1a0210157d6446b8c868c48b23339ea.gif#pic_center 1.5x, https://img-blog.csdnimg.cn/b1a0210157d6446b8c868c48b23339ea.gif#pic_center 2x"
+        data-sizes="auto"
+        alt="https://img-blog.csdnimg.cn/b1a0210157d6446b8c868c48b23339ea.gif#pic_center"
+        title="在这里插入图片描述" />
+它常用的命令有如下几个</p>
+<ul>
+<li><code>find_files</code> : 查找文件</li>
+<li><code>live_grep</code>: 使用正则表达式来进行内容的搜索，它可以跨文件搜索</li>
+<li><code>buffers</code>：查看当前打开的缓冲区，并且可以预览缓冲区的内容</li>
+<li><code>grep_string</code>: 以当前光标所在单词进行搜索</li>
+<li><code>oldfile</code>: 打开历史文件列表</li>
+<li><code>marks</code>: 打开书签表</li>
+<li><code>jumplist</code>: 打开跳转列表</li>
+</ul>
+<p>如果我们希望能够使用 <code>live_grep</code> 和 <code>grep_string</code> 的功能需要提前在系统上安装 ripgrep。例如在ubuntu 上可以使用下列命令安装</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">sudo apt-get install ripgrep
+</span></span></code></pre></div><h2 id="配置">配置</h2>
+<p>我们先对最常用的功能进行快捷键的映射</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-lua" data-lang="lua"><span class="line"><span class="cl"><span class="n">vim.api</span><span class="p">.</span><span class="n">nvim_set_keymap</span><span class="p">(</span><span class="s2">&#34;n&#34;</span><span class="p">,</span> <span class="s2">&#34;&lt;leader&gt;ff&#34;</span><span class="p">,</span> <span class="s2">&#34;&lt;Cmd&gt;Telescope find_files&lt;CR&gt;&#34;</span><span class="p">,</span> <span class="p">{</span><span class="n">noremap</span> <span class="o">=</span> <span class="kc">true</span><span class="p">,</span> <span class="n">silent</span> <span class="o">=</span> <span class="kc">true</span><span class="p">})</span>
+</span></span><span class="line"><span class="cl"><span class="n">vim.api</span><span class="p">.</span><span class="n">nvim_set_keymap</span><span class="p">(</span><span class="s2">&#34;n&#34;</span><span class="p">,</span> <span class="s2">&#34;&lt;leader&gt;gg&#34;</span><span class="p">,</span> <span class="s2">&#34;&lt;Cmd&gt;Telescope live_grep&lt;CR&gt;&#34;</span><span class="p">,</span> <span class="p">{</span><span class="n">noremap</span> <span class="o">=</span> <span class="kc">true</span><span class="p">,</span> <span class="n">silent</span> <span class="o">=</span> <span class="kc">true</span><span class="p">})</span>
+</span></span><span class="line"><span class="cl"><span class="n">vim.api</span><span class="p">.</span><span class="n">nvim_set_keymap</span><span class="p">(</span><span class="s2">&#34;n&#34;</span><span class="p">,</span> <span class="s2">&#34;&lt;leader&gt;fm&#34;</span><span class="p">,</span> <span class="s2">&#34;&lt;Cmd&gt;Telescope marks&lt;CR&gt;&#34;</span><span class="p">,</span> <span class="p">{</span><span class="n">noremap</span> <span class="o">=</span> <span class="kc">true</span><span class="p">,</span> <span class="n">silent</span> <span class="o">=</span> <span class="kc">true</span><span class="p">})</span>
+</span></span><span class="line"><span class="cl"><span class="n">vim.api</span><span class="p">.</span><span class="n">nvim_set_keymap</span><span class="p">(</span><span class="s2">&#34;n&#34;</span><span class="p">,</span> <span class="s2">&#34;&lt;leader&gt;fj&#34;</span><span class="p">,</span> <span class="s2">&#34;&lt;Cmd&gt;Telescope jumplist&lt;CR&gt;&#34;</span><span class="p">,</span> <span class="p">{</span><span class="n">noremap</span> <span class="o">=</span> <span class="kc">true</span><span class="p">,</span> <span class="n">silent</span> <span class="o">=</span> <span class="kc">true</span><span class="p">})</span>
+</span></span></code></pre></div><p>不知道各位小伙伴是否还记得，我们在配置启动界面的时候留下了几个功能没有添加，现在我们有了这个插件之后就可以添加一部分了</p>
+<p>在 <code>dashboard</code> 的配置中，我们可以补充相关功能对应的命令如下</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-lua" data-lang="lua"><span class="line"><span class="cl"><span class="n">db.custom_center</span> <span class="o">=</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="p">{</span><span class="n">icon</span> <span class="o">=</span> <span class="s2">&#34;  &#34;</span><span class="p">,</span> <span class="n">desc</span> <span class="o">=</span> <span class="s1">&#39;Recently lastest session    &#39;</span><span class="p">,</span> <span class="n">shortcut</span> <span class="o">=</span> <span class="s2">&#34;Leader s l&#34;</span><span class="p">,</span> <span class="n">action</span> <span class="o">=</span> <span class="s2">&#34;&#34;</span><span class="p">},</span>
+</span></span><span class="line"><span class="cl">    <span class="p">{</span><span class="n">icon</span> <span class="o">=</span> <span class="s2">&#34;  &#34;</span><span class="p">,</span> <span class="n">desc</span> <span class="o">=</span> <span class="s2">&#34;Recently opened files       &#34;</span><span class="p">,</span> <span class="n">shortcut</span> <span class="o">=</span> <span class="s2">&#34;Leader f h&#34;</span><span class="p">,</span> <span class="n">action</span> <span class="o">=</span> <span class="s2">&#34;Telescope oldfiles&#34;</span><span class="p">},</span>
+</span></span><span class="line"><span class="cl">    <span class="p">{</span><span class="n">icon</span> <span class="o">=</span> <span class="s2">&#34;  &#34;</span><span class="p">,</span> <span class="n">desc</span> <span class="o">=</span> <span class="s2">&#34;Find File                   &#34;</span><span class="p">,</span> <span class="n">shortcut</span> <span class="o">=</span> <span class="s2">&#34;leader f f&#34;</span><span class="p">,</span> <span class="n">action</span> <span class="o">=</span> <span class="s2">&#34;Telescope find_files&#34;</span><span class="p">},</span>
+</span></span><span class="line"><span class="cl">    <span class="p">{</span><span class="n">icon</span> <span class="o">=</span> <span class="s2">&#34;  &#34;</span><span class="p">,</span> <span class="n">desc</span> <span class="o">=</span> <span class="s2">&#34;File Browser                &#34;</span><span class="p">,</span> <span class="n">shortcut</span> <span class="o">=</span> <span class="s2">&#34;leader f b&#34;</span><span class="p">,</span> <span class="n">action</span> <span class="o">=</span> <span class="s2">&#34;Telescope file_browser&#34;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">},</span>                                                                                        <span class="p">{</span><span class="n">icon</span> <span class="o">=</span> <span class="s2">&#34;  &#34;</span><span class="p">,</span> <span class="n">desc</span> <span class="o">=</span> <span class="s2">&#34;Find Word                   &#34;</span><span class="p">,</span> <span class="n">shortcut</span> <span class="o">=</span> <span class="s2">&#34;leader g g&#34;</span><span class="p">,</span> <span class="n">action</span> <span class="o">=</span> <span class="s2">&#34;Telescope live_grep&#34;</span><span class="p">},</span>
+</span></span><span class="line"><span class="cl">    <span class="p">{</span><span class="n">icon</span> <span class="o">=</span> <span class="s2">&#34;  &#34;</span><span class="p">,</span> <span class="n">desc</span> <span class="o">=</span> <span class="s2">&#34;Open Personal dotfiles      &#34;</span><span class="p">,</span> <span class="n">shortcut</span> <span class="o">=</span> <span class="s2">&#34;leader e e&#34;</span><span class="p">,</span> <span class="n">action</span> <span class="o">=</span> <span class="s2">&#34;edit $MYVIMRC&#34;</span><span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p>要使用 <code>Telescope file_browser</code> 的功能我们需要额外安装一个插件。它扩展了 <code>Telescope</code> 插件的功能</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-lua" data-lang="lua"><span class="line"><span class="cl"><span class="n">use</span> <span class="p">{</span> <span class="s2">&#34;nvim-telescope/telescope-file-browser.nvim&#34;</span> <span class="p">}</span>
+</span></span></code></pre></div><p>并且我们需要在 <code>telescope</code> 配置中加载这个扩展</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-lua" data-lang="lua"><span class="line"><span class="cl"><span class="n">require</span><span class="p">(</span><span class="s1">&#39;telescope&#39;</span><span class="p">).</span><span class="n">load_extension</span> <span class="s2">&#34;file_browser&#34;</span>
+</span></span></code></pre></div><p>这样我们就完成了几乎所有的功能了，还差一个加载上次会话的功能，我们等到讨论会话的时候再来补上
+<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://img-blog.csdnimg.cn/53426d884b1243d094a5b5860121e681.gif#pic_center"
+        data-srcset="https://img-blog.csdnimg.cn/53426d884b1243d094a5b5860121e681.gif#pic_center, https://img-blog.csdnimg.cn/53426d884b1243d094a5b5860121e681.gif#pic_center 1.5x, https://img-blog.csdnimg.cn/53426d884b1243d094a5b5860121e681.gif#pic_center 2x"
+        data-sizes="auto"
+        alt="https://img-blog.csdnimg.cn/53426d884b1243d094a5b5860121e681.gif#pic_center"
+        title="在这里插入图片描述" /></p>
+<p>到现在我们的配置基本就结束了，我们目前仅仅只使用了它极为有限的功能。根据官方的文档，它有大量的导出函数用于各种功能，但是现在我们并不打算做太多的定制化开发，仅仅拿来用即可，所以目前的配置我认为已经够用了。各位小伙伴也可以根据自己的需求查阅官方文档进行额外的配置</p>
+</div><div class="post-footer" id="post-footer">
+    <div class="post-info">
+        <div class="post-info-line">
+            <div class="post-info-mod">
+                <span>Updated on 2022-09-01</span>
+            </div></div>
+        <div class="post-info-line">
+            <div class="post-info-md"></div>
+            <div class="post-info-share">
+                <span><a href="javascript:void(0);" title="Share on Twitter" data-sharer="twitter" data-url="http://HaiLateBoy.github.io/posts/vim-config20/" data-title="从零开始配置vim(20)——模糊查询" data-hashtags="vim,编辑工具,文本处理,lua,编辑器"><i class="fab fa-twitter fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Facebook" data-sharer="facebook" data-url="http://HaiLateBoy.github.io/posts/vim-config20/" data-hashtag="vim"><i class="fab fa-facebook-square fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Hacker News" data-sharer="hackernews" data-url="http://HaiLateBoy.github.io/posts/vim-config20/" data-title="从零开始配置vim(20)——模糊查询"><i class="fab fa-hacker-news fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Line" data-sharer="line" data-url="http://HaiLateBoy.github.io/posts/vim-config20/" data-title="从零开始配置vim(20)——模糊查询"><i data-svg-src="https://cdn.jsdelivr.net/npm/simple-icons@7.3.0/icons/line.svg" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on 微博" data-sharer="weibo" data-url="http://HaiLateBoy.github.io/posts/vim-config20/" data-title="从零开始配置vim(20)——模糊查询"><i class="fab fa-weibo fa-fw" aria-hidden="true"></i></a></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="post-info-more">
+        <section class="post-tags"><i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/vim/">vim</a>,&nbsp;<a href="/tags/%E7%BC%96%E8%BE%91%E5%B7%A5%E5%85%B7/">编辑工具</a>,&nbsp;<a href="/tags/%E6%96%87%E6%9C%AC%E5%A4%84%E7%90%86/">文本处理</a>,&nbsp;<a href="/tags/lua/">lua</a>,&nbsp;<a href="/tags/%E7%BC%96%E8%BE%91%E5%99%A8/">编辑器</a></section>
+        <section>
+            <span><a href="javascript:void(0);" onclick="window.history.back();">Back</a></span>&nbsp;|&nbsp;<span><a href="/">Home</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav"><a href="/posts/vim-config19/" class="prev" rel="prev" title="从零开始配置vim(19)——终端配置"><i class="fas fa-angle-left fa-fw" aria-hidden="true"></i>从零开始配置vim(19)——终端配置</a>
+            <a href="/posts/vim-config21/" class="next" rel="next" title="从零开始配置vim(21)——会话管理">从零开始配置vim(21)——会话管理<i class="fas fa-angle-right fa-fw" aria-hidden="true"></i></a></div>
+</div>
+</article></div>
+            </main><footer class="footer">
+        <div class="footer-container"><div class="footer-line">Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener noreffer" title="Hugo 0.121.2">Hugo</a> | Theme - <a href="https://github.com/dillonzq/LoveIt" target="_blank" rel="noopener noreffer" title="LoveIt 0.2.11"><i class="far fa-kiss-wink-heart fa-fw" aria-hidden="true"></i> LoveIt</a>
+                </div><div class="footer-line" itemscope itemtype="http://schema.org/CreativeWork"><i class="far fa-copyright fa-fw" aria-hidden="true"></i><span itemprop="copyrightYear">2022 - 2024</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="https://www.masimaro.xyz" target="_blank">Masimaro</a></span></div>
+        </div>
+    </footer></div>
+
+        <div id="fixed-buttons"><a href="#" id="back-to-top" class="fixed-button" title="Back to Top">
+                <i class="fas fa-arrow-up fa-fw" aria-hidden="true"></i>
+            </a><a href="#" id="view-comments" class="fixed-button" title="View Comments">
+                <i class="fas fa-comment fa-fw" aria-hidden="true"></i>
+            </a>
+        </div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.css"><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/autocomplete.js@0.38.1/dist/autocomplete.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lunr@2.3.9/lunr.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lazysizes@5.3.2/lazysizes.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/clipboard@2.0.11/dist/clipboard.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/sharer.js@0.5.1/sharer.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/auto-render.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/copy-tex.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/mhchem.min.js"></script><script type="text/javascript">window.config={"code":{"copyTitle":"Copy to clipboard","maxShownLines":50},"comment":{},"math":{"delimiters":[{"display":true,"left":"$$","right":"$$"},{"display":true,"left":"\\[","right":"\\]"},{"display":true,"left":"\\begin{equation}","right":"\\end{equation}"},{"display":true,"left":"\\begin{equation*}","right":"\\end{equation*}"},{"display":true,"left":"\\begin{align}","right":"\\end{align}"},{"display":true,"left":"\\begin{align*}","right":"\\end{align*}"},{"display":true,"left":"\\begin{alignat}","right":"\\end{alignat}"},{"display":true,"left":"\\begin{alignat*}","right":"\\end{alignat*}"},{"display":true,"left":"\\begin{gather}","right":"\\end{gather}"},{"display":true,"left":"\\begin{CD}","right":"\\end{CD}"},{"display":false,"left":"$","right":"$"},{"display":false,"left":"\\(","right":"\\)"}],"strict":false},"search":{"highlightTag":"em","maxResultLength":10,"noResultsFound":"No results found","snippetLength":50}};</script><script type="text/javascript" src="/js/theme.min.js"></script></body>
+</html>

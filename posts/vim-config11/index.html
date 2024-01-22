@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="robots" content="noodp" />
+        <title>从零开始配置 vim(11)——插件管理 - Masimaro&#39;s blog</title><meta name="Description" content="这是我用于记录日常和学习的小站"><meta property="og:title" content="从零开始配置 vim(11)——插件管理" />
+<meta property="og:description" content="之前我们介绍了基础配置部分和快捷键配置部分。如果你配置了这两个部分，vim已经算是比较好用了。但是作为代码编辑器来讲还是显的比较简陋，用这些" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://HaiLateBoy.github.io/posts/vim-config11/" /><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2022-08-10T09:29:52+08:00" />
+<meta property="article:modified_time" content="2022-08-10T09:29:52+08:00" /><meta property="og:site_name" content="Masimaro&#39;s blog" />
+
+<meta name="twitter:card" content="summary"/><meta name="twitter:title" content="从零开始配置 vim(11)——插件管理"/>
+<meta name="twitter:description" content="之前我们介绍了基础配置部分和快捷键配置部分。如果你配置了这两个部分，vim已经算是比较好用了。但是作为代码编辑器来讲还是显的比较简陋，用这些"/>
+<meta name="application-name" content="My cool site">
+<meta name="apple-mobile-web-app-title" content="My cool site"><meta name="theme-color" content="#ffffff"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="manifest" href="/site.webmanifest"><link rel="canonical" href="http://HaiLateBoy.github.io/posts/vim-config11/" /><link rel="prev" href="http://HaiLateBoy.github.io/posts/vim-config10/" /><link rel="next" href="http://HaiLateBoy.github.io/posts/vim-config12/" /><link rel="stylesheet" href="/css/style.min.css"><link rel="preload" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css"></noscript><link rel="preload" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css"></noscript><script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "BlogPosting",
+        "headline": "从零开始配置 vim(11)——插件管理",
+        "inLanguage": "zh-CN",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "http:\/\/HaiLateBoy.github.io\/posts\/vim-config11\/"
+        },"genre": "posts","keywords": "vim, 编辑工具, 文本处理, lua, 编辑器","wordcount":  1644 ,
+        "url": "http:\/\/HaiLateBoy.github.io\/posts\/vim-config11\/","datePublished": "2022-08-10T09:29:52+08:00","dateModified": "2022-08-10T09:29:52+08:00","publisher": {
+            "@type": "Organization",
+            "name": ""},"author": {
+                "@type": "Person",
+                "name": "Masimaro"
+            },"description": ""
+    }
+    </script></head>
+    <body data-header-desktop="fixed" data-header-mobile="auto"><script type="text/javascript">(window.localStorage && localStorage.getItem('theme') ? localStorage.getItem('theme') === 'dark' : ('auto' === 'auto' ? window.matchMedia('(prefers-color-scheme: dark)').matches : 'auto' === 'dark')) && document.body.setAttribute('theme', 'dark');</script>
+
+        <div id="mask"></div><div class="wrapper"><header class="desktop" id="header-desktop">
+    <div class="header-wrapper">
+        <div class="header-title">
+            <a href="/" title="Masimaro&#39;s blog">My cool site</a>
+        </div>
+        <div class="menu">
+            <div class="menu-inner"><a class="menu-item" href="/posts/" title="文章列表"> 文章 </a><a class="menu-item" href="/tags/" title="标签"> 标签 </a><a class="menu-item" href="/categories/" title="分类"> 分类 </a><a class="menu-item" href="/about" title="关于本站"> 关于 </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-desktop">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-desktop" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-desktop" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-desktop">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </span><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                    <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+                </a></div>
+        </div>
+    </div>
+</header><header class="mobile" id="header-mobile">
+    <div class="header-container">
+        <div class="header-wrapper">
+            <div class="header-title">
+                <a href="/" title="Masimaro&#39;s blog">My cool site</a>
+            </div>
+            <div class="menu-toggle" id="menu-toggle-mobile">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+        <div class="menu" id="menu-mobile"><div class="search-wrapper">
+                    <div class="search mobile" id="search-mobile">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-mobile">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-mobile" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-mobile" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-mobile">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </div>
+                    <a href="javascript:void(0);" class="search-cancel" id="search-cancel-mobile">
+                        Cancel
+                    </a>
+                </div><a class="menu-item" href="/posts/" title="文章列表">文章</a><a class="menu-item" href="/tags/" title="标签">标签</a><a class="menu-item" href="/categories/" title="分类">分类</a><a class="menu-item" href="/about" title="关于本站">关于</a><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+            </a></div>
+    </div>
+</header><div class="search-dropdown desktop">
+        <div id="search-dropdown-desktop"></div>
+    </div>
+    <div class="search-dropdown mobile">
+        <div id="search-dropdown-mobile"></div>
+    </div><main class="main">
+                <div class="container"><div class="toc" id="toc-auto">
+            <h2 class="toc-title">Contents</h2>
+            <div class="toc-content" id="toc-content-auto"></div>
+        </div><article class="page single"><h1 class="single-title animate__animated animate__flipInX">从零开始配置 vim(11)——插件管理</h1><div class="post-meta">
+            <div class="post-meta-line"><span class="post-author"><a href="https://www.masimaro.xyz" title="Author" target="_blank" rel="noopener noreffer author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Masimaro</a></span>&nbsp;<span class="post-category">included in <a href="/categories/vim-%E9%85%8D%E7%BD%AE/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>vim 配置</a></span></div>
+            <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw" aria-hidden="true"></i>&nbsp;<time datetime="2022-08-10">2022-08-10</time>&nbsp;<i class="fas fa-pencil-alt fa-fw" aria-hidden="true"></i>&nbsp;1644 words&nbsp;
+                <i class="far fa-clock fa-fw" aria-hidden="true"></i>&nbsp;4 minutes&nbsp;</div>
+        </div><div class="details toc" id="toc-static"  data-kept="true">
+                <div class="details-summary toc-title">
+                    <span>Contents</span>
+                    <span><i class="details-icon fas fa-angle-right" aria-hidden="true"></i></span>
+                </div>
+                <div class="details-content toc-content" id="toc-content-static"><nav id="TableOfContents">
+  <ul>
+    <li><a href="#使用lua添加自动命令组">使用lua添加自动命令组</a>
+      <ul>
+        <li><a href="#使用新版-neovim-api">使用新版 neovim api</a></li>
+        <li><a href="#在lua中执行vim命令">在lua中执行vim命令</a></li>
+      </ul>
+    </li>
+    <li><a href="#插件管理">插件管理</a></li>
+  </ul>
+</nav></div>
+            </div><div class="content" id="content"><p>之前我们介绍了基础配置部分和快捷键配置部分。如果你配置了这两个部分，vim已经算是比较好用了。但是作为代码编辑器来讲还是显的比较简陋，用这些配置来完成日常的编码任务会显得力不从心。vim比较强大的一点是它拥有丰富的插件系统。大量高手在上面为它开发各种形式的插件。今天我们将从插件管理开始，利用前人的成果丰富我们的vim功能</p>
+<h2 id="使用lua添加自动命令组">使用lua添加自动命令组</h2>
+<p>在正式开始介绍插件之前我们先优化一下加载配置文件的时机。之前我们介绍自动命令的时候已经给出了如何自动加载配置</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-lua" data-lang="lua"><span class="line"><span class="cl"><span class="n">augroup</span> <span class="n">NVIMRC</span>
+</span></span><span class="line"><span class="cl"><span class="n">autocmd</span><span class="err">!</span>
+</span></span><span class="line"><span class="cl"><span class="n">autocmd</span> <span class="n">BufWritePost</span> <span class="n">init.lua</span> <span class="n">source</span> <span class="o">%</span>
+</span></span><span class="line"><span class="cl"><span class="n">augroup</span> <span class="n">END</span>
+</span></span></code></pre></div><p>在使用vimscript的场合它可以正常工作。但是如何在 neovim中配置它呢？
+目前有两种解决办法</p>
+<h3 id="使用新版-neovim-api">使用新版 neovim api</h3>
+<p>在 <code>neovim0.7</code> 版本以后，我们可以使用下列 <code>api</code> 来创建并使用自动命令组</p>
+<ul>
+<li><code>nvim_create_augroup({name}, {*opts})</code> : 创建自动命令组，如果创建成功，返回自动命令组的id</li>
+<li><code>nvim_create_autocmd({event}, {*opts})</code>：创建自动命令。</li>
+</ul>
+<p><code>nvim_create_augroup</code> 传递一个自动命令组的名称，另外它可以接受一个 <code>table</code> 作为属性值，目前属性值可以传入一个 <code>clear</code> 的布尔值，相当于是否执行 <code>autocmd!</code> 。</p>
+<p><code>nvim_create_autocmd</code>，第一个参数是一个或者多个事件字符串组成的 <code>table</code>，它的含义与 <code>autocmd</code> 中的事件相同，用的字符串也相同。第二个参数是一个表示属性的 <code>table</code>。常用的有:</p>
+<ul>
+<li>group: 所属自动命令组</li>
+<li>pattern: autocmd中的 pattern部分</li>
+<li>callback: 一个lua的回调函数，当事件发生时，调用该回调函数</li>
+<li>command: 该字段可以填入一个 vim命令的字符串，相当于 autocmd中的 command部分</li>
+</ul>
+<p>我们要将上述代码改为 <code>lua</code> 版本，首先使用创建一个自动命令组</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-lua" data-lang="lua"><span class="line"><span class="cl"><span class="kd">local</span> <span class="n">nvimrc</span> <span class="o">=</span> <span class="n">vim.api</span><span class="p">.</span><span class="n">nvim_create_augroup</span><span class="p">(</span><span class="s2">&#34;NVIMRC&#34;</span><span class="p">,</span> <span class="p">{</span><span class="n">clear</span> <span class="o">=</span> <span class="kc">true</span><span class="p">})</span>
+</span></span></code></pre></div><p>接着为了方便我们使用 <code>command</code> 字段来完成这个自动命令</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-lua" data-lang="lua"><span class="line"><span class="cl"><span class="n">vim.api</span><span class="p">.</span><span class="n">nvim_create_autocmd</span><span class="p">({</span><span class="s2">&#34;BufWritePost&#34;</span><span class="p">},</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">pattern</span> <span class="o">=</span> <span class="s2">&#34;init.lua&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">group</span> <span class="o">=</span> <span class="n">nvimrc</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">command</span> <span class="o">=</span> <span class="s2">&#34;source %&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="p">})</span>
+</span></span></code></pre></div><p>在上一篇文章中，我们已经初步有了划分模块的概念。随着配置的越来越多，以后在 <code>init.lua</code> 中一定伴随着大量的 <code>require</code>。我们可以通过 <code>gf</code> 快速跳转到对应的模块，但是前提条件是我们已经设置了 <code>path</code> 变量。每次退出 <code>nvim</code> 再进来,需要重新设置，有没有觉得很麻烦呢？如果我们使用自动命令组，在进入 <code>init.lua</code> 之后自动设置 <code>path</code> 就好了。我们学会了使用自动命令组之后，来自己实现这个需求</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-lua" data-lang="lua"><span class="line"><span class="cl"><span class="n">vim.api</span><span class="p">.</span><span class="n">nvim_create_autocmd</span><span class="p">({</span><span class="s2">&#34;BufWritePost&#34;</span><span class="p">},</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">pattern</span> <span class="o">=</span> <span class="s2">&#34;init.lua&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">group</span> <span class="o">=</span> <span class="n">nvimrc</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">callback</span> <span class="o">=</span> <span class="kr">function</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">      <span class="n">vim.o</span><span class="p">.</span><span class="n">path</span> <span class="o">=</span> <span class="n">vim.o</span><span class="p">.</span><span class="n">path</span> <span class="o">..</span> <span class="s2">&#34;,**/*&#34;</span>
+</span></span><span class="line"><span class="cl">    <span class="kr">end</span>
+</span></span><span class="line"><span class="cl"><span class="p">})</span>
+</span></span></code></pre></div><p><code>path</code> 中可以添加多个路径作为文件搜索的路径，多个路径之间以 <code> ,</code> 分割。我们之前说过可以使用 <code>**/*</code> 表示当前目录下所有文件。这样退出重新进入 <code>nvim</code> 之后不需要再次手动输入 <code>path</code> 了。</p>
+<h3 id="在lua中执行vim命令">在lua中执行vim命令</h3>
+<p>在 0.7以前的版本中无法通过上述api来创建自动命令。但是它提供了执行vim命令的接口。</p>
+<p>我们可以使用 <code>vim.cmd</code> 来执行 <code>vim</code> 命令。它接收一个字符串参数，该字符串表示将要执行的 <code>vim</code> 命令。可以使用引号括起来，但是需要对其中的特殊字符进行转义。也可以使用 <code>[[]]</code> 来括起来，此时就不需要进行转义了。使用上述函数我们可以很轻松的实现上面的功能</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-lua" data-lang="lua"><span class="line"><span class="cl"><span class="n">vim.cmd</span><span class="s">[[
+</span></span></span><span class="line"><span class="cl"><span class="s">  augroup NVIMRC
+</span></span></span><span class="line"><span class="cl"><span class="s">    autocmd!
+</span></span></span><span class="line"><span class="cl"><span class="s">    autocmd BufWritePost init.lua source %
+</span></span></span><span class="line"><span class="cl"><span class="s">    autocmd BufReadPost init.lua set path+=**/*
+</span></span></span><span class="line"><span class="cl"><span class="s">  augroup END
+</span></span></span><span class="line"><span class="cl"><span class="s">]]</span>
+</span></span></code></pre></div><p>两种方式各有千秋，但是既然使用 lua做配置，那么我想的是能使用 lua的地方尽量用 lua。</p>
+<p>为了照顾还在使用  0.6 版本的小伙伴，我们先进行一下版本判断。最后的代码如下所示</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-lua" data-lang="lua"><span class="line"><span class="cl"><span class="kr">if</span> <span class="n">vim.fn</span><span class="p">.</span><span class="n">has</span> <span class="s2">&#34;nvim-0.7&#34;</span> <span class="kr">then</span>
+</span></span><span class="line"><span class="cl">  <span class="kd">local</span> <span class="n">nvimrc</span> <span class="o">=</span> <span class="n">vim.api</span><span class="p">.</span><span class="n">nvim_create_augroup</span><span class="p">(</span><span class="s2">&#34;NVIMRC&#34;</span><span class="p">,</span> <span class="p">{</span><span class="n">clear</span> <span class="o">=</span> <span class="kc">true</span><span class="p">})</span>
+</span></span><span class="line"><span class="cl">  <span class="n">vim.api</span><span class="p">.</span><span class="n">nvim_create_autocmd</span><span class="p">({</span><span class="s2">&#34;BufWritePost&#34;</span><span class="p">},</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">pattern</span> <span class="o">=</span> <span class="s2">&#34;init.lua&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">group</span> <span class="o">=</span> <span class="n">nvimrc</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">command</span> <span class="o">=</span> <span class="s2">&#34;source %&#34;</span>
+</span></span><span class="line"><span class="cl">  <span class="p">})</span>
+</span></span><span class="line"><span class="cl">  
+</span></span><span class="line"><span class="cl">  <span class="n">vim.api</span><span class="p">.</span><span class="n">nvim_create_autocmd</span><span class="p">({</span><span class="s2">&#34;BufWritePost&#34;</span><span class="p">},</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">pattern</span> <span class="o">=</span> <span class="s2">&#34;init.lua&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">group</span> <span class="o">=</span> <span class="n">nvimrc</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">callback</span> <span class="o">=</span> <span class="kr">function</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">      <span class="n">vim.o</span><span class="p">.</span><span class="n">path</span> <span class="o">=</span> <span class="n">vim.o</span><span class="p">.</span><span class="n">path</span> <span class="o">..</span> <span class="s2">&#34;,**/*&#34;</span>
+</span></span><span class="line"><span class="cl">    <span class="kr">end</span>
+</span></span><span class="line"><span class="cl">  <span class="p">})</span>
+</span></span><span class="line"><span class="cl"><span class="kr">else</span>
+</span></span><span class="line"><span class="cl">  <span class="n">vim.cmd</span><span class="s">[[
+</span></span></span><span class="line"><span class="cl"><span class="s">    augroup NVIMRC
+</span></span></span><span class="line"><span class="cl"><span class="s">      autocmd!
+</span></span></span><span class="line"><span class="cl"><span class="s">      autocmd BufWritePost init.lua source %
+</span></span></span><span class="line"><span class="cl"><span class="s">      autocmd BufReadPost init.lua set path+=**/*
+</span></span></span><span class="line"><span class="cl"><span class="s">      augroup END
+</span></span></span><span class="line"><span class="cl"><span class="s">  ]]</span>
+</span></span><span class="line"><span class="cl"><span class="kr">end</span>
+</span></span></code></pre></div><p>我将这段代码放到了 <code>lua/autocmd.lua</code> 中。所以我需要在 <code>init.lua</code> 中加载这个文件</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-lua" data-lang="lua"><span class="line"><span class="cl"><span class="n">require</span><span class="p">(</span><span class="s2">&#34;autocmd&#34;</span><span class="p">)</span>
+</span></span></code></pre></div><h2 id="插件管理">插件管理</h2>
+<p>在新版 <code>neovim</code> (版本大于 <code>0.5</code> ) 中，一般推荐使用 <a href="https://github.com/wbthomason/packer.nvim" target="_blank" rel="noopener noreffer ">packer</a> 这个插件管理工具。</p>
+<p>根据官方的描述，我们使用如下方式来进行安装</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-lua" data-lang="lua"><span class="line"><span class="cl"><span class="n">git</span> <span class="n">clone</span> <span class="c1">--depth 1 https://github.com/wbthomason/packer.nvim\</span>
+</span></span><span class="line"><span class="cl"> <span class="o">~/</span><span class="p">.</span><span class="kd">local</span><span class="o">/</span><span class="n">share</span><span class="o">/</span><span class="n">nvim</span><span class="o">/</span><span class="n">site</span><span class="o">/</span><span class="n">pack</span><span class="o">/</span><span class="n">packer</span><span class="o">/</span><span class="n">start</span><span class="o">/</span><span class="n">packer.nvim</span>
+</span></span></code></pre></div><p>根据官方的描述，我们可以在 <code>lua/plugins.lua</code> 中添加插件管理相关的代码。</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-lua" data-lang="lua"><span class="line"><span class="cl"><span class="kr">return</span> <span class="n">require</span><span class="p">(</span><span class="s1">&#39;packer&#39;</span><span class="p">).</span><span class="n">startup</span><span class="p">(</span><span class="kr">function</span><span class="p">(</span><span class="n">use</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">      <span class="c1">-- Packer can manage itself</span>
+</span></span><span class="line"><span class="cl">      <span class="n">use</span> <span class="s1">&#39;wbthomason/packer.nvim&#39;</span>
+</span></span><span class="line"><span class="cl">      <span class="c1">-- 添加另外插件</span>
+</span></span><span class="line"><span class="cl"><span class="kr">end</span><span class="p">)</span>
+</span></span></code></pre></div><p>接着我们需要在 <code>init.lua</code> 中加载这个文件</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-lua" data-lang="lua"><span class="line"><span class="cl"><span class="n">require</span><span class="p">(</span><span class="s2">&#34;plugins&#34;</span><span class="p">)</span>
+</span></span></code></pre></div><p>后面我们可以使用下面的一些命令来对插件进行管理</p>
+<ul>
+<li><code>PackerInstall</code>：先清理不需要的插件然后安装插件</li>
+<li><code>PackerClean</code>： 清理不需要的插件</li>
+<li><code>PackerUpdate</code>：先清理插件，然后更新已有的插件，再安装暂时没有的插件</li>
+<li><code>PackerSync</code>:  包括 <code>PackerClean</code>和 <code>PackerUpdate</code> 的功能</li>
+</ul>
+<p>根据官方的描述，不管是要增删改哪些插件，都可以用 <code>PackerSync</code> 这一条命令搞定。</p>
+<p>完成之后我们可以使用 q来退出，如果出错可以使用 r来重新下载
+<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://img-blog.csdnimg.cn/16b8b57075a94f5392b09141e289f5ba.png#pic_center"
+        data-srcset="https://img-blog.csdnimg.cn/16b8b57075a94f5392b09141e289f5ba.png#pic_center, https://img-blog.csdnimg.cn/16b8b57075a94f5392b09141e289f5ba.png#pic_center 1.5x, https://img-blog.csdnimg.cn/16b8b57075a94f5392b09141e289f5ba.png#pic_center 2x"
+        data-sizes="auto"
+        alt="https://img-blog.csdnimg.cn/16b8b57075a94f5392b09141e289f5ba.png#pic_center"
+        title="在这里插入图片描述" /></p>
+<p>本篇就到这里了。后面几篇文章主要通过该插件管理工具来下载并配置一些插件，敬请期待！</p>
+</div><div class="post-footer" id="post-footer">
+    <div class="post-info">
+        <div class="post-info-line">
+            <div class="post-info-mod">
+                <span>Updated on 2022-08-10</span>
+            </div></div>
+        <div class="post-info-line">
+            <div class="post-info-md"></div>
+            <div class="post-info-share">
+                <span><a href="javascript:void(0);" title="Share on Twitter" data-sharer="twitter" data-url="http://HaiLateBoy.github.io/posts/vim-config11/" data-title="从零开始配置 vim(11)——插件管理" data-hashtags="vim,编辑工具,文本处理,lua,编辑器"><i class="fab fa-twitter fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Facebook" data-sharer="facebook" data-url="http://HaiLateBoy.github.io/posts/vim-config11/" data-hashtag="vim"><i class="fab fa-facebook-square fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Hacker News" data-sharer="hackernews" data-url="http://HaiLateBoy.github.io/posts/vim-config11/" data-title="从零开始配置 vim(11)——插件管理"><i class="fab fa-hacker-news fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Line" data-sharer="line" data-url="http://HaiLateBoy.github.io/posts/vim-config11/" data-title="从零开始配置 vim(11)——插件管理"><i data-svg-src="https://cdn.jsdelivr.net/npm/simple-icons@7.3.0/icons/line.svg" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on 微博" data-sharer="weibo" data-url="http://HaiLateBoy.github.io/posts/vim-config11/" data-title="从零开始配置 vim(11)——插件管理"><i class="fab fa-weibo fa-fw" aria-hidden="true"></i></a></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="post-info-more">
+        <section class="post-tags"><i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/vim/">vim</a>,&nbsp;<a href="/tags/%E7%BC%96%E8%BE%91%E5%B7%A5%E5%85%B7/">编辑工具</a>,&nbsp;<a href="/tags/%E6%96%87%E6%9C%AC%E5%A4%84%E7%90%86/">文本处理</a>,&nbsp;<a href="/tags/lua/">lua</a>,&nbsp;<a href="/tags/%E7%BC%96%E8%BE%91%E5%99%A8/">编辑器</a></section>
+        <section>
+            <span><a href="javascript:void(0);" onclick="window.history.back();">Back</a></span>&nbsp;|&nbsp;<span><a href="/">Home</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav"><a href="/posts/vim-config10/" class="prev" rel="prev" title="从零开始配置 vim(10)——快捷键配置"><i class="fas fa-angle-left fa-fw" aria-hidden="true"></i>从零开始配置 vim(10)——快捷键配置</a>
+            <a href="/posts/vim-config12/" class="next" rel="next" title="从零开始配置 vim(12)——主题配置">从零开始配置 vim(12)——主题配置<i class="fas fa-angle-right fa-fw" aria-hidden="true"></i></a></div>
+</div>
+</article></div>
+            </main><footer class="footer">
+        <div class="footer-container"><div class="footer-line">Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener noreffer" title="Hugo 0.121.2">Hugo</a> | Theme - <a href="https://github.com/dillonzq/LoveIt" target="_blank" rel="noopener noreffer" title="LoveIt 0.2.11"><i class="far fa-kiss-wink-heart fa-fw" aria-hidden="true"></i> LoveIt</a>
+                </div><div class="footer-line" itemscope itemtype="http://schema.org/CreativeWork"><i class="far fa-copyright fa-fw" aria-hidden="true"></i><span itemprop="copyrightYear">2022 - 2024</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="https://www.masimaro.xyz" target="_blank">Masimaro</a></span></div>
+        </div>
+    </footer></div>
+
+        <div id="fixed-buttons"><a href="#" id="back-to-top" class="fixed-button" title="Back to Top">
+                <i class="fas fa-arrow-up fa-fw" aria-hidden="true"></i>
+            </a><a href="#" id="view-comments" class="fixed-button" title="View Comments">
+                <i class="fas fa-comment fa-fw" aria-hidden="true"></i>
+            </a>
+        </div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.css"><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/autocomplete.js@0.38.1/dist/autocomplete.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lunr@2.3.9/lunr.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lazysizes@5.3.2/lazysizes.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/clipboard@2.0.11/dist/clipboard.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/sharer.js@0.5.1/sharer.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/auto-render.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/copy-tex.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/mhchem.min.js"></script><script type="text/javascript">window.config={"code":{"copyTitle":"Copy to clipboard","maxShownLines":50},"comment":{},"math":{"delimiters":[{"display":true,"left":"$$","right":"$$"},{"display":true,"left":"\\[","right":"\\]"},{"display":true,"left":"\\begin{equation}","right":"\\end{equation}"},{"display":true,"left":"\\begin{equation*}","right":"\\end{equation*}"},{"display":true,"left":"\\begin{align}","right":"\\end{align}"},{"display":true,"left":"\\begin{align*}","right":"\\end{align*}"},{"display":true,"left":"\\begin{alignat}","right":"\\end{alignat}"},{"display":true,"left":"\\begin{alignat*}","right":"\\end{alignat*}"},{"display":true,"left":"\\begin{gather}","right":"\\end{gather}"},{"display":true,"left":"\\begin{CD}","right":"\\end{CD}"},{"display":false,"left":"$","right":"$"},{"display":false,"left":"\\(","right":"\\)"}],"strict":false},"search":{"highlightTag":"em","maxResultLength":10,"noResultsFound":"No results found","snippetLength":50}};</script><script type="text/javascript" src="/js/theme.min.js"></script></body>
+</html>

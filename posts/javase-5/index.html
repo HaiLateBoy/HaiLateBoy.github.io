@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="robots" content="noodp" />
+        <title>EL表达式与JSTL - Masimaro&#39;s blog</title><meta name="Description" content="这是我用于记录日常和学习的小站"><meta property="og:title" content="EL表达式与JSTL" />
+<meta property="og:description" content="JSP标准标签库（JSTL）是一个JSP标签集合，它封装了JSP应用的通用核心功能。 JSTL支持通用的、结构化的任务，比如迭代，条件判断，X" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://HaiLateBoy.github.io/posts/javase-5/" /><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2019-11-23T09:55:20+00:00" />
+<meta property="article:modified_time" content="2019-11-23T09:55:20+00:00" /><meta property="og:site_name" content="Masimaro&#39;s blog" />
+
+<meta name="twitter:card" content="summary"/><meta name="twitter:title" content="EL表达式与JSTL"/>
+<meta name="twitter:description" content="JSP标准标签库（JSTL）是一个JSP标签集合，它封装了JSP应用的通用核心功能。 JSTL支持通用的、结构化的任务，比如迭代，条件判断，X"/>
+<meta name="application-name" content="My cool site">
+<meta name="apple-mobile-web-app-title" content="My cool site"><meta name="theme-color" content="#ffffff"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="manifest" href="/site.webmanifest"><link rel="canonical" href="http://HaiLateBoy.github.io/posts/javase-5/" /><link rel="prev" href="http://HaiLateBoy.github.io/posts/javase-4/" /><link rel="next" href="http://HaiLateBoy.github.io/posts/javase-6/" /><link rel="stylesheet" href="/css/style.min.css"><link rel="preload" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css"></noscript><link rel="preload" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css"></noscript><script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "BlogPosting",
+        "headline": "EL表达式与JSTL",
+        "inLanguage": "zh-CN",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "http:\/\/HaiLateBoy.github.io\/posts\/javase-5\/"
+        },"genre": "posts","keywords": "JSP, JS标准标签库, Java Web","wordcount":  1303 ,
+        "url": "http:\/\/HaiLateBoy.github.io\/posts\/javase-5\/","datePublished": "2019-11-23T09:55:20+00:00","dateModified": "2019-11-23T09:55:20+00:00","publisher": {
+            "@type": "Organization",
+            "name": ""},"author": {
+                "@type": "Person",
+                "name": "Masimaro"
+            },"description": ""
+    }
+    </script></head>
+    <body data-header-desktop="fixed" data-header-mobile="auto"><script type="text/javascript">(window.localStorage && localStorage.getItem('theme') ? localStorage.getItem('theme') === 'dark' : ('auto' === 'auto' ? window.matchMedia('(prefers-color-scheme: dark)').matches : 'auto' === 'dark')) && document.body.setAttribute('theme', 'dark');</script>
+
+        <div id="mask"></div><div class="wrapper"><header class="desktop" id="header-desktop">
+    <div class="header-wrapper">
+        <div class="header-title">
+            <a href="/" title="Masimaro&#39;s blog">My cool site</a>
+        </div>
+        <div class="menu">
+            <div class="menu-inner"><a class="menu-item" href="/posts/" title="文章列表"> 文章 </a><a class="menu-item" href="/tags/" title="标签"> 标签 </a><a class="menu-item" href="/categories/" title="分类"> 分类 </a><a class="menu-item" href="/about" title="关于本站"> 关于 </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-desktop">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-desktop" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-desktop" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-desktop">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </span><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                    <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+                </a></div>
+        </div>
+    </div>
+</header><header class="mobile" id="header-mobile">
+    <div class="header-container">
+        <div class="header-wrapper">
+            <div class="header-title">
+                <a href="/" title="Masimaro&#39;s blog">My cool site</a>
+            </div>
+            <div class="menu-toggle" id="menu-toggle-mobile">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+        <div class="menu" id="menu-mobile"><div class="search-wrapper">
+                    <div class="search mobile" id="search-mobile">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-mobile">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-mobile" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-mobile" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-mobile">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </div>
+                    <a href="javascript:void(0);" class="search-cancel" id="search-cancel-mobile">
+                        Cancel
+                    </a>
+                </div><a class="menu-item" href="/posts/" title="文章列表">文章</a><a class="menu-item" href="/tags/" title="标签">标签</a><a class="menu-item" href="/categories/" title="分类">分类</a><a class="menu-item" href="/about" title="关于本站">关于</a><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+            </a></div>
+    </div>
+</header><div class="search-dropdown desktop">
+        <div id="search-dropdown-desktop"></div>
+    </div>
+    <div class="search-dropdown mobile">
+        <div id="search-dropdown-mobile"></div>
+    </div><main class="main">
+                <div class="container"><div class="toc" id="toc-auto">
+            <h2 class="toc-title">Contents</h2>
+            <div class="toc-content" id="toc-content-auto"></div>
+        </div><article class="page single"><h1 class="single-title animate__animated animate__flipInX">EL表达式与JSTL</h1><div class="post-meta">
+            <div class="post-meta-line"><span class="post-author"><a href="https://www.masimaro.xyz" title="Author" target="_blank" rel="noopener noreffer author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Masimaro</a></span>&nbsp;<span class="post-category">included in <a href="/categories/java/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>Java</a></span></div>
+            <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw" aria-hidden="true"></i>&nbsp;<time datetime="2019-11-23">2019-11-23</time>&nbsp;<i class="fas fa-pencil-alt fa-fw" aria-hidden="true"></i>&nbsp;1303 words&nbsp;
+                <i class="far fa-clock fa-fw" aria-hidden="true"></i>&nbsp;3 minutes&nbsp;</div>
+        </div><div class="details toc" id="toc-static"  data-kept="true">
+                <div class="details-summary toc-title">
+                    <span>Contents</span>
+                    <span><i class="details-icon fas fa-angle-right" aria-hidden="true"></i></span>
+                </div>
+                <div class="details-content toc-content" id="toc-content-static"><nav id="TableOfContents">
+  <ul>
+    <li><a href="#jstl">JSTL</a>
+      <ul>
+        <li><a href="#安装">安装</a></li>
+        <li><a href="#常用标签">常用标签</a></li>
+      </ul>
+    </li>
+    <li><a href="#el">EL</a></li>
+  </ul>
+</nav></div>
+            </div><div class="content" id="content"><p>JSP标准标签库（JSTL）是一个JSP标签集合，它封装了JSP应用的通用核心功能。</p>
+<p>JSTL支持通用的、结构化的任务，比如迭代，条件判断，XML文档操作，国际化标签，SQL标签。 除了这些，它还提供了一个框架来使用集成JSTL的自定义标签。</p>
+<!-- raw HTML omitted -->
+<h2 id="jstl">JSTL</h2>
+<h3 id="安装">安装</h3>
+<p>要使用jstl需要导入对应的库，可以去官方站点下载, <a href="http://archive.apache.org/dist/jakarta/taglibs/standard/binaries/" target="_blank" rel="noopener noreffer ">点击这里下载</a></p>
+<p>然后解压文件将得到的jar包放入到WEB-INF的lib中</p>
+<p>导入之后，在要使用它的jsp文件中使用taglib 导入库</p>
+<pre tabindex="0"><code class="language-jsp" data-lang="jsp">&lt;%@taglib prefix=&#34;c&#34; uri=&#34;http://java.sun.com/jsp/jstl/core&#34; %&gt;
+</code></pre><p>prefix 是标签的前缀，类似于命名空间，在使用库中的标签时需要加上这个前缀</p>
+<h3 id="常用标签">常用标签</h3>
+<h4 id="if-标签">if 标签</h4>
+<p>if标签用来做判断，当条件成立时，执行标签体的内容，条件写在test属性中，注意：只有if标签而没有对应的else标签。下面是一个例子:</p>
+<pre tabindex="0"><code class="language-jsp" data-lang="jsp">&lt;c:if test=&#34;${not empty requestScope.error}&#34;&gt;
+    &lt;div style=&#34;color:red;width:100%;&#34; align = &#34;center&#34;&gt;${requestScope.error}&lt;/div&gt;
+&lt;/c:if&gt;
+</code></pre><p>上述这个例子表示，当服务器返回错误信息时，将错误信息显示到页面上</p>
+<h4 id="choose-标签">choose 标签</h4>
+<p>choose 标签相当于switch 语句，该标签中可以包含 when 和 otherwise 作为字标签，相当于switch语句中的case和default，例如下面的例子</p>
+<pre tabindex="0"><code class="language-jsp" data-lang="jsp">&lt;p&gt;当前薪水为 : &lt;c:out value=&#34;${salary}&#34;/&gt;&lt;/p&gt;
+&lt;c:choose&gt;
+    &lt;c:when test=&#34;${salary &lt;= 2000}&#34;&gt;
+       老板我是你爹, 这个工作谁爱干谁干
+    &lt;/c:when&gt;
+    &lt;c:when test=&#34;${salary &gt; 50000}&#34;&gt;
+       公司是我家，工作就是我的价值，我热爱工作
+    &lt;/c:when&gt;
+    &lt;c:otherwise&gt;
+        心中无半点波澜，甚至想提前下班
+    &lt;/c:otherwise&gt;
+&lt;/c:choose&gt;
+</code></pre><h4 id="foreach-标签">foreach 标签</h4>
+<p>foreach 用来迭代容器中的元素，或者完成一些重复的操作。</p>
+<p>当使用foreach标签来进行重复性的操作时可以使用begin、end、var来控制循环，begin表示循环变量开始的值，end表示循环变量结束的值，与正常的for循环不同，循环变量的值可以等于end的值；使用var标签来定义循环变量的名称，使用step表示步进。例如:</p>
+<pre tabindex="0"><code class="language-jsp" data-lang="jsp">&lt;c:foreach begin = &#34;1&#34; end = &#34;10&#34; var = &#34;i step = &#34;1&#34;&gt;
+${i} &lt;br /&gt;
+&lt;/c:foreach&gt;
+</code></pre><p>等价于</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-java" data-lang="java"><span class="line"><span class="cl"><span class="k">for</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">1</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="n">10</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="o">++</span><span class="p">){</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">	</span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">i</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span></code></pre></div><p>当使用 foreach来迭代容器时使用item和 var来迭代，其中item为需要迭代的容器，var表示获取到的容器中的元素。例如</p>
+<pre tabindex="0"><code class="language-jsp" data-lang="jsp">&lt;c:foreach items = &#34;list&#34; var = &#34;l&#34;&gt;
+	${l}
+&lt;/c:foreach&gt;
+</code></pre><p>等价于</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-java" data-lang="java"><span class="line"><span class="cl"><span class="k">for</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">l</span><span class="p">:</span><span class="n">list</span><span class="p">){</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">	</span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">l</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span></code></pre></div><h2 id="el">EL</h2>
+<p>EL 表达式：Expression Language 表达式语言，用于替换和简化jsp页面中java代码的编写。EL 表达式使用 <code>${}</code> 来表示</p>
+<p>jsp 默认支持el表达式，在page指令中可以使用 isELIgnored 来指定是否忽略jsp页面中的el表达式；当然也可以使用 <code>\</code> 来作为转义符，表示 这个el表达式原样输出，例如 <code>\${cookie}</code></p>
+<p>EL表达式中可以支持算数运算符、比较运算符、逻辑运算符合empty 空运算符；empty用于判断字符串、集合、数组对象是否为null或者长度为0。</p>
+<p>在使用el表达式时需要注意以下几点：</p>
+<ol>
+<li>el表达式只能从域对象中获取值</li>
+<li>el表达式中如果是类对象，可以根据Java Bean规范来获取属性值</li>
+<li>针对list这种有序集合可以使用 <code>${域对象.键名[索引].属性}</code></li>
+<li>针对Map集合,使用 <code>${域对象.键名.key名}</code>或者 <code>${域对象.键名[&quot;key名&quot;]}</code></li>
+<li>el 表达式中对域对象都做了重命名，pageScope 对应于 pageContext、requestScope对应于request、sessionScope对应于session、applicationScope对应于applicate(ServletContext)</li>
+<li>表达式<code>${键名}</code> 依次从最小的域中去查找对应的键值，直到找到为止</li>
+</ol>
+<!-- raw HTML omitted -->
+</div><div class="post-footer" id="post-footer">
+    <div class="post-info">
+        <div class="post-info-line">
+            <div class="post-info-mod">
+                <span>Updated on 2019-11-23</span>
+            </div></div>
+        <div class="post-info-line">
+            <div class="post-info-md"></div>
+            <div class="post-info-share">
+                <span><a href="javascript:void(0);" title="Share on Twitter" data-sharer="twitter" data-url="http://HaiLateBoy.github.io/posts/javase-5/" data-title="EL表达式与JSTL" data-hashtags="JSP,JS标准标签库,Java Web"><i class="fab fa-twitter fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Facebook" data-sharer="facebook" data-url="http://HaiLateBoy.github.io/posts/javase-5/" data-hashtag="JSP"><i class="fab fa-facebook-square fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Hacker News" data-sharer="hackernews" data-url="http://HaiLateBoy.github.io/posts/javase-5/" data-title="EL表达式与JSTL"><i class="fab fa-hacker-news fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Line" data-sharer="line" data-url="http://HaiLateBoy.github.io/posts/javase-5/" data-title="EL表达式与JSTL"><i data-svg-src="https://cdn.jsdelivr.net/npm/simple-icons@7.3.0/icons/line.svg" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on 微博" data-sharer="weibo" data-url="http://HaiLateBoy.github.io/posts/javase-5/" data-title="EL表达式与JSTL"><i class="fab fa-weibo fa-fw" aria-hidden="true"></i></a></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="post-info-more">
+        <section class="post-tags"><i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/jsp/">jsp</a>,&nbsp;<a href="/tags/js%E6%A0%87%E5%87%86%E6%A0%87%E7%AD%BE%E5%BA%93/">JS标准标签库</a>,&nbsp;<a href="/tags/java-web/">java web</a></section>
+        <section>
+            <span><a href="javascript:void(0);" onclick="window.history.back();">Back</a></span>&nbsp;|&nbsp;<span><a href="/">Home</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav"><a href="/posts/javase-4/" class="prev" rel="prev" title="jsp"><i class="fas fa-angle-left fa-fw" aria-hidden="true"></i>jsp</a>
+            <a href="/posts/javase-6/" class="next" rel="next" title="Mybatis 框架">Mybatis 框架<i class="fas fa-angle-right fa-fw" aria-hidden="true"></i></a></div>
+</div>
+</article></div>
+            </main><footer class="footer">
+        <div class="footer-container"><div class="footer-line">Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener noreffer" title="Hugo 0.121.2">Hugo</a> | Theme - <a href="https://github.com/dillonzq/LoveIt" target="_blank" rel="noopener noreffer" title="LoveIt 0.2.11"><i class="far fa-kiss-wink-heart fa-fw" aria-hidden="true"></i> LoveIt</a>
+                </div><div class="footer-line" itemscope itemtype="http://schema.org/CreativeWork"><i class="far fa-copyright fa-fw" aria-hidden="true"></i><span itemprop="copyrightYear">2022 - 2024</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="https://www.masimaro.xyz" target="_blank">Masimaro</a></span></div>
+        </div>
+    </footer></div>
+
+        <div id="fixed-buttons"><a href="#" id="back-to-top" class="fixed-button" title="Back to Top">
+                <i class="fas fa-arrow-up fa-fw" aria-hidden="true"></i>
+            </a><a href="#" id="view-comments" class="fixed-button" title="View Comments">
+                <i class="fas fa-comment fa-fw" aria-hidden="true"></i>
+            </a>
+        </div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.css"><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/autocomplete.js@0.38.1/dist/autocomplete.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lunr@2.3.9/lunr.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lazysizes@5.3.2/lazysizes.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/clipboard@2.0.11/dist/clipboard.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/sharer.js@0.5.1/sharer.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/auto-render.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/copy-tex.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/mhchem.min.js"></script><script type="text/javascript">window.config={"code":{"copyTitle":"Copy to clipboard","maxShownLines":50},"comment":{},"math":{"delimiters":[{"display":true,"left":"$$","right":"$$"},{"display":true,"left":"\\[","right":"\\]"},{"display":true,"left":"\\begin{equation}","right":"\\end{equation}"},{"display":true,"left":"\\begin{equation*}","right":"\\end{equation*}"},{"display":true,"left":"\\begin{align}","right":"\\end{align}"},{"display":true,"left":"\\begin{align*}","right":"\\end{align*}"},{"display":true,"left":"\\begin{alignat}","right":"\\end{alignat}"},{"display":true,"left":"\\begin{alignat*}","right":"\\end{alignat*}"},{"display":true,"left":"\\begin{gather}","right":"\\end{gather}"},{"display":true,"left":"\\begin{CD}","right":"\\end{CD}"},{"display":false,"left":"$","right":"$"},{"display":false,"left":"\\(","right":"\\)"}],"strict":false},"search":{"highlightTag":"em","maxResultLength":10,"noResultsFound":"No results found","snippetLength":50}};</script><script type="text/javascript" src="/js/theme.min.js"></script></body>
+</html>

@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="robots" content="noodp" />
+        <title>vim 从嫌弃到依赖(10)——缓冲区列表 - Masimaro&#39;s blog</title><meta name="Description" content="这是我用于记录日常和学习的小站"><meta property="og:title" content="vim 从嫌弃到依赖(10)——缓冲区列表" />
+<meta property="og:description" content="之前的一系列文章主要介绍了vim文本相关的操作，并且也介绍了vim的几种模式。通过前面的内容，相信各位小伙伴们已经对vim有了一个基本的了解" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://HaiLateBoy.github.io/posts/vim-tutorial-11/" /><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2022-05-07T20:39:41+08:00" />
+<meta property="article:modified_time" content="2022-05-07T20:39:41+08:00" /><meta property="og:site_name" content="Masimaro&#39;s blog" />
+
+<meta name="twitter:card" content="summary"/><meta name="twitter:title" content="vim 从嫌弃到依赖(10)——缓冲区列表"/>
+<meta name="twitter:description" content="之前的一系列文章主要介绍了vim文本相关的操作，并且也介绍了vim的几种模式。通过前面的内容，相信各位小伙伴们已经对vim有了一个基本的了解"/>
+<meta name="application-name" content="My cool site">
+<meta name="apple-mobile-web-app-title" content="My cool site"><meta name="theme-color" content="#ffffff"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="manifest" href="/site.webmanifest"><link rel="canonical" href="http://HaiLateBoy.github.io/posts/vim-tutorial-11/" /><link rel="prev" href="http://HaiLateBoy.github.io/posts/vim-tutorial-10/" /><link rel="next" href="http://HaiLateBoy.github.io/posts/vim-tutorial-12/" /><link rel="stylesheet" href="/css/style.min.css"><link rel="preload" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css"></noscript><link rel="preload" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css"></noscript><script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "BlogPosting",
+        "headline": "vim 从嫌弃到依赖(10)——缓冲区列表",
+        "inLanguage": "zh-CN",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "http:\/\/HaiLateBoy.github.io\/posts\/vim-tutorial-11\/"
+        },"genre": "posts","keywords": "vim, 编辑工具, 文本处理","wordcount":  2990 ,
+        "url": "http:\/\/HaiLateBoy.github.io\/posts\/vim-tutorial-11\/","datePublished": "2022-05-07T20:39:41+08:00","dateModified": "2022-05-07T20:39:41+08:00","publisher": {
+            "@type": "Organization",
+            "name": ""},"author": {
+                "@type": "Person",
+                "name": "Masimaro"
+            },"description": ""
+    }
+    </script></head>
+    <body data-header-desktop="fixed" data-header-mobile="auto"><script type="text/javascript">(window.localStorage && localStorage.getItem('theme') ? localStorage.getItem('theme') === 'dark' : ('auto' === 'auto' ? window.matchMedia('(prefers-color-scheme: dark)').matches : 'auto' === 'dark')) && document.body.setAttribute('theme', 'dark');</script>
+
+        <div id="mask"></div><div class="wrapper"><header class="desktop" id="header-desktop">
+    <div class="header-wrapper">
+        <div class="header-title">
+            <a href="/" title="Masimaro&#39;s blog">My cool site</a>
+        </div>
+        <div class="menu">
+            <div class="menu-inner"><a class="menu-item" href="/posts/" title="文章列表"> 文章 </a><a class="menu-item" href="/tags/" title="标签"> 标签 </a><a class="menu-item" href="/categories/" title="分类"> 分类 </a><a class="menu-item" href="/about" title="关于本站"> 关于 </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-desktop">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-desktop" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-desktop" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-desktop">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </span><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                    <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+                </a></div>
+        </div>
+    </div>
+</header><header class="mobile" id="header-mobile">
+    <div class="header-container">
+        <div class="header-wrapper">
+            <div class="header-title">
+                <a href="/" title="Masimaro&#39;s blog">My cool site</a>
+            </div>
+            <div class="menu-toggle" id="menu-toggle-mobile">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+        <div class="menu" id="menu-mobile"><div class="search-wrapper">
+                    <div class="search mobile" id="search-mobile">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-mobile">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-mobile" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-mobile" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-mobile">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </div>
+                    <a href="javascript:void(0);" class="search-cancel" id="search-cancel-mobile">
+                        Cancel
+                    </a>
+                </div><a class="menu-item" href="/posts/" title="文章列表">文章</a><a class="menu-item" href="/tags/" title="标签">标签</a><a class="menu-item" href="/categories/" title="分类">分类</a><a class="menu-item" href="/about" title="关于本站">关于</a><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+            </a></div>
+    </div>
+</header><div class="search-dropdown desktop">
+        <div id="search-dropdown-desktop"></div>
+    </div>
+    <div class="search-dropdown mobile">
+        <div id="search-dropdown-mobile"></div>
+    </div><main class="main">
+                <div class="container"><div class="toc" id="toc-auto">
+            <h2 class="toc-title">Contents</h2>
+            <div class="toc-content" id="toc-content-auto"></div>
+        </div><article class="page single"><h1 class="single-title animate__animated animate__flipInX">vim 从嫌弃到依赖(10)——缓冲区列表</h1><div class="post-meta">
+            <div class="post-meta-line"><span class="post-author"><a href="https://www.masimaro.xyz" title="Author" target="_blank" rel="noopener noreffer author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Masimaro</a></span>&nbsp;<span class="post-category">included in <a href="/categories/vim/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>vim</a></span></div>
+            <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw" aria-hidden="true"></i>&nbsp;<time datetime="2022-05-07">2022-05-07</time>&nbsp;<i class="fas fa-pencil-alt fa-fw" aria-hidden="true"></i>&nbsp;2990 words&nbsp;
+                <i class="far fa-clock fa-fw" aria-hidden="true"></i>&nbsp;6 minutes&nbsp;</div>
+        </div><div class="details toc" id="toc-static"  data-kept="true">
+                <div class="details-summary toc-title">
+                    <span>Contents</span>
+                    <span><i class="details-icon fas fa-angle-right" aria-hidden="true"></i></span>
+                </div>
+                <div class="details-content toc-content" id="toc-content-static"><nav id="TableOfContents">
+  <ul>
+    <li><a href="#缓冲区列表简介">缓冲区列表简介</a></li>
+    <li><a href="#缓冲区列表参数">缓冲区列表参数</a></li>
+    <li><a href="#vim退出">vim退出</a></li>
+    <li><a href="#总结">总结</a></li>
+  </ul>
+</nav></div>
+            </div><div class="content" id="content"><p>之前的一系列文章主要介绍了vim文本相关的操作，并且也介绍了vim的几种模式。通过前面的内容，相信各位小伙伴们已经对vim有了一个基本的了解，同时也能够使用vim快速编辑文本，从这篇开始，我们将要介绍vim针对多个文件的操作，例如如何在多个文件中查找、跳转等等方式方法。让我们先从vim如何管理打开的多个文件开始吧</p>
+<h2 id="缓冲区列表简介">缓冲区列表简介</h2>
+<p>有过编程经验的小伙伴应该知道，将文件从磁盘读取到内存中时，都会事先分配一块内存缓冲区用来保存读取到的文件内容，vim同样是这么干的。</p>
+<p>vim在读取文件时会通过内存映射的方式，将磁盘中的内容映射到一块内存的缓冲中。vim可以打开多个文件，每个文件独立的占有一个缓冲区。为了管理这些打开的文件，vim中有了缓冲区列表的概念，同时也提供了一些配套的命令来操作缓冲区列表。</p>
+<p>假设现在在某个目录中有多个文件，我们使用vim同时打开，例如使用<code>vim init.lua test.py</code>。我们发现vim默认只展示一个文件中的内容，但是它打开了两个文件，现在有两个以文件名命名的缓冲区。通过命令<code>:ls</code> 查看当前打开的缓冲区。</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://img-blog.csdnimg.cn/8fd441097dd345c9b83487f8977575c8.gif#pic_center"
+        data-srcset="https://img-blog.csdnimg.cn/8fd441097dd345c9b83487f8977575c8.gif#pic_center, https://img-blog.csdnimg.cn/8fd441097dd345c9b83487f8977575c8.gif#pic_center 1.5x, https://img-blog.csdnimg.cn/8fd441097dd345c9b83487f8977575c8.gif#pic_center 2x"
+        data-sizes="auto"
+        alt="https://img-blog.csdnimg.cn/8fd441097dd345c9b83487f8977575c8.gif#pic_center"
+        title="缓冲区列表" />
+<code>:ls</code> 命令显示的内容每一行代表一个缓冲区的信息。它显示的信息如下：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="cl">:ls
+</span></span><span class="line"><span class="cl">  1 %a   &#34;.\test.py&#34;                    line 1
+</span></span><span class="line"><span class="cl">  2      &#34;.\init.lua&#34;                   line 0
+</span></span></code></pre></div><p>第一列的数字代表缓冲区的编号，该编号由vim随机指定，第二列的<code>%a</code> 代表缓冲区为激活的缓冲区(active)当前窗口显示的内容为激活缓冲区的内容。第三列则是缓冲区的名称，一般vim会将文件名作为缓冲区的名称</p>
+<p>我们可以使用<code>:bnext</code> 按<code>:ls</code> 的显示顺序，显示下一个缓冲区，<code>:bprev</code> 显示上一个缓冲区。<code>:blast</code> 显示最后一个缓冲区，<code>:bfirst</code>显示第一个缓冲区。</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://img-blog.csdnimg.cn/338cebf5ef4c4a888439aea93f14223e.gif#pic_center"
+        data-srcset="https://img-blog.csdnimg.cn/338cebf5ef4c4a888439aea93f14223e.gif#pic_center, https://img-blog.csdnimg.cn/338cebf5ef4c4a888439aea93f14223e.gif#pic_center 1.5x, https://img-blog.csdnimg.cn/338cebf5ef4c4a888439aea93f14223e.gif#pic_center 2x"
+        data-sizes="auto"
+        alt="https://img-blog.csdnimg.cn/338cebf5ef4c4a888439aea93f14223e.gif#pic_center"
+        title="切换缓冲区" />
+在切换过缓冲区之后再次执行<code>:ls</code> 之后发现此时显示的内容已有一些变化。现在显示的内容如下:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="cl">:ls
+</span></span><span class="line"><span class="cl">  1 #h   &#34;.\test.py&#34;                    line 1
+</span></span><span class="line"><span class="cl">  2 %a   &#34;.\init.lua&#34;                   line 1
+</span></span></code></pre></div><p>此时我们发现除了<code>%a</code> 代表当前处于激活状态的缓冲区外，另外一个缓冲区的前面多了个<code>#h</code> ，<code>#</code> 代表上一次处于激活状态的缓冲区，我们可以使用<code>&lt;ctrl + ^&gt;</code> 来切换到上次处于激活状态的缓冲区。而<code>h</code> 则代表隐藏缓冲区，当一个缓冲区由激活状态变为非激活状态的时候，vim会将其标记为隐藏缓冲区。</p>
+<p>除了按照顺序显示缓冲区，还可以通过缓冲区名称或者序号来指定显示某个缓冲区。例如使用<code>:buffer 1</code> 来显示编号为1的缓冲区。
+<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://img-blog.csdnimg.cn/6e7d3f3885a64c00b656229ffd6d1711.gif#pic_center"
+        data-srcset="https://img-blog.csdnimg.cn/6e7d3f3885a64c00b656229ffd6d1711.gif#pic_center, https://img-blog.csdnimg.cn/6e7d3f3885a64c00b656229ffd6d1711.gif#pic_center 1.5x, https://img-blog.csdnimg.cn/6e7d3f3885a64c00b656229ffd6d1711.gif#pic_center 2x"
+        data-sizes="auto"
+        alt="https://img-blog.csdnimg.cn/6e7d3f3885a64c00b656229ffd6d1711.gif#pic_center"
+        title="根据编号切换缓冲区" />
+还可以更直观的使用<code>buffer {bufname}</code> 来显示指定缓冲区，其中<code>{bufname}</code> 代表的是缓冲区的名称,例如<code>:buffer init.lua</code></p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://img-blog.csdnimg.cn/158a920f151b420e92f5ec07c7f2b9b7.gif#pic_center"
+        data-srcset="https://img-blog.csdnimg.cn/158a920f151b420e92f5ec07c7f2b9b7.gif#pic_center, https://img-blog.csdnimg.cn/158a920f151b420e92f5ec07c7f2b9b7.gif#pic_center 1.5x, https://img-blog.csdnimg.cn/158a920f151b420e92f5ec07c7f2b9b7.gif#pic_center 2x"
+        data-sizes="auto"
+        alt="https://img-blog.csdnimg.cn/158a920f151b420e92f5ec07c7f2b9b7.gif#pic_center"
+        title="使用缓冲区名称切换缓冲区" />
+看到这里，各位小伙伴肯定会觉得不管使用<code>:bnext</code> 之类的命令切换还是使用<code>:buffer</code> 来切换缓冲区，都需要输入这么长的命令，显得既繁琐又低效，那么有没有什么办法来解决这个问题呢？答案是通过快捷键映射。后面介绍我自己的配置时会介绍如何将其映射到快捷键上</p>
+<p>如果要删除某个缓冲区可以使用<code>:bdelete {bufname}</code>。该命令支持前面几篇文章中提到的范围操作，即<code>:nstart, nend bdelete</code> 来删除编号<code>nstart</code> 到 <code>nend</code> 的所有缓冲区。缓冲区缓冲区编号是vim自己分配的，要通过编号删除得执行<code>:ls</code>命令，并且有时候删除了后续可能还要再次打开，再退一步说，如果暂时不想用它，vim也只显示后面打开的缓冲区，我们使用这个场景很少，除非有充足的理由，否则不会去删除它。</p>
+<h2 id="缓冲区列表参数">缓冲区列表参数</h2>
+<p>在实际开发项目的时候，我们会打开很多文件，如果仅仅使用上述介绍的命令会发现在管理上有诸多不便。例如项目中有ui文件、有python代码、也有c代码、甚至还有java代码，我现在要找一个名为<code>showUserName</code> 的函数，而且我很清楚我要的ui中的内容，但是在python、c或者java中都有类似的函数名，采用全局搜索肯定都搜出来了，但是我只想在ui文件中搜索。这就涉及到项目文件的模块化。使用上述命令肯定无法满足模块化的要求。这个工作可以使用列表参数来完成。</p>
+<p>假设现在目录有3个<code>python</code> 文件，5个<code>cpp</code> 文件，还有2个<code>txt</code> 文件，我们按照文件类型进行分组打开，先打开<code>cpp</code> 文件</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">vim *.cpp
+</span></span></code></pre></div><p>使用 <code>:args</code> 显示参数列表。
+<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://img-blog.csdnimg.cn/2f3005b56c6a47179b982aaab4b60f5e.gif#pic_center"
+        data-srcset="https://img-blog.csdnimg.cn/2f3005b56c6a47179b982aaab4b60f5e.gif#pic_center, https://img-blog.csdnimg.cn/2f3005b56c6a47179b982aaab4b60f5e.gif#pic_center 1.5x, https://img-blog.csdnimg.cn/2f3005b56c6a47179b982aaab4b60f5e.gif#pic_center 2x"
+        data-sizes="auto"
+        alt="https://img-blog.csdnimg.cn/2f3005b56c6a47179b982aaab4b60f5e.gif#pic_center"
+        title="参数列表" />
+它输出的内容如下：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="cl">[a.cpp] b.cpp   c.cpp   d.cpp   e.cpp
+</span></span></code></pre></div><p>该列表记录了通过命令行另vim打开的所有文件缓冲区。其中使用<code>[]</code> 包裹起来的是当前处于激活状态也就是当前窗口显示的的缓冲。注意请不要被这个名字迷惑了，它并不是传递给vim的参数，而是作为参数传递给vim的文件的列表。也就是这条命令所打开的文件的列表。本质上仍然是一个缓冲区列表</p>
+<p>除了使用<code>:args</code>查看参数列表，也可以在<code>:args</code> 命令后添加缓冲区名称，例如<code>:args init.lua</code> 这样就将一个新的文件纳入之前的缓冲区列表中进行管理。后续可以将需要统一管理的缓冲区使用该命令添加进来，除了使用详细的文件名一个个添加之外，vim也支持使用通配符来进行匹配。甚至也可以在后面添加shell命令，以shell命令的输出作为缓冲区列表的参数，添加到参数列表，它的形式为</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">:args <span class="sb">`</span>cmd<span class="sb">`</span>
+</span></span></code></pre></div><p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://img-blog.csdnimg.cn/83811ae1b4a84edcba12226b5ec7dea4.gif#pic_center"
+        data-srcset="https://img-blog.csdnimg.cn/83811ae1b4a84edcba12226b5ec7dea4.gif#pic_center, https://img-blog.csdnimg.cn/83811ae1b4a84edcba12226b5ec7dea4.gif#pic_center 1.5x, https://img-blog.csdnimg.cn/83811ae1b4a84edcba12226b5ec7dea4.gif#pic_center 2x"
+        data-sizes="auto"
+        alt="https://img-blog.csdnimg.cn/83811ae1b4a84edcba12226b5ec7dea4.gif#pic_center"
+        title="args设置参数列表" />
+上述事例中，我们通过<code>args</code> 来将<code>ls</code> 输出的结果作为参数列表。再通过<code>:ls</code> 命令查看一下当前缓冲区列表，发现之前打开的仍然存在，只是我们将<code>test.py</code> 和 <code>init.lua</code> 这两个文件形成一组作为缓冲区的参数列表。</p>
+<p>当我们指定好了一组缓冲区列表参数之后，可以使用<code>:next</code> 、 <code>:prev</code> 、<code>first</code>、<code>last</code> 在这组缓冲区列表中进行切换。</p>
+<p><code>:args</code> 命令本身也支持使用通配符来将所有匹配的文件名设置为缓冲区列表参数，例如<code>:args *.py</code> 将当前目录中所有py文件加入，或者使用<code>:args **/*.py</code> 来将当前目录下所有子目录中的py文件加入。一般来说使用shell命令或者使用通配符的方式居多，但是也有直接使用文件名的情况出现</p>
+<p>后面我们可以根据参数列表，对列表中所有的缓冲区进行统一的修改或者在这些缓冲区中进行跳转之类的操作，当然这些等我们介绍到了对应的基础知识后再进行演示。</p>
+<h2 id="vim退出">vim退出</h2>
+<p>好像现在才讲到退出操作已经有点晚了，很多用上vim的小伙伴肯定也搜到如何退出了。不知道怎么退出的，应该已经退坑了。但是我在这里并不介绍使用何种命令来退出。而是介绍vim如何处理未同步到磁盘上的缓冲区的。</p>
+<p>我们随便打开多个文件，在任意一个或者多个缓冲区中执行<code>o</code> 或者其他能另其修改的命令。然后执行切换缓冲区的命令，例如<code>:bnext</code> 之类的，切换之后再次执行<code>:ls</code></p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="cl">  1 #h + &#34;.\init.lua&#34;                   line 2
+</span></span><span class="line"><span class="cl">  2 %a   &#34;.\test.py&#34;                    line 1
+</span></span></code></pre></div><p>我们发现在之前的基础之上，多了一个 <code>+</code> 它代表着这个缓冲区上的修改并未同步到磁盘文件中。此时如果执行<code>:q</code> 进行退出的话，会提示当前有缓冲区未同步到文件中，并且跳转到未同步的缓冲区。我们可以执行<code>:w</code> 来写入将缓冲区内容磁盘，也可以使用<code>:q!</code> 来忽略该缓冲区的修改，或者使用<code>:edit!</code>来强行的从磁盘读取内容并覆盖本次修改。这个时候vim将会切换到下一个未保存的缓冲区。如果嫌每次都这样比较麻烦，可以执行<code>:qall!</code> 忽略所有未修改的缓冲区并退出，或者使用<code>:wall</code> 来写入所有修改。</p>
+<h2 id="总结">总结</h2>
+<p>本文到此就结束了，最后再来总结一下该文中使用到的命令和快捷键：</p>
+<ul>
+<li>bnext: 切换到缓冲区列表中的下一个缓冲区</li>
+<li>bprev: 切换到缓冲区列表中的下一个缓冲区</li>
+<li>blast: 切换到缓冲区列表中的最后一个缓冲区</li>
+<li>bfirst: 切换到缓冲区列表中的第一个缓冲区</li>
+<li>&lt;Ctrl+^&gt;: 在上一个被激活的缓冲区和当前被激活的缓冲区之间进行轮换</li>
+<li>args: 显示当前缓冲区列表参数。后面也可以跟上文件名、shell命令和通配符，设置对应的缓冲区列表参数</li>
+<li>next: 切换到缓冲区列表参数中的下一个缓冲区</li>
+<li>prev: 切换到缓冲区列表参数中的上一个缓冲区</li>
+<li>last: 切换到缓冲区列表参数中的最后一个缓冲区</li>
+<li>first: 切换到缓冲区列表参数中的第一个缓冲区</li>
+</ul>
+</div><div class="post-footer" id="post-footer">
+    <div class="post-info">
+        <div class="post-info-line">
+            <div class="post-info-mod">
+                <span>Updated on 2022-05-07</span>
+            </div></div>
+        <div class="post-info-line">
+            <div class="post-info-md"></div>
+            <div class="post-info-share">
+                <span><a href="javascript:void(0);" title="Share on Twitter" data-sharer="twitter" data-url="http://HaiLateBoy.github.io/posts/vim-tutorial-11/" data-title="vim 从嫌弃到依赖(10)——缓冲区列表" data-hashtags="vim,编辑工具,文本处理"><i class="fab fa-twitter fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Facebook" data-sharer="facebook" data-url="http://HaiLateBoy.github.io/posts/vim-tutorial-11/" data-hashtag="vim"><i class="fab fa-facebook-square fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Hacker News" data-sharer="hackernews" data-url="http://HaiLateBoy.github.io/posts/vim-tutorial-11/" data-title="vim 从嫌弃到依赖(10)——缓冲区列表"><i class="fab fa-hacker-news fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Line" data-sharer="line" data-url="http://HaiLateBoy.github.io/posts/vim-tutorial-11/" data-title="vim 从嫌弃到依赖(10)——缓冲区列表"><i data-svg-src="https://cdn.jsdelivr.net/npm/simple-icons@7.3.0/icons/line.svg" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on 微博" data-sharer="weibo" data-url="http://HaiLateBoy.github.io/posts/vim-tutorial-11/" data-title="vim 从嫌弃到依赖(10)——缓冲区列表"><i class="fab fa-weibo fa-fw" aria-hidden="true"></i></a></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="post-info-more">
+        <section class="post-tags"><i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/vim/">vim</a>,&nbsp;<a href="/tags/%E7%BC%96%E8%BE%91%E5%B7%A5%E5%85%B7/">编辑工具</a>,&nbsp;<a href="/tags/%E6%96%87%E6%9C%AC%E5%A4%84%E7%90%86/">文本处理</a></section>
+        <section>
+            <span><a href="javascript:void(0);" onclick="window.history.back();">Back</a></span>&nbsp;|&nbsp;<span><a href="/">Home</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav"><a href="/posts/vim-tutorial-10/" class="prev" rel="prev" title="vim 从嫌弃到依赖(9)——命令模式进阶"><i class="fas fa-angle-left fa-fw" aria-hidden="true"></i>vim 从嫌弃到依赖(9)——命令模式进阶</a>
+            <a href="/posts/vim-tutorial-12/" class="next" rel="next" title="vim 从嫌弃到依赖(11)——标签页操作">vim 从嫌弃到依赖(11)——标签页操作<i class="fas fa-angle-right fa-fw" aria-hidden="true"></i></a></div>
+</div>
+</article></div>
+            </main><footer class="footer">
+        <div class="footer-container"><div class="footer-line">Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener noreffer" title="Hugo 0.121.2">Hugo</a> | Theme - <a href="https://github.com/dillonzq/LoveIt" target="_blank" rel="noopener noreffer" title="LoveIt 0.2.11"><i class="far fa-kiss-wink-heart fa-fw" aria-hidden="true"></i> LoveIt</a>
+                </div><div class="footer-line" itemscope itemtype="http://schema.org/CreativeWork"><i class="far fa-copyright fa-fw" aria-hidden="true"></i><span itemprop="copyrightYear">2022 - 2024</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="https://www.masimaro.xyz" target="_blank">Masimaro</a></span></div>
+        </div>
+    </footer></div>
+
+        <div id="fixed-buttons"><a href="#" id="back-to-top" class="fixed-button" title="Back to Top">
+                <i class="fas fa-arrow-up fa-fw" aria-hidden="true"></i>
+            </a><a href="#" id="view-comments" class="fixed-button" title="View Comments">
+                <i class="fas fa-comment fa-fw" aria-hidden="true"></i>
+            </a>
+        </div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.css"><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/autocomplete.js@0.38.1/dist/autocomplete.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lunr@2.3.9/lunr.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lazysizes@5.3.2/lazysizes.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/clipboard@2.0.11/dist/clipboard.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/sharer.js@0.5.1/sharer.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/auto-render.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/copy-tex.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/mhchem.min.js"></script><script type="text/javascript">window.config={"code":{"copyTitle":"Copy to clipboard","maxShownLines":50},"comment":{},"math":{"delimiters":[{"display":true,"left":"$$","right":"$$"},{"display":true,"left":"\\[","right":"\\]"},{"display":true,"left":"\\begin{equation}","right":"\\end{equation}"},{"display":true,"left":"\\begin{equation*}","right":"\\end{equation*}"},{"display":true,"left":"\\begin{align}","right":"\\end{align}"},{"display":true,"left":"\\begin{align*}","right":"\\end{align*}"},{"display":true,"left":"\\begin{alignat}","right":"\\end{alignat}"},{"display":true,"left":"\\begin{alignat*}","right":"\\end{alignat*}"},{"display":true,"left":"\\begin{gather}","right":"\\end{gather}"},{"display":true,"left":"\\begin{CD}","right":"\\end{CD}"},{"display":false,"left":"$","right":"$"},{"display":false,"left":"\\(","right":"\\)"}],"strict":false},"search":{"highlightTag":"em","maxResultLength":10,"noResultsFound":"No results found","snippetLength":50}};</script><script type="text/javascript" src="/js/theme.min.js"></script></body>
+</html>

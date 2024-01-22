@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="robots" content="noodp" />
+        <title>从零开始配置 vim(15)——状态栏配置 - Masimaro&#39;s blog</title><meta name="Description" content="这是我用于记录日常和学习的小站"><meta property="og:title" content="从零开始配置 vim(15)——状态栏配置" />
+<meta property="og:description" content="vim 下侧有一个状态栏，会显示当前打开的文件等一系列内容，只是我们很少去关注它。而且原生的vim也支持对状态栏进行自定义。这篇文章主要介绍如何自" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://HaiLateBoy.github.io/posts/vim-config15/" /><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2022-08-17T09:53:48+08:00" />
+<meta property="article:modified_time" content="2022-08-17T09:53:48+08:00" /><meta property="og:site_name" content="Masimaro&#39;s blog" />
+
+<meta name="twitter:card" content="summary"/><meta name="twitter:title" content="从零开始配置 vim(15)——状态栏配置"/>
+<meta name="twitter:description" content="vim 下侧有一个状态栏，会显示当前打开的文件等一系列内容，只是我们很少去关注它。而且原生的vim也支持对状态栏进行自定义。这篇文章主要介绍如何自"/>
+<meta name="application-name" content="My cool site">
+<meta name="apple-mobile-web-app-title" content="My cool site"><meta name="theme-color" content="#ffffff"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="manifest" href="/site.webmanifest"><link rel="canonical" href="http://HaiLateBoy.github.io/posts/vim-config15/" /><link rel="prev" href="http://HaiLateBoy.github.io/posts/vim-config14/" /><link rel="next" href="http://HaiLateBoy.github.io/posts/vim-config16/" /><link rel="stylesheet" href="/css/style.min.css"><link rel="preload" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css"></noscript><link rel="preload" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css"></noscript><script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "BlogPosting",
+        "headline": "从零开始配置 vim(15)——状态栏配置",
+        "inLanguage": "zh-CN",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "http:\/\/HaiLateBoy.github.io\/posts\/vim-config15\/"
+        },"genre": "posts","keywords": "vim, 编辑工具, 文本处理, lua, 编辑器","wordcount":  1815 ,
+        "url": "http:\/\/HaiLateBoy.github.io\/posts\/vim-config15\/","datePublished": "2022-08-17T09:53:48+08:00","dateModified": "2022-08-17T09:53:48+08:00","publisher": {
+            "@type": "Organization",
+            "name": ""},"author": {
+                "@type": "Person",
+                "name": "Masimaro"
+            },"description": ""
+    }
+    </script></head>
+    <body data-header-desktop="fixed" data-header-mobile="auto"><script type="text/javascript">(window.localStorage && localStorage.getItem('theme') ? localStorage.getItem('theme') === 'dark' : ('auto' === 'auto' ? window.matchMedia('(prefers-color-scheme: dark)').matches : 'auto' === 'dark')) && document.body.setAttribute('theme', 'dark');</script>
+
+        <div id="mask"></div><div class="wrapper"><header class="desktop" id="header-desktop">
+    <div class="header-wrapper">
+        <div class="header-title">
+            <a href="/" title="Masimaro&#39;s blog">My cool site</a>
+        </div>
+        <div class="menu">
+            <div class="menu-inner"><a class="menu-item" href="/posts/" title="文章列表"> 文章 </a><a class="menu-item" href="/tags/" title="标签"> 标签 </a><a class="menu-item" href="/categories/" title="分类"> 分类 </a><a class="menu-item" href="/about" title="关于本站"> 关于 </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-desktop">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-desktop" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-desktop" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-desktop">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </span><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                    <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+                </a></div>
+        </div>
+    </div>
+</header><header class="mobile" id="header-mobile">
+    <div class="header-container">
+        <div class="header-wrapper">
+            <div class="header-title">
+                <a href="/" title="Masimaro&#39;s blog">My cool site</a>
+            </div>
+            <div class="menu-toggle" id="menu-toggle-mobile">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+        <div class="menu" id="menu-mobile"><div class="search-wrapper">
+                    <div class="search mobile" id="search-mobile">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-mobile">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-mobile" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-mobile" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-mobile">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </div>
+                    <a href="javascript:void(0);" class="search-cancel" id="search-cancel-mobile">
+                        Cancel
+                    </a>
+                </div><a class="menu-item" href="/posts/" title="文章列表">文章</a><a class="menu-item" href="/tags/" title="标签">标签</a><a class="menu-item" href="/categories/" title="分类">分类</a><a class="menu-item" href="/about" title="关于本站">关于</a><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+            </a></div>
+    </div>
+</header><div class="search-dropdown desktop">
+        <div id="search-dropdown-desktop"></div>
+    </div>
+    <div class="search-dropdown mobile">
+        <div id="search-dropdown-mobile"></div>
+    </div><main class="main">
+                <div class="container"><div class="toc" id="toc-auto">
+            <h2 class="toc-title">Contents</h2>
+            <div class="toc-content" id="toc-content-auto"></div>
+        </div><article class="page single"><h1 class="single-title animate__animated animate__flipInX">从零开始配置 vim(15)——状态栏配置</h1><div class="post-meta">
+            <div class="post-meta-line"><span class="post-author"><a href="https://www.masimaro.xyz" title="Author" target="_blank" rel="noopener noreffer author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Masimaro</a></span>&nbsp;<span class="post-category">included in <a href="/categories/vim-%E9%85%8D%E7%BD%AE/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>vim 配置</a></span></div>
+            <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw" aria-hidden="true"></i>&nbsp;<time datetime="2022-08-17">2022-08-17</time>&nbsp;<i class="fas fa-pencil-alt fa-fw" aria-hidden="true"></i>&nbsp;1815 words&nbsp;
+                <i class="far fa-clock fa-fw" aria-hidden="true"></i>&nbsp;4 minutes&nbsp;</div>
+        </div><div class="details toc" id="toc-static"  data-kept="true">
+                <div class="details-summary toc-title">
+                    <span>Contents</span>
+                    <span><i class="details-icon fas fa-angle-right" aria-hidden="true"></i></span>
+                </div>
+                <div class="details-content toc-content" id="toc-content-static"><nav id="TableOfContents">
+  <ul>
+    <li><a href="#设置状态栏">设置状态栏</a>
+      <ul>
+        <li><a href="#控制边距和宽度">控制边距和宽度</a></li>
+        <li><a href="#分割">分割</a></li>
+        <li><a href="#练习">练习</a></li>
+      </ul>
+    </li>
+    <li><a href="#lualine-插件">lualine 插件</a></li>
+  </ul>
+</nav></div>
+            </div><div class="content" id="content"><p><code>vim</code> 下侧有一个状态栏，会显示当前打开的文件等一系列内容，只是我们很少去关注它。而且原生的vim也支持对状态栏进行自定义。这篇文章主要介绍如何自定义状态栏</p>
+<h2 id="设置状态栏">设置状态栏</h2>
+<p>我们可以采用 <code>set statusline</code> 来设置状态栏。
+例如我们输入 <code>:set statusline=%f\ -\ FileType=%y</code>。之后我们可以发现它变成了如下这个样子</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://img-blog.csdnimg.cn/a6a4816b77df4450993b521238d3311a.png#pic_center"
+        data-srcset="https://img-blog.csdnimg.cn/a6a4816b77df4450993b521238d3311a.png#pic_center, https://img-blog.csdnimg.cn/a6a4816b77df4450993b521238d3311a.png#pic_center 1.5x, https://img-blog.csdnimg.cn/a6a4816b77df4450993b521238d3311a.png#pic_center 2x"
+        data-sizes="auto"
+        alt="https://img-blog.csdnimg.cn/a6a4816b77df4450993b521238d3311a.png#pic_center"
+        title="在这里插入图片描述" />
+<code>statusline</code> 的值是一个格式字符串。上述命令我们使用了 <code>%f</code> 表示当前文件名称 。</p>
+<p>从上面的命令中明显感觉到只输出两个内容就已经开始显的比较繁琐了，如果显示的内容多了是不是就更加难以阅读和书写了呢？好在我们还能使用 lua来做设置。上述内容可以翻译为如下的 lua代码</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-lua" data-lang="lua"><span class="line"><span class="cl"><span class="n">vim.o</span><span class="p">.</span><span class="n">statusline</span> <span class="o">=</span> <span class="s2">&#34;%f - FileType=%y&#34;</span>
+</span></span></code></pre></div><p>我们保存之后发现下方的状态栏显示内容已经发生变化。</p>
+<h3 id="控制边距和宽度">控制边距和宽度</h3>
+<p>如果你写过 <code>c</code> 或者其他编程语言中的输出语句，应该很容易理解如何控制输出的格式，一般使用类似 `%4l`` 这样的语句来控制该项占4个字符宽度。这里的设置也是类似的</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-lua" data-lang="lua"><span class="line"><span class="cl"><span class="n">vim.o</span><span class="p">.</span><span class="n">statusline</span> <span class="o">=</span> <span class="s2">&#34;%20f - FileType=%y&#34;</span>
+</span></span></code></pre></div><p>它表示 文件名这项应该站20个字符宽度。最终效果如下所示
+<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://img-blog.csdnimg.cn/149ba00748ee447b9d686cf0d761a0dd.png#pic_center"
+        data-srcset="https://img-blog.csdnimg.cn/149ba00748ee447b9d686cf0d761a0dd.png#pic_center, https://img-blog.csdnimg.cn/149ba00748ee447b9d686cf0d761a0dd.png#pic_center 1.5x, https://img-blog.csdnimg.cn/149ba00748ee447b9d686cf0d761a0dd.png#pic_center 2x"
+        data-sizes="auto"
+        alt="https://img-blog.csdnimg.cn/149ba00748ee447b9d686cf0d761a0dd.png#pic_center"
+        title="在这里插入图片描述" /></p>
+<p>默认它的边距是添加在左边的，这样会让左侧空出一大半，会显得比较难看，我们可以使用 -来使空白站位符显示在右侧</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-lua" data-lang="lua"><span class="line"><span class="cl"><span class="n">vim.o</span><span class="p">.</span><span class="n">statusline</span> <span class="o">=</span> <span class="s2">&#34;%-20f - FileType=%y&#34;</span>
+</span></span></code></pre></div><p>当然我们也可以控制一下输出字符的最大长度，例如使用如下代码</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-lua" data-lang="lua"><span class="line"><span class="cl"><span class="n">vim.o</span><span class="p">.</span><span class="n">statusline</span> <span class="o">=</span> <span class="s2">&#34;%0.10F - FileType=%y&#34;</span>
+</span></span></code></pre></div><p>使用 %F可以显示文件的全路径。这里我们发现全路径大于10个字符，但是它只是显示了10个字符。使用这个方法可以防止某些超长的字符串破坏了我之前的布局</p>
+<h3 id="分割">分割</h3>
+<p>我们再来介绍一个符号 <code>%=</code>，它表示将 <code>%=</code> 后面的内容全局居右对齐，例如</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-lua" data-lang="lua"><span class="line"><span class="cl"><span class="n">vim.o</span><span class="p">.</span><span class="n">statusline</span> <span class="o">=</span> <span class="s2">&#34;%f %= FileType=%y&#34;</span>
+</span></span></code></pre></div><p>将得到如下显示内容
+<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://img-blog.csdnimg.cn/356c9f76296b44fea022d044c8c130e2.png#pic_center"
+        data-srcset="https://img-blog.csdnimg.cn/356c9f76296b44fea022d044c8c130e2.png#pic_center, https://img-blog.csdnimg.cn/356c9f76296b44fea022d044c8c130e2.png#pic_center 1.5x, https://img-blog.csdnimg.cn/356c9f76296b44fea022d044c8c130e2.png#pic_center 2x"
+        data-sizes="auto"
+        alt="https://img-blog.csdnimg.cn/356c9f76296b44fea022d044c8c130e2.png#pic_center"
+        title="在这里插入图片描述" /></p>
+<p>更多的关于各个标识符代表的含义可以使用 <code>:help statusline</code> 来查看。</p>
+<h3 id="练习">练习</h3>
+<p>最后我们来做一个小练习，我们希望将状态栏显示为如下内容</p>
+<pre tabindex="0"><code class="language-vimscript" data-lang="vimscript">mode | filename[status] | currentline:totalline                       |encoding|filetype|
+</code></pre><p>其中 <code>mode</code> 代表当前所处模式、<code>filename</code> 代表文件名称、<code>status</code> 代表文件状态(是否可读写、是否保存)、<code>currentline</code> 代表光标当前所在行数、<code>totalline</code> 代表文件一共多少行、<code>encoding</code> 代表文件编码、<code>filetype</code> 代表文件类型</p>
+<p>我们通过查阅文档可以知道:</p>
+<ul>
+<li>文件名称可以使用 <code>%f</code> 来显示</li>
+<li>文件状态可以使用 <code>%m</code> 来显示</li>
+<li>当前行可以使用 <code>%l</code></li>
+<li>当前buffer总行数可以使用 <code>%L</code></li>
+<li>文件类型可以使用 <code>%y</code> 来显示</li>
+</ul>
+<p>至于当前模式和文件类型我们先不管它，根据这些内容我们可以写下如下代码</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-lua" data-lang="lua"><span class="line"><span class="cl"><span class="n">vim.o</span><span class="p">.</span><span class="n">statusline</span> <span class="o">=</span> <span class="s2">&#34;mode|%f%m|%l:%L%=encoding|%y&#34;</span>
+</span></span></code></pre></div><p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://img-blog.csdnimg.cn/797e4f7bc52c44fbb23b8d54c6da4d72.png#pic_center"
+        data-srcset="https://img-blog.csdnimg.cn/797e4f7bc52c44fbb23b8d54c6da4d72.png#pic_center, https://img-blog.csdnimg.cn/797e4f7bc52c44fbb23b8d54c6da4d72.png#pic_center 1.5x, https://img-blog.csdnimg.cn/797e4f7bc52c44fbb23b8d54c6da4d72.png#pic_center 2x"
+        data-sizes="auto"
+        alt="https://img-blog.csdnimg.cn/797e4f7bc52c44fbb23b8d54c6da4d72.png#pic_center"
+        title="在这里插入图片描述" />
+<code>[+]</code> 表示对缓冲区所做的修改还没有写入到磁盘中。执行:w写入之后发现它直接消失了</p>
+<p>我们可以通过 <code>vim.g.encoding</code> 来获取当前文件的编码方式，因此我们改一下当前代码</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-lua" data-lang="lua"><span class="line"><span class="cl"><span class="n">vim.o</span><span class="p">.</span><span class="n">statusline</span> <span class="o">=</span> <span class="s2">&#34;mode|%f%m|%l:%L%=&#34;</span> <span class="o">..</span> <span class="n">vim.g</span><span class="p">.</span><span class="n">encoding</span> <span class="o">..</span> <span class="s2">&#34;|%y&#34;</span>
+</span></span></code></pre></div><p>我们发现此时的状态已经改过来了。</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://img-blog.csdnimg.cn/f54aec0e3bbd4da7a0cb680030008a53.png#pic_center"
+        data-srcset="https://img-blog.csdnimg.cn/f54aec0e3bbd4da7a0cb680030008a53.png#pic_center, https://img-blog.csdnimg.cn/f54aec0e3bbd4da7a0cb680030008a53.png#pic_center 1.5x, https://img-blog.csdnimg.cn/f54aec0e3bbd4da7a0cb680030008a53.png#pic_center 2x"
+        data-sizes="auto"
+        alt="https://img-blog.csdnimg.cn/f54aec0e3bbd4da7a0cb680030008a53.png#pic_center"
+        title="在这里插入图片描述" />
+最麻烦的是模式，<code>vim</code> 中提供了一个可以获取当前模式的函数 <code>mode</code> 。但是在 <code>lua</code> 接口中我没有找到对应的函数。因此我们仍然采用在 <code>lua</code> 中调用 <code>vimscript</code> 的方式。这次我们使用函数 <code>vim.api.nvim_eval()</code>。它可以执行 <code>vim</code> 命令并将返回执行的结果。</p>
+<p>我们可以定义一个函数返回当前所处模式</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-lua" data-lang="lua"><span class="line"><span class="cl"><span class="kr">function</span> <span class="nf">get_mode</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">    <span class="kd">local</span> <span class="n">mode</span> <span class="o">=</span> <span class="n">vim.api</span><span class="p">.</span><span class="n">nvim_eval</span><span class="p">(</span><span class="s">[[mode]]</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="kr">if</span> <span class="n">mode</span> <span class="o">==</span> <span class="s2">&#34;n&#34;</span> <span class="kr">then</span>
+</span></span><span class="line"><span class="cl">        <span class="kr">return</span> <span class="s2">&#34;Normal&#34;</span>
+</span></span><span class="line"><span class="cl">    <span class="kr">elseif</span> <span class="n">mode</span> <span class="o">==</span> <span class="s2">&#34;v&#34;</span> <span class="kr">then</span>
+</span></span><span class="line"><span class="cl">        <span class="kr">return</span> <span class="s2">&#34;Visual&#34;</span>
+</span></span><span class="line"><span class="cl">    <span class="kr">elseif</span> <span class="n">mode</span> <span class="o">==</span> <span class="s2">&#34;i&#34;</span> <span class="kr">then</span>
+</span></span><span class="line"><span class="cl">        <span class="kr">return</span> <span class="s2">&#34;Insert&#34;</span>
+</span></span><span class="line"><span class="cl">    <span class="kr">else</span>
+</span></span><span class="line"><span class="cl">        <span class="kr">return</span> <span class="s2">&#34;&#34;</span>
+</span></span><span class="line"><span class="cl">    <span class="kr">end</span>
+</span></span><span class="line"><span class="cl"><span class="kr">end</span>
+</span></span></code></pre></div><p>这里我们为了演示只返回了 3中模式的字符串，更多模式可以查看vim的帮助文档</p>
+<p>我们希望模式改变时对应的就修改 <code>mode</code> 对应的字段，此时我们应该采用自动命令。查看vim的用户手册我们发现，针对模式变化这一事件有一个叫做 <code>ModeChanged</code> 的事件类型，因此我们可以写下一些代码</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-lua" data-lang="lua"><span class="line"><span class="cl"><span class="kd">local</span> <span class="n">cmd_statusline</span> <span class="o">=</span> <span class="n">vim.api</span><span class="p">.</span><span class="n">nvim_create_autogroup</span><span class="p">(</span><span class="s2">&#34;SET_STATUS_LINE&#34;</span><span class="p">,</span> <span class="p">{</span><span class="n">clear</span> <span class="o">=</span> <span class="kc">true</span><span class="p">})</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">vim.api</span><span class="p">.</span><span class="n">nvim_create_autocmd</span><span class="p">({</span><span class="s2">&#34;ModeChanged&#34;</span><span class="p">},</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">pattern</span> <span class="o">=</span> <span class="s2">&#34;*&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">group</span> <span class="o">=</span> <span class="n">cmd_statusline</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">callback</span> <span class="o">=</span> <span class="kr">function</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">      <span class="kd">local</span> <span class="n">win_id</span> <span class="o">=</span> <span class="n">vim.api</span><span class="p">.</span><span class="n">nvim_eval</span><span class="p">(</span><span class="s">[[win_getid()]]</span><span class="p">)</span> <span class="c1">--获取当前window id</span>
+</span></span><span class="line"><span class="cl">      <span class="n">vim.wo</span><span class="p">[</span><span class="n">win_id</span><span class="p">].</span><span class="n">statusline</span> <span class="o">=</span> <span class="n">get_mode</span><span class="p">()</span> <span class="o">..</span> <span class="s2">&#34;|%f%m|%l:%L%=&#34;</span> <span class="o">..</span> <span class="n">vim.g</span><span class="p">.</span><span class="n">encoding</span> <span class="o">..</span> <span class="s2">&#34;|%y&#34;</span> <span class="c1">-- 使用 setlocal 针对窗口设置本地化配置</span>
+</span></span><span class="line"><span class="cl">    <span class="kr">end</span>
+</span></span><span class="line"><span class="cl"><span class="p">)</span>
+</span></span></code></pre></div><p>后面我们可以对字符串进行一些格式控制，这里就不展开了。我们将这些代码写到 init.lua中，保存后发现它大致效果如下
+<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://img-blog.csdnimg.cn/e3b47f0f5be242039b81ef5e8c652af5.gif#pic_center"
+        data-srcset="https://img-blog.csdnimg.cn/e3b47f0f5be242039b81ef5e8c652af5.gif#pic_center, https://img-blog.csdnimg.cn/e3b47f0f5be242039b81ef5e8c652af5.gif#pic_center 1.5x, https://img-blog.csdnimg.cn/e3b47f0f5be242039b81ef5e8c652af5.gif#pic_center 2x"
+        data-sizes="auto"
+        alt="https://img-blog.csdnimg.cn/e3b47f0f5be242039b81ef5e8c652af5.gif#pic_center"
+        title="在这里插入图片描述" />
+我们发现就是简单的设置状态栏的工作也是比较麻烦的。而且有时候我们又想它好看，带点颜色什么的。这就更麻烦了。好在有大量的插件可以帮助我们来完成这一工作</p>
+<h2 id="lualine-插件">lualine 插件</h2>
+<p><code>lualine</code> 是一个用 <code>lua</code> 语言开发的 <code>neovim</code> 的状态栏美化插件，可以使用如下代码进行安装</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-lua" data-lang="lua"><span class="line"><span class="cl"><span class="n">use</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="s1">&#39;nvim-lualine/lualine.nvim&#39;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">  <span class="n">requires</span> <span class="o">=</span> <span class="p">{</span> <span class="s1">&#39;kyazdani42/nvim-web-devicons&#39;</span><span class="p">,</span> <span class="n">opt</span> <span class="o">=</span> <span class="kc">true</span> <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p>我们创建 <code>lualine</code> 的配置文件，加入加载 <code>lualine</code> 的代码</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-lua" data-lang="lua"><span class="line"><span class="cl"><span class="n">require</span><span class="p">(</span><span class="s2">&#34;lualine&#34;</span><span class="p">).</span><span class="n">setup</span><span class="p">()</span>
+</span></span></code></pre></div><p>然后在主配置文件中加载该文件</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-lua" data-lang="lua"><span class="line"><span class="cl"><span class="n">require</span><span class="p">(</span><span class="s2">&#34;plugin-config/lualine&#34;</span><span class="p">)</span>
+</span></span></code></pre></div><p><code>lualine</code> 官方提供了3种主题的配色，我们可以直接在代码中引用，例如我这里引用 <a href="https://github.com/nvim-lualine/lualine.nvim/blob/master/examples/evil_lualine.lua" target="_blank" rel="noopener noreffer ">evil_lualine</a> 这个配置，然后将 theme改为之前我们安装的 tokyonight主题</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-lua" data-lang="lua"><span class="line"><span class="cl"><span class="n">theme</span> <span class="o">=</span> <span class="s2">&#34;tokyonight&#34;</span>
+</span></span></code></pre></div><p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://img-blog.csdnimg.cn/502c42430fc6474e818b9ba10b0d1a84.png#pic_center"
+        data-srcset="https://img-blog.csdnimg.cn/502c42430fc6474e818b9ba10b0d1a84.png#pic_center, https://img-blog.csdnimg.cn/502c42430fc6474e818b9ba10b0d1a84.png#pic_center 1.5x, https://img-blog.csdnimg.cn/502c42430fc6474e818b9ba10b0d1a84.png#pic_center 2x"
+        data-sizes="auto"
+        alt="https://img-blog.csdnimg.cn/502c42430fc6474e818b9ba10b0d1a84.png#pic_center"
+        title="在这里插入图片描述" /></p>
+<p>到这里我们已经完成了 状态栏的美化，其实主要靠插件，本篇一大部分写了如何使用原生的<code>statusline</code> 设置主要是自己手工设置比较有意思，而且也可以凑文章字数，其实你不知道<code>statusline</code> 这个也无所谓，很多插件都都对原生的方式进行了大量封装，而且能进行高度的自定义。完全可以满足你各种奇怪的口味。</p>
+<p>当然状态栏配置并不只有这一种插件，如果你知道有哪些状态栏的插件也欢迎在评论区留言给出</p>
+</div><div class="post-footer" id="post-footer">
+    <div class="post-info">
+        <div class="post-info-line">
+            <div class="post-info-mod">
+                <span>Updated on 2022-08-17</span>
+            </div></div>
+        <div class="post-info-line">
+            <div class="post-info-md"></div>
+            <div class="post-info-share">
+                <span><a href="javascript:void(0);" title="Share on Twitter" data-sharer="twitter" data-url="http://HaiLateBoy.github.io/posts/vim-config15/" data-title="从零开始配置 vim(15)——状态栏配置" data-hashtags="vim,编辑工具,文本处理,lua,编辑器"><i class="fab fa-twitter fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Facebook" data-sharer="facebook" data-url="http://HaiLateBoy.github.io/posts/vim-config15/" data-hashtag="vim"><i class="fab fa-facebook-square fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Hacker News" data-sharer="hackernews" data-url="http://HaiLateBoy.github.io/posts/vim-config15/" data-title="从零开始配置 vim(15)——状态栏配置"><i class="fab fa-hacker-news fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Line" data-sharer="line" data-url="http://HaiLateBoy.github.io/posts/vim-config15/" data-title="从零开始配置 vim(15)——状态栏配置"><i data-svg-src="https://cdn.jsdelivr.net/npm/simple-icons@7.3.0/icons/line.svg" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on 微博" data-sharer="weibo" data-url="http://HaiLateBoy.github.io/posts/vim-config15/" data-title="从零开始配置 vim(15)——状态栏配置"><i class="fab fa-weibo fa-fw" aria-hidden="true"></i></a></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="post-info-more">
+        <section class="post-tags"><i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/vim/">vim</a>,&nbsp;<a href="/tags/%E7%BC%96%E8%BE%91%E5%B7%A5%E5%85%B7/">编辑工具</a>,&nbsp;<a href="/tags/%E6%96%87%E6%9C%AC%E5%A4%84%E7%90%86/">文本处理</a>,&nbsp;<a href="/tags/lua/">lua</a>,&nbsp;<a href="/tags/%E7%BC%96%E8%BE%91%E5%99%A8/">编辑器</a></section>
+        <section>
+            <span><a href="javascript:void(0);" onclick="window.history.back();">Back</a></span>&nbsp;|&nbsp;<span><a href="/">Home</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav"><a href="/posts/vim-config14/" class="prev" rel="prev" title="从零开始配置 vim(14)——目录管理插件"><i class="fas fa-angle-left fa-fw" aria-hidden="true"></i>从零开始配置 vim(14)——目录管理插件</a>
+            <a href="/posts/vim-config16/" class="next" rel="next" title="从零开始配置 vim(16)——启动界面配置">从零开始配置 vim(16)——启动界面配置<i class="fas fa-angle-right fa-fw" aria-hidden="true"></i></a></div>
+</div>
+</article></div>
+            </main><footer class="footer">
+        <div class="footer-container"><div class="footer-line">Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener noreffer" title="Hugo 0.121.2">Hugo</a> | Theme - <a href="https://github.com/dillonzq/LoveIt" target="_blank" rel="noopener noreffer" title="LoveIt 0.2.11"><i class="far fa-kiss-wink-heart fa-fw" aria-hidden="true"></i> LoveIt</a>
+                </div><div class="footer-line" itemscope itemtype="http://schema.org/CreativeWork"><i class="far fa-copyright fa-fw" aria-hidden="true"></i><span itemprop="copyrightYear">2022 - 2024</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="https://www.masimaro.xyz" target="_blank">Masimaro</a></span></div>
+        </div>
+    </footer></div>
+
+        <div id="fixed-buttons"><a href="#" id="back-to-top" class="fixed-button" title="Back to Top">
+                <i class="fas fa-arrow-up fa-fw" aria-hidden="true"></i>
+            </a><a href="#" id="view-comments" class="fixed-button" title="View Comments">
+                <i class="fas fa-comment fa-fw" aria-hidden="true"></i>
+            </a>
+        </div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.css"><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/autocomplete.js@0.38.1/dist/autocomplete.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lunr@2.3.9/lunr.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lazysizes@5.3.2/lazysizes.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/clipboard@2.0.11/dist/clipboard.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/sharer.js@0.5.1/sharer.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/auto-render.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/copy-tex.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/mhchem.min.js"></script><script type="text/javascript">window.config={"code":{"copyTitle":"Copy to clipboard","maxShownLines":50},"comment":{},"math":{"delimiters":[{"display":true,"left":"$$","right":"$$"},{"display":true,"left":"\\[","right":"\\]"},{"display":true,"left":"\\begin{equation}","right":"\\end{equation}"},{"display":true,"left":"\\begin{equation*}","right":"\\end{equation*}"},{"display":true,"left":"\\begin{align}","right":"\\end{align}"},{"display":true,"left":"\\begin{align*}","right":"\\end{align*}"},{"display":true,"left":"\\begin{alignat}","right":"\\end{alignat}"},{"display":true,"left":"\\begin{alignat*}","right":"\\end{alignat*}"},{"display":true,"left":"\\begin{gather}","right":"\\end{gather}"},{"display":true,"left":"\\begin{CD}","right":"\\end{CD}"},{"display":false,"left":"$","right":"$"},{"display":false,"left":"\\(","right":"\\)"}],"strict":false},"search":{"highlightTag":"em","maxResultLength":10,"noResultsFound":"No results found","snippetLength":50}};</script><script type="text/javascript" src="/js/theme.min.js"></script></body>
+</html>

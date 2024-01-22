@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="robots" content="noodp" />
+        <title>vim 从嫌弃到依赖(5)——普通模式的一些操作 - Masimaro&#39;s blog</title><meta name="Description" content="这是我用于记录日常和学习的小站"><meta property="og:title" content="vim 从嫌弃到依赖(5)——普通模式的一些操作" />
+<meta property="og:description" content="通过前面几章内容的铺垫，基本已经介绍完了普通模式的大部分内容，按照进度下面会依次介绍插入模式、命令模式、选择模式的一些操作。根据不同模式提供" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://HaiLateBoy.github.io/posts/vim-tutorial-6/" /><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2022-04-19T10:04:31+00:00" />
+<meta property="article:modified_time" content="2022-04-19T10:04:31+00:00" /><meta property="og:site_name" content="Masimaro&#39;s blog" />
+
+<meta name="twitter:card" content="summary"/><meta name="twitter:title" content="vim 从嫌弃到依赖(5)——普通模式的一些操作"/>
+<meta name="twitter:description" content="通过前面几章内容的铺垫，基本已经介绍完了普通模式的大部分内容，按照进度下面会依次介绍插入模式、命令模式、选择模式的一些操作。根据不同模式提供"/>
+<meta name="application-name" content="My cool site">
+<meta name="apple-mobile-web-app-title" content="My cool site"><meta name="theme-color" content="#ffffff"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="manifest" href="/site.webmanifest"><link rel="canonical" href="http://HaiLateBoy.github.io/posts/vim-tutorial-6/" /><link rel="prev" href="http://HaiLateBoy.github.io/posts/vim-tutorial-5/" /><link rel="next" href="http://HaiLateBoy.github.io/posts/vim-tutorial-7/" /><link rel="stylesheet" href="/css/style.min.css"><link rel="preload" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css"></noscript><link rel="preload" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css"></noscript><script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "BlogPosting",
+        "headline": "vim 从嫌弃到依赖(5)——普通模式的一些操作",
+        "inLanguage": "zh-CN",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "http:\/\/HaiLateBoy.github.io\/posts\/vim-tutorial-6\/"
+        },"genre": "posts","keywords": "vim, 编辑工具, 文本处理","wordcount":  1549 ,
+        "url": "http:\/\/HaiLateBoy.github.io\/posts\/vim-tutorial-6\/","datePublished": "2022-04-19T10:04:31+00:00","dateModified": "2022-04-19T10:04:31+00:00","publisher": {
+            "@type": "Organization",
+            "name": ""},"author": {
+                "@type": "Person",
+                "name": "Masimaro"
+            },"description": ""
+    }
+    </script></head>
+    <body data-header-desktop="fixed" data-header-mobile="auto"><script type="text/javascript">(window.localStorage && localStorage.getItem('theme') ? localStorage.getItem('theme') === 'dark' : ('auto' === 'auto' ? window.matchMedia('(prefers-color-scheme: dark)').matches : 'auto' === 'dark')) && document.body.setAttribute('theme', 'dark');</script>
+
+        <div id="mask"></div><div class="wrapper"><header class="desktop" id="header-desktop">
+    <div class="header-wrapper">
+        <div class="header-title">
+            <a href="/" title="Masimaro&#39;s blog">My cool site</a>
+        </div>
+        <div class="menu">
+            <div class="menu-inner"><a class="menu-item" href="/posts/" title="文章列表"> 文章 </a><a class="menu-item" href="/tags/" title="标签"> 标签 </a><a class="menu-item" href="/categories/" title="分类"> 分类 </a><a class="menu-item" href="/about" title="关于本站"> 关于 </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-desktop">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-desktop" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-desktop" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-desktop">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </span><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                    <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+                </a></div>
+        </div>
+    </div>
+</header><header class="mobile" id="header-mobile">
+    <div class="header-container">
+        <div class="header-wrapper">
+            <div class="header-title">
+                <a href="/" title="Masimaro&#39;s blog">My cool site</a>
+            </div>
+            <div class="menu-toggle" id="menu-toggle-mobile">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+        <div class="menu" id="menu-mobile"><div class="search-wrapper">
+                    <div class="search mobile" id="search-mobile">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-mobile">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-mobile" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-mobile" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-mobile">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </div>
+                    <a href="javascript:void(0);" class="search-cancel" id="search-cancel-mobile">
+                        Cancel
+                    </a>
+                </div><a class="menu-item" href="/posts/" title="文章列表">文章</a><a class="menu-item" href="/tags/" title="标签">标签</a><a class="menu-item" href="/categories/" title="分类">分类</a><a class="menu-item" href="/about" title="关于本站">关于</a><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+            </a></div>
+    </div>
+</header><div class="search-dropdown desktop">
+        <div id="search-dropdown-desktop"></div>
+    </div>
+    <div class="search-dropdown mobile">
+        <div id="search-dropdown-mobile"></div>
+    </div><main class="main">
+                <div class="container"><div class="toc" id="toc-auto">
+            <h2 class="toc-title">Contents</h2>
+            <div class="toc-content" id="toc-content-auto"></div>
+        </div><article class="page single"><h1 class="single-title animate__animated animate__flipInX">vim 从嫌弃到依赖(5)——普通模式的一些操作</h1><div class="post-meta">
+            <div class="post-meta-line"><span class="post-author"><a href="https://www.masimaro.xyz" title="Author" target="_blank" rel="noopener noreffer author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Masimaro</a></span>&nbsp;<span class="post-category">included in <a href="/categories/vim/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>vim</a></span></div>
+            <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw" aria-hidden="true"></i>&nbsp;<time datetime="2022-04-19">2022-04-19</time>&nbsp;<i class="fas fa-pencil-alt fa-fw" aria-hidden="true"></i>&nbsp;1549 words&nbsp;
+                <i class="far fa-clock fa-fw" aria-hidden="true"></i>&nbsp;4 minutes&nbsp;</div>
+        </div><div class="details toc" id="toc-static"  data-kept="true">
+                <div class="details-summary toc-title">
+                    <span>Contents</span>
+                    <span><i class="details-icon fas fa-angle-right" aria-hidden="true"></i></span>
+                </div>
+                <div class="details-content toc-content" id="toc-content-static"><nav id="TableOfContents">
+  <ul>
+    <li><a href="#快速翻阅文本">快速翻阅文本</a></li>
+    <li><a href="#撤销">撤销</a></li>
+    <li><a href="#普通模式下对数字文本进行递增递减操作">普通模式下对数字文本进行递增递减操作</a></li>
+  </ul>
+</nav></div>
+            </div><div class="content" id="content"><p>通过前面几章内容的铺垫，基本已经介绍完了普通模式的大部分内容，按照进度下面会依次介绍插入模式、命令模式、选择模式的一些操作。根据不同模式提供功能的多少和使用频率，篇幅会有长有短。本来这篇文章应该介绍插入模式的。但是我在整理最近写的内容的时候发现我忘记了一些不太常用但是很好用的一些小技巧，所以这篇文章我们还是停留在普通模式下。</p>
+<!-- raw HTML omitted -->
+<h2 id="快速翻阅文本">快速翻阅文本</h2>
+<p>跳转光标的操作，之前介绍过 <code>h j k l w</code>等操作，但是在阅读代码的时候，仅仅根据这几个操作，效率着实有点低，即使使用类似 <code>数字 + j/k</code> 的方式来进行行间跳转，效率也一般。这里再介绍几个操作</p>
+<ul>
+<li>ctrl + f: 向下翻页</li>
+<li>ctrl + b: 向上翻页</li>
+</ul>
+<p>这里没有什么具体的例子，各位小伙伴只需要找到一个大一点的文件试试就能看到效果
+<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://img-blog.csdnimg.cn/473dca0791f24133b83e02a908424fc3.gif#pic_center"
+        data-srcset="https://img-blog.csdnimg.cn/473dca0791f24133b83e02a908424fc3.gif#pic_center, https://img-blog.csdnimg.cn/473dca0791f24133b83e02a908424fc3.gif#pic_center 1.5x, https://img-blog.csdnimg.cn/473dca0791f24133b83e02a908424fc3.gif#pic_center 2x"
+        data-sizes="auto"
+        alt="https://img-blog.csdnimg.cn/473dca0791f24133b83e02a908424fc3.gif#pic_center"
+        title="翻页" />
+除了使用这种翻到下一页或者上一页的操作之前，还可以相对于光标滚屏</p>
+<ul>
+<li>zt: 将光标所在行移动到窗口顶端</li>
+<li>zb: 将光标所在行移动到窗口底端</li>
+<li>zz: 将光标所在行移动到窗口中央</li>
+</ul>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://img-blog.csdnimg.cn/de579d695c024047adbefe937d033a97.gif#pic_center"
+        data-srcset="https://img-blog.csdnimg.cn/de579d695c024047adbefe937d033a97.gif#pic_center, https://img-blog.csdnimg.cn/de579d695c024047adbefe937d033a97.gif#pic_center 1.5x, https://img-blog.csdnimg.cn/de579d695c024047adbefe937d033a97.gif#pic_center 2x"
+        data-sizes="auto"
+        alt="https://img-blog.csdnimg.cn/de579d695c024047adbefe937d033a97.gif#pic_center"
+        title="相对于光标移动" />
+这个提供两个问题：</p>
+<ol>
+<li>为什么没有将他们放到前面跟 <code>h j k l</code> 这类的操作一块讲呢，当然是因为我忘记了啊。。。。这个理由虽然很重要，但是并不是主要理由。大家可以先猜猜。</li>
+<li>既然这个操作能大幅度提高我们阅读代码的效率，那为什么使用频率还会这么低呢</li>
+</ol>
+<p>有兴趣的小伙伴可以先不看后面的解答，自己操作一下，特别是在认真阅读代码的时候。可能就会有跟我下面说的一样的体验</p>
+<p>好了，现在公布我的答案：</p>
+<ol>
+<li>针对问题一，我的答案是，这几个操作并不属于<code>motion</code> 那一类，小伙伴们在试验的时候可以仔细观察一下光标，光标相对于窗口的位置其实并没有发生变化。</li>
+<li>大家在阅读代码的时候使用它们会不会觉得跳转太多了，每次跳转都感觉跟前面读过的衔接不上呢。体验非常不好，还不如我一直使用 <code>jjjjjjjjj</code> 甚至 <code>10j</code> 之类的操作。现在我采取折中的办法，就是翻页的快捷键我用，但是我将其映射为了 <code>10j</code> (如何映射快捷键以及如何定制自己的vim在后面说)</li>
+</ol>
+<h2 id="撤销">撤销</h2>
+<p>撤销在普通模式下使用 <code>u</code>，反撤销使用 <code>Ctrl+r</code>
+vim的撤销是撤销上次修改，结合之前介绍的<code>.</code> 命令的部分，我们可以知道上次修改指的是从进入插入模式那一刻起到退回到普通模式为止，进行的一系列的修改。根据这个特征，我们可以很方便的定义撤销哪些内容。例如在写这篇文章的时候我进入插入模式进行编写。然后在需要构思的地方退回到普通模式，想到了一些再次进入插入模式编辑，一旦发现有问题就可以在普通模式下撤销上次的修改。</p>
+<p>例如下面的例子：</p>
+<ul>
+<li>我们先使用 <code>cw</code> 替换一个单词，然后删除一行。
+<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://img-blog.csdnimg.cn/97e518ecc0874008a983942ddfbc75df.gif#pic_center"
+        data-srcset="https://img-blog.csdnimg.cn/97e518ecc0874008a983942ddfbc75df.gif#pic_center, https://img-blog.csdnimg.cn/97e518ecc0874008a983942ddfbc75df.gif#pic_center 1.5x, https://img-blog.csdnimg.cn/97e518ecc0874008a983942ddfbc75df.gif#pic_center 2x"
+        data-sizes="auto"
+        alt="https://img-blog.csdnimg.cn/97e518ecc0874008a983942ddfbc75df.gif#pic_center"
+        title="修改文本" /></li>
+<li>使用<code>u</code> 恢复上一次的修改，也就是恢复删除的一行
+<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://img-blog.csdnimg.cn/1883ed265758418a95e543a8dc517892.gif#pic_center"
+        data-srcset="https://img-blog.csdnimg.cn/1883ed265758418a95e543a8dc517892.gif#pic_center, https://img-blog.csdnimg.cn/1883ed265758418a95e543a8dc517892.gif#pic_center 1.5x, https://img-blog.csdnimg.cn/1883ed265758418a95e543a8dc517892.gif#pic_center 2x"
+        data-sizes="auto"
+        alt="https://img-blog.csdnimg.cn/1883ed265758418a95e543a8dc517892.gif#pic_center"
+        title="撤销修改" /></li>
+<li>使用 <code>ctrl + r</code> 执行反撤销，即再次删除上次恢复的一行
+<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://img-blog.csdnimg.cn/3db2805e9fd642e58e98fa57494f45f2.gif#pic_center"
+        data-srcset="https://img-blog.csdnimg.cn/3db2805e9fd642e58e98fa57494f45f2.gif#pic_center, https://img-blog.csdnimg.cn/3db2805e9fd642e58e98fa57494f45f2.gif#pic_center 1.5x, https://img-blog.csdnimg.cn/3db2805e9fd642e58e98fa57494f45f2.gif#pic_center 2x"
+        data-sizes="auto"
+        alt="https://img-blog.csdnimg.cn/3db2805e9fd642e58e98fa57494f45f2.gif#pic_center"
+        title="反撤销" />
+<code>u</code> 和 <code>ctrl+u</code> 是操作符，它们符合之前介绍的 <code>operat = 数字 + operator</code>的公式，因此如果想要恢复到最开始的状态，可以使用 <code>2u</code></li>
+</ul>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://img-blog.csdnimg.cn/04134a9373c0483e87acb61b6efa5298.gif#pic_center"
+        data-srcset="https://img-blog.csdnimg.cn/04134a9373c0483e87acb61b6efa5298.gif#pic_center, https://img-blog.csdnimg.cn/04134a9373c0483e87acb61b6efa5298.gif#pic_center 1.5x, https://img-blog.csdnimg.cn/04134a9373c0483e87acb61b6efa5298.gif#pic_center 2x"
+        data-sizes="auto"
+        alt="https://img-blog.csdnimg.cn/04134a9373c0483e87acb61b6efa5298.gif#pic_center"
+        title="2u 撤销两次修改" /></p>
+<h2 id="普通模式下对数字文本进行递增递减操作">普通模式下对数字文本进行递增递减操作</h2>
+<p>假设我们这么一段代码</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="line"><span class="cl"><span class="kd">var</span> <span class="nx">foo</span> <span class="o">=</span> <span class="mi">5</span> <span class="o">+</span> <span class="nx">i</span><span class="p">;</span>
+</span></span></code></pre></div><p>现在希望改为</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="line"><span class="cl"><span class="kd">var</span> <span class="nx">foo</span> <span class="o">=</span> <span class="mi">10</span> <span class="o">+</span> <span class="nx">i</span><span class="p">;</span>
+</span></span></code></pre></div><p>我们当然可以使用<code>cw</code> 来删除5，然后在插入模式下写入10。但是这里要介绍一个新的方法——使用 <code>Ctrl + a</code> 来在数字文本上进行递增操作，它也是一个操作符。符合之前的公式。这里假设光标在 5 的位置，然后执行 <code>5 Ctrl+a</code> 来实现将5这个数字文本递增5个的操作
+<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://img-blog.csdnimg.cn/e9293aa0d14d4116a1683fccb5329400.gif#pic_center"
+        data-srcset="https://img-blog.csdnimg.cn/e9293aa0d14d4116a1683fccb5329400.gif#pic_center, https://img-blog.csdnimg.cn/e9293aa0d14d4116a1683fccb5329400.gif#pic_center 1.5x, https://img-blog.csdnimg.cn/e9293aa0d14d4116a1683fccb5329400.gif#pic_center 2x"
+        data-sizes="auto"
+        alt="https://img-blog.csdnimg.cn/e9293aa0d14d4116a1683fccb5329400.gif#pic_center"
+        title="递增" />
+递减操作使用 <code>Ctrl x</code> 。</p>
+<p>下面请各位试试这么几种情况:</p>
+<ol>
+<li>如果光标不在数字位置，执行 <code>Ctrl a</code> 会发生什么呢？</li>
+<li>假设代码中有不止一个位置有数字，光标也不在某个具体数字上，执行<code>Ctrl + a</code> 又会发生什么呢？</li>
+<li>当前行没有数字，在后面几行有数字，执行<code>Ctrl a</code> 会发生什么呢？</li>
+</ol>
+<p>下面公布答案
+如果光标不在数字所在位置，该命令会在本行往后查找第一个出现数字的地方，并将光标跳转到该处，然后执行加1的操作。</p>
+<p>花了这么多篇幅总算将普通模式下的一些操作说完了，后面将会进入按照顺序分别讲述，插入模式、选择模式、命令模式。请感兴趣的小伙伴关注一下本专栏，有想要了解的内容也欢迎留言，等我按计划更新完了我想写的内容之后会考虑安排上的，在此谢谢小伙伴的捧场</p>
+<!-- raw HTML omitted -->
+</div><div class="post-footer" id="post-footer">
+    <div class="post-info">
+        <div class="post-info-line">
+            <div class="post-info-mod">
+                <span>Updated on 2022-04-19</span>
+            </div></div>
+        <div class="post-info-line">
+            <div class="post-info-md"></div>
+            <div class="post-info-share">
+                <span><a href="javascript:void(0);" title="Share on Twitter" data-sharer="twitter" data-url="http://HaiLateBoy.github.io/posts/vim-tutorial-6/" data-title="vim 从嫌弃到依赖(5)——普通模式的一些操作" data-hashtags="vim,编辑工具,文本处理"><i class="fab fa-twitter fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Facebook" data-sharer="facebook" data-url="http://HaiLateBoy.github.io/posts/vim-tutorial-6/" data-hashtag="vim"><i class="fab fa-facebook-square fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Hacker News" data-sharer="hackernews" data-url="http://HaiLateBoy.github.io/posts/vim-tutorial-6/" data-title="vim 从嫌弃到依赖(5)——普通模式的一些操作"><i class="fab fa-hacker-news fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Line" data-sharer="line" data-url="http://HaiLateBoy.github.io/posts/vim-tutorial-6/" data-title="vim 从嫌弃到依赖(5)——普通模式的一些操作"><i data-svg-src="https://cdn.jsdelivr.net/npm/simple-icons@7.3.0/icons/line.svg" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on 微博" data-sharer="weibo" data-url="http://HaiLateBoy.github.io/posts/vim-tutorial-6/" data-title="vim 从嫌弃到依赖(5)——普通模式的一些操作"><i class="fab fa-weibo fa-fw" aria-hidden="true"></i></a></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="post-info-more">
+        <section class="post-tags"><i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/vim/">vim</a>,&nbsp;<a href="/tags/%E7%BC%96%E8%BE%91%E5%B7%A5%E5%85%B7/">编辑工具</a>,&nbsp;<a href="/tags/%E6%96%87%E6%9C%AC%E5%A4%84%E7%90%86/">文本处理</a></section>
+        <section>
+            <span><a href="javascript:void(0);" onclick="window.history.back();">Back</a></span>&nbsp;|&nbsp;<span><a href="/">Home</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav"><a href="/posts/vim-tutorial-5/" class="prev" rel="prev" title="vim 从嫌弃到依赖(4)—— . 命令"><i class="fas fa-angle-left fa-fw" aria-hidden="true"></i>vim 从嫌弃到依赖(4)—— . 命令</a>
+            <a href="/posts/vim-tutorial-7/" class="next" rel="next" title="vim 从嫌弃到依赖(6)——插入模式">vim 从嫌弃到依赖(6)——插入模式<i class="fas fa-angle-right fa-fw" aria-hidden="true"></i></a></div>
+</div>
+</article></div>
+            </main><footer class="footer">
+        <div class="footer-container"><div class="footer-line">Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener noreffer" title="Hugo 0.121.2">Hugo</a> | Theme - <a href="https://github.com/dillonzq/LoveIt" target="_blank" rel="noopener noreffer" title="LoveIt 0.2.11"><i class="far fa-kiss-wink-heart fa-fw" aria-hidden="true"></i> LoveIt</a>
+                </div><div class="footer-line" itemscope itemtype="http://schema.org/CreativeWork"><i class="far fa-copyright fa-fw" aria-hidden="true"></i><span itemprop="copyrightYear">2022 - 2024</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="https://www.masimaro.xyz" target="_blank">Masimaro</a></span></div>
+        </div>
+    </footer></div>
+
+        <div id="fixed-buttons"><a href="#" id="back-to-top" class="fixed-button" title="Back to Top">
+                <i class="fas fa-arrow-up fa-fw" aria-hidden="true"></i>
+            </a><a href="#" id="view-comments" class="fixed-button" title="View Comments">
+                <i class="fas fa-comment fa-fw" aria-hidden="true"></i>
+            </a>
+        </div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.css"><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/autocomplete.js@0.38.1/dist/autocomplete.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lunr@2.3.9/lunr.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lazysizes@5.3.2/lazysizes.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/clipboard@2.0.11/dist/clipboard.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/sharer.js@0.5.1/sharer.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/auto-render.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/copy-tex.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/mhchem.min.js"></script><script type="text/javascript">window.config={"code":{"copyTitle":"Copy to clipboard","maxShownLines":50},"comment":{},"math":{"delimiters":[{"display":true,"left":"$$","right":"$$"},{"display":true,"left":"\\[","right":"\\]"},{"display":true,"left":"\\begin{equation}","right":"\\end{equation}"},{"display":true,"left":"\\begin{equation*}","right":"\\end{equation*}"},{"display":true,"left":"\\begin{align}","right":"\\end{align}"},{"display":true,"left":"\\begin{align*}","right":"\\end{align*}"},{"display":true,"left":"\\begin{alignat}","right":"\\end{alignat}"},{"display":true,"left":"\\begin{alignat*}","right":"\\end{alignat*}"},{"display":true,"left":"\\begin{gather}","right":"\\end{gather}"},{"display":true,"left":"\\begin{CD}","right":"\\end{CD}"},{"display":false,"left":"$","right":"$"},{"display":false,"left":"\\(","right":"\\)"}],"strict":false},"search":{"highlightTag":"em","maxResultLength":10,"noResultsFound":"No results found","snippetLength":50}};</script><script type="text/javascript" src="/js/theme.min.js"></script></body>
+</html>

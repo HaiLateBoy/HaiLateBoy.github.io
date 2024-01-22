@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="robots" content="noodp" />
+        <title>从零开始配置vim(31)——git 配置 - Masimaro&#39;s blog</title><meta name="Description" content="这是我用于记录日常和学习的小站"><meta property="og:title" content="从零开始配置vim(31)——git 配置" />
+<meta property="og:description" content="很抱歉又拖更了这么久了，在这个新公司我想快速度过试用期，所以大部分的精力主要花在日常工作上面。但是这个系列还是得更新下去，平时只能抽有限的业" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://HaiLateBoy.github.io/posts/vim-config31/" /><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2023-02-01T14:30:42+08:00" />
+<meta property="article:modified_time" content="2023-02-01T14:30:42+08:00" /><meta property="og:site_name" content="Masimaro&#39;s blog" />
+
+<meta name="twitter:card" content="summary"/><meta name="twitter:title" content="从零开始配置vim(31)——git 配置"/>
+<meta name="twitter:description" content="很抱歉又拖更了这么久了，在这个新公司我想快速度过试用期，所以大部分的精力主要花在日常工作上面。但是这个系列还是得更新下去，平时只能抽有限的业"/>
+<meta name="application-name" content="My cool site">
+<meta name="apple-mobile-web-app-title" content="My cool site"><meta name="theme-color" content="#ffffff"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="manifest" href="/site.webmanifest"><link rel="canonical" href="http://HaiLateBoy.github.io/posts/vim-config31/" /><link rel="prev" href="http://HaiLateBoy.github.io/posts/2022-new-year-plan/" /><link rel="next" href="http://HaiLateBoy.github.io/posts/vim-config32/" /><link rel="stylesheet" href="/css/style.min.css"><link rel="preload" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css"></noscript><link rel="preload" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css"></noscript><script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "BlogPosting",
+        "headline": "从零开始配置vim(31)——git 配置",
+        "inLanguage": "zh-CN",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "http:\/\/HaiLateBoy.github.io\/posts\/vim-config31\/"
+        },"genre": "posts","keywords": "vim, 编辑工具, 文本处理, lua, 编辑器","wordcount":  2280 ,
+        "url": "http:\/\/HaiLateBoy.github.io\/posts\/vim-config31\/","datePublished": "2023-02-01T14:30:42+08:00","dateModified": "2023-02-01T14:30:42+08:00","publisher": {
+            "@type": "Organization",
+            "name": ""},"author": {
+                "@type": "Person",
+                "name": "Masimaro"
+            },"description": ""
+    }
+    </script></head>
+    <body data-header-desktop="fixed" data-header-mobile="auto"><script type="text/javascript">(window.localStorage && localStorage.getItem('theme') ? localStorage.getItem('theme') === 'dark' : ('auto' === 'auto' ? window.matchMedia('(prefers-color-scheme: dark)').matches : 'auto' === 'dark')) && document.body.setAttribute('theme', 'dark');</script>
+
+        <div id="mask"></div><div class="wrapper"><header class="desktop" id="header-desktop">
+    <div class="header-wrapper">
+        <div class="header-title">
+            <a href="/" title="Masimaro&#39;s blog">My cool site</a>
+        </div>
+        <div class="menu">
+            <div class="menu-inner"><a class="menu-item" href="/posts/" title="文章列表"> 文章 </a><a class="menu-item" href="/tags/" title="标签"> 标签 </a><a class="menu-item" href="/categories/" title="分类"> 分类 </a><a class="menu-item" href="/about" title="关于本站"> 关于 </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-desktop">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-desktop" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-desktop" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-desktop">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </span><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                    <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+                </a></div>
+        </div>
+    </div>
+</header><header class="mobile" id="header-mobile">
+    <div class="header-container">
+        <div class="header-wrapper">
+            <div class="header-title">
+                <a href="/" title="Masimaro&#39;s blog">My cool site</a>
+            </div>
+            <div class="menu-toggle" id="menu-toggle-mobile">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+        <div class="menu" id="menu-mobile"><div class="search-wrapper">
+                    <div class="search mobile" id="search-mobile">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-mobile">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-mobile" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-mobile" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-mobile">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </div>
+                    <a href="javascript:void(0);" class="search-cancel" id="search-cancel-mobile">
+                        Cancel
+                    </a>
+                </div><a class="menu-item" href="/posts/" title="文章列表">文章</a><a class="menu-item" href="/tags/" title="标签">标签</a><a class="menu-item" href="/categories/" title="分类">分类</a><a class="menu-item" href="/about" title="关于本站">关于</a><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+            </a></div>
+    </div>
+</header><div class="search-dropdown desktop">
+        <div id="search-dropdown-desktop"></div>
+    </div>
+    <div class="search-dropdown mobile">
+        <div id="search-dropdown-mobile"></div>
+    </div><main class="main">
+                <div class="container"><div class="toc" id="toc-auto">
+            <h2 class="toc-title">Contents</h2>
+            <div class="toc-content" id="toc-content-auto"></div>
+        </div><article class="page single"><h1 class="single-title animate__animated animate__flipInX">从零开始配置vim(31)——git 配置</h1><div class="post-meta">
+            <div class="post-meta-line"><span class="post-author"><a href="https://www.masimaro.xyz" title="Author" target="_blank" rel="noopener noreffer author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Masimaro</a></span>&nbsp;<span class="post-category">included in <a href="/categories/vim-%E9%85%8D%E7%BD%AE/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>vim 配置</a></span></div>
+            <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw" aria-hidden="true"></i>&nbsp;<time datetime="2023-02-01">2023-02-01</time>&nbsp;<i class="fas fa-pencil-alt fa-fw" aria-hidden="true"></i>&nbsp;2280 words&nbsp;
+                <i class="far fa-clock fa-fw" aria-hidden="true"></i>&nbsp;5 minutes&nbsp;</div>
+        </div><div class="details toc" id="toc-static"  data-kept="true">
+                <div class="details-summary toc-title">
+                    <span>Contents</span>
+                    <span><i class="details-icon fas fa-angle-right" aria-hidden="true"></i></span>
+                </div>
+                <div class="details-content toc-content" id="toc-content-static"><nav id="TableOfContents">
+  <ul>
+    <li><a href="#gitsigns">gitsigns</a></li>
+    <li><a href="#diffview">diffview</a></li>
+    <li><a href="#lazygit">lazygit</a></li>
+  </ul>
+</nav></div>
+            </div><div class="content" id="content"><p>很抱歉又拖更了这么久了，在这个新公司我想快速度过试用期，所以大部分的精力主要花在日常工作上面。但是这个系列还是得更新下去，平时只能抽有限的业余时间来准备。这就导致我写这些文章就慢了一些。
+废话不多说，咱们正式开始有关git相关的配置。这些配置都是根据我自身使用习惯来定义的，不一定符合各位的习惯，各位可以根据自身的习惯来调整</p>
+<h2 id="gitsigns">gitsigns</h2>
+<p>第一个要推荐的插件是 <code>gitsigns</code>。就像它的名字一样，该插件可以将最近的更改以标签的形式展现出来方便我们查看。我们可以使用这样的代码进行安装 <code>use {'lewis6991/gitsigns.nvim' }</code>。需要注意最新的版本需要 <code>neovim</code> 的版本在<code>0.7</code> 以上。</p>
+<p>安装完成之后我们通过配置 <code>require('gitsigns').setup()</code>来使用它。这样我们就可以通过 <code>Gitsigns toggle_signs</code>来打开或者关闭符号显示了。
+<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://img-blog.csdnimg.cn/041e1f5036c84296a3c5fc4781d9ca8f.gif#pic_center"
+        data-srcset="https://img-blog.csdnimg.cn/041e1f5036c84296a3c5fc4781d9ca8f.gif#pic_center, https://img-blog.csdnimg.cn/041e1f5036c84296a3c5fc4781d9ca8f.gif#pic_center 1.5x, https://img-blog.csdnimg.cn/041e1f5036c84296a3c5fc4781d9ca8f.gif#pic_center 2x"
+        data-sizes="auto"
+        alt="https://img-blog.csdnimg.cn/041e1f5036c84296a3c5fc4781d9ca8f.gif#pic_center"
+        title="在这里插入图片描述" />
+除了采用最基本的符号显示以外，它还可以对改变位置的行号进行标记以及高亮显示变更的行。这两个功能可以通过 Gitsigns toggle_numl和 Gitsigns toggle_linel来打开，打开之后显示如下：
+<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://img-blog.csdnimg.cn/a03df37c6e434a5987662bd86680c408.jpeg#pic_center"
+        data-srcset="https://img-blog.csdnimg.cn/a03df37c6e434a5987662bd86680c408.jpeg#pic_center, https://img-blog.csdnimg.cn/a03df37c6e434a5987662bd86680c408.jpeg#pic_center 1.5x, https://img-blog.csdnimg.cn/a03df37c6e434a5987662bd86680c408.jpeg#pic_center 2x"
+        data-sizes="auto"
+        alt="https://img-blog.csdnimg.cn/a03df37c6e434a5987662bd86680c408.jpeg#pic_center"
+        title="在这里插入图片描述" />
+从图中可以看到，更改行行号被用绿色显示了出来并且更改行进行了高亮显示</p>
+<p>另外它还有其他的显示效果：
+它主要的一些显示功能主要有下面几个：</p>
+<ul>
+<li>toggle_signs: 显示变更记录</li>
+<li>toggle_numl: 显示变更行号</li>
+<li>toggle_linel：高亮变更的行</li>
+<li>toggle_delete: 显示被删除的行，以红色背景高亮显示</li>
+<li>toggle_word_diff: 在两行分别显示修改前和修改后的内容</li>
+<li>toggle_current_line_blame: 在对应行后面显示提交记录</li>
+</ul>
+<p>我们将所有的这些功能都打开将得到这么一个效果
+<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://img-blog.csdnimg.cn/7eab2e9a8fad43a6b030a04cf0787e06.jpeg#pic_center"
+        data-srcset="https://img-blog.csdnimg.cn/7eab2e9a8fad43a6b030a04cf0787e06.jpeg#pic_center, https://img-blog.csdnimg.cn/7eab2e9a8fad43a6b030a04cf0787e06.jpeg#pic_center 1.5x, https://img-blog.csdnimg.cn/7eab2e9a8fad43a6b030a04cf0787e06.jpeg#pic_center 2x"
+        data-sizes="auto"
+        alt="https://img-blog.csdnimg.cn/7eab2e9a8fad43a6b030a04cf0787e06.jpeg#pic_center"
+        title="在这里插入图片描述" /></p>
+<p>是不是看着有点乱？这是我修改了一处的，一旦修改多了看着会更混乱。所以我自己的经验告诉我在这个buffer里面最好是只打开 <code>signs</code>、<code>numl</code>、<code>linel</code>、<code>current_line_blame</code>的功能，其他的都关掉。也就是在当前<code>buffer</code>中只显示现在的代码，然后辅助以简单的符号来显示哪行是新加的，哪行被删除了，哪行被修改了，至于修改前是什么样子的，我可以通过其他方式来查阅。所有内容都在一个<code>buffer </code>中显示会比较乱，不利于阅读代码。</p>
+<p>我们可以通过配置将我们要显示的内容进行定义，也可以定义使用何种图标来表示修改记录。我们采用如下的配置</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-lua" data-lang="lua"><span class="line"><span class="cl"><span class="n">gitsigns.setup</span><span class="p">({</span>
+</span></span><span class="line"><span class="cl">    <span class="n">signs</span> <span class="o">=</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">add</span>          <span class="o">=</span> <span class="p">{</span><span class="n">hl</span> <span class="o">=</span> <span class="s1">&#39;GitSignsAdd&#39;</span>   <span class="p">,</span> <span class="n">text</span> <span class="o">=</span> <span class="s1">&#39;+&#39;</span><span class="p">,</span> <span class="n">numhl</span><span class="o">=</span><span class="s1">&#39;GitSignsAddNr&#39;</span>   <span class="p">,</span> <span class="n">linehl</span><span class="o">=</span><span class="s1">&#39;GitSignsAddLn&#39;</span><span class="p">},</span>
+</span></span><span class="line"><span class="cl">        <span class="n">change</span>       <span class="o">=</span> <span class="p">{</span><span class="n">hl</span> <span class="o">=</span> <span class="s1">&#39;GitSignsChange&#39;</span><span class="p">,</span> <span class="n">text</span> <span class="o">=</span> <span class="s1">&#39;│&#39;</span><span class="p">,</span> <span class="n">numhl</span><span class="o">=</span><span class="s1">&#39;GitSignsChangeNr&#39;</span><span class="p">,</span> <span class="n">linehl</span><span class="o">=</span><span class="s1">&#39;GitSignsChangeLn&#39;</span><span class="p">},</span>
+</span></span><span class="line"><span class="cl">        <span class="n">delete</span>       <span class="o">=</span> <span class="p">{</span><span class="n">hl</span> <span class="o">=</span> <span class="s1">&#39;GitSignsDelete&#39;</span><span class="p">,</span> <span class="n">text</span> <span class="o">=</span> <span class="s1">&#39;-&#39;</span><span class="p">,</span> <span class="n">numhl</span><span class="o">=</span><span class="s1">&#39;GitSignsDeleteNr&#39;</span><span class="p">,</span> <span class="n">linehl</span><span class="o">=</span><span class="s1">&#39;GitSignsDeleteLn&#39;</span><span class="p">},</span>
+</span></span><span class="line"><span class="cl">        <span class="n">topdelete</span>    <span class="o">=</span> <span class="p">{</span><span class="n">hl</span> <span class="o">=</span> <span class="s1">&#39;GitSignsDelete&#39;</span><span class="p">,</span> <span class="n">text</span> <span class="o">=</span> <span class="s1">&#39;-&#39;</span><span class="p">,</span> <span class="n">numhl</span><span class="o">=</span><span class="s1">&#39;GitSignsDeleteNr&#39;</span><span class="p">,</span> <span class="n">linehl</span><span class="o">=</span><span class="s1">&#39;GitSignsDeleteLn&#39;</span><span class="p">},</span>
+</span></span><span class="line"><span class="cl">        <span class="n">untracked</span>    <span class="o">=</span> <span class="p">{</span><span class="n">hl</span> <span class="o">=</span> <span class="s1">&#39;GitSignsAdd&#39;</span><span class="p">,</span>    <span class="n">text</span> <span class="o">=</span> <span class="s1">&#39;+&#39;</span><span class="p">,</span> <span class="n">numhl</span><span class="o">=</span><span class="s1">&#39;GitSignsAddNr&#39;</span>   <span class="p">,</span> <span class="n">linehl</span><span class="o">=</span><span class="s1">&#39;GitSignsAddLn&#39;</span><span class="p">},</span>
+</span></span><span class="line"><span class="cl">        <span class="n">changedelete</span> <span class="o">=</span> <span class="p">{</span><span class="n">hl</span> <span class="o">=</span> <span class="s1">&#39;GitSignsChange&#39;</span><span class="p">,</span> <span class="n">text</span> <span class="o">=</span> <span class="s1">&#39;~&#39;</span><span class="p">,</span> <span class="n">numhl</span><span class="o">=</span><span class="s1">&#39;GitSignsChangeNr&#39;</span><span class="p">,</span> <span class="n">linehl</span><span class="o">=</span><span class="s1">&#39;GitSignsChangeLn&#39;</span><span class="p">},</span>
+</span></span><span class="line"><span class="cl">    <span class="p">},</span>
+</span></span><span class="line"><span class="cl">    <span class="n">signcolumn</span> <span class="o">=</span> <span class="kc">true</span><span class="p">,</span>  <span class="c1">-- Toggle with `:Gitsigns toggle_signs`</span>
+</span></span><span class="line"><span class="cl">    <span class="n">numhl</span>      <span class="o">=</span> <span class="kc">true</span><span class="p">,</span> <span class="c1">-- Toggle with `:Gitsigns toggle_numhl`</span>
+</span></span><span class="line"><span class="cl">    <span class="n">linehl</span>     <span class="o">=</span> <span class="kc">true</span><span class="p">,</span> <span class="c1">-- Toggle with `:Gitsigns toggle_linehl`</span>
+</span></span><span class="line"><span class="cl">    <span class="n">word_diff</span>  <span class="o">=</span> <span class="kc">false</span><span class="p">,</span> <span class="c1">-- Toggle with `:Gitsigns toggle_word_diff`</span>
+</span></span><span class="line"><span class="cl">    <span class="n">watch_gitdir</span> <span class="o">=</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">interval</span> <span class="o">=</span> <span class="mi">1000</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">        <span class="n">follow_files</span> <span class="o">=</span> <span class="kc">true</span>
+</span></span><span class="line"><span class="cl">    <span class="p">},</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="n">attach_to_untracked</span> <span class="o">=</span> <span class="kc">true</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">current_line_blame</span> <span class="o">=</span> <span class="kc">false</span><span class="p">,</span> <span class="c1">-- Toggle with `:Gitsigns toggle_current_line_blame`</span>
+</span></span><span class="line"><span class="cl">    <span class="n">current_line_blame_opts</span> <span class="o">=</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">virt_text</span> <span class="o">=</span> <span class="kc">true</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">        <span class="n">virt_text_pos</span> <span class="o">=</span> <span class="s1">&#39;eol&#39;</span><span class="p">,</span> <span class="c1">-- &#39;eol&#39; | &#39;overlay&#39; | &#39;right_align&#39;</span>
+</span></span><span class="line"><span class="cl">        <span class="n">delay</span> <span class="o">=</span> <span class="mi">1000</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">        <span class="n">ignore_whitespace</span> <span class="o">=</span> <span class="kc">false</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="p">},</span>
+</span></span><span class="line"><span class="cl">    <span class="n">current_line_blame_formatter</span> <span class="o">=</span> <span class="s1">&#39;&lt;author&gt;, &lt;author_time:%Y-%m-%d&gt; - &lt;summary&gt;&#39;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="n">sign_priority</span> <span class="o">=</span> <span class="mi">6</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">update_debounce</span> <span class="o">=</span> <span class="mi">100</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">status_formatter</span> <span class="o">=</span> <span class="kc">nil</span><span class="p">,</span> <span class="c1">-- Use default</span>
+</span></span><span class="line"><span class="cl">    <span class="n">max_file_length</span> <span class="o">=</span> <span class="mi">40000</span><span class="p">,</span> <span class="c1">-- Disable if file is longer than this (in lines)</span>
+</span></span><span class="line"><span class="cl">    <span class="n">preview_config</span> <span class="o">=</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="c1">-- Options passed to nvim_open_win</span>
+</span></span><span class="line"><span class="cl">        <span class="n">border</span> <span class="o">=</span> <span class="s1">&#39;single&#39;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">        <span class="n">style</span> <span class="o">=</span> <span class="s1">&#39;minimal&#39;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">        <span class="n">relative</span> <span class="o">=</span> <span class="s1">&#39;cursor&#39;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">        <span class="n">row</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">        <span class="n">col</span> <span class="o">=</span> <span class="mi">1</span>
+</span></span><span class="line"><span class="cl">    <span class="p">},</span>
+</span></span><span class="line"><span class="cl">    <span class="n">yadm</span> <span class="o">=</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">enable</span> <span class="o">=</span> <span class="kc">false</span>
+</span></span><span class="line"><span class="cl">    <span class="p">},</span>
+</span></span><span class="line"><span class="cl"><span class="p">})</span>
+</span></span></code></pre></div><p>其中大部分都是官方给出的默认配置，我只是在此基础之上改了 signs在各种状态下显示的图标，以及显示哪些内容。主要是使用 <code>+</code> 来表示新增、<code>|</code> 来表示修改、<code>-</code> 表示删除。</p>
+<p>除了显示以外它有一个重要的功能就是在各种修改状态之间跳转，例如调用 <code>next_hunk</code>来跳转到下一个更改位置。并且它也集成了一些git的操作。我们对常用的操作定义一些快捷键</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-lua" data-lang="lua"><span class="line"><span class="cl"><span class="n">on_attach</span> <span class="o">=</span> <span class="kr">function</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">      <span class="n">vim.api</span><span class="p">.</span><span class="n">nvim_set_keymap</span><span class="p">(</span><span class="s2">&#34;n&#34;</span><span class="p">,</span> <span class="s2">&#34;&lt;leader&gt;gj&#34;</span><span class="p">,</span> <span class="s2">&#34;&lt;cmd&gt;Gitsigns next_hunk&lt;CR&gt;&#34;</span><span class="p">,</span> <span class="p">{</span><span class="n">silent</span> <span class="o">=</span> <span class="kc">true</span><span class="p">,</span> <span class="n">noremap</span> <span class="o">=</span> <span class="kc">true</span><span class="p">})</span>
+</span></span><span class="line"><span class="cl">      <span class="n">vim.api</span><span class="p">.</span><span class="n">nvim_set_keymap</span><span class="p">(</span><span class="s2">&#34;n&#34;</span><span class="p">,</span> <span class="s2">&#34;&lt;leader&gt;gk&#34;</span><span class="p">,</span> <span class="s2">&#34;&lt;Cmd&gt;Gitsigns prev_hhunk&lt;CR&gt;&#34;</span><span class="p">,</span> <span class="p">{</span><span class="n">silent</span> <span class="o">=</span> <span class="kc">true</span><span class="p">,</span> <span class="n">noremap</span> <span class="o">=</span> <span class="kc">true</span><span class="p">})</span>
+</span></span><span class="line"><span class="cl">      <span class="n">vim.api</span><span class="p">.</span><span class="n">nvim_set_keymap</span><span class="p">(</span><span class="s1">&#39;n&#39;</span><span class="p">,</span> <span class="s1">&#39;&lt;leader&gt;hs&#39;</span><span class="p">,</span> <span class="s1">&#39;:Gitsigns stage_hunk&lt;CR&gt;&#39;</span><span class="p">,</span> <span class="p">{</span><span class="n">silent</span> <span class="o">=</span> <span class="kc">true</span><span class="p">,</span> <span class="n">noremap</span> <span class="o">=</span> <span class="kc">true</span><span class="p">})</span>
+</span></span><span class="line"><span class="cl">      <span class="n">vim.api</span><span class="p">.</span><span class="n">nvim_set_keymap</span><span class="p">(</span><span class="s1">&#39;v&#39;</span><span class="p">,</span> <span class="s1">&#39;&lt;leader&gt;hs&#39;</span><span class="p">,</span> <span class="s1">&#39;:Gitsigns stage_hunk&lt;CR&gt;&#39;</span><span class="p">,</span> <span class="p">{</span><span class="n">silent</span> <span class="o">=</span> <span class="kc">true</span><span class="p">,</span> <span class="n">noremap</span> <span class="o">=</span> <span class="kc">true</span><span class="p">})</span>
+</span></span><span class="line"><span class="cl">      <span class="n">vim.api</span><span class="p">.</span><span class="n">nvim_set_keymap</span><span class="p">(</span><span class="s1">&#39;n&#39;</span><span class="p">,</span> <span class="s1">&#39;&lt;leader&gt;hr&#39;</span><span class="p">,</span> <span class="s1">&#39;:Gitsigns reset_hunk&lt;CR&gt;&#39;</span><span class="p">,</span> <span class="p">{</span><span class="n">silent</span> <span class="o">=</span> <span class="kc">true</span><span class="p">,</span> <span class="n">noremap</span> <span class="o">=</span> <span class="kc">true</span><span class="p">})</span>
+</span></span><span class="line"><span class="cl">      <span class="n">vim.api</span><span class="p">.</span><span class="n">nvim_set_keymap</span><span class="p">(</span><span class="s1">&#39;v&#39;</span><span class="p">,</span> <span class="s1">&#39;&lt;leader&gt;hr&#39;</span><span class="p">,</span> <span class="s1">&#39;:Gitsigns reset_hunk&lt;CR&gt;&#39;</span><span class="p">,</span> <span class="p">{</span><span class="n">silent</span> <span class="o">=</span> <span class="kc">true</span><span class="p">,</span> <span class="n">noremap</span> <span class="o">=</span> <span class="kc">true</span><span class="p">})</span>
+</span></span><span class="line"><span class="cl">      <span class="n">vim.api</span><span class="p">.</span><span class="n">nvim_set_keymap</span><span class="p">(</span><span class="s1">&#39;n&#39;</span><span class="p">,</span> <span class="s1">&#39;&lt;leader&gt;hS&#39;</span><span class="p">,</span> <span class="s1">&#39;&lt;cmd&gt;Gitsigns stage_buffer&lt;CR&gt;&#39;</span><span class="p">,</span> <span class="p">{</span><span class="n">silent</span> <span class="o">=</span> <span class="kc">true</span><span class="p">,</span> <span class="n">noremap</span> <span class="o">=</span> <span class="kc">true</span><span class="p">})</span>
+</span></span><span class="line"><span class="cl">      <span class="n">vim.api</span><span class="p">.</span><span class="n">nvim_set_keymap</span><span class="p">(</span><span class="s1">&#39;n&#39;</span><span class="p">,</span> <span class="s1">&#39;&lt;leader&gt;hu&#39;</span><span class="p">,</span> <span class="s1">&#39;&lt;cmd&gt;Gitsigns undo_stage_hunk&lt;CR&gt;&#39;</span><span class="p">,</span> <span class="p">{</span><span class="n">silent</span> <span class="o">=</span> <span class="kc">true</span><span class="p">,</span> <span class="n">noremap</span> <span class="o">=</span> <span class="kc">true</span><span class="p">})</span>
+</span></span><span class="line"><span class="cl">      <span class="n">vim.api</span><span class="p">.</span><span class="n">nvim_set_keymap</span><span class="p">(</span><span class="s1">&#39;n&#39;</span><span class="p">,</span> <span class="s1">&#39;&lt;leader&gt;hR&#39;</span><span class="p">,</span> <span class="s1">&#39;&lt;cmd&gt;Gitsigns reset_buffer&lt;CR&gt;&#39;</span><span class="p">,</span> <span class="p">{</span><span class="n">silent</span> <span class="o">=</span> <span class="kc">true</span><span class="p">,</span> <span class="n">noremap</span> <span class="o">=</span> <span class="kc">true</span><span class="p">})</span>
+</span></span><span class="line"><span class="cl">      <span class="n">vim.api</span><span class="p">.</span><span class="n">nvim_set_keymap</span><span class="p">(</span><span class="s1">&#39;n&#39;</span><span class="p">,</span> <span class="s1">&#39;&lt;leader&gt;hp&#39;</span><span class="p">,</span> <span class="s1">&#39;&lt;cmd&gt;Gitsigns preview_hunk&lt;CR&gt;&#39;</span><span class="p">,</span> <span class="p">{</span><span class="n">silent</span> <span class="o">=</span> <span class="kc">true</span><span class="p">,</span> <span class="n">noremap</span> <span class="o">=</span> <span class="kc">true</span><span class="p">})</span>
+</span></span><span class="line"><span class="cl">      <span class="n">vim.api</span><span class="p">.</span><span class="n">nvim_set_keymap</span><span class="p">(</span><span class="s1">&#39;n&#39;</span><span class="p">,</span> <span class="s1">&#39;&lt;leader&gt;hb&#39;</span><span class="p">,</span> <span class="s1">&#39;&lt;cmd&gt;lua require&#34;gitsigns&#34;.blame_line{full=true}&lt;CR&gt;&#39;</span><span class="p">,</span> <span class="p">{</span><span class="n">silent</span> <span class="o">=</span> <span class="kc">true</span><span class="p">,</span> <span class="n">noremap</span> <span class="o">=</span> <span class="kc">true</span><span class="p">})</span>
+</span></span><span class="line"><span class="cl">      <span class="n">vim.api</span><span class="p">.</span><span class="n">nvim_set_keymap</span><span class="p">(</span><span class="s1">&#39;n&#39;</span><span class="p">,</span> <span class="s1">&#39;&lt;leader&gt;tb&#39;</span><span class="p">,</span> <span class="s1">&#39;&lt;cmd&gt;Gitsigns toggle_current_line_blame&lt;CR&gt;&#39;</span><span class="p">,</span> <span class="p">{</span><span class="n">silent</span> <span class="o">=</span> <span class="kc">true</span><span class="p">,</span> <span class="n">noremap</span> <span class="o">=</span> <span class="kc">true</span><span class="p">})</span>
+</span></span><span class="line"><span class="cl">      <span class="n">vim.api</span><span class="p">.</span><span class="n">nvim_set_keymap</span><span class="p">(</span><span class="s1">&#39;n&#39;</span><span class="p">,</span> <span class="s1">&#39;&lt;leader&gt;hd&#39;</span><span class="p">,</span> <span class="s1">&#39;&lt;cmd&gt;Gitsigns diffthis&lt;CR&gt;&#39;</span><span class="p">,</span> <span class="p">{</span><span class="n">silent</span> <span class="o">=</span> <span class="kc">true</span><span class="p">,</span> <span class="n">noremap</span> <span class="o">=</span> <span class="kc">true</span><span class="p">})</span>
+</span></span><span class="line"><span class="cl">      <span class="n">vim.api</span><span class="p">.</span><span class="n">nvim_set_keymap</span><span class="p">(</span><span class="s1">&#39;n&#39;</span><span class="p">,</span> <span class="s1">&#39;&lt;leader&gt;hD&#39;</span><span class="p">,</span> <span class="s1">&#39;&lt;cmd&gt;lua require&#34;gitsigns&#34;.diffthis(&#34;~&#34;)&lt;CR&gt;&#39;</span><span class="p">,</span> <span class="p">{</span><span class="n">silent</span> <span class="o">=</span> <span class="kc">true</span><span class="p">,</span> <span class="n">noremap</span> <span class="o">=</span> <span class="kc">true</span><span class="p">})</span>
+</span></span><span class="line"><span class="cl">      <span class="n">vim.api</span><span class="p">.</span><span class="n">nvim_set_keymap</span><span class="p">(</span><span class="s1">&#39;n&#39;</span><span class="p">,</span> <span class="s1">&#39;&lt;leader&gt;td&#39;</span><span class="p">,</span> <span class="s1">&#39;&lt;cmd&gt;Gitsigns toggle_deleted&lt;CR&gt;&#39;</span><span class="p">,</span> <span class="p">{</span><span class="n">silent</span> <span class="o">=</span> <span class="kc">true</span><span class="p">,</span> <span class="n">noremap</span> <span class="o">=</span> <span class="kc">true</span><span class="p">})</span>
+</span></span><span class="line"><span class="cl">      <span class="n">vim.api</span><span class="p">.</span><span class="n">nvim_set_keymap</span><span class="p">(</span><span class="s1">&#39;o&#39;</span><span class="p">,</span> <span class="s1">&#39;ih&#39;</span><span class="p">,</span> <span class="s1">&#39;:&lt;C-U&gt;Gitsigns select_hunk&lt;CR&gt;&#39;</span><span class="p">,</span> <span class="p">{</span><span class="n">silent</span> <span class="o">=</span> <span class="kc">true</span><span class="p">,</span> <span class="n">noremap</span> <span class="o">=</span> <span class="kc">true</span><span class="p">})</span>
+</span></span><span class="line"><span class="cl">      <span class="n">vim.api</span><span class="p">.</span><span class="n">nvim_set_keymap</span><span class="p">(</span><span class="s1">&#39;x&#39;</span><span class="p">,</span> <span class="s1">&#39;ih&#39;</span><span class="p">,</span> <span class="s1">&#39;:&lt;C-U&gt;Gitsigns select_hunk&lt;CR&gt;&#39;</span><span class="p">,</span> <span class="p">{</span><span class="n">silent</span> <span class="o">=</span> <span class="kc">true</span><span class="p">,</span> <span class="n">noremap</span> <span class="o">=</span> <span class="kc">true</span><span class="p">})</span>
+</span></span><span class="line"><span class="cl">  <span class="kr">end</span>
+</span></span></code></pre></div><p>这里是我将官方给出的配置直接粘贴了过来，这堆快捷键定义的操作中我最常用的就是 <code>next_hunk</code>和 <code>prev_hunk</code>来在各种修改之间进行跳转。虽然偶尔也用用 <code>diffthis</code>来显示差异，但这部分我更喜欢使用我接下来介绍的插件
+<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://img-blog.csdnimg.cn/c444ff542f514810bc24642971690c8a.gif#pic_center"
+        data-srcset="https://img-blog.csdnimg.cn/c444ff542f514810bc24642971690c8a.gif#pic_center, https://img-blog.csdnimg.cn/c444ff542f514810bc24642971690c8a.gif#pic_center 1.5x, https://img-blog.csdnimg.cn/c444ff542f514810bc24642971690c8a.gif#pic_center 2x"
+        data-sizes="auto"
+        alt="https://img-blog.csdnimg.cn/c444ff542f514810bc24642971690c8a.gif#pic_center"
+        title="在这里插入图片描述" /></p>
+<h2 id="diffview">diffview</h2>
+<p>这个插件从名字上看就知道是专门用来查看版本差异的插件。与前面介绍的 gitsigns插件相比它有下面几个优点：</p>
+<ol>
+<li>它是专门用来显示差异的，与gitsigns相比，显示的更加明显</li>
+<li>它可以在文件树中显示有变更的文件</li>
+<li>它可以做到任意版本之间的差异对比</li>
+<li>它可以显示单个文件的版本提交记录
+<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://img-blog.csdnimg.cn/649696ee2e2c4e9e8a623598b2d10d18.jpeg#pic_center"
+        data-srcset="https://img-blog.csdnimg.cn/649696ee2e2c4e9e8a623598b2d10d18.jpeg#pic_center, https://img-blog.csdnimg.cn/649696ee2e2c4e9e8a623598b2d10d18.jpeg#pic_center 1.5x, https://img-blog.csdnimg.cn/649696ee2e2c4e9e8a623598b2d10d18.jpeg#pic_center 2x"
+        data-sizes="auto"
+        alt="https://img-blog.csdnimg.cn/649696ee2e2c4e9e8a623598b2d10d18.jpeg#pic_center"
+        title="DiffviewOpen" /></li>
+</ol>
+<p>它还有另外的功能，可以由各位小伙伴根据官方文档自行了解。
+它的使用方式如下：</p>
+<ul>
+<li><code>:DiffviewOpen</code>显示当前与上一个版本之间的差异</li>
+<li><code>:DiffviewOpen + 版本号</code> 可以显示当期与某一个特定版本的差异，例如 <code>:DiffviewOpen HEAD~2</code>或者<code>:DiffviewOpen 906ddac317</code>来查看版本差异</li>
+<li><code>:DiffviewFileHistory + 文件名</code> 来查看某个文件的版本差异
+<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://img-blog.csdnimg.cn/02c7c014d71149f9850f3f0aed51d4bd.jpeg#pic_center"
+        data-srcset="https://img-blog.csdnimg.cn/02c7c014d71149f9850f3f0aed51d4bd.jpeg#pic_center, https://img-blog.csdnimg.cn/02c7c014d71149f9850f3f0aed51d4bd.jpeg#pic_center 1.5x, https://img-blog.csdnimg.cn/02c7c014d71149f9850f3f0aed51d4bd.jpeg#pic_center 2x"
+        data-sizes="auto"
+        alt="https://img-blog.csdnimg.cn/02c7c014d71149f9850f3f0aed51d4bd.jpeg#pic_center"
+        title="DiffviewFileHistory" />
+因为它比较简单，具体的用法就不在这里演示了。
+关于它的配置，我自己认为平时很少使用，而且默认的配置已经够用了，也不太需要花精力为它优化快捷键了。</li>
+</ul>
+<h2 id="lazygit">lazygit</h2>
+<p><code>lazygit</code>是一个非常好用的<code>git</code>客户端，可以方便的进行提交、回滚、查看变更等<code>git</code>操作。这里我不推荐什么插件，因为它本身已经很强大了，而且脱离<code>vim</code>它也可以很好的工作。想来想去只有配置一个快捷键来快速打开 <code>lazygit</code> 的终端</p>
+<p>不知道各位小伙伴是否还记得之间介绍的 <code>toggleterm</code> 插件，我们将要依赖它来快速启动</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-lua" data-lang="lua"><span class="line"><span class="cl"><span class="kd">local</span> <span class="n">lazygitterm</span> <span class="o">=</span> <span class="n">Terminal</span><span class="p">:</span><span class="n">new</span><span class="p">({</span>
+</span></span><span class="line"><span class="cl">    <span class="n">cmd</span> <span class="o">=</span> <span class="s1">&#39;lazygit&#39;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">direction</span> <span class="o">=</span> <span class="s1">&#39;float&#39;</span>
+</span></span><span class="line"><span class="cl"><span class="p">})</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kr">function</span> <span class="nf">lazygit_toggle</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">    <span class="n">lazygitterm</span><span class="p">:</span><span class="n">toggle</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="kr">end</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">vim.api</span><span class="p">.</span><span class="n">nvim_set_keymap</span><span class="p">(</span><span class="s2">&#34;n&#34;</span><span class="p">,</span> <span class="s2">&#34;&lt;leader&gt;lg&#34;</span><span class="p">,</span> <span class="s2">&#34;&lt;Cmd&gt;lua lazygit_toggle()&lt;CR&gt;&#34;</span><span class="p">,</span> <span class="p">{</span><span class="n">noremap</span> <span class="o">=</span> <span class="kc">true</span><span class="p">,</span> <span class="n">silent</span> <span class="o">=</span> <span class="kc">true</span><span class="p">})</span>
+</span></span></code></pre></div><p>通过这样简单的配置我们已经可以使用 <code>&lt;leader&gt;lg</code>来快速启动 <code>lazygit</code>的客户端了。
+<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://img-blog.csdnimg.cn/99c612d9b14c4f1f8168d04986d999a2.gif#pic_center"
+        data-srcset="https://img-blog.csdnimg.cn/99c612d9b14c4f1f8168d04986d999a2.gif#pic_center, https://img-blog.csdnimg.cn/99c612d9b14c4f1f8168d04986d999a2.gif#pic_center 1.5x, https://img-blog.csdnimg.cn/99c612d9b14c4f1f8168d04986d999a2.gif#pic_center 2x"
+        data-sizes="auto"
+        alt="https://img-blog.csdnimg.cn/99c612d9b14c4f1f8168d04986d999a2.gif#pic_center"
+        title="在这里插入图片描述" />
+至此我们关于git的配置就完成了。一般我的使用习惯是使用 gitsigns来在更改中进行跳转，用于提交前或者合并分支前的代码审查，做到提交和合并都心中有数。在发生bug要回溯代码并且查看当前与没有问题的版本之间的差异会用到 diffview插件。在进行提交、合并、回溯等git相关操作时会使用到 lazygit。各位小伙伴也可以根据自己的使用习惯来定制这一部分的配置。</p>
+</div><div class="post-footer" id="post-footer">
+    <div class="post-info">
+        <div class="post-info-line">
+            <div class="post-info-mod">
+                <span>Updated on 2023-02-01</span>
+            </div></div>
+        <div class="post-info-line">
+            <div class="post-info-md"></div>
+            <div class="post-info-share">
+                <span><a href="javascript:void(0);" title="Share on Twitter" data-sharer="twitter" data-url="http://HaiLateBoy.github.io/posts/vim-config31/" data-title="从零开始配置vim(31)——git 配置" data-hashtags="vim,编辑工具,文本处理,lua,编辑器"><i class="fab fa-twitter fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Facebook" data-sharer="facebook" data-url="http://HaiLateBoy.github.io/posts/vim-config31/" data-hashtag="vim"><i class="fab fa-facebook-square fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Hacker News" data-sharer="hackernews" data-url="http://HaiLateBoy.github.io/posts/vim-config31/" data-title="从零开始配置vim(31)——git 配置"><i class="fab fa-hacker-news fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Line" data-sharer="line" data-url="http://HaiLateBoy.github.io/posts/vim-config31/" data-title="从零开始配置vim(31)——git 配置"><i data-svg-src="https://cdn.jsdelivr.net/npm/simple-icons@7.3.0/icons/line.svg" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on 微博" data-sharer="weibo" data-url="http://HaiLateBoy.github.io/posts/vim-config31/" data-title="从零开始配置vim(31)——git 配置"><i class="fab fa-weibo fa-fw" aria-hidden="true"></i></a></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="post-info-more">
+        <section class="post-tags"><i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/vim/">vim</a>,&nbsp;<a href="/tags/%E7%BC%96%E8%BE%91%E5%B7%A5%E5%85%B7/">编辑工具</a>,&nbsp;<a href="/tags/%E6%96%87%E6%9C%AC%E5%A4%84%E7%90%86/">文本处理</a>,&nbsp;<a href="/tags/lua/">lua</a>,&nbsp;<a href="/tags/%E7%BC%96%E8%BE%91%E5%99%A8/">编辑器</a></section>
+        <section>
+            <span><a href="javascript:void(0);" onclick="window.history.back();">Back</a></span>&nbsp;|&nbsp;<span><a href="/">Home</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav"><a href="/posts/2022-new-year-plan/" class="prev" rel="prev" title="2022年回顾与2023年展望"><i class="fas fa-angle-left fa-fw" aria-hidden="true"></i>2022年回顾与2023年展望</a>
+            <a href="/posts/vim-config32/" class="next" rel="next" title="从零开始配置vim(32)——最后再说两句">从零开始配置vim(32)——最后再说两句<i class="fas fa-angle-right fa-fw" aria-hidden="true"></i></a></div>
+</div>
+</article></div>
+            </main><footer class="footer">
+        <div class="footer-container"><div class="footer-line">Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener noreffer" title="Hugo 0.121.2">Hugo</a> | Theme - <a href="https://github.com/dillonzq/LoveIt" target="_blank" rel="noopener noreffer" title="LoveIt 0.2.11"><i class="far fa-kiss-wink-heart fa-fw" aria-hidden="true"></i> LoveIt</a>
+                </div><div class="footer-line" itemscope itemtype="http://schema.org/CreativeWork"><i class="far fa-copyright fa-fw" aria-hidden="true"></i><span itemprop="copyrightYear">2022 - 2024</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="https://www.masimaro.xyz" target="_blank">Masimaro</a></span></div>
+        </div>
+    </footer></div>
+
+        <div id="fixed-buttons"><a href="#" id="back-to-top" class="fixed-button" title="Back to Top">
+                <i class="fas fa-arrow-up fa-fw" aria-hidden="true"></i>
+            </a><a href="#" id="view-comments" class="fixed-button" title="View Comments">
+                <i class="fas fa-comment fa-fw" aria-hidden="true"></i>
+            </a>
+        </div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.css"><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/autocomplete.js@0.38.1/dist/autocomplete.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lunr@2.3.9/lunr.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lazysizes@5.3.2/lazysizes.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/clipboard@2.0.11/dist/clipboard.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/sharer.js@0.5.1/sharer.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/auto-render.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/copy-tex.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/mhchem.min.js"></script><script type="text/javascript">window.config={"code":{"copyTitle":"Copy to clipboard","maxShownLines":50},"comment":{},"math":{"delimiters":[{"display":true,"left":"$$","right":"$$"},{"display":true,"left":"\\[","right":"\\]"},{"display":true,"left":"\\begin{equation}","right":"\\end{equation}"},{"display":true,"left":"\\begin{equation*}","right":"\\end{equation*}"},{"display":true,"left":"\\begin{align}","right":"\\end{align}"},{"display":true,"left":"\\begin{align*}","right":"\\end{align*}"},{"display":true,"left":"\\begin{alignat}","right":"\\end{alignat}"},{"display":true,"left":"\\begin{alignat*}","right":"\\end{alignat*}"},{"display":true,"left":"\\begin{gather}","right":"\\end{gather}"},{"display":true,"left":"\\begin{CD}","right":"\\end{CD}"},{"display":false,"left":"$","right":"$"},{"display":false,"left":"\\(","right":"\\)"}],"strict":false},"search":{"highlightTag":"em","maxResultLength":10,"noResultsFound":"No results found","snippetLength":50}};</script><script type="text/javascript" src="/js/theme.min.js"></script></body>
+</html>

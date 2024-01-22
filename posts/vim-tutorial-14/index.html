@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="robots" content="noodp" />
+        <title>vim 从嫌弃到依赖(13)——motion 进阶 - Masimaro&#39;s blog</title><meta name="Description" content="这是我用于记录日常和学习的小站"><meta property="og:title" content="vim 从嫌弃到依赖(13)——motion 进阶" />
+<meta property="og:description" content="在最开始的时候我们介绍了一些vim中的motion 包括如何在字符间、单词间、行间以及多行间移动。·但是motion中的内容可远不止我们介绍的" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://HaiLateBoy.github.io/posts/vim-tutorial-14/" /><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2022-05-25T10:54:13+08:00" />
+<meta property="article:modified_time" content="2022-05-25T10:54:13+08:00" /><meta property="og:site_name" content="Masimaro&#39;s blog" />
+
+<meta name="twitter:card" content="summary"/><meta name="twitter:title" content="vim 从嫌弃到依赖(13)——motion 进阶"/>
+<meta name="twitter:description" content="在最开始的时候我们介绍了一些vim中的motion 包括如何在字符间、单词间、行间以及多行间移动。·但是motion中的内容可远不止我们介绍的"/>
+<meta name="application-name" content="My cool site">
+<meta name="apple-mobile-web-app-title" content="My cool site"><meta name="theme-color" content="#ffffff"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="manifest" href="/site.webmanifest"><link rel="canonical" href="http://HaiLateBoy.github.io/posts/vim-tutorial-14/" /><link rel="prev" href="http://HaiLateBoy.github.io/posts/vim-tutorial-13/" /><link rel="next" href="http://HaiLateBoy.github.io/posts/vim-tutorial-15/" /><link rel="stylesheet" href="/css/style.min.css"><link rel="preload" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css"></noscript><link rel="preload" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css"></noscript><script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "BlogPosting",
+        "headline": "vim 从嫌弃到依赖(13)——motion 进阶",
+        "inLanguage": "zh-CN",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "http:\/\/HaiLateBoy.github.io\/posts\/vim-tutorial-14\/"
+        },"genre": "posts","keywords": "vim, 编辑工具, 文本处理","wordcount":  1011 ,
+        "url": "http:\/\/HaiLateBoy.github.io\/posts\/vim-tutorial-14\/","datePublished": "2022-05-25T10:54:13+08:00","dateModified": "2022-05-25T10:54:13+08:00","publisher": {
+            "@type": "Organization",
+            "name": ""},"author": {
+                "@type": "Person",
+                "name": "Masimaro"
+            },"description": ""
+    }
+    </script></head>
+    <body data-header-desktop="fixed" data-header-mobile="auto"><script type="text/javascript">(window.localStorage && localStorage.getItem('theme') ? localStorage.getItem('theme') === 'dark' : ('auto' === 'auto' ? window.matchMedia('(prefers-color-scheme: dark)').matches : 'auto' === 'dark')) && document.body.setAttribute('theme', 'dark');</script>
+
+        <div id="mask"></div><div class="wrapper"><header class="desktop" id="header-desktop">
+    <div class="header-wrapper">
+        <div class="header-title">
+            <a href="/" title="Masimaro&#39;s blog">My cool site</a>
+        </div>
+        <div class="menu">
+            <div class="menu-inner"><a class="menu-item" href="/posts/" title="文章列表"> 文章 </a><a class="menu-item" href="/tags/" title="标签"> 标签 </a><a class="menu-item" href="/categories/" title="分类"> 分类 </a><a class="menu-item" href="/about" title="关于本站"> 关于 </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-desktop">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-desktop" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-desktop" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-desktop">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </span><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                    <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+                </a></div>
+        </div>
+    </div>
+</header><header class="mobile" id="header-mobile">
+    <div class="header-container">
+        <div class="header-wrapper">
+            <div class="header-title">
+                <a href="/" title="Masimaro&#39;s blog">My cool site</a>
+            </div>
+            <div class="menu-toggle" id="menu-toggle-mobile">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+        <div class="menu" id="menu-mobile"><div class="search-wrapper">
+                    <div class="search mobile" id="search-mobile">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-mobile">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-mobile" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-mobile" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-mobile">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </div>
+                    <a href="javascript:void(0);" class="search-cancel" id="search-cancel-mobile">
+                        Cancel
+                    </a>
+                </div><a class="menu-item" href="/posts/" title="文章列表">文章</a><a class="menu-item" href="/tags/" title="标签">标签</a><a class="menu-item" href="/categories/" title="分类">分类</a><a class="menu-item" href="/about" title="关于本站">关于</a><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+            </a></div>
+    </div>
+</header><div class="search-dropdown desktop">
+        <div id="search-dropdown-desktop"></div>
+    </div>
+    <div class="search-dropdown mobile">
+        <div id="search-dropdown-mobile"></div>
+    </div><main class="main">
+                <div class="container"><div class="toc" id="toc-auto">
+            <h2 class="toc-title">Contents</h2>
+            <div class="toc-content" id="toc-content-auto"></div>
+        </div><article class="page single"><h1 class="single-title animate__animated animate__flipInX">vim 从嫌弃到依赖(13)——motion 进阶</h1><div class="post-meta">
+            <div class="post-meta-line"><span class="post-author"><a href="https://www.masimaro.xyz" title="Author" target="_blank" rel="noopener noreffer author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Masimaro</a></span>&nbsp;<span class="post-category">included in <a href="/categories/vim/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>vim</a></span></div>
+            <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw" aria-hidden="true"></i>&nbsp;<time datetime="2022-05-25">2022-05-25</time>&nbsp;<i class="fas fa-pencil-alt fa-fw" aria-hidden="true"></i>&nbsp;1011 words&nbsp;
+                <i class="far fa-clock fa-fw" aria-hidden="true"></i>&nbsp;3 minutes&nbsp;</div>
+        </div><div class="details toc" id="toc-static"  data-kept="true">
+                <div class="details-summary toc-title">
+                    <span>Contents</span>
+                    <span><i class="details-icon fas fa-angle-right" aria-hidden="true"></i></span>
+                </div>
+                <div class="details-content toc-content" id="toc-content-static"><nav id="TableOfContents">
+  <ul>
+    <li><a href="#vim屏幕行与实际行">vim屏幕行与实际行</a></li>
+    <li><a href="#单词与字串">单词与字串</a></li>
+  </ul>
+</nav></div>
+            </div><div class="content" id="content"><p>在最开始的时候我们介绍了一些vim中的<code>motion</code> 包括如何在字符间、单词间、行间以及多行间移动。·但是<code>motion</code>中的内容可远不止我们介绍的这些，平时用到的也远不止之间介绍的那些。
+之所以没有一次介绍完，主要是不想搞那么复杂，一次性全都介绍完那么篇幅会显得很长，而且显的很复杂。vim入门最重要的一步就是用起来，如果初学者因为看到入门类的文章出现一堆不知道什么意思的操作命令，肯定会被吓跑的，也就无法体会到vim的魅力了。像这种进阶类的内容我想将它们放到后面，等各位小伙伴能熟练使用vim完成编辑任务之后再来考虑通过进阶内容进一步提高使用效率。</p>
+<h2 id="vim屏幕行与实际行">vim屏幕行与实际行</h2>
+<p>vim中有一个<code>wrap</code> 设置，表示一行文本超过多少行就会自动折行，这样就不会出现在一个屏幕上显示不全的问题了。在最开始配置<code>neovim</code> 的基础配置的时候已经展示过该如何启用<code>wrap</code> 设置，这里就不再演示了</p>
+<p>在启用自动折行的设置后，如果一行文本字符数超过设置的值会自动折行。在屏幕上显示为多行。当我们开启了显示行号的设置之后很容易区分。实际行在vim中只显示一个行号，而在屏幕上会显示多行。</p>
+<p>我们知道行间移动使用的是<code>j、k</code>, 他们是在实际行之间移动，如果想要在屏幕行间移动，可以使用 <code>gj、gk</code>。一般针对行相关的操作，只需要在前面加上<code>g</code> 就可以改成在屏幕行之间的操作。例如<code>g0</code> 是移动光标到屏幕行行首。<code>g$</code> 移动到屏幕行行尾。他们与普通的行移动<code>motion</code> 用法类似，即可以配合数字表示重复，也可以配合<code>operator</code> 来执行相应的操作。
+<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://img-blog.csdnimg.cn/08d1595d649f4ce79fb4f9d54874b095.gif#pic_center"
+        data-srcset="https://img-blog.csdnimg.cn/08d1595d649f4ce79fb4f9d54874b095.gif#pic_center, https://img-blog.csdnimg.cn/08d1595d649f4ce79fb4f9d54874b095.gif#pic_center 1.5x, https://img-blog.csdnimg.cn/08d1595d649f4ce79fb4f9d54874b095.gif#pic_center 2x"
+        data-sizes="auto"
+        alt="https://img-blog.csdnimg.cn/08d1595d649f4ce79fb4f9d54874b095.gif#pic_center"
+        title="vim 行与实际上跳转" /></p>
+<h2 id="单词与字串">单词与字串</h2>
+<p>在vim中一个单词由字母、数字、下划线或者其他非空白字符组成，单词间以空白字符分割。而字串是由非空白字符序列组成。这个感觉可能很抽象，但是多多联系和尝试应该就很容易明白了。</p>
+<p>字串间的移动使用大写的<code>W</code>， <code>B</code>。下面来看一个例子</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="cl">e.g. there&#39;s a nvim config file in &#34;~/.config/nvim/init.lua&#34;
+</span></span></code></pre></div><p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://img-blog.csdnimg.cn/14dfaeed4ff041d6910526c54fd18d5d.gif#pic_center"
+        data-srcset="https://img-blog.csdnimg.cn/14dfaeed4ff041d6910526c54fd18d5d.gif#pic_center, https://img-blog.csdnimg.cn/14dfaeed4ff041d6910526c54fd18d5d.gif#pic_center 1.5x, https://img-blog.csdnimg.cn/14dfaeed4ff041d6910526c54fd18d5d.gif#pic_center 2x"
+        data-sizes="auto"
+        alt="https://img-blog.csdnimg.cn/14dfaeed4ff041d6910526c54fd18d5d.gif#pic_center"
+        title="字符与字串" />
+我自己总结如下：</p>
+<ol>
+<li>区别单词应该以字母、数字、其他非空白字符进行分类</li>
+<li>字串仅仅以空白字符为区分</li>
+<li>同一类型的字符序列组成的部分作为一个单词。</li>
+</ol>
+<p>例如上述句子由字母、空白字符和其他非空白字符（<code>. ' ~ /</code>）组成, <code>e.g.</code> 后面是一个空白字符，因此它被划分为一个字串，而它自身经历了字母、非空字符、字母、非空字符的序列，所以vim将他们划分为了4个单词。</p>
+<p>如果这样比较麻烦，那就简单的记住：字串比单词要长，不需要细粒度的移动，可以用字串间移动。</p>
+<p>本次就说到这里了，各位可以配合一下最开始的几篇文章，配合使用，巩固一下motion相关使用。</p>
+</div><div class="post-footer" id="post-footer">
+    <div class="post-info">
+        <div class="post-info-line">
+            <div class="post-info-mod">
+                <span>Updated on 2022-05-25</span>
+            </div></div>
+        <div class="post-info-line">
+            <div class="post-info-md"></div>
+            <div class="post-info-share">
+                <span><a href="javascript:void(0);" title="Share on Twitter" data-sharer="twitter" data-url="http://HaiLateBoy.github.io/posts/vim-tutorial-14/" data-title="vim 从嫌弃到依赖(13)——motion 进阶" data-hashtags="vim,编辑工具,文本处理"><i class="fab fa-twitter fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Facebook" data-sharer="facebook" data-url="http://HaiLateBoy.github.io/posts/vim-tutorial-14/" data-hashtag="vim"><i class="fab fa-facebook-square fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Hacker News" data-sharer="hackernews" data-url="http://HaiLateBoy.github.io/posts/vim-tutorial-14/" data-title="vim 从嫌弃到依赖(13)——motion 进阶"><i class="fab fa-hacker-news fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Line" data-sharer="line" data-url="http://HaiLateBoy.github.io/posts/vim-tutorial-14/" data-title="vim 从嫌弃到依赖(13)——motion 进阶"><i data-svg-src="https://cdn.jsdelivr.net/npm/simple-icons@7.3.0/icons/line.svg" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on 微博" data-sharer="weibo" data-url="http://HaiLateBoy.github.io/posts/vim-tutorial-14/" data-title="vim 从嫌弃到依赖(13)——motion 进阶"><i class="fab fa-weibo fa-fw" aria-hidden="true"></i></a></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="post-info-more">
+        <section class="post-tags"><i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/vim/">vim</a>,&nbsp;<a href="/tags/%E7%BC%96%E8%BE%91%E5%B7%A5%E5%85%B7/">编辑工具</a>,&nbsp;<a href="/tags/%E6%96%87%E6%9C%AC%E5%A4%84%E7%90%86/">文本处理</a></section>
+        <section>
+            <span><a href="javascript:void(0);" onclick="window.history.back();">Back</a></span>&nbsp;|&nbsp;<span><a href="/">Home</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav"><a href="/posts/vim-tutorial-13/" class="prev" rel="prev" title="vim 从嫌弃到依赖(12)——打开及保存文件"><i class="fas fa-angle-left fa-fw" aria-hidden="true"></i>vim 从嫌弃到依赖(12)——打开及保存文件</a>
+            <a href="/posts/vim-tutorial-15/" class="next" rel="next" title="vim 从嫌弃到依赖(14)——快速跳转">vim 从嫌弃到依赖(14)——快速跳转<i class="fas fa-angle-right fa-fw" aria-hidden="true"></i></a></div>
+</div>
+</article></div>
+            </main><footer class="footer">
+        <div class="footer-container"><div class="footer-line">Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener noreffer" title="Hugo 0.121.2">Hugo</a> | Theme - <a href="https://github.com/dillonzq/LoveIt" target="_blank" rel="noopener noreffer" title="LoveIt 0.2.11"><i class="far fa-kiss-wink-heart fa-fw" aria-hidden="true"></i> LoveIt</a>
+                </div><div class="footer-line" itemscope itemtype="http://schema.org/CreativeWork"><i class="far fa-copyright fa-fw" aria-hidden="true"></i><span itemprop="copyrightYear">2022 - 2024</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="https://www.masimaro.xyz" target="_blank">Masimaro</a></span></div>
+        </div>
+    </footer></div>
+
+        <div id="fixed-buttons"><a href="#" id="back-to-top" class="fixed-button" title="Back to Top">
+                <i class="fas fa-arrow-up fa-fw" aria-hidden="true"></i>
+            </a><a href="#" id="view-comments" class="fixed-button" title="View Comments">
+                <i class="fas fa-comment fa-fw" aria-hidden="true"></i>
+            </a>
+        </div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.css"><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/autocomplete.js@0.38.1/dist/autocomplete.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lunr@2.3.9/lunr.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lazysizes@5.3.2/lazysizes.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/clipboard@2.0.11/dist/clipboard.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/sharer.js@0.5.1/sharer.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/auto-render.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/copy-tex.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/mhchem.min.js"></script><script type="text/javascript">window.config={"code":{"copyTitle":"Copy to clipboard","maxShownLines":50},"comment":{},"math":{"delimiters":[{"display":true,"left":"$$","right":"$$"},{"display":true,"left":"\\[","right":"\\]"},{"display":true,"left":"\\begin{equation}","right":"\\end{equation}"},{"display":true,"left":"\\begin{equation*}","right":"\\end{equation*}"},{"display":true,"left":"\\begin{align}","right":"\\end{align}"},{"display":true,"left":"\\begin{align*}","right":"\\end{align*}"},{"display":true,"left":"\\begin{alignat}","right":"\\end{alignat}"},{"display":true,"left":"\\begin{alignat*}","right":"\\end{alignat*}"},{"display":true,"left":"\\begin{gather}","right":"\\end{gather}"},{"display":true,"left":"\\begin{CD}","right":"\\end{CD}"},{"display":false,"left":"$","right":"$"},{"display":false,"left":"\\(","right":"\\)"}],"strict":false},"search":{"highlightTag":"em","maxResultLength":10,"noResultsFound":"No results found","snippetLength":50}};</script><script type="text/javascript" src="/js/theme.min.js"></script></body>
+</html>

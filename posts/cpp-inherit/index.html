@@ -1,0 +1,736 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="robots" content="noodp" />
+        <title>C&#43;&#43; 继承分析 - Masimaro&#39;s blog</title><meta name="Description" content="这是我用于记录日常和学习的小站"><meta property="og:title" content="C&#43;&#43; 继承分析" />
+<meta property="og:description" content="面向对象的三大特性之一就是继承，继承运行我么重用基类中已经存在的内容，这样就简化了代码的编写工作。继承中有三种继承方式即:public protected pr" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://HaiLateBoy.github.io/posts/cpp-inherit/" /><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2018-04-14T10:16:34+00:00" />
+<meta property="article:modified_time" content="2018-04-14T10:16:34+00:00" /><meta property="og:site_name" content="Masimaro&#39;s blog" />
+
+<meta name="twitter:card" content="summary"/><meta name="twitter:title" content="C&#43;&#43; 继承分析"/>
+<meta name="twitter:description" content="面向对象的三大特性之一就是继承，继承运行我么重用基类中已经存在的内容，这样就简化了代码的编写工作。继承中有三种继承方式即:public protected pr"/>
+<meta name="application-name" content="My cool site">
+<meta name="apple-mobile-web-app-title" content="My cool site"><meta name="theme-color" content="#ffffff"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="manifest" href="/site.webmanifest"><link rel="canonical" href="http://HaiLateBoy.github.io/posts/cpp-inherit/" /><link rel="prev" href="http://HaiLateBoy.github.io/posts/oledb-and-ado-9/" /><link rel="next" href="http://HaiLateBoy.github.io/posts/oledb-and-ado-10/" /><link rel="stylesheet" href="/css/style.min.css"><link rel="preload" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css"></noscript><link rel="preload" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css"></noscript><script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "BlogPosting",
+        "headline": "C++ 继承分析",
+        "inLanguage": "zh-CN",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "http:\/\/HaiLateBoy.github.io\/posts\/cpp-inherit\/"
+        },"genre": "posts","keywords": "VC\u002b\u002b, 反汇编, C\u002b\u002b实现原理","wordcount":  6358 ,
+        "url": "http:\/\/HaiLateBoy.github.io\/posts\/cpp-inherit\/","datePublished": "2018-04-14T10:16:34+00:00","dateModified": "2018-04-14T10:16:34+00:00","publisher": {
+            "@type": "Organization",
+            "name": ""},"author": {
+                "@type": "Person",
+                "name": "Masimaro"
+            },"description": ""
+    }
+    </script></head>
+    <body data-header-desktop="fixed" data-header-mobile="auto"><script type="text/javascript">(window.localStorage && localStorage.getItem('theme') ? localStorage.getItem('theme') === 'dark' : ('auto' === 'auto' ? window.matchMedia('(prefers-color-scheme: dark)').matches : 'auto' === 'dark')) && document.body.setAttribute('theme', 'dark');</script>
+
+        <div id="mask"></div><div class="wrapper"><header class="desktop" id="header-desktop">
+    <div class="header-wrapper">
+        <div class="header-title">
+            <a href="/" title="Masimaro&#39;s blog">My cool site</a>
+        </div>
+        <div class="menu">
+            <div class="menu-inner"><a class="menu-item" href="/posts/" title="文章列表"> 文章 </a><a class="menu-item" href="/tags/" title="标签"> 标签 </a><a class="menu-item" href="/categories/" title="分类"> 分类 </a><a class="menu-item" href="/about" title="关于本站"> 关于 </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-desktop">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-desktop" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-desktop" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-desktop">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </span><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                    <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+                </a></div>
+        </div>
+    </div>
+</header><header class="mobile" id="header-mobile">
+    <div class="header-container">
+        <div class="header-wrapper">
+            <div class="header-title">
+                <a href="/" title="Masimaro&#39;s blog">My cool site</a>
+            </div>
+            <div class="menu-toggle" id="menu-toggle-mobile">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+        <div class="menu" id="menu-mobile"><div class="search-wrapper">
+                    <div class="search mobile" id="search-mobile">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-mobile">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-mobile" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-mobile" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-mobile">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </div>
+                    <a href="javascript:void(0);" class="search-cancel" id="search-cancel-mobile">
+                        Cancel
+                    </a>
+                </div><a class="menu-item" href="/posts/" title="文章列表">文章</a><a class="menu-item" href="/tags/" title="标签">标签</a><a class="menu-item" href="/categories/" title="分类">分类</a><a class="menu-item" href="/about" title="关于本站">关于</a><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+            </a></div>
+    </div>
+</header><div class="search-dropdown desktop">
+        <div id="search-dropdown-desktop"></div>
+    </div>
+    <div class="search-dropdown mobile">
+        <div id="search-dropdown-mobile"></div>
+    </div><main class="main">
+                <div class="container"><div class="toc" id="toc-auto">
+            <h2 class="toc-title">Contents</h2>
+            <div class="toc-content" id="toc-content-auto"></div>
+        </div><article class="page single"><h1 class="single-title animate__animated animate__flipInX">C++ 继承分析</h1><div class="post-meta">
+            <div class="post-meta-line"><span class="post-author"><a href="https://www.masimaro.xyz" title="Author" target="_blank" rel="noopener noreffer author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Masimaro</a></span>&nbsp;<span class="post-category">included in <a href="/categories/vc++%E5%8F%8D%E6%B1%87%E7%BC%96%E5%88%86%E6%9E%90/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>VC++反汇编分析</a></span></div>
+            <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw" aria-hidden="true"></i>&nbsp;<time datetime="2018-04-14">2018-04-14</time>&nbsp;<i class="fas fa-pencil-alt fa-fw" aria-hidden="true"></i>&nbsp;6358 words&nbsp;
+                <i class="far fa-clock fa-fw" aria-hidden="true"></i>&nbsp;13 minutes&nbsp;</div>
+        </div><div class="details toc" id="toc-static"  data-kept="true">
+                <div class="details-summary toc-title">
+                    <span>Contents</span>
+                    <span><i class="details-icon fas fa-angle-right" aria-hidden="true"></i></span>
+                </div>
+                <div class="details-content toc-content" id="toc-content-static"><nav id="TableOfContents">
+  <ul>
+    <li><a href="#dynamic_cast强制类型转化与static_cast类型转化">dynamic_cast强制类型转化与static_cast类型转化</a></li>
+  </ul>
+</nav></div>
+            </div><div class="content" id="content"><p>面向对象的三大特性之一就是继承，继承运行我么重用基类中已经存在的内容，这样就简化了代码的编写工作。继承中有三种继承方式即:public protected private，这三种方式规定了不同的访问权限，这些权限的检查由编译器在语法检查阶段进行，不参与生成最终的机器码，所以在这里不对这三中权限进行讨论，以下的内容都是采用的共有继承。</p>
+<!-- raw HTML omitted -->
+<h1 id="单继承">单继承</h1>
+<p>首先看下面的代码：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">CParent</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl"><span class="k">public</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">	<span class="n">CParent</span><span class="p">(){</span>
+</span></span><span class="line"><span class="cl">		<span class="n">printf</span><span class="p">(</span><span class="s">&#34;CParent()</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="cl">	<span class="o">~</span><span class="n">CParent</span><span class="p">(){</span>
+</span></span><span class="line"><span class="cl">		<span class="n">printf</span><span class="p">(</span><span class="s">&#34;~CParent()</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="kt">void</span> <span class="nf">setNumber</span><span class="p">(</span><span class="kt">int</span> <span class="n">n</span><span class="p">){</span>
+</span></span><span class="line"><span class="cl">		<span class="n">m_nParent</span> <span class="o">=</span> <span class="n">n</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="kt">int</span> <span class="nf">getNumber</span><span class="p">(){</span>
+</span></span><span class="line"><span class="cl">		<span class="k">return</span> <span class="n">m_nParent</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">protected</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">	<span class="kt">int</span> <span class="n">m_nParent</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">};</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">CChild</span> <span class="o">:</span> <span class="k">public</span> <span class="n">CParent</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl"><span class="k">public</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">	<span class="kt">void</span> <span class="n">ShowNumber</span><span class="p">(</span><span class="kt">int</span> <span class="n">n</span><span class="p">){</span>
+</span></span><span class="line"><span class="cl">		<span class="n">setNumber</span><span class="p">(</span><span class="n">n</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">		<span class="n">m_nChild</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span><span class="n">m_nParent</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">		<span class="n">printf</span><span class="p">(</span><span class="s">&#34;child:%d</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">,</span> <span class="n">m_nChild</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">		<span class="n">printf</span><span class="p">(</span><span class="s">&#34;parent:%d</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">,</span> <span class="n">m_nParent</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="k">protected</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">	<span class="kt">int</span> <span class="n">m_nChild</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">};</span>
+</span></span><span class="line"><span class="cl"><span class="kt">int</span> <span class="nf">main</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">	<span class="n">CChild</span> <span class="n">cc</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">cc</span><span class="p">.</span><span class="n">ShowNumber</span><span class="p">(</span><span class="mi">2</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p>上面的代码中定义了一个基类，以及一个对应的派生类，在派生类的函数中，调用和成员m_nParent，我们没有在派生类中定义这个变量，很明显这个变量来自于基类，子类会继承基类中的函数成员和数据成员，下面的汇编代码展示了它是如何存储以及如何调用函数的:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-asm" data-lang="asm"><span class="line"><span class="cl"><span class="err">41:</span>       <span class="nf">CChild</span> <span class="no">cc</span><span class="c1">;
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">004012</span><span class="nf">AD</span>   <span class="no">lea</span>         <span class="no">ecx</span><span class="p">,[</span><span class="no">ebp-14h</span><span class="p">]</span><span class="c1">;将类对象的首地址this放入ecx中
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">004012</span><span class="nf">B0</span>   <span class="no">call</span>        <span class="err">@</span><span class="no">ILT</span><span class="err">+</span><span class="mi">5</span><span class="p">(</span><span class="no">CChild</span><span class="p">::</span><span class="no">CChild</span><span class="p">)</span> <span class="p">(</span><span class="mi">0040100</span><span class="no">a</span><span class="p">)</span><span class="c1">;调用构造函数
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">004012</span><span class="nf">B5</span>   <span class="no">mov</span>         <span class="no">dword</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">ebp-4</span><span class="p">],</span><span class="mi">0</span>
+</span></span><span class="line"><span class="cl"><span class="err">42:</span>       <span class="nf">cc.ShowNumber</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="c1">;
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">004012</span><span class="nf">BC</span>   <span class="no">push</span>        <span class="mi">2</span>
+</span></span><span class="line"><span class="cl"><span class="err">004012</span><span class="nf">BE</span>   <span class="no">lea</span>         <span class="no">ecx</span><span class="p">,[</span><span class="no">ebp-14h</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="err">004012</span><span class="nf">C1</span>   <span class="no">call</span>        <span class="err">@</span><span class="no">ILT</span><span class="err">+</span><span class="mi">10</span><span class="p">(</span><span class="no">CChild</span><span class="p">::</span><span class="no">ShowNumber</span><span class="p">)</span> <span class="p">(</span><span class="mi">0040100</span><span class="no">f</span><span class="p">)</span><span class="c1">;调用自身的函数
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">43:</span>       <span class="nf">return</span> <span class="mi">0</span><span class="c1">;
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">004012</span><span class="nf">C6</span>   <span class="no">mov</span>         <span class="no">dword</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">ebp-18h</span><span class="p">],</span><span class="mi">0</span>
+</span></span><span class="line"><span class="cl"><span class="err">004012</span><span class="nf">CD</span>   <span class="no">mov</span>         <span class="no">dword</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">ebp-4</span><span class="p">],</span><span class="mi">0</span><span class="no">FFFFFFFFh</span>
+</span></span><span class="line"><span class="cl"><span class="err">004012</span><span class="nf">D4</span>   <span class="no">lea</span>         <span class="no">ecx</span><span class="p">,[</span><span class="no">ebp-14h</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="err">004012</span><span class="nf">D7</span>   <span class="no">call</span>        <span class="err">@</span><span class="no">ILT</span><span class="err">+</span><span class="mi">25</span><span class="p">(</span><span class="no">CChild</span><span class="p">::</span><span class="err">~</span><span class="no">CChild</span><span class="p">)</span> <span class="p">(</span><span class="mi">0040101</span><span class="no">e</span><span class="p">)</span><span class="c1">;调用析构函数
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">004012</span><span class="nf">DC</span>   <span class="no">mov</span>         <span class="no">eax</span><span class="p">,</span><span class="no">dword</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">ebp-18h</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="c1">;构造函数
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">0040140</span><span class="nf">A</span>   <span class="no">mov</span>         <span class="no">dword</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">ebp-4</span><span class="p">],</span><span class="no">ecx</span>
+</span></span><span class="line"><span class="cl"><span class="err">0040140</span><span class="nf">D</span>   <span class="no">mov</span>         <span class="no">ecx</span><span class="p">,</span><span class="no">dword</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">ebp-4</span><span class="p">]</span><span class="c1">;到此ecx和ebp - 4位置的值都是对象的首地址
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">00401410</span>   <span class="nf">call</span>        <span class="err">@</span><span class="no">ILT</span><span class="err">+</span><span class="mi">35</span><span class="p">(</span><span class="no">CParent</span><span class="p">::</span><span class="no">CParent</span><span class="p">)</span> <span class="p">(</span><span class="mi">00401028</span><span class="p">)</span><span class="c1">;调用父类的构造
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">00401415</span>   <span class="nf">mov</span>         <span class="no">eax</span><span class="p">,</span><span class="no">dword</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">ebp-4</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="c1">;ShowNumber函数
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">00401339</span>   <span class="nf">pop</span>         <span class="no">ecx</span><span class="c1">;还原this指针
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">0040133</span><span class="nf">A</span>   <span class="no">mov</span>         <span class="no">dword</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">ebp-4</span><span class="p">],</span><span class="no">ecx</span><span class="c1">;ebp - 4存储的是this指针
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">31:</span>           <span class="nf">setNumber</span><span class="p">(</span><span class="no">n</span><span class="p">)</span><span class="c1">;
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">0040133</span><span class="nf">D</span>   <span class="no">mov</span>         <span class="no">eax</span><span class="p">,</span><span class="no">dword</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">ebp</span><span class="err">+</span><span class="mi">8</span><span class="p">]</span><span class="c1">;ebp + 8是showNumber参数
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">00401340</span>   <span class="nf">push</span>        <span class="no">eax</span>
+</span></span><span class="line"><span class="cl"><span class="err">00401341</span>   <span class="nf">mov</span>         <span class="no">ecx</span><span class="p">,</span><span class="no">dword</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">ebp-4</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="err">00401344</span>   <span class="nf">call</span>        <span class="err">@</span><span class="no">ILT</span><span class="err">+</span><span class="mi">0</span><span class="p">(</span><span class="no">CParent</span><span class="p">::</span><span class="no">setNumber</span><span class="p">)</span> <span class="p">(</span><span class="mi">00401005</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="err">32:</span>           <span class="nf">m_nChild</span> <span class="err">=</span> <span class="mi">2</span> <span class="p">*</span><span class="no">m_nParent</span><span class="c1">;
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">00401349</span>   <span class="nf">mov</span>         <span class="no">ecx</span><span class="p">,</span><span class="no">dword</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">ebp-4</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="err">0040134</span><span class="nf">C</span>   <span class="no">mov</span>         <span class="no">edx</span><span class="p">,</span><span class="no">dword</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">ecx</span><span class="p">]</span><span class="c1">;取this对象的头4个字节的值到edx中
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">0040134</span><span class="nf">E</span>   <span class="no">shl</span>         <span class="no">edx</span><span class="p">,</span><span class="mi">1</span><span class="c1">;edx左移1位，相当于edx = edx * 2
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">00401350</span>   <span class="nf">mov</span>         <span class="no">eax</span><span class="p">,</span><span class="no">dword</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">ebp-4</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="err">00401353</span>   <span class="nf">mov</span>         <span class="no">dword</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">eax</span><span class="err">+</span><span class="mi">4</span><span class="p">],</span><span class="no">edx</span> <span class="c1">;将edx的值放入到对象的第4个字节处
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">33:</span>           <span class="nf">printf</span><span class="p">(</span><span class="err">&#34;</span><span class="no">child</span><span class="p">:</span><span class="nv">%d</span><span class="err">\</span><span class="no">n</span><span class="err">&#34;</span><span class="p">,</span> <span class="no">m_nChild</span><span class="p">)</span><span class="c1">;
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">00401356</span>   <span class="nf">mov</span>         <span class="no">ecx</span><span class="p">,</span><span class="no">dword</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">ebp-4</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="err">00401359</span>   <span class="nf">mov</span>         <span class="no">edx</span><span class="p">,</span><span class="no">dword</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">ecx</span><span class="err">+</span><span class="mi">4</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="err">0040135</span><span class="nf">C</span>   <span class="no">push</span>        <span class="no">edx</span>
+</span></span><span class="line"><span class="cl"><span class="err">0040135</span><span class="nf">D</span>   <span class="no">push</span>        <span class="no">offset</span> <span class="no">string</span> <span class="err">&#34;</span><span class="no">child</span><span class="p">:</span><span class="nv">%d</span><span class="err">\</span><span class="no">n</span><span class="err">&#34;</span> <span class="p">(</span><span class="mi">0042</span><span class="no">f02c</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="err">00401362</span>   <span class="nf">call</span>        <span class="no">printf</span> <span class="p">(</span><span class="mi">00401</span><span class="no">c70</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="err">00401367</span>   <span class="nf">add</span>         <span class="no">esp</span><span class="p">,</span><span class="mi">8</span>
+</span></span><span class="line"><span class="cl"><span class="err">34:</span>           <span class="nf">printf</span><span class="p">(</span><span class="err">&#34;</span><span class="no">parent</span><span class="p">:</span><span class="nv">%d</span><span class="err">\</span><span class="no">n</span><span class="err">&#34;</span><span class="p">,</span> <span class="no">m_nParent</span><span class="p">)</span><span class="c1">;
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">0040136</span><span class="nf">A</span>   <span class="no">mov</span>         <span class="no">eax</span><span class="p">,</span><span class="no">dword</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">ebp-4</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="err">0040136</span><span class="nf">D</span>   <span class="no">mov</span>         <span class="no">ecx</span><span class="p">,</span><span class="no">dword</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">eax</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="err">0040136</span><span class="nf">F</span>   <span class="no">push</span>        <span class="no">ecx</span>
+</span></span><span class="line"><span class="cl"><span class="err">00401370</span>   <span class="nf">push</span>        <span class="no">offset</span> <span class="no">string</span> <span class="err">&#34;</span><span class="no">parent</span><span class="p">:</span><span class="nv">%d</span><span class="err">\</span><span class="no">n</span><span class="err">&#34;</span> <span class="p">(</span><span class="mi">0042</span><span class="no">f01c</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="err">00401375</span>   <span class="nf">call</span>        <span class="no">printf</span> <span class="p">(</span><span class="mi">00401</span><span class="no">c70</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="err">0040137</span><span class="nf">A</span>   <span class="no">add</span>         <span class="no">esp</span><span class="p">,</span><span class="mi">8</span>
+</span></span><span class="line"><span class="cl"><span class="c1">;setNumber函数
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">16:</span>           <span class="nf">m_nParent</span> <span class="err">=</span> <span class="no">n</span><span class="c1">;
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">004013</span><span class="nf">CD</span>   <span class="no">mov</span>         <span class="no">eax</span><span class="p">,</span><span class="no">dword</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">ebp-4</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="err">004013</span><span class="nf">D0</span>   <span class="no">mov</span>         <span class="no">ecx</span><span class="p">,</span><span class="no">dword</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">ebp</span><span class="err">+</span><span class="mi">8</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="err">004013</span><span class="nf">D3</span>   <span class="no">mov</span>         <span class="no">dword</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">eax</span><span class="p">],</span><span class="no">ecx</span><span class="c1">;给对象的头四个字节赋值
+</span></span></span></code></pre></div><p>从上面的汇编代码可以看到大致的执行流程，首先调用编译器提供的默认构造函数，在这个构造函数中调用父类的构造函数，然后在showNumber中调用setNumber为父类的m_nParent赋值，然后为m_nChild赋值，最后执行输出语句。
+上面的汇编代码在执行为m_nParent赋值时操作的内存地址是this，而为m_nChild赋值时操作的是this + 4通过这一点可以看出，类CChild在内存中的分布，首先在低地址位分步的是基类的成员，高地址为分步的是派生类的成员，我们随着代码的执行，查看寄存器和内存的值也发现，m_nParent在低地址位m_nChild在高地址位：
+<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="http://img.blog.csdn.net/20160706225137823"
+        data-srcset="http://img.blog.csdn.net/20160706225137823, http://img.blog.csdn.net/20160706225137823 1.5x, http://img.blog.csdn.net/20160706225137823 2x"
+        data-sizes="auto"
+        alt="http://img.blog.csdn.net/20160706225137823"
+        title="这里写图片描述" />
+当父类中含有构造函数，而子类中没有时，编译器会提供默认构造函数，这个构造只调用父类的构造，而不做其他多余的操作，但是如果子类中构造，而父类中没有构造，则不会为父类提供默认构造。但是当父类中有虚函数时又例外，这个时候会为父类提供默认构造，以便初始化虚函数表指针。
+在析构时，为了可以析构父类会首先调用子类的析构，当析构到父类的部分时，调用父类的构造，也就是说析构的调用顺序与构造正好相反。
+子类在内存中的排列顺序为先依次摆放父类的成员，后安排子类的成员。
+C++中的函数符号名称与C中的有很大的不同，编译器根据这个符号名称可以知道这个函数的形参列表，和作用范围，所以在继承的情况下，父类的成员函数的作用范围在父类中，而派生类则包含了父类的成员，所以自然包含了父类的作用范围，在进行函数调用时，会首先在其自身的范围中查找，然后再在其父类中查找，因此子类可以调用父类的函数。在子类中将父类的成员放到内存的前段是为了方便子类调用父类中的成员。但是当子类中有对应的函数，这个时候会直接调用子类中的函数，这个时候发生了覆盖。
+当类中定义了其他类成员，并定义了初始化列表时，构造的顺序又是怎样的呢？</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">CParent</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl"><span class="k">public</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">	<span class="n">CParent</span><span class="p">(){</span>
+</span></span><span class="line"><span class="cl">		<span class="n">m_nParent</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="k">protected</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">	<span class="kt">int</span> <span class="n">m_nParent</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">};</span>
+</span></span><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">CInit</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl"><span class="k">public</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">	<span class="n">CInit</span><span class="p">(){</span>
+</span></span><span class="line"><span class="cl">		<span class="n">m_nNumber</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="k">protected</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">	<span class="kt">int</span> <span class="n">m_nNumber</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">};</span>
+</span></span><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">CChild</span> <span class="o">:</span> <span class="k">public</span> <span class="n">CParent</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl"><span class="k">public</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">	<span class="n">CChild</span><span class="p">()</span><span class="o">:</span> <span class="n">m_nChild</span><span class="p">(</span><span class="mi">1</span><span class="p">){}</span>
+</span></span><span class="line"><span class="cl"><span class="k">protected</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">	<span class="n">CInit</span> <span class="n">m_Init</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="kt">int</span> <span class="n">m_nChild</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">};</span>
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-asm" data-lang="asm"><span class="line"><span class="cl"><span class="err">34:</span>       <span class="nf">CChild</span> <span class="no">cc</span><span class="c1">;
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">00401288</span>   <span class="nf">lea</span>         <span class="no">ecx</span><span class="p">,[</span><span class="no">ebp-0Ch</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="err">0040128</span><span class="nf">B</span>   <span class="no">call</span>        <span class="err">@</span><span class="no">ILT</span><span class="err">+</span><span class="mi">5</span><span class="p">(</span><span class="no">CChild</span><span class="p">::</span><span class="no">CChild</span><span class="p">)</span> <span class="p">(</span><span class="mi">0040100</span><span class="no">a</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="c1">;构造函数
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">004012</span><span class="nf">C9</span>   <span class="no">pop</span>         <span class="no">ecx</span>
+</span></span><span class="line"><span class="cl"><span class="err">004012</span><span class="nf">CA</span>   <span class="no">mov</span>         <span class="no">dword</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">ebp-4</span><span class="p">],</span><span class="no">ecx</span>
+</span></span><span class="line"><span class="cl"><span class="err">004012</span><span class="nf">CD</span>   <span class="no">mov</span>         <span class="no">ecx</span><span class="p">,</span><span class="no">dword</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">ebp-4</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="err">004012</span><span class="nf">D0</span>   <span class="no">call</span>        <span class="err">@</span><span class="no">ILT</span><span class="err">+</span><span class="mi">25</span><span class="p">(</span><span class="no">CParent</span><span class="p">::</span><span class="no">CParent</span><span class="p">)</span> <span class="p">(</span><span class="mi">0040101</span><span class="no">e</span><span class="p">)</span><span class="c1">;先调用父类的构造
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">004012</span><span class="nf">D5</span>   <span class="no">mov</span>         <span class="no">ecx</span><span class="p">,</span><span class="no">dword</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">ebp-4</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="err">004012</span><span class="nf">D8</span>   <span class="no">add</span>         <span class="no">ecx</span><span class="p">,</span><span class="mi">4</span>
+</span></span><span class="line"><span class="cl"><span class="err">004012</span><span class="nf">DB</span>   <span class="no">call</span>        <span class="err">@</span><span class="no">ILT</span><span class="err">+</span><span class="mi">0</span><span class="p">(</span><span class="no">CInit</span><span class="p">::</span><span class="no">CInit</span><span class="p">)</span> <span class="p">(</span><span class="mi">00401005</span><span class="p">)</span><span class="c1">;然后调用类成员的构造
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">004012</span><span class="nf">E0</span>   <span class="no">mov</span>         <span class="no">eax</span><span class="p">,</span><span class="no">dword</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">ebp-4</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="err">004012</span><span class="nf">E3</span>   <span class="no">mov</span>         <span class="no">dword</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">eax</span><span class="err">+</span><span class="mi">8</span><span class="p">],</span><span class="mi">1</span><span class="c1">;最后调用初始化列表中的操作
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">004012</span><span class="nf">EA</span>   <span class="no">mov</span>         <span class="no">eax</span><span class="p">,</span><span class="no">dword</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">ebp-4</span><span class="p">]</span>
+</span></span></code></pre></div><p>综上分析，编译器在对对象进行初始化时是根据各个部分在内存中的排放顺序来进行初始化的，就上面的例子来说，最上面的是基类的所以它首先调用的是基类的构造，然后是类的成员，所以接着调用成员对象的构造函数，最后是自身定义的变量，所以最后初始化自身的变量，但是初始化列表中的操作是先于类自身构造函数中的代码的。
+由于父类的成员在内存中的分步是先于派生类自身的成员，所以通过派生类的指针可以很容易寻址到父类的成员，而且可以将派生类的指针转化为父类进行操作，并且不会出错，但是反过来将父类的指针转化为派生类来使用则会造成越界访问。
+下面我们来看一下对于虚表指针的初始化问题，如果在基类中存在虚函数，而且在派生类中重写这个虚函数的话，编译器会如何初始化虚表指针。</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">CParent</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl"><span class="k">public</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">	<span class="k">virtual</span> <span class="kt">void</span> <span class="n">print</span><span class="p">(){</span>
+</span></span><span class="line"><span class="cl">		<span class="n">printf</span><span class="p">(</span><span class="s">&#34;CParent()</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">};</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">CChild</span> <span class="o">:</span> <span class="k">public</span> <span class="n">CParent</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl"><span class="k">public</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">	<span class="k">virtual</span> <span class="kt">void</span> <span class="n">print</span><span class="p">(){</span>
+</span></span><span class="line"><span class="cl">		<span class="n">printf</span><span class="p">(</span><span class="s">&#34;CChild()</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">};</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kt">int</span> <span class="nf">main</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">	<span class="n">CChild</span> <span class="n">cc</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"> 	<span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-asm" data-lang="asm"><span class="line"><span class="cl"><span class="c1">;函数地址
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">@</span><span class="nf">ILT</span><span class="err">+</span><span class="mi">0</span><span class="p">(</span><span class="err">?</span><span class="no">print@CParent@@UAEXXZ</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl"><span class="err">00401005</span>   <span class="nf">jmp</span>         <span class="no">CParent</span><span class="p">::</span><span class="no">print</span>
+</span></span><span class="line"><span class="cl"><span class="err">@</span><span class="nf">ILT</span><span class="err">+</span><span class="mi">10</span><span class="p">(</span><span class="err">?</span><span class="no">print@CChild@@UAEXXZ</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl"><span class="err">0040100</span><span class="nf">F</span>   <span class="no">jmp</span>         <span class="no">CChild</span><span class="p">::</span><span class="no">print</span>
+</span></span><span class="line"><span class="cl"><span class="c1">;派生类构造函数
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">004012</span><span class="nf">C9</span>   <span class="no">pop</span>         <span class="no">ecx</span>
+</span></span><span class="line"><span class="cl"><span class="err">004012</span><span class="nf">CA</span>   <span class="no">mov</span>         <span class="no">dword</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">ebp-4</span><span class="p">],</span><span class="no">ecx</span>
+</span></span><span class="line"><span class="cl"><span class="err">004012</span><span class="nf">CD</span>   <span class="no">mov</span>         <span class="no">ecx</span><span class="p">,</span><span class="no">dword</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">ebp-4</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="err">004012</span><span class="nf">D0</span>   <span class="no">call</span>        <span class="err">@</span><span class="no">ILT</span><span class="err">+</span><span class="mi">30</span><span class="p">(</span><span class="no">CParent</span><span class="p">::</span><span class="no">CParent</span><span class="p">)</span> <span class="p">(</span><span class="mi">00401023</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="err">004012</span><span class="nf">D5</span>   <span class="no">mov</span>         <span class="no">eax</span><span class="p">,</span><span class="no">dword</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">ebp-4</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="err">004012</span><span class="nf">D8</span>   <span class="no">mov</span>         <span class="no">dword</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">eax</span><span class="p">],</span><span class="no">offset</span> <span class="no">CChild</span><span class="p">::</span><span class="err">`</span><span class="no">vftable</span><span class="err">&#39;</span> <span class="p">(</span><span class="mi">0042</span><span class="no">f01c</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="err">004012</span><span class="nf">DE</span>   <span class="no">mov</span>         <span class="no">eax</span><span class="p">,</span><span class="no">dword</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">ebp-4</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="c1">;基类构造函数
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">00401379</span>   <span class="nf">pop</span>         <span class="no">ecx</span>
+</span></span><span class="line"><span class="cl"><span class="err">0040137</span><span class="nf">A</span>   <span class="no">mov</span>         <span class="no">dword</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">ebp-4</span><span class="p">],</span><span class="no">ecx</span>
+</span></span><span class="line"><span class="cl"><span class="err">0040137</span><span class="nf">D</span>   <span class="no">mov</span>         <span class="no">eax</span><span class="p">,</span><span class="no">dword</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">ebp-4</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="err">00401380</span>   <span class="nf">mov</span>         <span class="no">dword</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">eax</span><span class="p">],</span><span class="no">offset</span> <span class="no">CParent</span><span class="p">::</span><span class="err">`</span><span class="no">vftable</span><span class="err">&#39;</span> <span class="p">(</span><span class="mi">0042</span><span class="no">f02c</span><span class="p">)</span>
+</span></span></code></pre></div><p>上述代码的基本流程是首先执行基类的构造函数，在基类中首先初始化虚函数指针，从上面的汇编代码中可以看到，这个虚函数指针的值为0x0042f02c查看这块内存可以看到，它保存的值为0x00401005上面我们列出的虚函数地址可以看到，这个值正是基类中虚函数的地址。当基类的构造函数调用完成后，接着执行派生类的虚表指针的初始化，将它自身虚函数的地址存入到虚表中。
+通过上面的分析可以知道，在派生类中如果重写了基类中的虚函数，那么在创建新的类对象时会有两次虚表指针的初始化操作，第一次是将基类的虚表指针赋值给对象，然后再将自身的虚表指针赋值给对象，将前一次的覆盖，如果是在基类的构造中调用虚函数，这个时候由于还没有生成派生类，所以会直接寻址，找到基类中的虚函数，这个时候不会构成多态，但是如果在派生类的构造函数中调用，这个时候已经初始化了虚表指针，会进行虚表的间接寻址调用派生类的虚函数构成多态。
+析构函数与构造函数相反，在执行析构时，会首先将虚表指针赋值为当前类的虚表地址，调用当前类的虚函数，然后再将虚表指针赋值为其基类的虚表地址，执行基类的虚函数。</p>
+<h1 id="多重继承">多重继承</h1>
+<p>多重继承的情况与单继承的情况类似，只是其父类变为多个，首先来分析多重继承的内存分布情况</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">CParent1</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl"><span class="k">public</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">	<span class="k">virtual</span> <span class="kt">void</span> <span class="n">fnc1</span><span class="p">(){</span>
+</span></span><span class="line"><span class="cl">		<span class="n">printf</span><span class="p">(</span><span class="s">&#34;CParent1 fnc1</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">protected</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">	<span class="kt">int</span> <span class="n">m_n1</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">};</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">CParent2</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl"><span class="k">public</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">	<span class="k">virtual</span> <span class="kt">void</span> <span class="n">fnc2</span><span class="p">(){</span>
+</span></span><span class="line"><span class="cl">		<span class="n">printf</span><span class="p">(</span><span class="s">&#34;CParent2 fnc2</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">protected</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">	<span class="kt">int</span> <span class="n">m_n2</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">};</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">CChild</span> <span class="o">:</span> <span class="k">public</span> <span class="n">CParent1</span><span class="p">,</span> <span class="k">public</span> <span class="n">CParent2</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl"><span class="k">public</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">	<span class="k">virtual</span> <span class="kt">void</span> <span class="n">fnc1</span><span class="p">(){</span>
+</span></span><span class="line"><span class="cl">		<span class="n">printf</span><span class="p">(</span><span class="s">&#34;CChild fnc1()</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="k">virtual</span> <span class="kt">void</span> <span class="nf">fnc2</span><span class="p">(){</span>
+</span></span><span class="line"><span class="cl">		<span class="n">printf</span><span class="p">(</span><span class="s">&#34;CChild fnc2()</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">protected</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">	<span class="kt">int</span> <span class="n">m_n3</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">};</span>
+</span></span><span class="line"><span class="cl"><span class="kt">int</span> <span class="nf">main</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">	<span class="n">CChild</span> <span class="n">cc</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">CParent1</span> <span class="o">*</span><span class="n">p</span> <span class="o">=</span> <span class="o">&amp;</span><span class="n">cc</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">p</span><span class="o">-&gt;</span><span class="n">fnc1</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">	<span class="n">CParent2</span> <span class="o">*</span><span class="n">p1</span> <span class="o">=</span> <span class="o">&amp;</span><span class="n">cc</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">p1</span><span class="o">-&gt;</span><span class="n">fnc2</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">	<span class="n">p</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">p1</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p>上述代码中，CChild类有两个基类，CParent1 CParent2 ，并且重写了这两个类中的函数：fnc1 fnc2，然后在主函数中分别将cc对象转化为它的两个基类的指针，通过指针调用虚函数，实现多态。下面是它的反汇编代码</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-asm" data-lang="asm"><span class="line"><span class="cl"><span class="err">43:</span>       <span class="nf">CChild</span> <span class="no">cc</span><span class="c1">;
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">004012</span><span class="nf">A8</span>   <span class="no">lea</span>         <span class="no">ecx</span><span class="p">,[</span><span class="no">ebp-14h</span><span class="p">]</span><span class="c1">;对象的this指针
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">004012</span><span class="nf">AB</span>   <span class="no">call</span>        <span class="err">@</span><span class="no">ILT</span><span class="err">+</span><span class="mi">15</span><span class="p">(</span><span class="no">CChild</span><span class="p">::</span><span class="no">CChild</span><span class="p">)</span> <span class="p">(</span><span class="mi">00401014</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="err">44:</span>       <span class="nf">CParent1</span> <span class="p">*</span><span class="no">p</span> <span class="err">=</span> <span class="err">&amp;</span><span class="no">cc</span><span class="c1">;
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">004012</span><span class="nf">B0</span>   <span class="no">lea</span>         <span class="no">eax</span><span class="p">,[</span><span class="no">ebp-14h</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="err">004012</span><span class="nf">B3</span>   <span class="no">mov</span>         <span class="no">dword</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">ebp-18h</span><span class="p">],</span><span class="no">eax</span><span class="c1">;[ebp - 18h]是p的值
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">45:</span>       <span class="nf">p-</span><span class="err">&gt;</span><span class="no">fnc1</span><span class="p">()</span><span class="c1">;
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">004012</span><span class="nf">B6</span>   <span class="no">mov</span>         <span class="no">ecx</span><span class="p">,</span><span class="no">dword</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">ebp-18h</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="err">004012</span><span class="nf">B9</span>   <span class="no">mov</span>         <span class="no">edx</span><span class="p">,</span><span class="no">dword</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">ecx</span><span class="p">]</span><span class="c1">;对象的头四个字节是虚函数表指针
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">004012</span><span class="nf">BB</span>   <span class="no">mov</span>         <span class="no">esi</span><span class="p">,</span><span class="no">esp</span>
+</span></span><span class="line"><span class="cl"><span class="err">004012</span><span class="nf">BD</span>   <span class="no">mov</span>         <span class="no">ecx</span><span class="p">,</span><span class="no">dword</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">ebp-18h</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="err">004012</span><span class="nf">C0</span>   <span class="no">call</span>        <span class="no">dword</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">edx</span><span class="p">]</span><span class="c1">;通过虚函数地址调用虚函数
+</span></span></span><span class="line"><span class="cl"><span class="c1">;部分代码略
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">46:</span>       <span class="nf">CParent2</span> <span class="p">*</span><span class="no">p1</span> <span class="err">=</span> <span class="err">&amp;</span><span class="no">cc</span><span class="c1">;
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">004012</span><span class="nf">C9</span>   <span class="no">lea</span>         <span class="no">eax</span><span class="p">,[</span><span class="no">ebp-14h</span><span class="p">]</span><span class="c1">;eax = this
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">004012</span><span class="nf">CC</span>   <span class="no">test</span>        <span class="no">eax</span><span class="p">,</span><span class="no">eax</span>
+</span></span><span class="line"><span class="cl"><span class="err">004012</span><span class="nf">CE</span>   <span class="no">je</span>          <span class="no">main</span><span class="err">+</span><span class="mi">48</span><span class="no">h</span> <span class="p">(</span><span class="mi">004012</span><span class="no">d8</span><span class="p">)</span><span class="c1">;校验this是否为空
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">004012</span><span class="nf">D0</span>   <span class="no">lea</span>         <span class="no">ecx</span><span class="p">,[</span><span class="no">ebp-0Ch</span><span class="p">]</span><span class="c1">;this指针向下偏移8个字节
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">004012</span><span class="nf">D3</span>   <span class="no">mov</span>         <span class="no">dword</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">ebp-20h</span><span class="p">],</span><span class="no">ecx</span>
+</span></span><span class="line"><span class="cl"><span class="err">004012</span><span class="nf">D6</span>   <span class="no">jmp</span>         <span class="no">main</span><span class="err">+</span><span class="mi">4</span><span class="no">Fh</span> <span class="p">(</span><span class="mi">004012</span><span class="no">df</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="err">004012</span><span class="nf">D8</span>   <span class="no">mov</span>         <span class="no">dword</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">ebp-20h</span><span class="p">],</span><span class="mi">0</span><span class="c1">;如果this为null会将edx赋值为0
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">004012</span><span class="nf">DF</span>   <span class="no">mov</span>         <span class="no">edx</span><span class="p">,</span><span class="no">dword</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">ebp-20h</span><span class="p">]</span><span class="c1">;edx = this + 8
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">004012</span><span class="nf">E2</span>   <span class="no">mov</span>         <span class="no">dword</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">ebp-1Ch</span><span class="p">],</span><span class="no">edx</span><span class="c1">;[ebp - 1CH]是p1的值
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">47:</span>       <span class="nf">p1-</span><span class="err">&gt;</span><span class="no">fnc2</span><span class="p">()</span><span class="c1">;
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">004012</span><span class="nf">E5</span>   <span class="no">mov</span>         <span class="no">eax</span><span class="p">,</span><span class="no">dword</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">ebp-1Ch</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="err">004012</span><span class="nf">E8</span>   <span class="no">mov</span>         <span class="no">edx</span><span class="p">,</span><span class="no">dword</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">eax</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="err">004012</span><span class="nf">EA</span>   <span class="no">mov</span>         <span class="no">esi</span><span class="p">,</span><span class="no">esp</span>
+</span></span><span class="line"><span class="cl"><span class="err">004012</span><span class="nf">EC</span>   <span class="no">mov</span>         <span class="no">ecx</span><span class="p">,</span><span class="no">dword</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">ebp-1Ch</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="err">004012</span><span class="nf">EF</span>   <span class="no">call</span>        <span class="no">dword</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">edx</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="err">004012</span><span class="nf">F1</span>   <span class="no">cmp</span>         <span class="no">esi</span><span class="p">,</span><span class="no">esp</span>
+</span></span><span class="line"><span class="cl"><span class="err">004012</span><span class="nf">F3</span>   <span class="no">call</span>        <span class="no">__chkesp</span> <span class="p">(</span><span class="mi">00401680</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="c1">;CChild构造函数
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">0040135</span><span class="nf">A</span>   <span class="no">mov</span>         <span class="no">dword</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">ebp-4</span><span class="p">],</span><span class="no">ecx</span>
+</span></span><span class="line"><span class="cl"><span class="err">0040135</span><span class="nf">D</span>   <span class="no">mov</span>         <span class="no">ecx</span><span class="p">,</span><span class="no">dword</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">ebp-4</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="err">00401360</span>   <span class="nf">call</span>        <span class="err">@</span><span class="no">ILT</span><span class="err">+</span><span class="mi">40</span><span class="p">(</span><span class="no">CParent1</span><span class="p">::</span><span class="no">CParent1</span><span class="p">)</span> <span class="p">(</span><span class="mi">0040102</span><span class="no">d</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="err">00401365</span>   <span class="nf">mov</span>         <span class="no">ecx</span><span class="p">,</span><span class="no">dword</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">ebp-4</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="err">00401368</span>   <span class="nf">add</span>         <span class="no">ecx</span><span class="p">,</span><span class="mi">8</span><span class="c1">;将指向对象首地址的指针向下偏移了8个字节
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">0040136</span><span class="nf">B</span>   <span class="no">call</span>        <span class="err">@</span><span class="no">ILT</span><span class="err">+</span><span class="mi">45</span><span class="p">(</span><span class="no">CParent2</span><span class="p">::</span><span class="no">CParent2</span><span class="p">)</span> <span class="p">(</span><span class="mi">00401032</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="err">00401370</span>   <span class="nf">mov</span>         <span class="no">eax</span><span class="p">,</span><span class="no">dword</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">ebp-4</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="err">00401373</span>   <span class="nf">mov</span>         <span class="no">dword</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">eax</span><span class="p">],</span><span class="no">offset</span> <span class="no">CChild</span><span class="p">::</span><span class="err">`</span><span class="no">vftable</span><span class="err">&#39;</span> <span class="p">(</span><span class="mi">0042</span><span class="no">f020</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="err">00401379</span>   <span class="nf">mov</span>         <span class="no">ecx</span><span class="p">,</span><span class="no">dword</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">ebp-4</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="err">0040137</span><span class="nf">C</span>   <span class="no">mov</span>         <span class="no">dword</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">ecx</span><span class="err">+</span><span class="mi">8</span><span class="p">],</span><span class="no">offset</span> <span class="no">CChild</span><span class="p">::</span><span class="err">`</span><span class="no">vftable</span><span class="err">&#39;</span> <span class="p">(</span><span class="mi">0042</span><span class="no">f01c</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="err">00401383</span>   <span class="nf">mov</span>         <span class="no">eax</span><span class="p">,</span><span class="no">dword</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">ebp-4</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="c1">;CParent1构造函数
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">00401469</span>   <span class="nf">pop</span>         <span class="no">ecx</span>
+</span></span><span class="line"><span class="cl"><span class="err">0040146</span><span class="nf">A</span>   <span class="no">mov</span>         <span class="no">dword</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">ebp-4</span><span class="p">],</span><span class="no">ecx</span>
+</span></span><span class="line"><span class="cl"><span class="err">0040146</span><span class="nf">D</span>   <span class="no">mov</span>         <span class="no">eax</span><span class="p">,</span><span class="no">dword</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">ebp-4</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="err">00401470</span>   <span class="nf">mov</span>         <span class="no">dword</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">eax</span><span class="p">],</span><span class="no">offset</span> <span class="no">CParent1</span><span class="p">::</span><span class="err">`</span><span class="no">vftable</span><span class="err">&#39;</span> <span class="p">(</span><span class="mi">0042</span><span class="no">f04c</span><span class="p">)</span><span class="c1">;初始化虚表指针
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">00401476</span>   <span class="nf">mov</span>         <span class="no">eax</span><span class="p">,</span><span class="no">dword</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">ebp-4</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="c1">;CParent2构造函数
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">004014</span><span class="nf">F9</span>   <span class="no">pop</span>         <span class="no">ecx</span>
+</span></span><span class="line"><span class="cl"><span class="err">004014</span><span class="nf">FA</span>   <span class="no">mov</span>         <span class="no">dword</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">ebp-4</span><span class="p">],</span><span class="no">ecx</span>
+</span></span><span class="line"><span class="cl"><span class="err">004014</span><span class="nf">FD</span>   <span class="no">mov</span>         <span class="no">eax</span><span class="p">,</span><span class="no">dword</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">ebp-4</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="err">00401500</span>   <span class="nf">mov</span>         <span class="no">dword</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">eax</span><span class="p">],</span><span class="no">offset</span> <span class="no">CParent2</span><span class="p">::</span><span class="err">`</span><span class="no">vftable</span><span class="err">&#39;</span> <span class="p">(</span><span class="mi">0042</span><span class="no">f064</span><span class="p">)</span><span class="c1">;初始化虚表指针
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">00401506</span>   <span class="nf">mov</span>         <span class="no">eax</span><span class="p">,</span><span class="no">dword</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">ebp-4</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="c1">;虚函数地址
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">@</span><span class="nf">ILT</span><span class="err">+</span><span class="mi">0</span><span class="p">(</span><span class="err">?</span><span class="no">fnc2@CChild@@UAEXXZ</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl"><span class="err">00401005</span>   <span class="nf">jmp</span>         <span class="no">CChild</span><span class="p">::</span><span class="no">fnc2</span> <span class="p">(</span><span class="mi">00401400</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="err">@</span><span class="nf">ILT</span><span class="err">+</span><span class="mi">5</span><span class="p">(</span><span class="err">?</span><span class="no">fnc1@CParent1@@UAEXXZ</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl"><span class="err">0040100</span><span class="nf">A</span>   <span class="no">jmp</span>         <span class="no">CParent1</span><span class="p">::</span><span class="no">fnc1</span> <span class="p">(</span><span class="mi">00401490</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="err">@</span><span class="nf">ILT</span><span class="err">+</span><span class="mi">10</span><span class="p">(</span><span class="err">?</span><span class="no">fnc1@CChild@@UAEXXZ</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl"><span class="err">0040100</span><span class="nf">F</span>   <span class="no">jmp</span>         <span class="no">CChild</span><span class="p">::</span><span class="no">fnc1</span> <span class="p">(</span><span class="mi">004013</span><span class="no">b0</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="err">@</span><span class="nf">ILT</span><span class="err">+</span><span class="mi">20</span><span class="p">(</span><span class="err">?</span><span class="no">fnc2@CParent2@@UAEXXZ</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl"><span class="err">00401019</span>   <span class="nf">jmp</span>         <span class="no">CParent2</span><span class="p">::</span><span class="no">fnc2</span> <span class="p">(</span><span class="mi">00401520</span><span class="p">)</span>
+</span></span></code></pre></div><table>
+<thead>
+<tr>
+<th style="text-align:left">内存地址</th>
+<th style="text-align:left">存储的值</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">0012FF6C</td>
+<td style="text-align:left">20 F0 42 00</td>
+</tr>
+<tr>
+<td style="text-align:left">0012FF70</td>
+<td style="text-align:left">CC CC CC CC</td>
+</tr>
+<tr>
+<td style="text-align:left">0012FF74</td>
+<td style="text-align:left">1C F0 42 00</td>
+</tr>
+<tr>
+<td style="text-align:left">0012FF78</td>
+<td style="text-align:left">CC CC CC CC</td>
+</tr>
+<tr>
+<td style="text-align:left">0012FF7C</td>
+<td style="text-align:left">CC CC CC CC</td>
+</tr>
+<tr>
+<td style="text-align:left">从上面的汇编代码中可以看到，在为该类对象分配内存时，会根据继承的顺序，依次调用基类的构造函数，在构造函数中，与单继承类似，在各个基类的构造中，先将虚表指针初始化为各个基类的虚表地址，然后在调用完各个基类的构造函数后将虚表指针覆盖为对象自身的虚表地址，唯一不同的是，派生类有多个虚表指针，有几个派生类就有几个虚表指针。另外派生类的内存分布与单继承的分布情况相似，根据继承顺序从低地址到高地址依次摆放，最后是派生类自己定义的部分，每个基类都会在其自身所在位置的首地址处构建一个虚表。</td>
+<td></td>
+</tr>
+<tr>
+<td style="text-align:left">在调用各自基类的构造函数时，并不是笼统的将对象的首地址传递给基类的构造函数，而是经过相应的地址偏移之后，将偏移后的地址传递给对应的构造。在转化为父类的指针时也是经过了相应的地址偏移。</td>
+<td></td>
+</tr>
+<tr>
+<td style="text-align:left">在析构时首先析构自身，然后按照与构造相反的顺序调用基类的析构函数。</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h2 id="dynamic_cast强制类型转化与static_cast类型转化">dynamic_cast强制类型转化与static_cast类型转化</h2>
+<p>根据上面的说明我们可以简单的画一张图：
+<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="http://img.blog.csdn.net/20171012224220685?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvbGFudWFnZQ==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast"
+        data-srcset="http://img.blog.csdn.net/20171012224220685?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvbGFudWFnZQ==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast, http://img.blog.csdn.net/20171012224220685?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvbGFudWFnZQ==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast 1.5x, http://img.blog.csdn.net/20171012224220685?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvbGFudWFnZQ==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast 2x"
+        data-sizes="auto"
+        alt="http://img.blog.csdn.net/20171012224220685?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvbGFudWFnZQ==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast"
+        title="这里写图片描述" />
+这个对象中有三个虚表，分别位于各个基类所在内存的首地址处，如果我们利用多态的特性进行类型转化的话如果采用static_cast的方式会进行静态转化，也就是说它只是简单的将对象的首地址进行类型转化，这个时候如果调用CParent2的函数，在编译的时候不会报错，但是在运行时可能在虚表中（注意如果是这种情况它找到的虚表其实是CParent1的虚表）找不到想要的虚函数，这个时候调用会引起非法内存访问，造成程序崩溃。但是用dynamic_cast可以进行偏移地址的计算，自动偏移到CParent2内存部分的首地址，这个时候调用虚函数不会产生崩溃的问题。所以在有多重继承和多继承的时候尽量使用dynamic_cast进行类型转化。</p>
+<h1 id="抽象类">抽象类</h1>
+<p>抽象类是不能实例化的类，只要有纯虚函数就是一个抽象类。纯虚函数是只有定义而没有实现的函数，由于虚函数的地址需要填入虚表，所以必须提供虚函数的定义，以便编译器能够将虚函数的地址放入虚表，所以虚函数必须定义，但是纯虚函数不一样，它不能定义。</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">CParent</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl"><span class="k">public</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">	<span class="k">virtual</span> <span class="n">show</span><span class="p">()</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">};</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">CChild</span> <span class="o">:</span> <span class="k">public</span> <span class="n">CParent</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl"><span class="k">public</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">	<span class="k">virtual</span> <span class="n">show</span><span class="p">(){</span>
+</span></span><span class="line"><span class="cl">		<span class="n">printf</span><span class="p">(</span><span class="s">&#34;CChild()</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">};</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kt">int</span> <span class="nf">main</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">	<span class="n">CChild</span> <span class="n">cc</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">CParent</span> <span class="o">*</span><span class="n">p</span> <span class="o">=</span> <span class="o">&amp;</span><span class="n">cc</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">p</span><span class="o">-&gt;</span><span class="n">show</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl"> 	<span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p>上面的代码定义了一个抽象类CParent，而CChild继承这个抽象类并实现了其中的纯虚函数，在主函数中通过基类的指针掉用虚函数，形成多态。</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-asm" data-lang="asm"><span class="line"><span class="cl"><span class="err">22:</span>       <span class="nf">CChild</span> <span class="no">cc</span><span class="c1">;
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">00401288</span>   <span class="nf">lea</span>         <span class="no">ecx</span><span class="p">,[</span><span class="no">ebp-4</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="err">0040128</span><span class="nf">B</span>   <span class="no">call</span>        <span class="err">@</span><span class="no">ILT</span><span class="err">+</span><span class="mi">0</span><span class="p">(</span><span class="no">CChild</span><span class="p">::</span><span class="no">CChild</span><span class="p">)</span> <span class="p">(</span><span class="mi">00401005</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="err">23:</span>       <span class="nf">CParent</span> <span class="p">*</span><span class="no">p</span> <span class="err">=</span> <span class="err">&amp;</span><span class="no">cc</span><span class="c1">;
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">00401290</span>   <span class="nf">lea</span>         <span class="no">eax</span><span class="p">,[</span><span class="no">ebp-4</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="err">00401293</span>   <span class="nf">mov</span>         <span class="no">dword</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">ebp-8</span><span class="p">],</span><span class="no">eax</span>
+</span></span><span class="line"><span class="cl"><span class="err">24:</span>       <span class="nf">p-</span><span class="err">&gt;</span><span class="no">show</span><span class="p">()</span><span class="c1">;
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">00401296</span>   <span class="nf">mov</span>         <span class="no">ecx</span><span class="p">,</span><span class="no">dword</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">ebp-8</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="err">00401299</span>   <span class="nf">mov</span>         <span class="no">edx</span><span class="p">,</span><span class="no">dword</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">ecx</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="err">0040129</span><span class="nf">B</span>   <span class="no">mov</span>         <span class="no">esi</span><span class="p">,</span><span class="no">esp</span>
+</span></span><span class="line"><span class="cl"><span class="err">0040129</span><span class="nf">D</span>   <span class="no">mov</span>         <span class="no">ecx</span><span class="p">,</span><span class="no">dword</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">ebp-8</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="err">004012</span><span class="nf">A0</span>   <span class="no">call</span>        <span class="no">dword</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">edx</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="c1">;CChild构造函数
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">004012</span><span class="nf">F0</span>   <span class="no">call</span>        <span class="err">@</span><span class="no">ILT</span><span class="err">+</span><span class="mi">25</span><span class="p">(</span><span class="no">CParent</span><span class="p">::</span><span class="no">CParent</span><span class="p">)</span> <span class="p">(</span><span class="mi">0040101</span><span class="no">e</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="err">004012</span><span class="nf">F5</span>   <span class="no">mov</span>         <span class="no">eax</span><span class="p">,</span><span class="no">dword</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">ebp-4</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="err">004012</span><span class="nf">F8</span>   <span class="no">mov</span>         <span class="no">dword</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">eax</span><span class="p">],</span><span class="no">offset</span> <span class="no">CChild</span><span class="p">::</span><span class="err">`</span><span class="no">vftable</span><span class="err">&#39;</span> <span class="p">(</span><span class="mi">0042</span><span class="no">f01c</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="nf">CParent构造函数</span>
+</span></span><span class="line"><span class="cl"><span class="err">00401399</span>   <span class="nf">pop</span>         <span class="no">ecx</span>
+</span></span><span class="line"><span class="cl"><span class="err">0040139</span><span class="nf">A</span>   <span class="no">mov</span>         <span class="no">dword</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">ebp-4</span><span class="p">],</span><span class="no">ecx</span>
+</span></span><span class="line"><span class="cl"><span class="err">0040139</span><span class="nf">D</span>   <span class="no">mov</span>         <span class="no">eax</span><span class="p">,</span><span class="no">dword</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">ebp-4</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="err">004013</span><span class="nf">A0</span>   <span class="no">mov</span>         <span class="no">dword</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">eax</span><span class="p">],</span><span class="no">offset</span> <span class="no">CParent</span><span class="p">::</span><span class="err">`</span><span class="no">vftable</span><span class="err">&#39;</span> <span class="p">(</span><span class="mi">0042</span><span class="no">f02c</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="err">004013</span><span class="nf">A6</span>   <span class="no">mov</span>         <span class="no">eax</span><span class="p">,</span><span class="no">dword</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">ebp-4</span><span class="p">]</span>
+</span></span></code></pre></div><p>构造函数中仍然是调用了基类的构造函数，并在基类的构造中对虚表指针进行了赋值，但是基类中并没有定义show函数，而是将它作为纯虚函数，那么虚表中存储的的是什么东西呢，这个位置存储的是一个_purecall函数，主要是为了防止误调纯虚函数。</p>
+<h1 id="菱形继承">菱形继承</h1>
+<p>菱形继承是最为复杂的一种继承方式，它结合了单继承和多继承</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">CGrand</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl"><span class="k">public</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">	<span class="k">virtual</span> <span class="kt">void</span> <span class="n">func1</span><span class="p">(){</span>
+</span></span><span class="line"><span class="cl">		<span class="n">printf</span><span class="p">(</span><span class="s">&#34;CGrand func1()</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="k">protected</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">	<span class="kt">int</span> <span class="n">m_nNum1</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">};</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">CParent1</span> <span class="o">:</span> <span class="k">public</span> <span class="n">CGrand</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl"><span class="k">public</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">	<span class="k">virtual</span> <span class="kt">void</span> <span class="n">func2</span><span class="p">(){</span>
+</span></span><span class="line"><span class="cl">		<span class="n">printf</span><span class="p">(</span><span class="s">&#34;CParent1 func2()</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="k">virtual</span> <span class="kt">void</span> <span class="nf">func3</span><span class="p">(){</span>
+</span></span><span class="line"><span class="cl">		<span class="n">printf</span><span class="p">(</span><span class="s">&#34;CParent1 func3()</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="k">protected</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">	<span class="kt">int</span> <span class="n">m_nNum2</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">};</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">CParent2</span> <span class="o">:</span> <span class="k">public</span> <span class="n">CGrand</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl"><span class="k">public</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">	<span class="k">virtual</span> <span class="kt">void</span> <span class="n">func4</span><span class="p">(){</span>
+</span></span><span class="line"><span class="cl">		<span class="n">printf</span><span class="p">(</span><span class="s">&#34;CParent2 func4()</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="k">virtual</span> <span class="kt">void</span> <span class="nf">func5</span><span class="p">(){</span>
+</span></span><span class="line"><span class="cl">		<span class="n">printf</span><span class="p">(</span><span class="s">&#34;CParent2 func5()</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="k">protected</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">	<span class="kt">int</span> <span class="n">m_nNum3</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">};</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">CChild</span> <span class="o">:</span> <span class="k">public</span> <span class="n">CParent1</span><span class="p">,</span> <span class="k">public</span> <span class="n">CParent2</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl"><span class="k">public</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">	<span class="k">virtual</span> <span class="kt">void</span> <span class="n">func2</span><span class="p">(){</span>
+</span></span><span class="line"><span class="cl">		<span class="n">printf</span><span class="p">(</span><span class="s">&#34;CChild func2()</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="k">virtual</span> <span class="kt">void</span> <span class="nf">func4</span><span class="p">(){</span>
+</span></span><span class="line"><span class="cl">		<span class="n">printf</span><span class="p">(</span><span class="s">&#34;CChild func4()</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">protected</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">	<span class="kt">int</span> <span class="n">m_nNum4</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">};</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kt">int</span> <span class="nf">main</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">	<span class="n">CChild</span> <span class="n">cc</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">CParent1</span> <span class="o">*</span><span class="n">p1</span> <span class="o">=</span> <span class="o">&amp;</span><span class="n">cc</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">CParent2</span> <span class="o">*</span><span class="n">p2</span> <span class="o">=</span> <span class="o">&amp;</span><span class="n">cc</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"> 	<span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p>上面的代码中有4个类，其中CGrand类为祖父类，而CParent1 CParent2为父类，他们都派生自组父类，而子类继承与CParent1 CParent2，根据前面的经验可以知道sizeof(CGrand) = 4(vt) + 4(int) = 8，而sizeof(CParent1) = sizeof(CParent2) = sizeof(CGrand) + 4(int) = 12， sizeof(CChild) = sizeof(CParent1) + sizeof(CParent2) + 4(int) = 28;
+大致可以知道CChild对象的内存分布是CParent1 CParent2 int这种情况，通过反汇编的方式我们可以看出对象的内存分布如下：
+<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="http://img.blog.csdn.net/20160709204624054"
+        data-srcset="http://img.blog.csdn.net/20160709204624054, http://img.blog.csdn.net/20160709204624054 1.5x, http://img.blog.csdn.net/20160709204624054 2x"
+        data-sizes="auto"
+        alt="http://img.blog.csdn.net/20160709204624054"
+        title="这里写图片描述" />
+内存的分步来看，CParent1 CParent2都继承自CGrand类，所以他们都有CGrand类的成员，而CChild类继承自两个类，所以CGrand类的成员在CChild类中有两份，所以在调用m_nNum1成员时会产生二义性，编译器不知道你准备调用那个m_nNum1成员，所以一般这个时候需要指定调用的是哪个部分的m_nNum1成员。同时在转化为祖父类的时候也会产生二义性。而虚继承可以有效的解决这个问题。一般来说虚继承可以有效的避免二义性是因为重复的内容在对象中只有一份。下面对上述例子进行相应的修改，为每个类添加构造函数构造初始化这些成员变量：m_nNum1 = 1；m_nNum2 = 2； m_nNum3 = 3； m_nNum4 = 4；
+另外再为CParent1 CParent2类添加虚继承。这个时候我们运行程序输入类CChild的大小：sizeof(CChild) = 36；按照之前所说的同样的内容只保留的一份，那内存大小应该会减少才对，为何突然增大了8个字节呢，下面来看看对象在内存中的分步：
+0012FF5C  30 F0 42 00
+0012FF60  48 F0 42 00
+0012FF64  02 00 00 00
+0012FF68  24 F0 42 00
+0012FF6C  3C F0 42 00
+0012FF70  03 00 00 00
+0012FF74  04 00 00 00
+0012FF78  20 F0 42 00
+0012FF7C  01 00 00 00
+上述内存的分步与我们之前想象的有很大的不同，所有变量的确只有一份，但是总内存大小还是变大了，同时它的存储顺序也不是按照我们之前所说的父类的排在子类的前面，而且还多了一些我们并不了解的数据
+下面通过反汇编代码来说明这些数值的作用：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-asm" data-lang="asm"><span class="line"><span class="cl"><span class="c1">;主函数部分
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">73:</span>       <span class="nf">CChild</span> <span class="no">cc</span><span class="c1">;
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">004012</span><span class="nf">D8</span>   <span class="no">push</span>        <span class="mi">1</span><span class="c1">;是否构造祖父类1表示构造，0表示不构造
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">004012</span><span class="nf">DA</span>   <span class="no">lea</span>         <span class="no">ecx</span><span class="p">,[</span><span class="no">ebp-24h</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="err">004012</span><span class="nf">DD</span>   <span class="no">call</span>        <span class="err">@</span><span class="no">ILT</span><span class="err">+</span><span class="mi">5</span><span class="p">(</span><span class="no">CChild</span><span class="p">::</span><span class="no">CChild</span><span class="p">)</span> <span class="p">(</span><span class="mi">0040100</span><span class="no">a</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="err">74:</span>       <span class="nf">printf</span><span class="p">(</span><span class="err">&#34;</span><span class="nv">%d</span><span class="err">\</span><span class="no">n</span><span class="err">&#34;</span><span class="p">,</span> <span class="no">sizeof</span><span class="p">(</span><span class="no">cc</span><span class="p">))</span><span class="c1">;
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">004012</span><span class="nf">E2</span>   <span class="no">push</span>        <span class="mi">24</span><span class="no">h</span>
+</span></span><span class="line"><span class="cl"><span class="err">004012</span><span class="nf">E4</span>   <span class="no">push</span>        <span class="no">offset</span> <span class="no">string</span> <span class="err">&#34;</span><span class="nv">%d</span><span class="err">\</span><span class="no">n</span><span class="err">&#34;</span> <span class="p">(</span><span class="mi">0042</span><span class="no">f01c</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="err">004012</span><span class="nf">E9</span>   <span class="no">call</span>        <span class="no">printf</span> <span class="p">(</span><span class="mi">00401</span><span class="no">a70</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="err">004012</span><span class="nf">EE</span>   <span class="no">add</span>         <span class="no">esp</span><span class="p">,</span><span class="mi">8</span>
+</span></span><span class="line"><span class="cl"><span class="err">75:</span>       <span class="nf">CParent1</span> <span class="p">*</span><span class="no">p1</span> <span class="err">=</span> <span class="err">&amp;</span><span class="no">cc</span><span class="c1">;
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">004012</span><span class="nf">F1</span>   <span class="no">lea</span>         <span class="no">eax</span><span class="p">,[</span><span class="no">ebp-24h</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="err">004012</span><span class="nf">F4</span>   <span class="no">mov</span>         <span class="no">dword</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">ebp-28h</span><span class="p">],</span><span class="no">eax</span>
+</span></span><span class="line"><span class="cl"><span class="err">76:</span>       <span class="nf">CParent2</span> <span class="p">*</span><span class="no">p2</span> <span class="err">=</span> <span class="err">&amp;</span><span class="no">cc</span><span class="c1">;
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">004012</span><span class="nf">F7</span>   <span class="no">lea</span>         <span class="no">ecx</span><span class="p">,[</span><span class="no">ebp-24h</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="err">004012</span><span class="nf">FA</span>   <span class="no">test</span>        <span class="no">ecx</span><span class="p">,</span><span class="no">ecx</span>
+</span></span><span class="line"><span class="cl"><span class="err">004012</span><span class="nf">FC</span>   <span class="no">je</span>          <span class="no">main</span><span class="err">+</span><span class="mi">46</span><span class="no">h</span> <span class="p">(</span><span class="mi">00401306</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="err">004012</span><span class="nf">FE</span>   <span class="no">lea</span>         <span class="no">edx</span><span class="p">,[</span><span class="no">ebp-18h</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="err">00401301</span>   <span class="nf">mov</span>         <span class="no">dword</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">ebp-34h</span><span class="p">],</span><span class="no">edx</span>
+</span></span><span class="line"><span class="cl"><span class="err">00401304</span>   <span class="nf">jmp</span>         <span class="no">main</span><span class="err">+</span><span class="mi">4</span><span class="no">Dh</span> <span class="p">(</span><span class="mi">0040130</span><span class="no">d</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="err">00401306</span>   <span class="nf">mov</span>         <span class="no">dword</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">ebp-34h</span><span class="p">],</span><span class="mi">0</span>
+</span></span><span class="line"><span class="cl"><span class="err">0040130</span><span class="nf">D</span>   <span class="no">mov</span>         <span class="no">eax</span><span class="p">,</span><span class="no">dword</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">ebp-34h</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="err">00401310</span>   <span class="nf">mov</span>         <span class="no">dword</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">ebp-2Ch</span><span class="p">],</span><span class="no">eax</span>
+</span></span><span class="line"><span class="cl"><span class="err">77:</span>       <span class="nf">CGrand</span> <span class="p">*</span><span class="no">p3</span> <span class="err">=</span> <span class="err">&amp;</span><span class="no">cc</span><span class="c1">;
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">00401313</span>   <span class="nf">lea</span>         <span class="no">ecx</span><span class="p">,[</span><span class="no">ebp-24h</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="err">00401316</span>   <span class="nf">test</span>        <span class="no">ecx</span><span class="p">,</span><span class="no">ecx</span><span class="c1">;this指针不为空
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">00401318</span>   <span class="nf">jne</span>         <span class="no">main</span><span class="err">+</span><span class="mi">63</span><span class="no">h</span> <span class="p">(</span><span class="mi">00401323</span><span class="p">)</span><span class="c1">;不为空则跳转
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">0040131</span><span class="nf">A</span>   <span class="no">mov</span>         <span class="no">dword</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">ebp-38h</span><span class="p">],</span><span class="mi">0</span>
+</span></span><span class="line"><span class="cl"><span class="err">00401321</span>   <span class="nf">jmp</span>         <span class="no">main</span><span class="err">+</span><span class="mi">70</span><span class="no">h</span> <span class="p">(</span><span class="mi">00401330</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="err">00401323</span>   <span class="nf">mov</span>         <span class="no">edx</span><span class="p">,</span><span class="no">dword</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">ebp-20h</span><span class="p">]</span><span class="c1">;edx = 0x0040f048
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">00401326</span>   <span class="nf">mov</span>         <span class="no">eax</span><span class="p">,</span><span class="no">dword</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">edx</span><span class="err">+</span><span class="mi">4</span><span class="p">]</span><span class="c1">;eax = 0x18这个可以通过查看内存获得
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">00401329</span>   <span class="nf">lea</span>         <span class="no">ecx</span><span class="p">,[</span><span class="no">ebp</span><span class="err">+</span><span class="no">eax-20h</span><span class="p">]</span><span class="c1">; ebp + eax - 20h = 0x0012ff78, ecx = 0x0012FF78
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">0040132</span><span class="nf">D</span>   <span class="no">mov</span>         <span class="no">dword</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">ebp-38h</span><span class="p">],</span><span class="no">ecx</span><span class="c1">;经过偏移后获得这个地址
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">00401330</span>   <span class="nf">mov</span>         <span class="no">edx</span><span class="p">,</span><span class="no">dword</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">ebp-38h</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="err">00401333</span>   <span class="nf">mov</span>         <span class="no">dword</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">ebp-30h</span><span class="p">],</span><span class="no">edx</span>
+</span></span><span class="line"><span class="cl"><span class="c1">;CChild构造
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">0040135</span><span class="nf">A</span>   <span class="no">mov</span>         <span class="no">dword</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">ebp-4</span><span class="p">],</span><span class="no">ecx</span>
+</span></span><span class="line"><span class="cl"><span class="err">0040135</span><span class="nf">D</span>   <span class="no">cmp</span>         <span class="no">dword</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">ebp</span><span class="err">+</span><span class="mi">8</span><span class="p">],</span><span class="mi">0</span>
+</span></span><span class="line"><span class="cl"><span class="err">00401361</span>   <span class="nf">je</span>          <span class="no">CChild</span><span class="p">::</span><span class="no">CChild</span><span class="err">+</span><span class="mi">42</span><span class="no">h</span> <span class="p">(</span><span class="mi">00401382</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="err">00401363</span>   <span class="nf">mov</span>         <span class="no">eax</span><span class="p">,</span><span class="no">dword</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">ebp-4</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="err">00401366</span>   <span class="nf">mov</span>         <span class="no">dword</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">eax</span><span class="err">+</span><span class="mi">4</span><span class="p">],</span><span class="no">offset</span> <span class="no">CChild</span><span class="p">::</span><span class="err">`</span><span class="no">vbtable</span><span class="err">&#39;</span> <span class="p">(</span><span class="mi">0042</span><span class="no">f048</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="err">0040136</span><span class="nf">D</span>   <span class="no">mov</span>         <span class="no">ecx</span><span class="p">,</span><span class="no">dword</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">ebp-4</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="err">00401370</span>   <span class="nf">mov</span>         <span class="no">dword</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">ecx</span><span class="err">+</span><span class="mi">10</span><span class="no">h</span><span class="p">],</span><span class="no">offset</span> <span class="no">CChild</span><span class="p">::</span><span class="err">`</span><span class="no">vbtable</span><span class="err">&#39;</span> <span class="p">(</span><span class="mi">0042</span><span class="no">f03c</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="err">00401377</span>   <span class="nf">mov</span>         <span class="no">ecx</span><span class="p">,</span><span class="no">dword</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">ebp-4</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="err">0040137</span><span class="nf">A</span>   <span class="no">add</span>         <span class="no">ecx</span><span class="p">,</span><span class="mi">1</span><span class="no">Ch</span>
+</span></span><span class="line"><span class="cl"><span class="err">0040137</span><span class="nf">D</span>   <span class="no">call</span>        <span class="err">@</span><span class="no">ILT</span><span class="err">+</span><span class="mi">0</span><span class="p">(</span><span class="no">CGrand</span><span class="p">::</span><span class="no">CGrand</span><span class="p">)</span> <span class="p">(</span><span class="mi">00401005</span><span class="p">)</span><span class="c1">;this 指针向下偏移1ch，开始构造父类
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">00401382</span>   <span class="nf">push</span>        <span class="mi">0</span><span class="c1">;保证父类只构造一次
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">00401384</span>   <span class="nf">mov</span>         <span class="no">ecx</span><span class="p">,</span><span class="no">dword</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">ebp-4</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="err">00401387</span>   <span class="nf">call</span>        <span class="err">@</span><span class="no">ILT</span><span class="err">+</span><span class="mi">60</span><span class="p">(</span><span class="no">CParent1</span><span class="p">::</span><span class="no">CParent1</span><span class="p">)</span> <span class="p">(</span><span class="mi">00401041</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="err">0040138</span><span class="nf">C</span>   <span class="no">push</span>        <span class="mi">0</span>
+</span></span><span class="line"><span class="cl"><span class="err">0040138</span><span class="nf">E</span>   <span class="no">mov</span>         <span class="no">ecx</span><span class="p">,</span><span class="no">dword</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">ebp-4</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="err">00401391</span>   <span class="nf">add</span>         <span class="no">ecx</span><span class="p">,</span><span class="mi">0</span><span class="no">Ch</span>
+</span></span><span class="line"><span class="cl"><span class="err">00401394</span>   <span class="nf">call</span>        <span class="err">@</span><span class="no">ILT</span><span class="err">+</span><span class="mi">65</span><span class="p">(</span><span class="no">CParent2</span><span class="p">::</span><span class="no">CParent2</span><span class="p">)</span> <span class="p">(</span><span class="mi">00401046</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="err">00401399</span>   <span class="nf">mov</span>         <span class="no">edx</span><span class="p">,</span><span class="no">dword</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">ebp-4</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="err">0040139</span><span class="nf">C</span>   <span class="no">mov</span>         <span class="no">dword</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">edx</span><span class="p">],</span><span class="no">offset</span> <span class="no">CChild</span><span class="p">::</span><span class="err">`</span><span class="no">vftable</span><span class="err">&#39;</span> <span class="p">(</span><span class="mi">0042</span><span class="no">f030</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="err">004013</span><span class="nf">A2</span>   <span class="no">mov</span>         <span class="no">eax</span><span class="p">,</span><span class="no">dword</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">ebp-4</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="err">004013</span><span class="nf">A5</span>   <span class="no">mov</span>         <span class="no">dword</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">eax</span><span class="err">+</span><span class="mi">0</span><span class="no">Ch</span><span class="p">],</span><span class="no">offset</span> <span class="no">CChild</span><span class="p">::</span><span class="err">`</span><span class="no">vftable</span><span class="err">&#39;</span> <span class="p">(</span><span class="mi">0042</span><span class="no">f024</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="err">004013</span><span class="nf">AC</span>   <span class="no">mov</span>         <span class="no">ecx</span><span class="p">,</span><span class="no">dword</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">ebp-4</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="err">004013</span><span class="nf">AF</span>   <span class="no">mov</span>         <span class="no">edx</span><span class="p">,</span><span class="no">dword</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">ecx</span><span class="err">+</span><span class="mi">4</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="err">004013</span><span class="nf">B2</span>   <span class="no">mov</span>         <span class="no">eax</span><span class="p">,</span><span class="no">dword</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">edx</span><span class="err">+</span><span class="mi">4</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="err">004013</span><span class="nf">B5</span>   <span class="no">mov</span>         <span class="no">ecx</span><span class="p">,</span><span class="no">dword</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">ebp-4</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="err">004013</span><span class="nf">B8</span>   <span class="no">mov</span>         <span class="no">dword</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">ecx</span><span class="err">+</span><span class="no">eax</span><span class="err">+</span><span class="mi">4</span><span class="p">],</span><span class="no">offset</span> <span class="no">CChild</span><span class="p">::</span><span class="err">`</span><span class="no">vftable</span><span class="err">&#39;</span> <span class="p">(</span><span class="mi">0042</span><span class="no">f020</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="err">57:</span>           <span class="nf">m_nNum4</span> <span class="err">=</span> <span class="mi">4</span><span class="c1">;
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">004013</span><span class="nf">C0</span>   <span class="no">mov</span>         <span class="no">edx</span><span class="p">,</span><span class="no">dword</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">ebp-4</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="err">004013</span><span class="nf">C3</span>   <span class="no">mov</span>         <span class="no">dword</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">edx</span><span class="err">+</span><span class="mi">18</span><span class="no">h</span><span class="p">],</span><span class="mi">4</span>
+</span></span><span class="line"><span class="cl"><span class="err">58:</span>       <span class="err">}</span>
+</span></span><span class="line"><span class="cl"><span class="c1">;CGrand构造
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">00401429</span>   <span class="nf">pop</span>         <span class="no">ecx</span>
+</span></span><span class="line"><span class="cl"><span class="err">0040142</span><span class="nf">A</span>   <span class="no">mov</span>         <span class="no">dword</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">ebp-4</span><span class="p">],</span><span class="no">ecx</span>
+</span></span><span class="line"><span class="cl"><span class="err">0040142</span><span class="nf">D</span>   <span class="no">mov</span>         <span class="no">eax</span><span class="p">,</span><span class="no">dword</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">ebp-4</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="err">00401430</span>   <span class="nf">mov</span>         <span class="no">dword</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">eax</span><span class="p">],</span><span class="no">offset</span> <span class="no">CGrand</span><span class="p">::</span><span class="err">`</span><span class="no">vftable</span><span class="err">&#39;</span> <span class="p">(</span><span class="mi">0042</span><span class="no">f054</span><span class="p">)</span><span class="c1">;虚表指针后期会被替代
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">10:</span>           <span class="nf">m_nNum1</span> <span class="err">=</span> <span class="mi">1</span><span class="c1">;
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">00401436</span>   <span class="nf">mov</span>         <span class="no">ecx</span><span class="p">,</span><span class="no">dword</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">ebp-4</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="err">00401439</span>   <span class="nf">mov</span>         <span class="no">dword</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">ecx</span><span class="err">+</span><span class="mi">4</span><span class="p">],</span><span class="mi">1</span>
+</span></span><span class="line"><span class="cl"><span class="err">11:</span>       <span class="err">}</span>
+</span></span><span class="line"><span class="cl"><span class="c1">;CParent1构造
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">04014</span><span class="nf">C9</span>   <span class="no">pop</span>         <span class="no">ecx</span>
+</span></span><span class="line"><span class="cl"><span class="err">004014</span><span class="nf">CA</span>   <span class="no">mov</span>         <span class="no">dword</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">ebp-4</span><span class="p">],</span><span class="no">ecx</span>
+</span></span><span class="line"><span class="cl"><span class="err">004014</span><span class="nf">CD</span>   <span class="no">cmp</span>         <span class="no">dword</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">ebp</span><span class="err">+</span><span class="mi">8</span><span class="p">],</span><span class="mi">0</span><span class="c1">;不再调用祖父类构造
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">004014</span><span class="nf">D1</span>   <span class="no">je</span>          <span class="no">CParent1</span><span class="p">::</span><span class="no">CParent1</span><span class="err">+</span><span class="mi">38</span><span class="no">h</span> <span class="p">(</span><span class="mi">004014</span><span class="no">e8</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="err">004014</span><span class="nf">D3</span>   <span class="no">mov</span>         <span class="no">eax</span><span class="p">,</span><span class="no">dword</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">ebp-4</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="err">004014</span><span class="nf">D6</span>   <span class="no">mov</span>         <span class="no">dword</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">eax</span><span class="err">+</span><span class="mi">4</span><span class="p">],</span><span class="no">offset</span> <span class="no">CParent1</span><span class="p">::</span><span class="err">`</span><span class="no">vbtable</span><span class="err">&#39;</span> <span class="p">(</span><span class="mi">0042</span><span class="no">f07c</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="err">004014</span><span class="nf">DD</span>   <span class="no">mov</span>         <span class="no">ecx</span><span class="p">,</span><span class="no">dword</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">ebp-4</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="err">004014</span><span class="nf">E0</span>   <span class="no">add</span>         <span class="no">ecx</span><span class="p">,</span><span class="mi">0</span><span class="no">Ch</span>
+</span></span><span class="line"><span class="cl"><span class="err">004014</span><span class="nf">E3</span>   <span class="no">call</span>        <span class="err">@</span><span class="no">ILT</span><span class="err">+</span><span class="mi">0</span><span class="p">(</span><span class="no">CGrand</span><span class="p">::</span><span class="no">CGrand</span><span class="p">)</span> <span class="p">(</span><span class="mi">00401005</span><span class="p">)</span><span class="c1">;这个时候会跳过这个构造函数的调用
+</span></span></span></code></pre></div><p>通过上面的代码可以看出，为了使得相同的内容只有一份，在程序中额外传入一个参数作为标记，用于表示是否调用祖父类构造函数，当初始化完祖父类后将此标记置0以后不再初始化，另外程序在每个父类中都多添加了一个四字节的成员用来存储一个一个偏移地址，以便能正确的将派生类转化为父类。所以每当多出一个虚继承就多了一个记录偏移量的4字节内存，所以这个类总共多出了8个字节。所以这时候的类所占内存大小为28 + 4 * 2 = 36字节。</p>
+<!-- raw HTML omitted -->
+</div><div class="post-footer" id="post-footer">
+    <div class="post-info">
+        <div class="post-info-line">
+            <div class="post-info-mod">
+                <span>Updated on 2018-04-14</span>
+            </div></div>
+        <div class="post-info-line">
+            <div class="post-info-md"></div>
+            <div class="post-info-share">
+                <span><a href="javascript:void(0);" title="Share on Twitter" data-sharer="twitter" data-url="http://HaiLateBoy.github.io/posts/cpp-inherit/" data-title="C&#43;&#43; 继承分析" data-hashtags="VC&#43;&#43;,反汇编,C&#43;&#43;实现原理"><i class="fab fa-twitter fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Facebook" data-sharer="facebook" data-url="http://HaiLateBoy.github.io/posts/cpp-inherit/" data-hashtag="VC&#43;&#43;"><i class="fab fa-facebook-square fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Hacker News" data-sharer="hackernews" data-url="http://HaiLateBoy.github.io/posts/cpp-inherit/" data-title="C&#43;&#43; 继承分析"><i class="fab fa-hacker-news fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Line" data-sharer="line" data-url="http://HaiLateBoy.github.io/posts/cpp-inherit/" data-title="C&#43;&#43; 继承分析"><i data-svg-src="https://cdn.jsdelivr.net/npm/simple-icons@7.3.0/icons/line.svg" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on 微博" data-sharer="weibo" data-url="http://HaiLateBoy.github.io/posts/cpp-inherit/" data-title="C&#43;&#43; 继承分析"><i class="fab fa-weibo fa-fw" aria-hidden="true"></i></a></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="post-info-more">
+        <section class="post-tags"><i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/vc&#43;&#43;/">VC&#43;&#43;</a>,&nbsp;<a href="/tags/%E5%8F%8D%E6%B1%87%E7%BC%96/">反汇编</a>,&nbsp;<a href="/tags/c&#43;&#43;%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86/">C&#43;&#43;实现原理</a></section>
+        <section>
+            <span><a href="javascript:void(0);" onclick="window.history.back();">Back</a></span>&nbsp;|&nbsp;<span><a href="/">Home</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav"><a href="/posts/oledb-and-ado-9/" class="prev" rel="prev" title="OLEDB 枚举数据源"><i class="fas fa-angle-left fa-fw" aria-hidden="true"></i>OLEDB 枚举数据源</a>
+            <a href="/posts/oledb-and-ado-10/" class="next" rel="next" title="OLEDB不使用SQL语句直接打开数据表">OLEDB不使用SQL语句直接打开数据表<i class="fas fa-angle-right fa-fw" aria-hidden="true"></i></a></div>
+</div>
+</article></div>
+            </main><footer class="footer">
+        <div class="footer-container"><div class="footer-line">Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener noreffer" title="Hugo 0.121.2">Hugo</a> | Theme - <a href="https://github.com/dillonzq/LoveIt" target="_blank" rel="noopener noreffer" title="LoveIt 0.2.11"><i class="far fa-kiss-wink-heart fa-fw" aria-hidden="true"></i> LoveIt</a>
+                </div><div class="footer-line" itemscope itemtype="http://schema.org/CreativeWork"><i class="far fa-copyright fa-fw" aria-hidden="true"></i><span itemprop="copyrightYear">2022 - 2024</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="https://www.masimaro.xyz" target="_blank">Masimaro</a></span></div>
+        </div>
+    </footer></div>
+
+        <div id="fixed-buttons"><a href="#" id="back-to-top" class="fixed-button" title="Back to Top">
+                <i class="fas fa-arrow-up fa-fw" aria-hidden="true"></i>
+            </a><a href="#" id="view-comments" class="fixed-button" title="View Comments">
+                <i class="fas fa-comment fa-fw" aria-hidden="true"></i>
+            </a>
+        </div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.css"><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/autocomplete.js@0.38.1/dist/autocomplete.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lunr@2.3.9/lunr.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lazysizes@5.3.2/lazysizes.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/clipboard@2.0.11/dist/clipboard.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/sharer.js@0.5.1/sharer.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/auto-render.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/copy-tex.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/mhchem.min.js"></script><script type="text/javascript">window.config={"code":{"copyTitle":"Copy to clipboard","maxShownLines":50},"comment":{},"math":{"delimiters":[{"display":true,"left":"$$","right":"$$"},{"display":true,"left":"\\[","right":"\\]"},{"display":true,"left":"\\begin{equation}","right":"\\end{equation}"},{"display":true,"left":"\\begin{equation*}","right":"\\end{equation*}"},{"display":true,"left":"\\begin{align}","right":"\\end{align}"},{"display":true,"left":"\\begin{align*}","right":"\\end{align*}"},{"display":true,"left":"\\begin{alignat}","right":"\\end{alignat}"},{"display":true,"left":"\\begin{alignat*}","right":"\\end{alignat*}"},{"display":true,"left":"\\begin{gather}","right":"\\end{gather}"},{"display":true,"left":"\\begin{CD}","right":"\\end{CD}"},{"display":false,"left":"$","right":"$"},{"display":false,"left":"\\(","right":"\\)"}],"strict":false},"search":{"highlightTag":"em","maxResultLength":10,"noResultsFound":"No results found","snippetLength":50}};</script><script type="text/javascript" src="/js/theme.min.js"></script></body>
+</html>

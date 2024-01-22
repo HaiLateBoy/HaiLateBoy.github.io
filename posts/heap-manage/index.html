@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="robots" content="noodp" />
+        <title>C 堆内存管理 - Masimaro&#39;s blog</title><meta name="Description" content="这是我用于记录日常和学习的小站"><meta property="og:title" content="C 堆内存管理" />
+<meta property="og:description" content="在Win32 程序中每个进程都占有4GB的虚拟地址空间，这4G的地址空间内部又被分为代码段，全局变量段堆段和栈段，栈内存由函数使用，用来存储函" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://HaiLateBoy.github.io/posts/heap-manage/" /><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2018-09-01T09:44:24+00:00" />
+<meta property="article:modified_time" content="2018-09-01T09:44:24+00:00" /><meta property="og:site_name" content="Masimaro&#39;s blog" />
+
+<meta name="twitter:card" content="summary"/><meta name="twitter:title" content="C 堆内存管理"/>
+<meta name="twitter:description" content="在Win32 程序中每个进程都占有4GB的虚拟地址空间，这4G的地址空间内部又被分为代码段，全局变量段堆段和栈段，栈内存由函数使用，用来存储函"/>
+<meta name="application-name" content="My cool site">
+<meta name="apple-mobile-web-app-title" content="My cool site"><meta name="theme-color" content="#ffffff"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="manifest" href="/site.webmanifest"><link rel="canonical" href="http://HaiLateBoy.github.io/posts/heap-manage/" /><link rel="prev" href="http://HaiLateBoy.github.io/posts/vc-exception-callstack/" /><link rel="next" href="http://HaiLateBoy.github.io/posts/code-inject/" /><link rel="stylesheet" href="/css/style.min.css"><link rel="preload" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css"></noscript><link rel="preload" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css"></noscript><script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "BlogPosting",
+        "headline": "C 堆内存管理",
+        "inLanguage": "zh-CN",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "http:\/\/HaiLateBoy.github.io\/posts\/heap-manage\/"
+        },"genre": "posts","keywords": "VC\u002b\u002b, 反汇编, C\u002b\u002b实现原理","wordcount":  1025 ,
+        "url": "http:\/\/HaiLateBoy.github.io\/posts\/heap-manage\/","datePublished": "2018-09-01T09:44:24+00:00","dateModified": "2018-09-01T09:44:24+00:00","publisher": {
+            "@type": "Organization",
+            "name": ""},"author": {
+                "@type": "Person",
+                "name": "Masimaro"
+            },"description": ""
+    }
+    </script></head>
+    <body data-header-desktop="fixed" data-header-mobile="auto"><script type="text/javascript">(window.localStorage && localStorage.getItem('theme') ? localStorage.getItem('theme') === 'dark' : ('auto' === 'auto' ? window.matchMedia('(prefers-color-scheme: dark)').matches : 'auto' === 'dark')) && document.body.setAttribute('theme', 'dark');</script>
+
+        <div id="mask"></div><div class="wrapper"><header class="desktop" id="header-desktop">
+    <div class="header-wrapper">
+        <div class="header-title">
+            <a href="/" title="Masimaro&#39;s blog">My cool site</a>
+        </div>
+        <div class="menu">
+            <div class="menu-inner"><a class="menu-item" href="/posts/" title="文章列表"> 文章 </a><a class="menu-item" href="/tags/" title="标签"> 标签 </a><a class="menu-item" href="/categories/" title="分类"> 分类 </a><a class="menu-item" href="/about" title="关于本站"> 关于 </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-desktop">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-desktop" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-desktop" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-desktop">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </span><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                    <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+                </a></div>
+        </div>
+    </div>
+</header><header class="mobile" id="header-mobile">
+    <div class="header-container">
+        <div class="header-wrapper">
+            <div class="header-title">
+                <a href="/" title="Masimaro&#39;s blog">My cool site</a>
+            </div>
+            <div class="menu-toggle" id="menu-toggle-mobile">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+        <div class="menu" id="menu-mobile"><div class="search-wrapper">
+                    <div class="search mobile" id="search-mobile">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-mobile">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-mobile" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-mobile" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-mobile">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </div>
+                    <a href="javascript:void(0);" class="search-cancel" id="search-cancel-mobile">
+                        Cancel
+                    </a>
+                </div><a class="menu-item" href="/posts/" title="文章列表">文章</a><a class="menu-item" href="/tags/" title="标签">标签</a><a class="menu-item" href="/categories/" title="分类">分类</a><a class="menu-item" href="/about" title="关于本站">关于</a><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+            </a></div>
+    </div>
+</header><div class="search-dropdown desktop">
+        <div id="search-dropdown-desktop"></div>
+    </div>
+    <div class="search-dropdown mobile">
+        <div id="search-dropdown-mobile"></div>
+    </div><main class="main">
+                <div class="container"><div class="toc" id="toc-auto">
+            <h2 class="toc-title">Contents</h2>
+            <div class="toc-content" id="toc-content-auto"></div>
+        </div><article class="page single"><h1 class="single-title animate__animated animate__flipInX">C 堆内存管理</h1><div class="post-meta">
+            <div class="post-meta-line"><span class="post-author"><a href="https://www.masimaro.xyz" title="Author" target="_blank" rel="noopener noreffer author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Masimaro</a></span>&nbsp;<span class="post-category">included in <a href="/categories/vc++%E5%8F%8D%E6%B1%87%E7%BC%96%E5%88%86%E6%9E%90/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>VC++反汇编分析</a></span></div>
+            <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw" aria-hidden="true"></i>&nbsp;<time datetime="2018-09-01">2018-09-01</time>&nbsp;<i class="fas fa-pencil-alt fa-fw" aria-hidden="true"></i>&nbsp;1025 words&nbsp;
+                <i class="far fa-clock fa-fw" aria-hidden="true"></i>&nbsp;3 minutes&nbsp;</div>
+        </div><div class="details toc" id="toc-static"  data-kept="true">
+                <div class="details-summary toc-title">
+                    <span>Contents</span>
+                    <span><i class="details-icon fas fa-angle-right" aria-hidden="true"></i></span>
+                </div>
+                <div class="details-content toc-content" id="toc-content-static"><nav id="TableOfContents">
+  <ul>
+    <li><a href="#堆内存的双向链表管理">堆内存的双向链表管理</a></li>
+  </ul>
+</nav></div>
+            </div><div class="content" id="content"><p>在Win32 程序中每个进程都占有4GB的虚拟地址空间，这4G的地址空间内部又被分为代码段，全局变量段堆段和栈段，栈内存由函数使用，用来存储函数内部的局部变量，而堆是由程序员自己申请与释放的，系统在管理堆内存的时候采用的双向链表的方式，接下来将通过调试代码来分析堆内存的管理。</p>
+<!-- raw HTML omitted -->
+<h2 id="堆内存的双向链表管理">堆内存的双向链表管理</h2>
+<p>下面是一段测试代码</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;iostream&gt;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp"></span><span class="k">using</span> <span class="k">namespace</span> <span class="n">std</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kt">int</span> <span class="nf">main</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">	<span class="kt">int</span> <span class="o">*</span><span class="n">p</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="kr">__int64</span> <span class="o">*</span><span class="n">q</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="kt">int</span> <span class="o">*</span><span class="n">m</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="n">p</span> <span class="o">=</span> <span class="k">new</span> <span class="kt">int</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="k">if</span> <span class="p">(</span><span class="nb">NULL</span> <span class="o">==</span> <span class="n">p</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">	<span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="k">return</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="cl">	<span class="o">*</span><span class="n">p</span> <span class="o">=</span> <span class="mh">0x11223344</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="n">q</span> <span class="o">=</span> <span class="k">new</span> <span class="kr">__int64</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="k">if</span> <span class="p">(</span><span class="nb">NULL</span> <span class="o">==</span> <span class="n">q</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">	<span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="k">return</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="cl">	<span class="o">*</span><span class="n">q</span> <span class="o">=</span> <span class="mh">0x1122334455667788</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="n">m</span> <span class="o">=</span> <span class="k">new</span> <span class="kt">int</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="k">if</span> <span class="p">(</span><span class="nb">NULL</span> <span class="o">==</span> <span class="n">m</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">	<span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="k">return</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="cl">	<span class="o">*</span><span class="n">m</span> <span class="o">=</span> <span class="mh">0x11223344</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="k">delete</span> <span class="n">p</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="k">delete</span> <span class="n">q</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="k">delete</span> <span class="n">m</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p>我们对这段代码进行调试，当代码执行到delete p;位置的时候(此时还没有执行delete语句)查看变量的值如下:</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="/heap-manage/%e5%90%84%e5%8f%98%e9%87%8f%e7%9a%84%e5%80%bc.png"
+        data-srcset="/heap-manage/%e5%90%84%e5%8f%98%e9%87%8f%e7%9a%84%e5%80%bc.png, /heap-manage/%e5%90%84%e5%8f%98%e9%87%8f%e7%9a%84%e5%80%bc.png 1.5x, /heap-manage/%e5%90%84%e5%8f%98%e9%87%8f%e7%9a%84%e5%80%bc.png 2x"
+        data-sizes="auto"
+        alt="/heap-manage/各变量的值.png"
+        title="pqm 的相关值" />
+p q m变量的地址比较接近，这三个指针变量本身保存在函数的栈中。从图中看存储这三个变量内存的地址好像不像栈结构，这是由于在高版本的VS中默认开启了地址随机化，所以这里看不出来这些地址的关系，但是如果在VC6里面可以很明显的看到它们在一个栈结构中。</p>
+<p>我们将p, q, m这三者所指向的内存都减去 0x20 得到</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="n">p</span> <span class="o">-</span> <span class="mh">0x20</span> <span class="o">=</span> <span class="mh">0x00035cc8</span> <span class="o">-</span> <span class="mh">0x20</span> <span class="o">=</span> <span class="mh">0x00035ca8</span>
+</span></span><span class="line"><span class="cl"><span class="n">q</span> <span class="o">-</span> <span class="mh">0x20</span> <span class="o">=</span> <span class="mh">0x00035d08</span> <span class="o">-</span> <span class="mh">0x20</span> <span class="o">=</span> <span class="mh">0x00035ce8</span>
+</span></span><span class="line"><span class="cl"><span class="n">m</span> <span class="o">-</span> <span class="mh">0x20</span> <span class="o">=</span> <span class="mh">0x00035d50</span> <span class="o">-</span> <span class="mh">0x20</span> <span class="o">=</span> <span class="mh">0x00035d30</span>
+</span></span></code></pre></div><p>在内存窗口中分别查看p - 0x20, q- 0x20, m- 0x20 位置的内存如下</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="/heap-manage/p%e7%9a%84%e5%a0%86%e5%86%85%e5%ad%98.png"
+        data-srcset="/heap-manage/p%e7%9a%84%e5%a0%86%e5%86%85%e5%ad%98.png, /heap-manage/p%e7%9a%84%e5%a0%86%e5%86%85%e5%ad%98.png 1.5x, /heap-manage/p%e7%9a%84%e5%a0%86%e5%86%85%e5%ad%98.png 2x"
+        data-sizes="auto"
+        alt="/heap-manage/p的堆内存.png"
+        title="p内存" /></p>
+<p>通过观察发现p - 0x20处前8个字节存储了两个地址分别是 0x00035c38、0x00035ce8。是不是对0x00035ce8 这个地址感到很熟悉呢，它就是q - 0x20 处的地址，按照这个思路我们观察这些内存发现</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">内存地址</th>
+<th style="text-align:left">前四个字节</th>
+<th style="text-align:left">后四个字节</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">0x00035ca8</td>
+<td style="text-align:left">0x00035c38</td>
+<td style="text-align:left">0x00035ce8</td>
+</tr>
+<tr>
+<td style="text-align:left">0x00035ce8</td>
+<td style="text-align:left">0x00035ca8</td>
+<td style="text-align:left">0x00035d30</td>
+</tr>
+<tr>
+<td style="text-align:left">0x00035d30</td>
+<td style="text-align:left">0x00035ce8</td>
+<td style="text-align:left">0x00000000</td>
+</tr>
+</tbody>
+</table>
+<p>看到这些地址有没有发现什么呢？没错，这个结构有两个指针域，第一个指针域指向前一个节点，后一个指针域指向后一个节点，这是一个典型的双向链表结构，你没有发现？没关系，我们将这个地址整理一下得到下面这个图表</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="/heap-manage/%e5%8f%8c%e5%90%91%e9%93%be%e8%a1%a8%e7%bb%93%e6%9e%84.png"
+        data-srcset="/heap-manage/%e5%8f%8c%e5%90%91%e9%93%be%e8%a1%a8%e7%bb%93%e6%9e%84.png, /heap-manage/%e5%8f%8c%e5%90%91%e9%93%be%e8%a1%a8%e7%bb%93%e6%9e%84.png 1.5x, /heap-manage/%e5%8f%8c%e5%90%91%e9%93%be%e8%a1%a8%e7%bb%93%e6%9e%84.png 2x"
+        data-sizes="auto"
+        alt="/heap-manage/双向链表结构.png"
+        title="堆内存管理的双向链表" /></p>
+<p>既然知道了它的管理方式，那么接着往后执行delete语句，这个时候再看这些地址对应的内存中保存的值</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">内存地址</th>
+<th style="text-align:left">前四个字节</th>
+<th style="text-align:left">后四个字节</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">0x00035CA8</td>
+<td style="text-align:left">0x00035d70</td>
+<td style="text-align:left">0x000300c4</td>
+</tr>
+<tr>
+<td style="text-align:left">0x00035ce8</td>
+<td style="text-align:left">0x00035c38</td>
+<td style="text-align:left">0x00035d30</td>
+</tr>
+<tr>
+<td style="text-align:left">0x00035d30</td>
+<td style="text-align:left">0x00035ce8</td>
+<td style="text-align:left">0x00000000</td>
+</tr>
+</tbody>
+</table>
+<p>系统已经改变了后面两个节点中next和pre指针域的内容，将p节点从双向链表中除去了。而这个时候仔细观察p节点中存储内容发现里面得值已经变为 0xfeee 了。</p>
+<p>我们在delete的时候并没有传入对应的参数告知系统该回收多大的内存，那么它是怎么知道该如何回收内存的呢。我们回到之前的那个p - 0x20 内存的图上看，是不是在里面发现了一个0x00000004的值，其实这个值就是当前节点占了多少个字节，如果不相信，可以看看q- 0x20 和m - 0x20 内存处保存的值看看，在对应的偏移处是不是有 8和4。系统根据这个值来回收对应的内存。</p>
+<!-- raw HTML omitted -->
+</div><div class="post-footer" id="post-footer">
+    <div class="post-info">
+        <div class="post-info-line">
+            <div class="post-info-mod">
+                <span>Updated on 2018-09-01</span>
+            </div></div>
+        <div class="post-info-line">
+            <div class="post-info-md"></div>
+            <div class="post-info-share">
+                <span><a href="javascript:void(0);" title="Share on Twitter" data-sharer="twitter" data-url="http://HaiLateBoy.github.io/posts/heap-manage/" data-title="C 堆内存管理" data-hashtags="VC&#43;&#43;,反汇编,C&#43;&#43;实现原理"><i class="fab fa-twitter fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Facebook" data-sharer="facebook" data-url="http://HaiLateBoy.github.io/posts/heap-manage/" data-hashtag="VC&#43;&#43;"><i class="fab fa-facebook-square fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Hacker News" data-sharer="hackernews" data-url="http://HaiLateBoy.github.io/posts/heap-manage/" data-title="C 堆内存管理"><i class="fab fa-hacker-news fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Line" data-sharer="line" data-url="http://HaiLateBoy.github.io/posts/heap-manage/" data-title="C 堆内存管理"><i data-svg-src="https://cdn.jsdelivr.net/npm/simple-icons@7.3.0/icons/line.svg" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on 微博" data-sharer="weibo" data-url="http://HaiLateBoy.github.io/posts/heap-manage/" data-title="C 堆内存管理"><i class="fab fa-weibo fa-fw" aria-hidden="true"></i></a></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="post-info-more">
+        <section class="post-tags"><i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/vc&#43;&#43;/">VC&#43;&#43;</a>,&nbsp;<a href="/tags/%E5%8F%8D%E6%B1%87%E7%BC%96/">反汇编</a>,&nbsp;<a href="/tags/c&#43;&#43;%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86/">C&#43;&#43;实现原理</a></section>
+        <section>
+            <span><a href="javascript:void(0);" onclick="window.history.back();">Back</a></span>&nbsp;|&nbsp;<span><a href="/">Home</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav"><a href="/posts/vc-exception-callstack/" class="prev" rel="prev" title="VC&#43;&#43; 崩溃处理以及打印调用堆栈"><i class="fas fa-angle-left fa-fw" aria-hidden="true"></i>VC++ 崩溃处理以及打印调用堆栈</a>
+            <a href="/posts/code-inject/" class="next" rel="next" title="Windows下的代码注入">Windows下的代码注入<i class="fas fa-angle-right fa-fw" aria-hidden="true"></i></a></div>
+</div>
+</article></div>
+            </main><footer class="footer">
+        <div class="footer-container"><div class="footer-line">Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener noreffer" title="Hugo 0.121.2">Hugo</a> | Theme - <a href="https://github.com/dillonzq/LoveIt" target="_blank" rel="noopener noreffer" title="LoveIt 0.2.11"><i class="far fa-kiss-wink-heart fa-fw" aria-hidden="true"></i> LoveIt</a>
+                </div><div class="footer-line" itemscope itemtype="http://schema.org/CreativeWork"><i class="far fa-copyright fa-fw" aria-hidden="true"></i><span itemprop="copyrightYear">2022 - 2024</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="https://www.masimaro.xyz" target="_blank">Masimaro</a></span></div>
+        </div>
+    </footer></div>
+
+        <div id="fixed-buttons"><a href="#" id="back-to-top" class="fixed-button" title="Back to Top">
+                <i class="fas fa-arrow-up fa-fw" aria-hidden="true"></i>
+            </a><a href="#" id="view-comments" class="fixed-button" title="View Comments">
+                <i class="fas fa-comment fa-fw" aria-hidden="true"></i>
+            </a>
+        </div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.css"><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/autocomplete.js@0.38.1/dist/autocomplete.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lunr@2.3.9/lunr.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lazysizes@5.3.2/lazysizes.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/clipboard@2.0.11/dist/clipboard.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/sharer.js@0.5.1/sharer.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/auto-render.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/copy-tex.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/mhchem.min.js"></script><script type="text/javascript">window.config={"code":{"copyTitle":"Copy to clipboard","maxShownLines":50},"comment":{},"math":{"delimiters":[{"display":true,"left":"$$","right":"$$"},{"display":true,"left":"\\[","right":"\\]"},{"display":true,"left":"\\begin{equation}","right":"\\end{equation}"},{"display":true,"left":"\\begin{equation*}","right":"\\end{equation*}"},{"display":true,"left":"\\begin{align}","right":"\\end{align}"},{"display":true,"left":"\\begin{align*}","right":"\\end{align*}"},{"display":true,"left":"\\begin{alignat}","right":"\\end{alignat}"},{"display":true,"left":"\\begin{alignat*}","right":"\\end{alignat*}"},{"display":true,"left":"\\begin{gather}","right":"\\end{gather}"},{"display":true,"left":"\\begin{CD}","right":"\\end{CD}"},{"display":false,"left":"$","right":"$"},{"display":false,"left":"\\(","right":"\\)"}],"strict":false},"search":{"highlightTag":"em","maxResultLength":10,"noResultsFound":"No results found","snippetLength":50}};</script><script type="text/javascript" src="/js/theme.min.js"></script></body>
+</html>

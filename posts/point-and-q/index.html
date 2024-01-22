@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="robots" content="noodp" />
+        <title>地址、指针与引用 - Masimaro&#39;s blog</title><meta name="Description" content="这是我用于记录日常和学习的小站"><meta property="og:title" content="地址、指针与引用" />
+<meta property="og:description" content="计算机本身是不认识程序中给的变量名，不管我们以何种方式给变量命名，最终都会转化为相应的地址，编译器会生成一些符号常量并且与对应的地址相关联，以达到访问变量的目的." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://HaiLateBoy.github.io/posts/point-and-q/" /><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2017-12-25T19:16:31+00:00" />
+<meta property="article:modified_time" content="2017-12-25T19:16:31+00:00" /><meta property="og:site_name" content="Masimaro&#39;s blog" />
+
+<meta name="twitter:card" content="summary"/><meta name="twitter:title" content="地址、指针与引用"/>
+<meta name="twitter:description" content="计算机本身是不认识程序中给的变量名，不管我们以何种方式给变量命名，最终都会转化为相应的地址，编译器会生成一些符号常量并且与对应的地址相关联，以达到访问变量的目的."/>
+<meta name="application-name" content="My cool site">
+<meta name="apple-mobile-web-app-title" content="My cool site"><meta name="theme-color" content="#ffffff"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="manifest" href="/site.webmanifest"><link rel="canonical" href="http://HaiLateBoy.github.io/posts/point-and-q/" /><link rel="prev" href="http://HaiLateBoy.github.io/posts/c-num-in-memory/" /><link rel="next" href="http://HaiLateBoy.github.io/posts/define-and-const/" /><link rel="stylesheet" href="/css/style.min.css"><link rel="preload" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css"></noscript><link rel="preload" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css"></noscript><script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "BlogPosting",
+        "headline": "地址、指针与引用",
+        "inLanguage": "zh-CN",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "http:\/\/HaiLateBoy.github.io\/posts\/point-and-q\/"
+        },"genre": "posts","keywords": "VC\u002b\u002b, 反汇编, C\u002b\u002b实现原理","wordcount":  2632 ,
+        "url": "http:\/\/HaiLateBoy.github.io\/posts\/point-and-q\/","datePublished": "2017-12-25T19:16:31+00:00","dateModified": "2017-12-25T19:16:31+00:00","publisher": {
+            "@type": "Organization",
+            "name": ""},"author": {
+                "@type": "Person",
+                "name": "Masimaro"
+            },"description": ""
+    }
+    </script></head>
+    <body data-header-desktop="fixed" data-header-mobile="auto"><script type="text/javascript">(window.localStorage && localStorage.getItem('theme') ? localStorage.getItem('theme') === 'dark' : ('auto' === 'auto' ? window.matchMedia('(prefers-color-scheme: dark)').matches : 'auto' === 'dark')) && document.body.setAttribute('theme', 'dark');</script>
+
+        <div id="mask"></div><div class="wrapper"><header class="desktop" id="header-desktop">
+    <div class="header-wrapper">
+        <div class="header-title">
+            <a href="/" title="Masimaro&#39;s blog">My cool site</a>
+        </div>
+        <div class="menu">
+            <div class="menu-inner"><a class="menu-item" href="/posts/" title="文章列表"> 文章 </a><a class="menu-item" href="/tags/" title="标签"> 标签 </a><a class="menu-item" href="/categories/" title="分类"> 分类 </a><a class="menu-item" href="/about" title="关于本站"> 关于 </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-desktop">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-desktop" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-desktop" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-desktop">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </span><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                    <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+                </a></div>
+        </div>
+    </div>
+</header><header class="mobile" id="header-mobile">
+    <div class="header-container">
+        <div class="header-wrapper">
+            <div class="header-title">
+                <a href="/" title="Masimaro&#39;s blog">My cool site</a>
+            </div>
+            <div class="menu-toggle" id="menu-toggle-mobile">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+        <div class="menu" id="menu-mobile"><div class="search-wrapper">
+                    <div class="search mobile" id="search-mobile">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-mobile">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-mobile" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-mobile" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-mobile">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </div>
+                    <a href="javascript:void(0);" class="search-cancel" id="search-cancel-mobile">
+                        Cancel
+                    </a>
+                </div><a class="menu-item" href="/posts/" title="文章列表">文章</a><a class="menu-item" href="/tags/" title="标签">标签</a><a class="menu-item" href="/categories/" title="分类">分类</a><a class="menu-item" href="/about" title="关于本站">关于</a><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+            </a></div>
+    </div>
+</header><div class="search-dropdown desktop">
+        <div id="search-dropdown-desktop"></div>
+    </div>
+    <div class="search-dropdown mobile">
+        <div id="search-dropdown-mobile"></div>
+    </div><main class="main">
+                <div class="container"><div class="toc" id="toc-auto">
+            <h2 class="toc-title">Contents</h2>
+            <div class="toc-content" id="toc-content-auto"></div>
+        </div><article class="page single"><h1 class="single-title animate__animated animate__flipInX">地址、指针与引用</h1><div class="post-meta">
+            <div class="post-meta-line"><span class="post-author"><a href="https://www.masimaro.xyz" title="Author" target="_blank" rel="noopener noreffer author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Masimaro</a></span>&nbsp;<span class="post-category">included in <a href="/categories/vc++%E5%8F%8D%E6%B1%87%E7%BC%96%E5%88%86%E6%9E%90/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>VC++反汇编分析</a></span></div>
+            <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw" aria-hidden="true"></i>&nbsp;<time datetime="2017-12-25">2017-12-25</time>&nbsp;<i class="fas fa-pencil-alt fa-fw" aria-hidden="true"></i>&nbsp;2632 words&nbsp;
+                <i class="far fa-clock fa-fw" aria-hidden="true"></i>&nbsp;6 minutes&nbsp;</div>
+        </div><div class="details toc" id="toc-static"  data-kept="true">
+                <div class="details-summary toc-title">
+                    <span>Contents</span>
+                    <span><i class="details-icon fas fa-angle-right" aria-hidden="true"></i></span>
+                </div>
+                <div class="details-content toc-content" id="toc-content-static"><nav id="TableOfContents"></nav></div>
+            </div><div class="content" id="content"><p>计算机本身是不认识程序中给的变量名，不管我们以何种方式给变量命名，最终都会转化为相应的地址，编译器会生成一些符号常量并且与对应的地址相关联，以达到访问变量的目的.</p>
+<p>变量是在内存中用来存储数据以供程序使用，变量主要有两个部分构成：变量名、变量类型，其中变量名对应了一块具体的内存地址，而变量类型则表明该如何翻译内存中存储的二级制数。我们知道不同的类型翻译为二进制的值不同，比如整型是直接通过数学转化、浮点数是采用IEEE的方法、字符则根据ASCII码转化，同样变量类型决定了变量所占的内存大小，以及如何在二进制和变量所表达的真正意义之间转化。而指针变量也是一个变量，在内存中也占空间，不过比较特殊的是它存储的是其他变量的地址。在32位的机器中，每个进程能访问4GB的内存地址空间，所以程序中的地址采用32位二进制数表示，也就是一个整型变量的长度，地址值一般没有负数所以准确的说指针变量的类型应该是unsigned int 即每个指针变量占4个字节。还记得在定义结构体中可以使用该结构体的指针作为成员，但是不能使用该结构的实例作为成员吗？这是因为编译器需要根据各个成员变量的大小分配相关的内存，用该结构体的实例作为成员时，该结构体根本没有定义完整，编译器是不会知道该如何分配内存的，而任何类型的指针都只占4个字节，编译器自然知道如何分配内存。我们在书写指针变量时给定的类型是它所指向的变量的类型，这个类型决定了如何翻译所对应内存中的值，以及该访问多少个字节的内存。对指针的间接访问会先先取出值，访问到对应的内存，再根据指针所指向的变量的类型，翻译成对应的值。一般指针只能指向对应类型的变量，比如int类型的指针只能指向int型的变量，而有一种指针变量可以指向所有类型的变量，它就是void类型的指针变量，但是由于这种类型的变量没有指定它所对应的变量的类型，所以即使有了对应的地址，它也不知道该取多大内存的数据，以及如何解释这些数据，所以这种类型的指针不支持间接访问，下面是一个间接访问的例子：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="kt">int</span> <span class="nf">main</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">int</span> <span class="n">nValue</span> <span class="o">=</span> <span class="mi">10</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">float</span> <span class="n">fValue</span> <span class="o">=</span> <span class="mf">10.0f</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">char</span> <span class="n">cValue</span> <span class="o">=</span> <span class="sc">&#39;C&#39;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">int</span> <span class="o">*</span><span class="n">pnValue</span> <span class="o">=</span> <span class="o">&amp;</span><span class="n">nValue</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">float</span> <span class="o">*</span><span class="n">pfValue</span> <span class="o">=</span> <span class="o">&amp;</span><span class="n">fValue</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">char</span> <span class="o">*</span><span class="n">pcValue</span> <span class="o">=</span> <span class="o">&amp;</span><span class="n">cValue</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">printf</span><span class="p">(</span><span class="s">&#34;pnValue = %x, *pnValue = %d</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">,</span> <span class="n">pnValue</span><span class="p">,</span> <span class="o">*</span><span class="n">pnValue</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">printf</span><span class="p">(</span><span class="s">&#34;pfValue = %x, *pfValue = %f</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">,</span> <span class="n">pfValue</span><span class="p">,</span> <span class="o">*</span><span class="n">pfValue</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">printf</span><span class="p">(</span><span class="s">&#34;pcValue = %x, *pcValue = %c</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">,</span> <span class="n">pcValue</span><span class="p">,</span> <span class="o">*</span><span class="n">pcValue</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p>下面是它对应的反汇编代码（部分）：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-asm" data-lang="asm"><span class="line"><span class="cl"><span class="err">10:</span>       <span class="nf">int</span> <span class="no">nValue</span> <span class="err">=</span> <span class="mi">10</span><span class="c1">;
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">00401268</span>   <span class="nf">mov</span>         <span class="no">dword</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">ebp-4</span><span class="p">],</span><span class="mi">0</span><span class="no">Ah</span>
+</span></span><span class="line"><span class="cl"><span class="err">11:</span>       <span class="nf">float</span> <span class="no">fValue</span> <span class="err">=</span> <span class="mi">10</span><span class="no">.0f</span><span class="c1">;
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">0040126</span><span class="nf">F</span>   <span class="no">mov</span>         <span class="no">dword</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">ebp-8</span><span class="p">],</span><span class="mi">41200000</span><span class="no">h</span>
+</span></span><span class="line"><span class="cl"><span class="err">12:</span>       <span class="nf">char</span> <span class="no">cValue</span> <span class="err">=</span> <span class="err">&#39;</span><span class="no">C</span><span class="err">&#39;</span><span class="c1">;
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">00401276</span>   <span class="nf">mov</span>         <span class="no">byte</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">ebp-0Ch</span><span class="p">],</span><span class="mi">43</span><span class="no">h</span>
+</span></span><span class="line"><span class="cl"><span class="err">13:</span>       <span class="nf">int</span> <span class="p">*</span><span class="no">pnValue</span> <span class="err">=</span> <span class="err">&amp;</span><span class="no">nValue</span><span class="c1">;
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">0040127</span><span class="nf">A</span>   <span class="no">lea</span>         <span class="no">eax</span><span class="p">,[</span><span class="no">ebp-4</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="err">0040127</span><span class="nf">D</span>   <span class="no">mov</span>         <span class="no">dword</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">ebp-10h</span><span class="p">],</span><span class="no">eax</span>
+</span></span><span class="line"><span class="cl"><span class="err">14:</span>       <span class="nf">float</span> <span class="p">*</span><span class="no">pfValue</span> <span class="err">=</span> <span class="err">&amp;</span><span class="no">fValue</span><span class="c1">;
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">00401280</span>   <span class="nf">lea</span>         <span class="no">ecx</span><span class="p">,[</span><span class="no">ebp-8</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="err">00401283</span>   <span class="nf">mov</span>         <span class="no">dword</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">ebp-14h</span><span class="p">],</span><span class="no">ecx</span>
+</span></span><span class="line"><span class="cl"><span class="err">15:</span>       <span class="nf">char</span> <span class="p">*</span><span class="no">pcValue</span> <span class="err">=</span> <span class="err">&amp;</span><span class="no">cValue</span><span class="c1">;
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">00401286</span>   <span class="nf">lea</span>         <span class="no">edx</span><span class="p">,[</span><span class="no">ebp-0Ch</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="err">00401289</span>   <span class="nf">mov</span>         <span class="no">dword</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">ebp-18h</span><span class="p">],</span><span class="no">edx</span>
+</span></span><span class="line"><span class="cl"><span class="err">16:</span>       <span class="nf">printf</span><span class="p">(</span><span class="err">&#34;</span><span class="no">pnValue</span> <span class="err">=</span> <span class="nv">%x</span><span class="p">,</span> <span class="p">*</span><span class="no">pnValue</span> <span class="err">=</span> <span class="nv">%d</span><span class="err">\</span><span class="no">n</span><span class="err">&#34;</span><span class="p">,</span> <span class="no">pnValue</span><span class="p">,</span> <span class="p">*</span><span class="no">pnValue</span><span class="p">)</span><span class="c1">;
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">0040128</span><span class="nf">C</span>   <span class="no">mov</span>         <span class="no">eax</span><span class="p">,</span><span class="no">dword</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">ebp-10h</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="err">0040128</span><span class="nf">F</span>   <span class="no">mov</span>         <span class="no">ecx</span><span class="p">,</span><span class="no">dword</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">eax</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="err">00401291</span>   <span class="nf">push</span>        <span class="no">ecx</span>
+</span></span><span class="line"><span class="cl"><span class="err">00401292</span>   <span class="nf">mov</span>         <span class="no">edx</span><span class="p">,</span><span class="no">dword</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">ebp-10h</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="err">00401295</span>   <span class="nf">push</span>        <span class="no">edx</span>
+</span></span><span class="line"><span class="cl"><span class="err">00401296</span>   <span class="nf">push</span>        <span class="no">offset</span> <span class="no">string</span> <span class="err">&#34;</span><span class="no">pnValue</span> <span class="err">=</span> <span class="nv">%x</span><span class="p">,</span> <span class="p">*</span><span class="no">pnValue</span> <span class="err">=</span> <span class="nv">%d</span><span class="err">\</span><span class="no">n</span><span class="err">&#34;</span> <span class="p">(</span><span class="mi">00432064</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="err">0040129</span><span class="nf">B</span>   <span class="no">call</span>        <span class="no">printf</span> <span class="p">(</span><span class="mi">00401580</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="err">004012</span><span class="nf">A0</span>   <span class="no">add</span>         <span class="no">esp</span><span class="p">,</span><span class="mi">0</span><span class="no">Ch</span>
+</span></span></code></pre></div><p>从上面的汇编代码可以看到指针变量会占内存空间，它们的地址分别是：[ebp - 10h] 、 [ebp - 14h]、 [ebp - 18h],在给指针变量赋值时首先将变量的地址赋值给临时寄存器，然后将寄存器的值赋值给指针变量，而通过间接访问时也经过了一个临时寄存器，先将指针变量的值赋值给临时寄存器（mov     eax,dword ptr [ebp-10h])然后通过这个临时寄存器访问变量的地址空间，得到变量值（     mov         ecx,dword ptr [eax])，由于间接访问进过了这几步，所以在效率上是比不上直接使用变量。下面是对char型变量的间接访问：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-asm" data-lang="asm"><span class="line"><span class="cl"><span class="err">004012</span><span class="nf">BF</span>   <span class="no">mov</span>         <span class="no">edx</span><span class="p">,</span><span class="no">dword</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">ebp-18h</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="err">004012</span><span class="nf">C2</span>   <span class="no">movsx</span>       <span class="no">eax</span><span class="p">,</span><span class="no">byte</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">edx</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="err">004012</span><span class="nf">C5</span>   <span class="no">push</span>        <span class="no">eax</span>
+</span></span></code></pre></div><p>首先也是将指针变量的值取出来，放到寄存器中，然后根据寄存器寻址找到变量对应的地址，访问变量。其中”bye ptr“表示只操作该地址中的一个字节。</p>
+<p>对于地址我们可以进行加法和减法操作，地址的加法主要用于向下寻址，一般用于数组等占用连续内存空间的数据结构，一般是地址加上一个数值，表示向后偏移一定的单位，指针同样也有这样的操作，但是与地址值不同的是指针每加一个单位，表示向后偏移一个元素，而地址值加1则就是在原来的基础上加上一。指针偏移是根据其所指向的变量类型来决定的，比如有下面的程序：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span><span class="o">*</span> <span class="n">argv</span><span class="p">[])</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">char</span> <span class="n">szBuf</span><span class="p">[</span><span class="mi">5</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="mh">0x01</span><span class="p">,</span> <span class="mh">0x23</span><span class="p">,</span> <span class="mh">0x45</span><span class="p">,</span> <span class="mh">0x67</span><span class="p">,</span> <span class="mh">0x89</span><span class="p">};</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">int</span> <span class="o">*</span><span class="n">pInt</span> <span class="o">=</span> <span class="p">(</span><span class="kt">int</span><span class="o">*</span><span class="p">)</span><span class="n">szBuf</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">short</span> <span class="o">*</span><span class="n">pShort</span> <span class="o">=</span> <span class="p">(</span><span class="kt">short</span><span class="o">*</span><span class="p">)</span><span class="n">szBuf</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">char</span> <span class="o">*</span><span class="n">pChar</span> <span class="o">=</span> <span class="n">szBuf</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="n">pInt</span> <span class="o">+=</span> <span class="mi">1</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">pShort</span> <span class="o">+=</span> <span class="mi">1</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">pChar</span> <span class="o">+=</span> <span class="mi">1</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p>它的汇编代码如下：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-asm" data-lang="asm"><span class="line"><span class="cl"><span class="err">9:</span>        <span class="nf">char</span> <span class="no">szBuf</span><span class="p">[</span><span class="mi">5</span><span class="p">]</span> <span class="err">=</span> <span class="err">{</span><span class="mi">0x01</span><span class="p">,</span> <span class="mi">0x23</span><span class="p">,</span> <span class="mi">0x45</span><span class="p">,</span> <span class="mi">0x67</span><span class="p">,</span> <span class="mi">0x89</span><span class="err">}</span><span class="c1">;
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">00401028</span>   <span class="nf">mov</span>         <span class="no">byte</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">ebp-8</span><span class="p">],</span><span class="mi">1</span>
+</span></span><span class="line"><span class="cl"><span class="err">0040102</span><span class="nf">C</span>   <span class="no">mov</span>         <span class="no">byte</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">ebp-7</span><span class="p">],</span><span class="mi">23</span><span class="no">h</span>
+</span></span><span class="line"><span class="cl"><span class="err">00401030</span>   <span class="nf">mov</span>         <span class="no">byte</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">ebp-6</span><span class="p">],</span><span class="mi">45</span><span class="no">h</span>
+</span></span><span class="line"><span class="cl"><span class="err">00401034</span>   <span class="nf">mov</span>         <span class="no">byte</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">ebp-5</span><span class="p">],</span><span class="mi">67</span><span class="no">h</span>
+</span></span><span class="line"><span class="cl"><span class="err">00401038</span>   <span class="nf">mov</span>         <span class="no">byte</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">ebp-4</span><span class="p">],</span><span class="mi">89</span><span class="no">h</span>
+</span></span><span class="line"><span class="cl"><span class="err">10:</span>       <span class="nf">int</span> <span class="p">*</span><span class="no">pInt</span> <span class="err">=</span> <span class="p">(</span><span class="no">int</span><span class="p">*)</span><span class="no">szBuf</span><span class="c1">;
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">0040103</span><span class="nf">C</span>   <span class="no">lea</span>         <span class="no">eax</span><span class="p">,[</span><span class="no">ebp-8</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="err">0040103</span><span class="nf">F</span>   <span class="no">mov</span>         <span class="no">dword</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">ebp-0Ch</span><span class="p">],</span><span class="no">eax</span>
+</span></span><span class="line"><span class="cl"><span class="err">11:</span>       <span class="nf">short</span> <span class="p">*</span><span class="no">pShort</span> <span class="err">=</span> <span class="p">(</span><span class="no">short</span><span class="p">*)</span><span class="no">szBuf</span><span class="c1">;
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">00401042</span>   <span class="nf">lea</span>         <span class="no">ecx</span><span class="p">,[</span><span class="no">ebp-8</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="err">00401045</span>   <span class="nf">mov</span>         <span class="no">dword</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">ebp-10h</span><span class="p">],</span><span class="no">ecx</span>
+</span></span><span class="line"><span class="cl"><span class="err">12:</span>       <span class="nf">char</span> <span class="p">*</span><span class="no">pChar</span> <span class="err">=</span> <span class="no">szBuf</span><span class="c1">;
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">00401048</span>   <span class="nf">lea</span>         <span class="no">edx</span><span class="p">,[</span><span class="no">ebp-8</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="err">0040104</span><span class="nf">B</span>   <span class="no">mov</span>         <span class="no">dword</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">ebp-14h</span><span class="p">],</span><span class="no">edx</span>
+</span></span><span class="line"><span class="cl"><span class="err">13:</span>
+</span></span><span class="line"><span class="cl"><span class="err">14:</span>       <span class="nf">pInt</span> <span class="err">+=</span> <span class="mi">1</span><span class="c1">;
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">0040104</span><span class="nf">E</span>   <span class="no">mov</span>         <span class="no">eax</span><span class="p">,</span><span class="no">dword</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">ebp-0Ch</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="err">00401051</span>   <span class="nf">add</span>         <span class="no">eax</span><span class="p">,</span><span class="mi">4</span>
+</span></span><span class="line"><span class="cl"><span class="err">00401054</span>   <span class="nf">mov</span>         <span class="no">dword</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">ebp-0Ch</span><span class="p">],</span><span class="no">eax</span>
+</span></span><span class="line"><span class="cl"><span class="err">15:</span>       <span class="nf">pShort</span> <span class="err">+=</span> <span class="mi">1</span><span class="c1">;
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">00401057</span>   <span class="nf">mov</span>         <span class="no">ecx</span><span class="p">,</span><span class="no">dword</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">ebp-10h</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="err">0040105</span><span class="nf">A</span>   <span class="no">add</span>         <span class="no">ecx</span><span class="p">,</span><span class="mi">2</span>
+</span></span><span class="line"><span class="cl"><span class="err">0040105</span><span class="nf">D</span>   <span class="no">mov</span>         <span class="no">dword</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">ebp-10h</span><span class="p">],</span><span class="no">ecx</span>
+</span></span><span class="line"><span class="cl"><span class="err">16:</span>       <span class="nf">pChar</span> <span class="err">+=</span> <span class="mi">1</span><span class="c1">;
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">00401060</span>   <span class="nf">mov</span>         <span class="no">edx</span><span class="p">,</span><span class="no">dword</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">ebp-14h</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="err">00401063</span>   <span class="nf">add</span>         <span class="no">edx</span><span class="p">,</span><span class="mi">1</span>
+</span></span><span class="line"><span class="cl"><span class="err">00401066</span>   <span class="nf">mov</span>         <span class="no">dword</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">ebp-14h</span><span class="p">],</span><span class="no">edx</span>
+</span></span></code></pre></div><p>根据其汇编代码可以看出，对于int型的指针，每加1个会向后偏移4个字节，short会偏移2个字节，char型的会偏移1个，所以根据以上的内容，可以得出一个公式：TYPE* P p + n = p + sizeof(TYPE) *n</p>
+<p>根据上面的加法公式我们可以推导出两个指针的减法公式，TYPE <em>p1, TYPE</em> p2: p2 - p1 = ((int)p2 - (int)p1) / sizeof(TYPE)，两个指针相减得到的结果是两个指针之间拥有元素的个数。只有同类型的指针之间才可以相减。而指针的乘除法则没有意义，地址之间的乘除法也没有意义。</p>
+<p>　　引用是在C++中提出的，是变量的一个别名，提出引用主要是希望减少指针的使用，引用于指针在一个函数中想上述例子中那样使用并没有太大的意义，大量使用它们是在函数中，作为参数传递，不仅可以节省效率，同时也可以传递一段缓冲，作为输出参数来使用。这大大提升了程序的效率以及灵活性。但是在一些新手程序员看来指针无疑是噩梦般的存在，所以C++引入了引用，希望代替指针。在一般的C++书中都说引用是变量的一个别名是不占内存的，但是我通过查看反汇编代码发现引用并不是向书上说的那样，下面是一段程序及它的反汇编代码：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="kt">int</span> <span class="n">nValue</span> <span class="o">=</span> <span class="mi">10</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="kt">int</span> <span class="o">&amp;</span><span class="n">rValue</span> <span class="o">=</span> <span class="n">nValue</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="n">printf</span><span class="p">(</span><span class="s">&#34;%d</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">,</span> <span class="n">rValue</span><span class="p">);</span>
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-asm" data-lang="asm"><span class="line"><span class="cl"><span class="err">10:</span>       <span class="nf">int</span> <span class="no">nValue</span> <span class="err">=</span> <span class="mi">10</span><span class="c1">;
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">00401268</span>   <span class="nf">mov</span>         <span class="no">dword</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">ebp-4</span><span class="p">],</span><span class="mi">0</span><span class="no">Ah</span>
+</span></span><span class="line"><span class="cl"><span class="err">11:</span>       <span class="nf">int</span> <span class="err">&amp;</span><span class="no">rValue</span> <span class="err">=</span> <span class="no">nValue</span><span class="c1">;
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">0040126</span><span class="nf">F</span>   <span class="no">lea</span>         <span class="no">eax</span><span class="p">,[</span><span class="no">ebp-4</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="err">00401272</span>   <span class="nf">mov</span>         <span class="no">dword</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">ebp-8</span><span class="p">],</span><span class="no">eax</span>
+</span></span><span class="line"><span class="cl"><span class="err">12:</span>       <span class="nf">printf</span><span class="p">(</span><span class="err">&#34;</span><span class="nv">%d</span><span class="err">\</span><span class="no">n</span><span class="err">&#34;</span><span class="p">,</span> <span class="no">rValue</span><span class="p">)</span><span class="c1">;
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">00401275</span>   <span class="nf">mov</span>         <span class="no">ecx</span><span class="p">,</span><span class="no">dword</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">ebp-8</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="err">00401278</span>   <span class="nf">mov</span>         <span class="no">edx</span><span class="p">,</span><span class="no">dword</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">ecx</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="err">0040127</span><span class="nf">A</span>   <span class="no">push</span>        <span class="no">edx</span>
+</span></span><span class="line"><span class="cl"><span class="err">0040127</span><span class="nf">B</span>   <span class="no">push</span>        <span class="no">offset</span> <span class="no">string</span> <span class="err">&#34;</span><span class="nv">%d</span><span class="err">\</span><span class="no">n</span><span class="err">&#34;</span> <span class="p">(</span><span class="mi">0042</span><span class="no">e01c</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="err">00401280</span>   <span class="nf">call</span>        <span class="no">printf</span> <span class="p">(</span><span class="mi">00401520</span><span class="p">)</span>
+</span></span></code></pre></div><p>从汇编代码中可以看到，在定义引用并为它赋值的过程中，编译器其实是将变量的地址赋值给了一个新的变量，这个变量的地址是[ebp - 8h]，在调用printf函数的时候，编译器将地址取出并将它压到函数栈中。下面是将引用改为指针的情况：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-asm" data-lang="asm"><span class="line"><span class="cl"><span class="err">10:</span>       <span class="nf">int</span> <span class="no">nValue</span> <span class="err">=</span> <span class="mi">10</span><span class="c1">;
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">00401268</span>   <span class="nf">mov</span>         <span class="no">dword</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">ebp-4</span><span class="p">],</span><span class="mi">0</span><span class="no">Ah</span>
+</span></span><span class="line"><span class="cl"><span class="err">11:</span>       <span class="nf">int</span> <span class="p">*</span><span class="no">pValue</span> <span class="err">=</span> <span class="err">&amp;</span><span class="no">nValue</span><span class="c1">;
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">0040126</span><span class="nf">F</span>   <span class="no">lea</span>         <span class="no">eax</span><span class="p">,[</span><span class="no">ebp-4</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="err">00401272</span>   <span class="nf">mov</span>         <span class="no">dword</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">ebp-8</span><span class="p">],</span><span class="no">eax</span>
+</span></span><span class="line"><span class="cl"><span class="err">12:</span>       <span class="nf">printf</span><span class="p">(</span><span class="err">&#34;</span><span class="nv">%d</span><span class="err">\</span><span class="no">n</span><span class="err">&#34;</span><span class="p">,</span> <span class="p">*</span><span class="no">pValue</span><span class="p">)</span><span class="c1">;
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">00401275</span>   <span class="nf">mov</span>         <span class="no">ecx</span><span class="p">,</span><span class="no">dword</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">ebp-8</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="err">00401278</span>   <span class="nf">mov</span>         <span class="no">edx</span><span class="p">,</span><span class="no">dword</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">ecx</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="err">0040127</span><span class="nf">A</span>   <span class="no">push</span>        <span class="no">edx</span>
+</span></span><span class="line"><span class="cl"><span class="err">0040127</span><span class="nf">B</span>   <span class="no">push</span>        <span class="no">offset</span> <span class="no">string</span> <span class="err">&#34;</span><span class="nv">%d</span><span class="err">\</span><span class="no">n</span><span class="err">&#34;</span> <span class="p">(</span><span class="mi">0042</span><span class="no">e01c</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="err">00401280</span>   <span class="nf">call</span>        <span class="no">printf</span> <span class="p">(</span><span class="mi">00401520</span><span class="p">)</span>
+</span></span></code></pre></div><p>两种情况的汇编代码完全一样，也就是说引用其实就是指针，编译器将其包装了一下，使它的行为变得和使用变量相同，而且在语法层面上做了一个限制，引用在定义的时候必须初始化，且初始化完成后就不能指向其他变量，这个行为与常指针相同。
+PS:在之前的博客中，我说引用其实就是指针，但是现在我自己感觉这句话可能有点问题，引用就是变量的一个别名，而变量实际上最终也归结到对应内存地址的访问上。所以当二者的汇编代码是一样时其实也不能说明它就是指针，在函数外访问该函数中的值本身时，也是要通过地址访问。所以这两段汇编代码一样并不能说明二者是同一个东西</p></div><div class="post-footer" id="post-footer">
+    <div class="post-info">
+        <div class="post-info-line">
+            <div class="post-info-mod">
+                <span>Updated on 2017-12-25</span>
+            </div></div>
+        <div class="post-info-line">
+            <div class="post-info-md"></div>
+            <div class="post-info-share">
+                <span><a href="javascript:void(0);" title="Share on Twitter" data-sharer="twitter" data-url="http://HaiLateBoy.github.io/posts/point-and-q/" data-title="地址、指针与引用" data-hashtags="VC&#43;&#43;,反汇编,C&#43;&#43;实现原理"><i class="fab fa-twitter fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Facebook" data-sharer="facebook" data-url="http://HaiLateBoy.github.io/posts/point-and-q/" data-hashtag="VC&#43;&#43;"><i class="fab fa-facebook-square fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Hacker News" data-sharer="hackernews" data-url="http://HaiLateBoy.github.io/posts/point-and-q/" data-title="地址、指针与引用"><i class="fab fa-hacker-news fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Line" data-sharer="line" data-url="http://HaiLateBoy.github.io/posts/point-and-q/" data-title="地址、指针与引用"><i data-svg-src="https://cdn.jsdelivr.net/npm/simple-icons@7.3.0/icons/line.svg" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on 微博" data-sharer="weibo" data-url="http://HaiLateBoy.github.io/posts/point-and-q/" data-title="地址、指针与引用"><i class="fab fa-weibo fa-fw" aria-hidden="true"></i></a></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="post-info-more">
+        <section class="post-tags"><i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/vc&#43;&#43;/">VC&#43;&#43;</a>,&nbsp;<a href="/tags/%E5%8F%8D%E6%B1%87%E7%BC%96/">反汇编</a>,&nbsp;<a href="/tags/c&#43;&#43;%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86/">C&#43;&#43;实现原理</a></section>
+        <section>
+            <span><a href="javascript:void(0);" onclick="window.history.back();">Back</a></span>&nbsp;|&nbsp;<span><a href="/">Home</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav"><a href="/posts/c-num-in-memory/" class="prev" rel="prev" title="C/C&#43;&#43;中整数与浮点数在内存中的表示方式"><i class="fas fa-angle-left fa-fw" aria-hidden="true"></i>C/C++中整数与浮点数在内存中的表示方式</a>
+            <a href="/posts/define-and-const/" class="next" rel="next" title="C/C&#43;&#43;中define定义的常量与const常量">C/C++中define定义的常量与const常量<i class="fas fa-angle-right fa-fw" aria-hidden="true"></i></a></div>
+</div>
+</article></div>
+            </main><footer class="footer">
+        <div class="footer-container"><div class="footer-line">Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener noreffer" title="Hugo 0.121.2">Hugo</a> | Theme - <a href="https://github.com/dillonzq/LoveIt" target="_blank" rel="noopener noreffer" title="LoveIt 0.2.11"><i class="far fa-kiss-wink-heart fa-fw" aria-hidden="true"></i> LoveIt</a>
+                </div><div class="footer-line" itemscope itemtype="http://schema.org/CreativeWork"><i class="far fa-copyright fa-fw" aria-hidden="true"></i><span itemprop="copyrightYear">2022 - 2024</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="https://www.masimaro.xyz" target="_blank">Masimaro</a></span></div>
+        </div>
+    </footer></div>
+
+        <div id="fixed-buttons"><a href="#" id="back-to-top" class="fixed-button" title="Back to Top">
+                <i class="fas fa-arrow-up fa-fw" aria-hidden="true"></i>
+            </a><a href="#" id="view-comments" class="fixed-button" title="View Comments">
+                <i class="fas fa-comment fa-fw" aria-hidden="true"></i>
+            </a>
+        </div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.css"><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/autocomplete.js@0.38.1/dist/autocomplete.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lunr@2.3.9/lunr.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lazysizes@5.3.2/lazysizes.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/clipboard@2.0.11/dist/clipboard.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/sharer.js@0.5.1/sharer.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/auto-render.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/copy-tex.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/mhchem.min.js"></script><script type="text/javascript">window.config={"code":{"copyTitle":"Copy to clipboard","maxShownLines":50},"comment":{},"math":{"delimiters":[{"display":true,"left":"$$","right":"$$"},{"display":true,"left":"\\[","right":"\\]"},{"display":true,"left":"\\begin{equation}","right":"\\end{equation}"},{"display":true,"left":"\\begin{equation*}","right":"\\end{equation*}"},{"display":true,"left":"\\begin{align}","right":"\\end{align}"},{"display":true,"left":"\\begin{align*}","right":"\\end{align*}"},{"display":true,"left":"\\begin{alignat}","right":"\\end{alignat}"},{"display":true,"left":"\\begin{alignat*}","right":"\\end{alignat*}"},{"display":true,"left":"\\begin{gather}","right":"\\end{gather}"},{"display":true,"left":"\\begin{CD}","right":"\\end{CD}"},{"display":false,"left":"$","right":"$"},{"display":false,"left":"\\(","right":"\\)"}],"strict":false},"search":{"highlightTag":"em","maxResultLength":10,"noResultsFound":"No results found","snippetLength":50}};</script><script type="text/javascript" src="/js/theme.min.js"></script></body>
+</html>

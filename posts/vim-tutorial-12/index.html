@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="robots" content="noodp" />
+        <title>vim 从嫌弃到依赖(11)——标签页操作 - Masimaro&#39;s blog</title><meta name="Description" content="这是我用于记录日常和学习的小站"><meta property="og:title" content="vim 从嫌弃到依赖(11)——标签页操作" />
+<meta property="og:description" content="各位小伙伴们，你们好，我又更新了！ 之前介绍了vim关于多窗口的操作，vim中多窗口是将多个窗口在一个屏幕中显示，这似乎与我们常见的ide有点" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://HaiLateBoy.github.io/posts/vim-tutorial-12/" /><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2022-05-11T10:41:10+08:00" />
+<meta property="article:modified_time" content="2022-05-11T10:41:10+08:00" /><meta property="og:site_name" content="Masimaro&#39;s blog" />
+
+<meta name="twitter:card" content="summary"/><meta name="twitter:title" content="vim 从嫌弃到依赖(11)——标签页操作"/>
+<meta name="twitter:description" content="各位小伙伴们，你们好，我又更新了！ 之前介绍了vim关于多窗口的操作，vim中多窗口是将多个窗口在一个屏幕中显示，这似乎与我们常见的ide有点"/>
+<meta name="application-name" content="My cool site">
+<meta name="apple-mobile-web-app-title" content="My cool site"><meta name="theme-color" content="#ffffff"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="manifest" href="/site.webmanifest"><link rel="canonical" href="http://HaiLateBoy.github.io/posts/vim-tutorial-12/" /><link rel="prev" href="http://HaiLateBoy.github.io/posts/vim-tutorial-11/" /><link rel="next" href="http://HaiLateBoy.github.io/posts/vim-tutorial-13/" /><link rel="stylesheet" href="/css/style.min.css"><link rel="preload" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css"></noscript><link rel="preload" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css"></noscript><script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "BlogPosting",
+        "headline": "vim 从嫌弃到依赖(11)——标签页操作",
+        "inLanguage": "zh-CN",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "http:\/\/HaiLateBoy.github.io\/posts\/vim-tutorial-12\/"
+        },"genre": "posts","keywords": "vim, 编辑工具, 文本处理","wordcount":  1340 ,
+        "url": "http:\/\/HaiLateBoy.github.io\/posts\/vim-tutorial-12\/","datePublished": "2022-05-11T10:41:10+08:00","dateModified": "2022-05-11T10:41:10+08:00","publisher": {
+            "@type": "Organization",
+            "name": ""},"author": {
+                "@type": "Person",
+                "name": "Masimaro"
+            },"description": ""
+    }
+    </script></head>
+    <body data-header-desktop="fixed" data-header-mobile="auto"><script type="text/javascript">(window.localStorage && localStorage.getItem('theme') ? localStorage.getItem('theme') === 'dark' : ('auto' === 'auto' ? window.matchMedia('(prefers-color-scheme: dark)').matches : 'auto' === 'dark')) && document.body.setAttribute('theme', 'dark');</script>
+
+        <div id="mask"></div><div class="wrapper"><header class="desktop" id="header-desktop">
+    <div class="header-wrapper">
+        <div class="header-title">
+            <a href="/" title="Masimaro&#39;s blog">My cool site</a>
+        </div>
+        <div class="menu">
+            <div class="menu-inner"><a class="menu-item" href="/posts/" title="文章列表"> 文章 </a><a class="menu-item" href="/tags/" title="标签"> 标签 </a><a class="menu-item" href="/categories/" title="分类"> 分类 </a><a class="menu-item" href="/about" title="关于本站"> 关于 </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-desktop">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-desktop" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-desktop" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-desktop">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </span><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                    <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+                </a></div>
+        </div>
+    </div>
+</header><header class="mobile" id="header-mobile">
+    <div class="header-container">
+        <div class="header-wrapper">
+            <div class="header-title">
+                <a href="/" title="Masimaro&#39;s blog">My cool site</a>
+            </div>
+            <div class="menu-toggle" id="menu-toggle-mobile">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+        <div class="menu" id="menu-mobile"><div class="search-wrapper">
+                    <div class="search mobile" id="search-mobile">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-mobile">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-mobile" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-mobile" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-mobile">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </div>
+                    <a href="javascript:void(0);" class="search-cancel" id="search-cancel-mobile">
+                        Cancel
+                    </a>
+                </div><a class="menu-item" href="/posts/" title="文章列表">文章</a><a class="menu-item" href="/tags/" title="标签">标签</a><a class="menu-item" href="/categories/" title="分类">分类</a><a class="menu-item" href="/about" title="关于本站">关于</a><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+            </a></div>
+    </div>
+</header><div class="search-dropdown desktop">
+        <div id="search-dropdown-desktop"></div>
+    </div>
+    <div class="search-dropdown mobile">
+        <div id="search-dropdown-mobile"></div>
+    </div><main class="main">
+                <div class="container"><div class="toc" id="toc-auto">
+            <h2 class="toc-title">Contents</h2>
+            <div class="toc-content" id="toc-content-auto"></div>
+        </div><article class="page single"><h1 class="single-title animate__animated animate__flipInX">vim 从嫌弃到依赖(11)——标签页操作</h1><div class="post-meta">
+            <div class="post-meta-line"><span class="post-author"><a href="https://www.masimaro.xyz" title="Author" target="_blank" rel="noopener noreffer author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Masimaro</a></span>&nbsp;<span class="post-category">included in <a href="/categories/vim/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>vim</a></span></div>
+            <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw" aria-hidden="true"></i>&nbsp;<time datetime="2022-05-11">2022-05-11</time>&nbsp;<i class="fas fa-pencil-alt fa-fw" aria-hidden="true"></i>&nbsp;1340 words&nbsp;
+                <i class="far fa-clock fa-fw" aria-hidden="true"></i>&nbsp;3 minutes&nbsp;</div>
+        </div><div class="details toc" id="toc-static"  data-kept="true">
+                <div class="details-summary toc-title">
+                    <span>Contents</span>
+                    <span><i class="details-icon fas fa-angle-right" aria-hidden="true"></i></span>
+                </div>
+                <div class="details-content toc-content" id="toc-content-static"><nav id="TableOfContents">
+  <ul>
+    <li><a href="#标签页">标签页</a>
+      <ul>
+        <li><a href="#关闭标签">关闭标签</a></li>
+        <li><a href="#切换标签页">切换标签页</a></li>
+      </ul>
+    </li>
+    <li><a href="#最后总结">最后总结</a></li>
+  </ul>
+</nav></div>
+            </div><div class="content" id="content"><p>各位小伙伴们，你们好，我又更新了！
+之前介绍了vim关于多窗口的操作，vim中多窗口是将多个窗口在一个屏幕中显示，这似乎与我们常见的ide有点不一样，一般的ide都是新开一个窗口之后在新的标签页中显示，通过不同的标签页对应不同的文件。我们的浏览器就是一个典型的例子。</p>
+<p>而vim似乎不是这样的，vim管理文件采用的是缓冲区列表的方式，一个缓冲区对应一个显示窗口，而多个窗口可以显示在一个屏幕上。而vim中的标签页更像是一个容器，用来容纳这么些窗口。它更像是一个虚拟桌面，不管在功能上还是使用习惯上都像是虚拟桌面。（虚拟桌面可是个摸鱼的好东西，不过现在有更高级的摸鱼方法就是了。 有朝一日我一定要尝试用vim来摸鱼）</p>
+<p>除了使用它来摸鱼，我们再来想象这么一个场景：我们在做一个项目，已经打开了需要的代码文件，并且将它们经过了精心的布局，但是这个时候来了新的任务（以前的老项目出bug了，wtf！），我们不想在精心布置的窗口中插入这么一个第三者，总归心里有点别扭。这个时候我们新开一个标签页，在这个标签页里打开原来项目相关的文件。当我们修复完这个bug之后，直接切回到原来的标签页。之前的布局仍在原地等待着你（这么一个对你不离不弃的编辑器，多么令人感动）。</p>
+<p>我知道，看了我这么长的vim教程，很多小伙伴已经头晕脑胀了，甚至有的可能觉得最近介绍的东西，使用插件能更好的完成类似的操作，这些操作方式已经过时了。但是vim它提供了原生的操作，总有它的道理。打起精神来吧。</p>
+<h2 id="标签页">标签页</h2>
+<p>可以使用命令<code>:tabedit {filename}</code> 打开一个新的标签页，如果不加文件名则打开一个空的标签页。我们也可以使用<code>tabnew</code> 命令，参数与效果完全相同。</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://img-blog.csdnimg.cn/692e92da99f142c988b567f56ddb2314.gif#pic_center"
+        data-srcset="https://img-blog.csdnimg.cn/692e92da99f142c988b567f56ddb2314.gif#pic_center, https://img-blog.csdnimg.cn/692e92da99f142c988b567f56ddb2314.gif#pic_center 1.5x, https://img-blog.csdnimg.cn/692e92da99f142c988b567f56ddb2314.gif#pic_center 2x"
+        data-sizes="auto"
+        alt="https://img-blog.csdnimg.cn/692e92da99f142c988b567f56ddb2314.gif#pic_center"
+        title="打开新标签页" />
+如果当前标签页中包括多个窗口，那么可以使用<code>&lt;Ctrl+w&gt;T</code> 将当前缓冲区移动到新的标签页中。
+<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://img-blog.csdnimg.cn/6cfef0af3ff5405eaad20d6edf076289.gif#pic_center"
+        data-srcset="https://img-blog.csdnimg.cn/6cfef0af3ff5405eaad20d6edf076289.gif#pic_center, https://img-blog.csdnimg.cn/6cfef0af3ff5405eaad20d6edf076289.gif#pic_center 1.5x, https://img-blog.csdnimg.cn/6cfef0af3ff5405eaad20d6edf076289.gif#pic_center 2x"
+        data-sizes="auto"
+        alt="https://img-blog.csdnimg.cn/6cfef0af3ff5405eaad20d6edf076289.gif#pic_center"
+        title="Ctrl &#43; W T 将当前缓冲区移动到新标签页" /></p>
+<h3 id="关闭标签">关闭标签</h3>
+<p>可以使用<code>tabc[lose]</code> 或者使用<code>tabo[nly]</code> 来关闭标签页，前者是关闭当前标签页，后者是关闭所有，只保留当前激活的标签页。</p>
+<h3 id="切换标签页">切换标签页</h3>
+<p>在普通模式下使用<code>gt</code> 切换到下一个标签页，使用<code>gT</code> 切换到上一个标签页，也可以在命令模式中使用<code>:tabn[ext]</code> 和 <code>tabp[revious]</code> 来达到同样的效果。另外<code>tabnext</code> 和<code>gt</code> 前面都是支持添加数字编号的。这样我们可以方便的跳转到第几个标签页，这个编号是从1开始的。
+<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://img-blog.csdnimg.cn/a6a2f487cb76408fa1b5befd8ce13c18.gif#pic_center"
+        data-srcset="https://img-blog.csdnimg.cn/a6a2f487cb76408fa1b5befd8ce13c18.gif#pic_center, https://img-blog.csdnimg.cn/a6a2f487cb76408fa1b5befd8ce13c18.gif#pic_center 1.5x, https://img-blog.csdnimg.cn/a6a2f487cb76408fa1b5befd8ce13c18.gif#pic_center 2x"
+        data-sizes="auto"
+        alt="https://img-blog.csdnimg.cn/a6a2f487cb76408fa1b5befd8ce13c18.gif#pic_center"
+        title="使用gt切换标签页" />
+<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://img-blog.csdnimg.cn/54532b4d796340759e1e820c0a1ff687.gif#pic_center"
+        data-srcset="https://img-blog.csdnimg.cn/54532b4d796340759e1e820c0a1ff687.gif#pic_center, https://img-blog.csdnimg.cn/54532b4d796340759e1e820c0a1ff687.gif#pic_center 1.5x, https://img-blog.csdnimg.cn/54532b4d796340759e1e820c0a1ff687.gif#pic_center 2x"
+        data-sizes="auto"
+        alt="https://img-blog.csdnimg.cn/54532b4d796340759e1e820c0a1ff687.gif#pic_center"
+        title="通过标签页编号切换" />
+最后再介绍一个<code>tabmove {n}</code> 命令，它可以用来移动当前标签页到指定位置，后面加数字表示移动到第几个标签的位置，不加数字默认移动到结尾位置。当然如果你使用的是图形版的vim或者终端支持鼠标操作，也可以使用拖拽的方式完成这一工作。
+<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://img-blog.csdnimg.cn/cf07a9db478541fca448da5af6b0ba40.gif#pic_center"
+        data-srcset="https://img-blog.csdnimg.cn/cf07a9db478541fca448da5af6b0ba40.gif#pic_center, https://img-blog.csdnimg.cn/cf07a9db478541fca448da5af6b0ba40.gif#pic_center 1.5x, https://img-blog.csdnimg.cn/cf07a9db478541fca448da5af6b0ba40.gif#pic_center 2x"
+        data-sizes="auto"
+        alt="https://img-blog.csdnimg.cn/cf07a9db478541fca448da5af6b0ba40.gif#pic_center"
+        title="移动标签页" /></p>
+<h2 id="最后总结">最后总结</h2>
+<p>关于标签的操作，基本就这么多了。其实真要说起来，这些操作比较繁琐，记起来也麻烦，vim自带的标签功能相对比较简陋，后面我会介绍对应的插件对其进行扩充，本来我想跳过这部分的内容，毕竟有更好的插件和更好的操作方式。但是它作为vim提供的一大功能，使用频率也算比较大，想想还是说一下比较好吧。</p>
+<p>最后总结一下提到的一些命令吧：</p>
+<ul>
+<li><code>:tabedit {filename}</code> : 新建标签页，并在标签页中打开对应文件</li>
+<li><code>tabnew</code>: 与<code>tabedit</code> 完全相同</li>
+<li><code>&lt;Ctrl+w&gt;T</code>: 如果当前标签中有多个子窗口，它会将当前活动子窗口放到新的标签页中</li>
+<li><code>tabc[lose]</code>: 关闭当前标签页</li>
+<li><code>tabo[nly]</code>: 关闭除当前激活标签页的所有</li>
+<li><code>gt</code> 或 <code>:tabn[ext]</code>: 切换到下一个标签页</li>
+<li><code>gT</code> 或 <code>tabp[revious]</code>: 切换到上一个标签页</li>
+<li><code>tabmove {n}</code>: 移动当前标签页</li>
+</ul>
+</div><div class="post-footer" id="post-footer">
+    <div class="post-info">
+        <div class="post-info-line">
+            <div class="post-info-mod">
+                <span>Updated on 2022-05-11</span>
+            </div></div>
+        <div class="post-info-line">
+            <div class="post-info-md"></div>
+            <div class="post-info-share">
+                <span><a href="javascript:void(0);" title="Share on Twitter" data-sharer="twitter" data-url="http://HaiLateBoy.github.io/posts/vim-tutorial-12/" data-title="vim 从嫌弃到依赖(11)——标签页操作" data-hashtags="vim,编辑工具,文本处理"><i class="fab fa-twitter fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Facebook" data-sharer="facebook" data-url="http://HaiLateBoy.github.io/posts/vim-tutorial-12/" data-hashtag="vim"><i class="fab fa-facebook-square fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Hacker News" data-sharer="hackernews" data-url="http://HaiLateBoy.github.io/posts/vim-tutorial-12/" data-title="vim 从嫌弃到依赖(11)——标签页操作"><i class="fab fa-hacker-news fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Line" data-sharer="line" data-url="http://HaiLateBoy.github.io/posts/vim-tutorial-12/" data-title="vim 从嫌弃到依赖(11)——标签页操作"><i data-svg-src="https://cdn.jsdelivr.net/npm/simple-icons@7.3.0/icons/line.svg" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on 微博" data-sharer="weibo" data-url="http://HaiLateBoy.github.io/posts/vim-tutorial-12/" data-title="vim 从嫌弃到依赖(11)——标签页操作"><i class="fab fa-weibo fa-fw" aria-hidden="true"></i></a></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="post-info-more">
+        <section class="post-tags"><i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/vim/">vim</a>,&nbsp;<a href="/tags/%E7%BC%96%E8%BE%91%E5%B7%A5%E5%85%B7/">编辑工具</a>,&nbsp;<a href="/tags/%E6%96%87%E6%9C%AC%E5%A4%84%E7%90%86/">文本处理</a></section>
+        <section>
+            <span><a href="javascript:void(0);" onclick="window.history.back();">Back</a></span>&nbsp;|&nbsp;<span><a href="/">Home</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav"><a href="/posts/vim-tutorial-11/" class="prev" rel="prev" title="vim 从嫌弃到依赖(10)——缓冲区列表"><i class="fas fa-angle-left fa-fw" aria-hidden="true"></i>vim 从嫌弃到依赖(10)——缓冲区列表</a>
+            <a href="/posts/vim-tutorial-13/" class="next" rel="next" title="vim 从嫌弃到依赖(12)——打开及保存文件">vim 从嫌弃到依赖(12)——打开及保存文件<i class="fas fa-angle-right fa-fw" aria-hidden="true"></i></a></div>
+</div>
+</article></div>
+            </main><footer class="footer">
+        <div class="footer-container"><div class="footer-line">Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener noreffer" title="Hugo 0.121.2">Hugo</a> | Theme - <a href="https://github.com/dillonzq/LoveIt" target="_blank" rel="noopener noreffer" title="LoveIt 0.2.11"><i class="far fa-kiss-wink-heart fa-fw" aria-hidden="true"></i> LoveIt</a>
+                </div><div class="footer-line" itemscope itemtype="http://schema.org/CreativeWork"><i class="far fa-copyright fa-fw" aria-hidden="true"></i><span itemprop="copyrightYear">2022 - 2024</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="https://www.masimaro.xyz" target="_blank">Masimaro</a></span></div>
+        </div>
+    </footer></div>
+
+        <div id="fixed-buttons"><a href="#" id="back-to-top" class="fixed-button" title="Back to Top">
+                <i class="fas fa-arrow-up fa-fw" aria-hidden="true"></i>
+            </a><a href="#" id="view-comments" class="fixed-button" title="View Comments">
+                <i class="fas fa-comment fa-fw" aria-hidden="true"></i>
+            </a>
+        </div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.css"><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/autocomplete.js@0.38.1/dist/autocomplete.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lunr@2.3.9/lunr.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lazysizes@5.3.2/lazysizes.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/clipboard@2.0.11/dist/clipboard.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/sharer.js@0.5.1/sharer.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/auto-render.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/copy-tex.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/mhchem.min.js"></script><script type="text/javascript">window.config={"code":{"copyTitle":"Copy to clipboard","maxShownLines":50},"comment":{},"math":{"delimiters":[{"display":true,"left":"$$","right":"$$"},{"display":true,"left":"\\[","right":"\\]"},{"display":true,"left":"\\begin{equation}","right":"\\end{equation}"},{"display":true,"left":"\\begin{equation*}","right":"\\end{equation*}"},{"display":true,"left":"\\begin{align}","right":"\\end{align}"},{"display":true,"left":"\\begin{align*}","right":"\\end{align*}"},{"display":true,"left":"\\begin{alignat}","right":"\\end{alignat}"},{"display":true,"left":"\\begin{alignat*}","right":"\\end{alignat*}"},{"display":true,"left":"\\begin{gather}","right":"\\end{gather}"},{"display":true,"left":"\\begin{CD}","right":"\\end{CD}"},{"display":false,"left":"$","right":"$"},{"display":false,"left":"\\(","right":"\\)"}],"strict":false},"search":{"highlightTag":"em","maxResultLength":10,"noResultsFound":"No results found","snippetLength":50}};</script><script type="text/javascript" src="/js/theme.min.js"></script></body>
+</html>

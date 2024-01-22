@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="robots" content="noodp" />
+        <title>OLEDB数据源 - Masimaro&#39;s blog</title><meta name="Description" content="这是我用于记录日常和学习的小站"><meta property="og:title" content="OLEDB数据源" />
+<meta property="og:description" content="数据源在oledb中指数据提供者，这里可以简单的理解为数据库程序。数据源对象代表数据库的一个连接，是需要创建的第一个对象。而数据源对象主要用于配置数据库连接的相关属性如连接数据库的用户名密码等等" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://HaiLateBoy.github.io/posts/oledb-and-ado-2/" /><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2018-01-12T21:42:37+00:00" />
+<meta property="article:modified_time" content="2018-01-12T21:42:37+00:00" /><meta property="og:site_name" content="Masimaro&#39;s blog" />
+
+<meta name="twitter:card" content="summary"/><meta name="twitter:title" content="OLEDB数据源"/>
+<meta name="twitter:description" content="数据源在oledb中指数据提供者，这里可以简单的理解为数据库程序。数据源对象代表数据库的一个连接，是需要创建的第一个对象。而数据源对象主要用于配置数据库连接的相关属性如连接数据库的用户名密码等等"/>
+<meta name="application-name" content="My cool site">
+<meta name="apple-mobile-web-app-title" content="My cool site"><meta name="theme-color" content="#ffffff"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="manifest" href="/site.webmanifest"><link rel="canonical" href="http://HaiLateBoy.github.io/posts/oledb-and-ado-2/" /><link rel="prev" href="http://HaiLateBoy.github.io/posts/crazy-programmer-read/" /><link rel="next" href="http://HaiLateBoy.github.io/posts/c-loop/" /><link rel="stylesheet" href="/css/style.min.css"><link rel="preload" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css"></noscript><link rel="preload" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css"></noscript><script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "BlogPosting",
+        "headline": "OLEDB数据源",
+        "inLanguage": "zh-CN",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "http:\/\/HaiLateBoy.github.io\/posts\/oledb-and-ado-2\/"
+        },"genre": "posts","keywords": "OLEDB, 数据库编程, VC\u002b\u002b, 数据库","wordcount":  4364 ,
+        "url": "http:\/\/HaiLateBoy.github.io\/posts\/oledb-and-ado-2\/","datePublished": "2018-01-12T21:42:37+00:00","dateModified": "2018-01-12T21:42:37+00:00","publisher": {
+            "@type": "Organization",
+            "name": ""},"author": {
+                "@type": "Person",
+                "name": "Masimaro"
+            },"description": ""
+    }
+    </script></head>
+    <body data-header-desktop="fixed" data-header-mobile="auto"><script type="text/javascript">(window.localStorage && localStorage.getItem('theme') ? localStorage.getItem('theme') === 'dark' : ('auto' === 'auto' ? window.matchMedia('(prefers-color-scheme: dark)').matches : 'auto' === 'dark')) && document.body.setAttribute('theme', 'dark');</script>
+
+        <div id="mask"></div><div class="wrapper"><header class="desktop" id="header-desktop">
+    <div class="header-wrapper">
+        <div class="header-title">
+            <a href="/" title="Masimaro&#39;s blog">My cool site</a>
+        </div>
+        <div class="menu">
+            <div class="menu-inner"><a class="menu-item" href="/posts/" title="文章列表"> 文章 </a><a class="menu-item" href="/tags/" title="标签"> 标签 </a><a class="menu-item" href="/categories/" title="分类"> 分类 </a><a class="menu-item" href="/about" title="关于本站"> 关于 </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-desktop">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-desktop" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-desktop" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-desktop">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </span><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                    <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+                </a></div>
+        </div>
+    </div>
+</header><header class="mobile" id="header-mobile">
+    <div class="header-container">
+        <div class="header-wrapper">
+            <div class="header-title">
+                <a href="/" title="Masimaro&#39;s blog">My cool site</a>
+            </div>
+            <div class="menu-toggle" id="menu-toggle-mobile">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+        <div class="menu" id="menu-mobile"><div class="search-wrapper">
+                    <div class="search mobile" id="search-mobile">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-mobile">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-mobile" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-mobile" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-mobile">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </div>
+                    <a href="javascript:void(0);" class="search-cancel" id="search-cancel-mobile">
+                        Cancel
+                    </a>
+                </div><a class="menu-item" href="/posts/" title="文章列表">文章</a><a class="menu-item" href="/tags/" title="标签">标签</a><a class="menu-item" href="/categories/" title="分类">分类</a><a class="menu-item" href="/about" title="关于本站">关于</a><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+            </a></div>
+    </div>
+</header><div class="search-dropdown desktop">
+        <div id="search-dropdown-desktop"></div>
+    </div>
+    <div class="search-dropdown mobile">
+        <div id="search-dropdown-mobile"></div>
+    </div><main class="main">
+                <div class="container"><div class="toc" id="toc-auto">
+            <h2 class="toc-title">Contents</h2>
+            <div class="toc-content" id="toc-content-auto"></div>
+        </div><article class="page single"><h1 class="single-title animate__animated animate__flipInX">OLEDB数据源</h1><div class="post-meta">
+            <div class="post-meta-line"><span class="post-author"><a href="https://www.masimaro.xyz" title="Author" target="_blank" rel="noopener noreffer author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Masimaro</a></span>&nbsp;<span class="post-category">included in <a href="/categories/windows-%E6%95%B0%E6%8D%AE%E5%BA%93%E7%BC%96%E7%A8%8B/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>windows 数据库编程</a></span></div>
+            <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw" aria-hidden="true"></i>&nbsp;<time datetime="2018-01-12">2018-01-12</time>&nbsp;<i class="fas fa-pencil-alt fa-fw" aria-hidden="true"></i>&nbsp;4364 words&nbsp;
+                <i class="far fa-clock fa-fw" aria-hidden="true"></i>&nbsp;9 minutes&nbsp;</div>
+        </div><div class="details toc" id="toc-static"  data-kept="true">
+                <div class="details-summary toc-title">
+                    <span>Contents</span>
+                    <span><i class="details-icon fas fa-angle-right" aria-hidden="true"></i></span>
+                </div>
+                <div class="details-content toc-content" id="toc-content-static"><nav id="TableOfContents">
+  <ul>
+    <li><a href="#直接创建idbinitialize接口">直接创建IDBInitialize接口</a></li>
+    <li><a href="#使用idbpromptinitialize接口来创建数据源对象">使用IDBPromptInitialize接口来创建数据源对象</a></li>
+    <li><a href="#使用idatainitialize接口来创建数据源对象">使用IDataInitialize接口来创建数据源对象</a></li>
+  </ul>
+</nav></div>
+            </div><div class="content" id="content"><p>数据源在oledb中指数据提供者，这里可以简单的理解为数据库程序。数据源对象代表数据库的一个连接，是需要创建的第一个对象。而数据源对象主要用于配置数据库连接的相关属性如连接数据库的用户名密码等等</p>
+<p>数据源主要完成的功能如下：</p>
+<ol>
+<li>进行数据库身份认证</li>
+<li>为每个连接准备对应的资源，如对应的数据缓冲，网络连接资源</li>
+<li>设置连接属性，给访问者何种权限，设置连接的超时值等等，对象会根据对应的属性打开对应的接口。它的这些设置都是通过属性进行的</li>
+</ol>
+<h1 id="oledb属性与属性设置">OLEDB属性与属性设置</h1>
+<p>OLEDB虽然是基于COM的一组接口，但是它与标准的COM接口有点不同，它的一大特色在于它自身的属性设置，有的接口虽然对象中存在但是调用QueryInterface是查询不出来的，只有设置相应的接口才会打开，有的接口可以根据属性值表现不同的行为。比如设置了对应的只读属性则不允许使用更新接口。
+每个属性都有值、类型、说明和读写属性，对于行集对象，还有一个用于指示是否可以逐列应用它的指示器。
+属性由一个GUID和一个整数ID进行唯一标识。
+属性集是所有具有相同 组GUID 的一组属性。在逻辑上它们都用于同一种功能，比如有的属性集用于设置数据源连接属性，有的用于设置行集属性等等。它们是应用在同一个特定对象上的一组属性。在每个这样的属性组中都有属性每个属性属于一个或者多个属性组。
+属性定义如下：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="k">typedef</span> <span class="k">struct</span> <span class="nc">tagDBPROP</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">   <span class="n">DBPROPID</span>        <span class="n">dwPropertyID</span><span class="p">;</span> <span class="c1">//属性GUID
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>   <span class="n">DBPROPOPTIONS</span>   <span class="n">dwOptions</span><span class="p">;</span> <span class="c1">//属性的操作方式
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>   <span class="n">DBPROPSTATUS</span>    <span class="n">dwStatus</span><span class="p">;</span> <span class="c1">//属性设置状态
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>   <span class="n">DBID</span>            <span class="n">colid</span><span class="p">;</span> <span class="c1">//属性ID，一般给DB_NULLID
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>   <span class="n">VARIANT</span>         <span class="n">vValue</span><span class="p">;</span> <span class="c1">//属性值
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">}</span> <span class="n">DBPROP</span><span class="p">;</span>
+</span></span></code></pre></div><p>dwOptions:属性的操作方式有3种，但是一般只使用其中的两种：DBPROPOPTIONS_REQUIRED表示必须设置成功，如果设置失败，则设置属性的操作失败，DBPROPOPTIONS_OPTIONAL，表示可选，即即使该属性设置失败，设置属性的操作也返回成功。DBPROPOPTIONS_SETIFCHEAP表示如果在设置属性操作时在在dwStatus参数中返回该属性设置的状态，是否成功，失败的原因等等。
+属性集的定义如下：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="k">typedef</span> <span class="k">struct</span> <span class="nc">tagDBPROPSET</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">   <span class="n">DBPROP</span> <span class="o">*</span>   <span class="n">rgProperties</span><span class="p">;</span> <span class="c1">//属性数组的指针
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>   <span class="n">ULONG</span>      <span class="n">cProperties</span><span class="p">;</span> <span class="c1">//属性数组中元素个数
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>   <span class="n">GUID</span>       <span class="n">guidPropertySet</span><span class="p">;</span> <span class="c1">//属性集的GUID
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">}</span> <span class="n">DBPROPSET</span><span class="p">;</span>
+</span></span></code></pre></div><p>目前属性组包括初始化属性组、数据源属性组、会话属性组、行集属性组、表属性组和列属性组等等。
+设置属性一般包含如下几个步骤：</p>
+<ol>
+<li>分配一个属性类型DBPRO的数组，一般倾向于多分配一个，最后一个数组元素全0，作为结尾</li>
+<li>确定每个属性的属性GUID，即明确我们需要设置的是对象的哪个属性</li>
+<li>填充对应的属性值，属性操作方式</li>
+<li>填充对应的属性集DBPROPSET结构。设置该属性集的GUID</li>
+<li>调用对应的接口设置属性</li>
+</ol>
+<h1 id="数据源对象接口">数据源对象接口</h1>
+<p>数据源对象的接口定义如下：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="n">CoType</span> <span class="n">TDataSource</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">   <span class="p">[</span><span class="n">mandatory</span><span class="p">]</span>   <span class="n">interface</span> <span class="n">IDBCreateSession</span><span class="p">;</span> <span class="c1">//创建回话对象
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>   <span class="p">[</span><span class="n">mandatory</span><span class="p">]</span>   <span class="n">interface</span> <span class="n">IDBInitialize</span><span class="p">;</span> <span class="c1">//创建数据源连接对象
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>   <span class="p">[</span><span class="n">mandatory</span><span class="p">]</span>   <span class="n">interface</span> <span class="n">IDBProperties</span><span class="p">;</span> <span class="c1">///创建数据源的属性操作对象
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>   <span class="p">[</span><span class="n">mandatory</span><span class="p">]</span>   <span class="n">interface</span> <span class="n">IPersist</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">   <span class="p">[</span><span class="n">optional</span><span class="p">]</span>    <span class="n">interface</span> <span class="n">IConnectionPointContainer</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">   <span class="p">[</span><span class="n">optional</span><span class="p">]</span>    <span class="n">interface</span> <span class="n">IDBAsynchStatus</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">   <span class="p">[</span><span class="n">optional</span><span class="p">]</span>    <span class="n">interface</span> <span class="n">IDBDataSourceAdmin</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">   <span class="p">[</span><span class="n">optional</span><span class="p">]</span>    <span class="n">interface</span> <span class="n">IDBInfo</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">   <span class="p">[</span><span class="n">optional</span><span class="p">]</span>    <span class="n">interface</span> <span class="n">IObjectAccessControl</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">   <span class="p">[</span><span class="n">optional</span><span class="p">]</span>    <span class="n">interface</span> <span class="n">IPersistFile</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">   <span class="p">[</span><span class="n">optional</span><span class="p">]</span>    <span class="n">interface</span> <span class="n">ISecurityInfo</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">   <span class="p">[</span><span class="n">optional</span><span class="p">]</span>    <span class="n">interface</span> <span class="n">ISupportErrorInfo</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">   <span class="p">[</span><span class="n">optional</span><span class="p">]</span>    <span class="n">interface</span> <span class="n">ITrusteeAdmin</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">   <span class="p">[</span><span class="n">optional</span><span class="p">]</span>    <span class="n">interface</span> <span class="n">ITrusteeGroupAdmin</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p>在上面代码中，mandatory表示是数据源必须提供的接口，optional表示的是可选性提供的接口，在创建对应的接口时尽量使用必须实现的接口，如果需要使用可选择的接口，一定要判断数据源是否支持。在数据源对象中最主要的还是前三个必须提供的接口</p>
+<h1 id="连接到数据库">连接到数据库</h1>
+<p>连接到数据源一般使用IDBInitialize接口的Initialize方法，但是生成IDBInitialize接口有几种不同的方式，下面一一列举出来</p>
+<h2 id="直接创建idbinitialize接口">直接创建IDBInitialize接口</h2>
+<p>这种方式一般调用CoCreateInstance函数创建，下面是具体的代码</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;tchar.h&gt;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;windows.h&gt;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;strsafe.h&gt;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp"></span>
+</span></span><span class="line"><span class="cl"><span class="cp">#define COM_NO_WINDOWS_H    </span><span class="c1">//如果已经包含了Windows.h或不使用其他Windows库函数时
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="cp">#define OLEDBVER 0x0260     </span><span class="c1">//MSDAC2.6版
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="cp">#include</span> <span class="cpf">&lt;oledb.h&gt;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;oledberr.h&gt;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp"></span>
+</span></span><span class="line"><span class="cl"><span class="cp">#define GRS_ALLOC(sz)       HeapAlloc(GetProcessHeap(),0,sz)
+</span></span></span><span class="line"><span class="cl"><span class="cp">#define GRS_CALLOC(sz)      HeapAlloc(GetProcessHeap(),HEAP_ZERO_MEMORY,sz)
+</span></span></span><span class="line"><span class="cl"><span class="cp">#define GRS_SAFEFREE(p)     if(NULL != p){HeapFree(GetProcessHeap(),0,p);p=NULL;}
+</span></span></span><span class="line"><span class="cl"><span class="cp"></span>
+</span></span><span class="line"><span class="cl"><span class="cp">#define GRS_USEPRINTF() TCHAR pBuf[1024] = {}
+</span></span></span><span class="line"><span class="cl"><span class="cp"></span><span class="c1">//定义输出宏
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="cp">#define GRS_PRINTF(...) \
+</span></span></span><span class="line"><span class="cl"><span class="cp">    GRS_USEPRINTF();\
+</span></span></span><span class="line"><span class="cl"><span class="cp">    StringCchPrintf(pBuf,1024,__VA_ARGS__);\
+</span></span></span><span class="line"><span class="cl"><span class="cp">    WriteConsole(GetStdHandle(STD_OUTPUT_HANDLE),pBuf,lstrlen(pBuf),NULL,NULL);
+</span></span></span><span class="line"><span class="cl"><span class="cp"></span>
+</span></span><span class="line"><span class="cl"><span class="c1">//安全释放，为了养成良好的编码习惯，特作此宏定义
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="cp">#define GRS_SAFERELEASE(I)\
+</span></span></span><span class="line"><span class="cl"><span class="cp">    if(NULL != (I))\
+</span></span></span><span class="line"><span class="cl"><span class="cp">    {\
+</span></span></span><span class="line"><span class="cl"><span class="cp">        (I)-&gt;Release();\
+</span></span></span><span class="line"><span class="cl"><span class="cp">        (I)=NULL;\
+</span></span></span><span class="line"><span class="cl"><span class="cp">    }
+</span></span></span><span class="line"><span class="cl"><span class="cp"></span><span class="c1">//检测上一步的操作是否成功
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="cp">#define GRS_COM_CHECK(hr,...)\
+</span></span></span><span class="line"><span class="cl"><span class="cp">    if(FAILED(hr))\
+</span></span></span><span class="line"><span class="cl"><span class="cp">    {\
+</span></span></span><span class="line"><span class="cl"><span class="cp">        GRS_PRINTF(__VA_ARGS__);\
+</span></span></span><span class="line"><span class="cl"><span class="cp">        goto CLEAR_UP;\
+</span></span></span><span class="line"><span class="cl"><span class="cp">    }
+</span></span></span><span class="line"><span class="cl"><span class="cp"></span>
+</span></span><span class="line"><span class="cl"><span class="kt">int</span> <span class="nf">_tmain</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="n">TCHAR</span><span class="o">*</span> <span class="n">argv</span><span class="p">[])</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">CoInitialize</span><span class="p">(</span><span class="nb">NULL</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">//创建OLEDB init接口
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="n">IDBInitialize</span> <span class="o">*</span><span class="n">pDBInit</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">IDBProperties</span> <span class="o">*</span><span class="n">pIDBProperties</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">//设置链接属性
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="n">DBPROPSET</span> <span class="n">dbPropset</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="mi">0</span><span class="p">};</span>
+</span></span><span class="line"><span class="cl">    <span class="n">DBPROP</span> <span class="n">dbProps</span><span class="p">[</span><span class="mi">5</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="mi">0</span><span class="p">};</span>
+</span></span><span class="line"><span class="cl">    <span class="n">CLSID</span> <span class="n">clsid_MSDASQL</span> <span class="o">=</span> <span class="p">{</span><span class="mi">0</span><span class="p">};</span> <span class="c1">//sql server 的数据源对象
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    
+</span></span><span class="line"><span class="cl">    <span class="n">HRESULT</span> <span class="n">hRes</span> <span class="o">=</span> <span class="n">CLSIDFromProgID</span><span class="p">(</span><span class="n">_T</span><span class="p">(</span><span class="s">&#34;SQLOLEDB&#34;</span><span class="p">),</span> <span class="o">&amp;</span><span class="n">clsid_MSDASQL</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">GRS_COM_CHECK</span><span class="p">(</span><span class="n">hRes</span><span class="p">,</span> <span class="n">_T</span><span class="p">(</span><span class="s">&#34;获取SQLOLEDB的CLSID失败，错误码：0x%08x</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">),</span> <span class="n">hRes</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">hRes</span> <span class="o">=</span> <span class="n">CoCreateInstance</span><span class="p">(</span><span class="n">clsid_MSDASQL</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">,</span> <span class="n">CLSCTX_INPROC_SERVER</span><span class="p">,</span> <span class="n">IID_IDBInitialize</span><span class="p">,(</span><span class="kt">void</span><span class="o">**</span><span class="p">)</span><span class="o">&amp;</span><span class="n">pDBInit</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">GRS_COM_CHECK</span><span class="p">(</span><span class="n">hRes</span><span class="p">,</span> <span class="n">_T</span><span class="p">(</span><span class="s">&#34;无法创建IDBInitialize接口，错误码：0x%08x</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">),</span> <span class="n">hRes</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="c1">//指定数据库实例名，这里使用了别名local，指定本地默认实例
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="n">dbProps</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">dwPropertyID</span> <span class="o">=</span> <span class="n">DBPROP_INIT_DATASOURCE</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">dbProps</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">dwOptions</span> <span class="o">=</span> <span class="n">DBPROPOPTIONS_REQUIRED</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">dbProps</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">vValue</span><span class="p">.</span><span class="n">vt</span> <span class="o">=</span> <span class="n">VT_BSTR</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">dbProps</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">vValue</span><span class="p">.</span><span class="n">bstrVal</span> <span class="o">=</span> <span class="n">SysAllocString</span><span class="p">(</span><span class="n">OLESTR</span><span class="p">(</span><span class="s">&#34;LIU-PC</span><span class="se">\\</span><span class="s">SQLEXPRESS&#34;</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">    <span class="n">dbProps</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">colid</span> <span class="o">=</span> <span class="n">DB_NULLID</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="c1">//指定数据库库名
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="n">dbProps</span><span class="p">[</span><span class="mi">1</span><span class="p">].</span><span class="n">dwPropertyID</span> <span class="o">=</span> <span class="n">DBPROP_INIT_CATALOG</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">dbProps</span><span class="p">[</span><span class="mi">1</span><span class="p">].</span><span class="n">dwOptions</span> <span class="o">=</span> <span class="n">DBPROPOPTIONS_REQUIRED</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">dbProps</span><span class="p">[</span><span class="mi">1</span><span class="p">].</span><span class="n">vValue</span><span class="p">.</span><span class="n">vt</span> <span class="o">=</span> <span class="n">VT_BSTR</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">dbProps</span><span class="p">[</span><span class="mi">1</span><span class="p">].</span><span class="n">vValue</span><span class="p">.</span><span class="n">bstrVal</span> <span class="o">=</span> <span class="n">SysAllocString</span><span class="p">(</span><span class="n">OLESTR</span><span class="p">(</span><span class="s">&#34;Study&#34;</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">    <span class="n">dbProps</span><span class="p">[</span><span class="mi">1</span><span class="p">].</span><span class="n">colid</span> <span class="o">=</span> <span class="n">DB_NULLID</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="c1">//指定链接数据库的用户名
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="n">dbProps</span><span class="p">[</span><span class="mi">2</span><span class="p">].</span><span class="n">dwPropertyID</span> <span class="o">=</span> <span class="n">DBPROP_AUTH_USERID</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">dbProps</span><span class="p">[</span><span class="mi">2</span><span class="p">].</span><span class="n">vValue</span><span class="p">.</span><span class="n">vt</span> <span class="o">=</span> <span class="n">VT_BSTR</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">dbProps</span><span class="p">[</span><span class="mi">2</span><span class="p">].</span><span class="n">vValue</span><span class="p">.</span><span class="n">bstrVal</span> <span class="o">=</span> <span class="n">SysAllocString</span><span class="p">(</span><span class="n">OLESTR</span><span class="p">(</span><span class="s">&#34;sa&#34;</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="c1">//指定链接数据库的用户密码
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="n">dbProps</span><span class="p">[</span><span class="mi">3</span><span class="p">].</span><span class="n">dwPropertyID</span> <span class="o">=</span> <span class="n">DBPROP_AUTH_PASSWORD</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">dbProps</span><span class="p">[</span><span class="mi">3</span><span class="p">].</span><span class="n">vValue</span><span class="p">.</span><span class="n">vt</span> <span class="o">=</span> <span class="n">VT_BSTR</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">dbProps</span><span class="p">[</span><span class="mi">3</span><span class="p">].</span><span class="n">vValue</span><span class="p">.</span><span class="n">bstrVal</span> <span class="o">=</span> <span class="n">SysAllocString</span><span class="p">(</span><span class="n">OLESTR</span><span class="p">(</span><span class="s">&#34;123456&#34;</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="c1">//设置属性
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="n">hRes</span> <span class="o">=</span> <span class="n">pDBInit</span><span class="o">-&gt;</span><span class="n">QueryInterface</span><span class="p">(</span><span class="n">IID_IDBProperties</span><span class="p">,</span> <span class="p">(</span><span class="kt">void</span><span class="o">**</span><span class="p">)</span><span class="o">&amp;</span><span class="n">pIDBProperties</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">GRS_COM_CHECK</span><span class="p">(</span><span class="n">hRes</span><span class="p">,</span> <span class="n">_T</span><span class="p">(</span><span class="s">&#34;查询IDBProperties接口失败, 错误码:%08x</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">),</span> <span class="n">hRes</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">dbPropset</span><span class="o">-&gt;</span><span class="n">guidPropertySet</span> <span class="o">=</span> <span class="n">DBPROPSET_DBINIT</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">dbPropset</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">cProperties</span> <span class="o">=</span> <span class="mi">4</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">dbPropset</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">rgProperties</span> <span class="o">=</span> <span class="n">dbProps</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">hRes</span> <span class="o">=</span> <span class="n">pIDBProperties</span><span class="o">-&gt;</span><span class="n">SetProperties</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">dbPropset</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">GRS_COM_CHECK</span><span class="p">(</span><span class="n">hRes</span><span class="p">,</span> <span class="n">_T</span><span class="p">(</span><span class="s">&#34;设置属性失败, 错误码:%08x</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">),</span> <span class="n">hRes</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="c1">//链接数据库
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="n">hRes</span> <span class="o">=</span> <span class="n">pDBInit</span><span class="o">-&gt;</span><span class="n">Initialize</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">    <span class="n">GRS_COM_CHECK</span><span class="p">(</span><span class="n">hRes</span><span class="p">,</span> <span class="n">_T</span><span class="p">(</span><span class="s">&#34;链接数据库失败：错误码:%08x</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">),</span> <span class="n">hRes</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">//do something
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="n">pDBInit</span><span class="o">-&gt;</span><span class="n">Uninitialize</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="n">GRS_PRINTF</span><span class="p">(</span><span class="n">_T</span><span class="p">(</span><span class="s">&#34;数据库操作成功!!!!!</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl"><span class="nl">CLEAR_UP</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">    <span class="n">GRS_SAFEFREE</span><span class="p">(</span><span class="n">pDBInit</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">GRS_SAFEFREE</span><span class="p">(</span><span class="n">pIDBProperties</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">CoUninitialize</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p>这是一份完整的可执行代码，后续的部分对于重复的代码将不再给出。
+在上述代码中我们首先根据字符串SQLOLEDB查找到SQL Server对应的数据源对象，然后根据数据源对象查询出IDBProperties对象，接着分配一些空间来设置属性和属性集，调用IDBProperties接口的SetProperties函数来设置对应的数据源对象的接口。最后调用IDBInitialize接口的Initialize链接数据源，调用Uninitialize函数来断开连接。
+一般数据源对象的属性集合的GUID为DBPROPSET_DBINIT，下面包含的属性最主要的有：</p>
+<ol>
+<li>DBPROP_INIT_DATASOURCE:数据连接实例（具体的DBMS实例名）</li>
+<li>DBPROP_INIT_CATALOG：目录名（在SQL Server中对应的是具体的数据库名称，对于ORACLE来说没有意义）</li>
+<li>DBPROP_AUTH_USERID: 用户名</li>
+<li>DBPROP_AUTH_PASSWORD: 密码</li>
+</ol>
+<p>我们也注意到上面调用SysAllocString的BSTR类型的字符串并没有调用对应的函数进行释放，会不会发生内存泄露？其实不用担心OLEDB在断开连接的时候已经帮助我们释放了这部分空间。</p>
+<h2 id="使用idbpromptinitialize接口来创建数据源对象">使用IDBPromptInitialize接口来创建数据源对象</h2>
+<p>上述方法是依托于标准的COM，虽然也成功创建的数据源连接，但是无法在标准的com之上进行更多的初始化操作，导致了有些特定的高级功能无法使用，所以在实践中常用的还是利用IDBPromptInitialize和IDataInitialize的方式比较多。
+IDBPromptInitialize创建时会弹出一个数据源选择的对话框，供用户选择相关配置信息（数据源/用户名/密码等）然后根据这些配置自动生成连接对象。
+下面看一个弹出数据源对话框的例子：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="kt">void</span> <span class="nf">ConnectSQLServerByDialog</span><span class="p">()</span> <span class="c1">//通过弹出对话框来链接SQL SERVER数据库
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">DECLARE_BUFFER</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">    <span class="n">DECLARE_OLEDB_INTERFACE</span><span class="p">(</span><span class="n">IDBPromptInitialize</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">DECLARE_OLEDB_INTERFACE</span><span class="p">(</span><span class="n">IDBInitialize</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="n">HWND</span> <span class="n">hDesktop</span> <span class="o">=</span> <span class="n">GetDesktopWindow</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">    <span class="n">HRESULT</span> <span class="n">hRes</span> <span class="o">=</span> <span class="n">CoCreateInstance</span><span class="p">(</span><span class="n">CLSID_DataLinks</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">,</span> <span class="n">CLSCTX_INPROC_SERVER</span><span class="p">,</span> <span class="n">IID_IDBPromptInitialize</span><span class="p">,</span> <span class="p">(</span><span class="kt">void</span><span class="o">**</span><span class="p">)</span><span class="o">&amp;</span><span class="n">pIDBPromptInitialize</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">COM_CHECK_SUCCESS</span><span class="p">(</span><span class="n">hRes</span><span class="p">,</span> <span class="n">_T</span><span class="p">(</span><span class="s">&#34;创建IDBPromptInitialize接口失败: %08x&#34;</span><span class="p">),</span> <span class="n">hRes</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">//调用该函数弹出数据源对话框
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="n">hRes</span> <span class="o">=</span> <span class="n">pIDBPromptInitialize</span><span class="o">-&gt;</span><span class="n">PromptDataSource</span><span class="p">(</span><span class="nb">NULL</span><span class="p">,</span> <span class="n">hDesktop</span><span class="p">,</span> <span class="n">DBPROMPTOPTIONS_PROPERTYSHEET</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">,</span> <span class="n">IID_IDBInitialize</span><span class="p">,</span> <span class="p">(</span><span class="n">IUnknown</span><span class="o">**</span><span class="p">)</span><span class="o">&amp;</span><span class="n">pIDBInitialize</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">COM_CHECK_SUCCESS</span><span class="p">(</span><span class="n">hRes</span><span class="p">,</span> <span class="n">_T</span><span class="p">(</span><span class="s">&#34;弹出数据源对话框失败:%08x</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">),</span> <span class="n">hRes</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="n">hRes</span> <span class="o">=</span> <span class="n">pIDBInitialize</span><span class="o">-&gt;</span><span class="n">Initialize</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">    <span class="n">COM_CHECK_SUCCESS</span><span class="p">(</span><span class="n">hRes</span><span class="p">,</span> <span class="n">_T</span><span class="p">(</span><span class="s">&#34;链接数据库失败:%08x</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">),</span> <span class="n">hRes</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">COM_PRINTF</span><span class="p">(</span><span class="n">_T</span><span class="p">(</span><span class="s">&#34;链接数据库成功</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="n">hRes</span> <span class="o">=</span> <span class="n">pIDBInitialize</span><span class="o">-&gt;</span><span class="n">Uninitialize</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl"><span class="nl">__CLEAN_UP</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">    <span class="n">SAFE_RELEASE</span><span class="p">(</span><span class="n">pIDBPromptInitialize</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">SAFE_RELEASE</span><span class="p">(</span><span class="n">pIDBInitialize</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p>除了这种方式，他还可以直接创建出IDBInitialize接口，利用之前设置属性的方式来连接到数据库，下面是一个演示的例子：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl">    <span class="n">HRESULT</span> <span class="n">hRes</span> <span class="o">=</span> <span class="n">CoCreateInstance</span><span class="p">(</span><span class="n">CLSID_MSDAINITIALIZE</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">,</span> <span class="n">CLSCTX_INPROC_SERVER</span><span class="p">,</span> <span class="n">IID_IDataInitialize</span><span class="p">,</span> <span class="p">(</span><span class="kt">void</span><span class="o">**</span><span class="p">)</span><span class="o">&amp;</span><span class="n">pIDataInitialize</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">COM_CHECK_SUCCESS</span><span class="p">(</span><span class="n">hRes</span><span class="p">,</span> <span class="n">_T</span><span class="p">(</span><span class="s">&#34;创建接口IDBInitialize失败：%08x</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">),</span> <span class="n">hRes</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">hRes</span> <span class="o">=</span> <span class="n">CLSIDFromProgID</span><span class="p">(</span><span class="n">_T</span><span class="p">(</span><span class="s">&#34;SQLOLEDB&#34;</span><span class="p">),</span> <span class="o">&amp;</span><span class="n">clsid</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">COM_CHECK_SUCCESS</span><span class="p">(</span><span class="n">hRes</span><span class="p">,</span> <span class="n">_T</span><span class="p">(</span><span class="s">&#34;查询SQLOLEDB CLSID 失败:%08x</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">),</span> <span class="n">hRes</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">hRes</span> <span class="o">=</span> <span class="n">pIDataInitialize</span><span class="o">-&gt;</span><span class="n">CreateDBInstance</span><span class="p">(</span><span class="n">clsid</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">        <span class="n">CLSCTX_INPROC_SERVER</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">,</span> <span class="n">IID_IDBInitialize</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">        <span class="p">(</span><span class="n">IUnknown</span><span class="o">**</span><span class="p">)</span><span class="o">&amp;</span><span class="n">pIDBInitialize</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">COM_CHECK_SUCCESS</span><span class="p">(</span><span class="n">hRes</span><span class="p">,</span> <span class="n">_T</span><span class="p">(</span><span class="s">&#34;创建IDBInitialize接口失败:%08x</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">),</span> <span class="n">hRes</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="c1">//后续的代码就是我们之前写的那段定义属性，设置属性，连接数据库的代码
+</span></span></span></code></pre></div><h2 id="使用idatainitialize接口来创建数据源对象">使用IDataInitialize接口来创建数据源对象</h2>
+<p>使用IDataInitialize接口可以直接使用连接字串连接到数据库，下面是使用连接字串的例子:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="kt">void</span> <span class="nf">ConnectSQLServerByConnstr</span><span class="p">()</span> <span class="c1">//通过连接字符串连接数据库
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">DECLARE_OLEDB_INTERFACE</span><span class="p">(</span><span class="n">IDataInitialize</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">DECLARE_OLEDB_INTERFACE</span><span class="p">(</span><span class="n">IDBInitialize</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">DECLARE_BUFFER</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">    <span class="n">HRESULT</span> <span class="n">hRes</span> <span class="o">=</span> <span class="n">CoCreateInstance</span><span class="p">(</span><span class="n">CLSID_MSDAINITIALIZE</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">,</span> <span class="n">CLSCTX_INPROC_SERVER</span><span class="p">,</span> <span class="n">IID_IDataInitialize</span><span class="p">,</span> <span class="p">(</span><span class="kt">void</span><span class="o">**</span><span class="p">)</span><span class="o">&amp;</span><span class="n">pIDataInitialize</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">COM_CHECK_SUCCESS</span><span class="p">(</span><span class="n">hRes</span><span class="p">,</span> <span class="n">_T</span><span class="p">(</span><span class="s">&#34;创建IDataInitialize接口失败:%08x!</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">),</span> <span class="n">hRes</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="n">hRes</span> <span class="o">=</span> <span class="n">pIDataInitialize</span><span class="o">-&gt;</span><span class="n">GetDataSource</span><span class="p">(</span><span class="nb">NULL</span><span class="p">,</span> <span class="n">CLSCTX_INPROC_SERVER</span><span class="p">,</span> 
+</span></span><span class="line"><span class="cl">        <span class="n">OLESTR</span><span class="p">(</span><span class="s">&#34;Provider=SQLOLEDB.1;Persist Security Info=False;User ID=sa;Password = 123456;Initial Catalog=Study;Data Source=LIU-PC</span><span class="se">\\</span><span class="s">SQLEXPRESS;&#34;</span><span class="p">),</span> 
+</span></span><span class="line"><span class="cl">        <span class="n">IID_IDBInitialize</span><span class="p">,</span> <span class="p">(</span><span class="n">IUnknown</span><span class="o">**</span><span class="p">)</span><span class="o">&amp;</span><span class="n">pIDBInitialize</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">COM_CHECK_SUCCESS</span><span class="p">(</span><span class="n">hRes</span><span class="p">,</span> <span class="n">_T</span><span class="p">(</span><span class="s">&#34;获取IDBInitialize接口失败:%08x!</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">),</span> <span class="n">hRes</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">hRes</span> <span class="o">=</span> <span class="n">pIDBInitialize</span><span class="o">-&gt;</span><span class="n">Initialize</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">    <span class="n">COM_CHECK_SUCCESS</span><span class="p">(</span><span class="n">hRes</span><span class="p">,</span> <span class="n">_T</span><span class="p">(</span><span class="s">&#34;连接数据库失败:%08x!</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">),</span> <span class="n">hRes</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">COM_PRINTF</span><span class="p">(</span><span class="n">_T</span><span class="p">(</span><span class="s">&#34;连接数据库成功</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">    <span class="n">pIDBInitialize</span><span class="o">-&gt;</span><span class="n">Uninitialize</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl"><span class="nl">__CLEAN_UP</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">    <span class="n">SAFE_RELEASE</span><span class="p">(</span><span class="n">pIDataInitialize</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">SAFE_RELEASE</span><span class="p">(</span><span class="n">pIDBInitialize</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p>#获取连接字串
+其实除了上面这种直接创建IDataInitialize接口的方法外，还可以使用IDBPromptInitialize接口Query出一个IDataInitialize接口，然后再设置连接字串连接到数据库。
+其实在OLEDB中，可以认为连接字串最终被翻译为对应的属性，也就是说OLEDDB保存着对应连接的属性，我们可以通过不同的方式来获取不同类型的属性，比如使用IDBProperties接口来获取对应的链接属性，或者使用IDataInitialize的GetInitializationString函数来获取连接的链接字串。
+既然它保存着每个连接的对应属性，那么是不是可以将用户在数据源对话框上的操作最终保存为数据连接字串呢，答案是肯定的。实现的思路如下：</p>
+<ol>
+<li>调用IDBPromptInitialize接口的PromptDataSourc方法弹出数据源对话框，让用户操作</li>
+<li>根据IDBPromptInitialize接口Query出IDataInitialize接口</li>
+<li>调用IDataInitialize接口的GetInitializationString来获取连接字串
+下面是具体实现的代码：</li>
+</ol>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="kt">void</span> <span class="nf">GetConnectString</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">DECLARE_OLEDB_INTERFACE</span><span class="p">(</span><span class="n">IDBPromptInitialize</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">DECLARE_OLEDB_INTERFACE</span><span class="p">(</span><span class="n">IDataInitialize</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">DECLARE_OLEDB_INTERFACE</span><span class="p">(</span><span class="n">IDBInitialize</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">DECLARE_BUFFER</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="n">LPOLESTR</span> <span class="n">pConnStr</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">HWND</span> <span class="n">hDeskTop</span> <span class="o">=</span> <span class="n">GetDesktopWindow</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">    <span class="n">HRESULT</span> <span class="n">hRes</span> <span class="o">=</span> <span class="n">CoCreateInstance</span><span class="p">(</span><span class="n">CLSID_DataLinks</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">,</span> <span class="n">CLSCTX_INPROC_SERVER</span><span class="p">,</span> <span class="n">IID_IDBPromptInitialize</span><span class="p">,</span> <span class="p">(</span><span class="kt">void</span><span class="o">**</span><span class="p">)</span><span class="o">&amp;</span><span class="n">pIDBPromptInitialize</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">COM_CHECK_SUCCESS</span><span class="p">(</span><span class="n">hRes</span><span class="p">,</span> <span class="n">_T</span><span class="p">(</span><span class="s">&#34;创建IDBPromptInitialize接口失败:%08x!</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">),</span> <span class="n">hRes</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">hRes</span> <span class="o">=</span> <span class="n">pIDBPromptInitialize</span><span class="o">-&gt;</span><span class="n">PromptDataSource</span><span class="p">(</span><span class="nb">NULL</span><span class="p">,</span> <span class="n">hDeskTop</span><span class="p">,</span> <span class="n">DBPROMPTOPTIONS_PROPERTYSHEET</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">,</span> <span class="n">IID_IDBInitialize</span><span class="p">,</span> <span class="p">(</span><span class="n">IUnknown</span><span class="o">**</span><span class="p">)</span><span class="o">&amp;</span><span class="n">pIDBInitialize</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">COM_CHECK_SUCCESS</span><span class="p">(</span><span class="n">hRes</span><span class="p">,</span> <span class="n">_T</span><span class="p">(</span><span class="s">&#34;弹出数据源对话框失败:%08x</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">),</span> <span class="n">hRes</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="n">hRes</span><span class="o">=</span> <span class="n">pIDBPromptInitialize</span><span class="o">-&gt;</span><span class="n">QueryInterface</span><span class="p">(</span><span class="n">IID_IDataInitialize</span><span class="p">,</span> <span class="p">(</span><span class="kt">void</span><span class="o">**</span><span class="p">)</span><span class="o">&amp;</span><span class="n">pIDataInitialize</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">COM_CHECK_SUCCESS</span><span class="p">(</span><span class="n">hRes</span><span class="p">,</span> <span class="n">_T</span><span class="p">(</span><span class="s">&#34;创建IDataInitialize接口失败:%08x!</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">),</span> <span class="n">hRes</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="n">hRes</span> <span class="o">=</span> <span class="n">pIDataInitialize</span><span class="o">-&gt;</span><span class="n">GetInitializationString</span><span class="p">(</span><span class="n">pIDBInitialize</span><span class="p">,</span> <span class="n">TRUE</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">pConnStr</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">COM_CHECK_SUCCESS</span><span class="p">(</span><span class="n">hRes</span><span class="p">,</span> <span class="n">_T</span><span class="p">(</span><span class="s">&#34;获取连接字串失败失败:%08x</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">),</span> <span class="n">hRes</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="n">COM_PRINTF</span><span class="p">(</span><span class="n">_T</span><span class="p">(</span><span class="s">&#34;连接字符串:%s&#34;</span><span class="p">),</span> <span class="n">pConnStr</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">SysAllocString</span><span class="p">(</span><span class="n">pConnStr</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="nl">__CLEAN_UP</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">    <span class="n">SAFE_RELEASE</span><span class="p">(</span><span class="n">pIDataInitialize</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">SAFE_RELEASE</span><span class="p">(</span><span class="n">pIDBInitialize</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">SAFE_RELEASE</span><span class="p">(</span><span class="n">pIDBPromptInitialize</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p><strong>为了节约篇幅，这些笔记内容只会列举部分关键的代码，至完整的代码我会随着博客内容的进度慢慢上传到GitHub项目中，并在博文的最末尾给出对应文件的地址</strong>
+<a href="https://github.com/aMonst/OLEDB_Demo/blob/master/ConnectDB.cpp" target="_blank" rel="noopener noreffer ">本次代码地址1</a>
+<a href="https://github.com/aMonst/OLEDB_Demo/blob/master/DataSource.cpp" target="_blank" rel="noopener noreffer ">本次代码地址2</a></p></div><div class="post-footer" id="post-footer">
+    <div class="post-info">
+        <div class="post-info-line">
+            <div class="post-info-mod">
+                <span>Updated on 2018-01-12</span>
+            </div></div>
+        <div class="post-info-line">
+            <div class="post-info-md"></div>
+            <div class="post-info-share">
+                <span><a href="javascript:void(0);" title="Share on Twitter" data-sharer="twitter" data-url="http://HaiLateBoy.github.io/posts/oledb-and-ado-2/" data-title="OLEDB数据源" data-hashtags="OLEDB,数据库编程,VC&#43;&#43;,数据库"><i class="fab fa-twitter fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Facebook" data-sharer="facebook" data-url="http://HaiLateBoy.github.io/posts/oledb-and-ado-2/" data-hashtag="OLEDB"><i class="fab fa-facebook-square fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Hacker News" data-sharer="hackernews" data-url="http://HaiLateBoy.github.io/posts/oledb-and-ado-2/" data-title="OLEDB数据源"><i class="fab fa-hacker-news fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Line" data-sharer="line" data-url="http://HaiLateBoy.github.io/posts/oledb-and-ado-2/" data-title="OLEDB数据源"><i data-svg-src="https://cdn.jsdelivr.net/npm/simple-icons@7.3.0/icons/line.svg" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on 微博" data-sharer="weibo" data-url="http://HaiLateBoy.github.io/posts/oledb-and-ado-2/" data-title="OLEDB数据源"><i class="fab fa-weibo fa-fw" aria-hidden="true"></i></a></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="post-info-more">
+        <section class="post-tags"><i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/oledb/">OLEDB</a>,&nbsp;<a href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93%E7%BC%96%E7%A8%8B/">数据库编程</a>,&nbsp;<a href="/tags/vc&#43;&#43;/">VC&#43;&#43;</a>,&nbsp;<a href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93/">数据库</a></section>
+        <section>
+            <span><a href="javascript:void(0);" onclick="window.history.back();">Back</a></span>&nbsp;|&nbsp;<span><a href="/">Home</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav"><a href="/posts/crazy-programmer-read/" class="prev" rel="prev" title="《疯狂的程序员》读后感"><i class="fas fa-angle-left fa-fw" aria-hidden="true"></i>《疯狂的程序员》读后感</a>
+            <a href="/posts/c-loop/" class="next" rel="next" title="C语言循环的实现">C语言循环的实现<i class="fas fa-angle-right fa-fw" aria-hidden="true"></i></a></div>
+</div>
+</article></div>
+            </main><footer class="footer">
+        <div class="footer-container"><div class="footer-line">Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener noreffer" title="Hugo 0.121.2">Hugo</a> | Theme - <a href="https://github.com/dillonzq/LoveIt" target="_blank" rel="noopener noreffer" title="LoveIt 0.2.11"><i class="far fa-kiss-wink-heart fa-fw" aria-hidden="true"></i> LoveIt</a>
+                </div><div class="footer-line" itemscope itemtype="http://schema.org/CreativeWork"><i class="far fa-copyright fa-fw" aria-hidden="true"></i><span itemprop="copyrightYear">2022 - 2024</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="https://www.masimaro.xyz" target="_blank">Masimaro</a></span></div>
+        </div>
+    </footer></div>
+
+        <div id="fixed-buttons"><a href="#" id="back-to-top" class="fixed-button" title="Back to Top">
+                <i class="fas fa-arrow-up fa-fw" aria-hidden="true"></i>
+            </a><a href="#" id="view-comments" class="fixed-button" title="View Comments">
+                <i class="fas fa-comment fa-fw" aria-hidden="true"></i>
+            </a>
+        </div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.css"><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/autocomplete.js@0.38.1/dist/autocomplete.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lunr@2.3.9/lunr.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lazysizes@5.3.2/lazysizes.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/clipboard@2.0.11/dist/clipboard.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/sharer.js@0.5.1/sharer.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/auto-render.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/copy-tex.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/mhchem.min.js"></script><script type="text/javascript">window.config={"code":{"copyTitle":"Copy to clipboard","maxShownLines":50},"comment":{},"math":{"delimiters":[{"display":true,"left":"$$","right":"$$"},{"display":true,"left":"\\[","right":"\\]"},{"display":true,"left":"\\begin{equation}","right":"\\end{equation}"},{"display":true,"left":"\\begin{equation*}","right":"\\end{equation*}"},{"display":true,"left":"\\begin{align}","right":"\\end{align}"},{"display":true,"left":"\\begin{align*}","right":"\\end{align*}"},{"display":true,"left":"\\begin{alignat}","right":"\\end{alignat}"},{"display":true,"left":"\\begin{alignat*}","right":"\\end{alignat*}"},{"display":true,"left":"\\begin{gather}","right":"\\end{gather}"},{"display":true,"left":"\\begin{CD}","right":"\\end{CD}"},{"display":false,"left":"$","right":"$"},{"display":false,"left":"\\(","right":"\\)"}],"strict":false},"search":{"highlightTag":"em","maxResultLength":10,"noResultsFound":"No results found","snippetLength":50}};</script><script type="text/javascript" src="/js/theme.min.js"></script></body>
+</html>

@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="robots" content="noodp" />
+        <title>C&#43;&#43; 调用Python3 - Masimaro&#39;s blog</title><meta name="Description" content="这是我用于记录日常和学习的小站"><meta property="og:title" content="C&#43;&#43; 调用Python3" />
+<meta property="og:description" content="作为一种胶水语言，Python 能够很容易地调用 C 、 C&#43;&#43; 等语言，也能够通过其他语言调用 Python 的模块。 Python 提供了 C&#43;&#43; 库，使得开发者能很方便地从 C&#43;&#43; 程序中调用" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://HaiLateBoy.github.io/posts/c-call-python/" /><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2018-07-29T19:11:55+00:00" />
+<meta property="article:modified_time" content="2018-07-29T19:11:55+00:00" /><meta property="og:site_name" content="Masimaro&#39;s blog" />
+
+<meta name="twitter:card" content="summary"/><meta name="twitter:title" content="C&#43;&#43; 调用Python3"/>
+<meta name="twitter:description" content="作为一种胶水语言，Python 能够很容易地调用 C 、 C&#43;&#43; 等语言，也能够通过其他语言调用 Python 的模块。 Python 提供了 C&#43;&#43; 库，使得开发者能很方便地从 C&#43;&#43; 程序中调用"/>
+<meta name="application-name" content="My cool site">
+<meta name="apple-mobile-web-app-title" content="My cool site"><meta name="theme-color" content="#ffffff"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="manifest" href="/site.webmanifest"><link rel="canonical" href="http://HaiLateBoy.github.io/posts/c-call-python/" /><link rel="prev" href="http://HaiLateBoy.github.io/posts/winsock2-api/" /><link rel="next" href="http://HaiLateBoy.github.io/posts/socket-pool/" /><link rel="stylesheet" href="/css/style.min.css"><link rel="preload" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css"></noscript><link rel="preload" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css"></noscript><script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "BlogPosting",
+        "headline": "C++ 调用Python3",
+        "inLanguage": "zh-CN",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "http:\/\/HaiLateBoy.github.io\/posts\/c-call-python\/"
+        },"genre": "posts","keywords": "C\u002b\u002b 调用Python3","wordcount":  3433 ,
+        "url": "http:\/\/HaiLateBoy.github.io\/posts\/c-call-python\/","datePublished": "2018-07-29T19:11:55+00:00","dateModified": "2018-07-29T19:11:55+00:00","publisher": {
+            "@type": "Organization",
+            "name": ""},"author": {
+                "@type": "Person",
+                "name": "Masimaro"
+            },"description": ""
+    }
+    </script></head>
+    <body data-header-desktop="fixed" data-header-mobile="auto"><script type="text/javascript">(window.localStorage && localStorage.getItem('theme') ? localStorage.getItem('theme') === 'dark' : ('auto' === 'auto' ? window.matchMedia('(prefers-color-scheme: dark)').matches : 'auto' === 'dark')) && document.body.setAttribute('theme', 'dark');</script>
+
+        <div id="mask"></div><div class="wrapper"><header class="desktop" id="header-desktop">
+    <div class="header-wrapper">
+        <div class="header-title">
+            <a href="/" title="Masimaro&#39;s blog">My cool site</a>
+        </div>
+        <div class="menu">
+            <div class="menu-inner"><a class="menu-item" href="/posts/" title="文章列表"> 文章 </a><a class="menu-item" href="/tags/" title="标签"> 标签 </a><a class="menu-item" href="/categories/" title="分类"> 分类 </a><a class="menu-item" href="/about" title="关于本站"> 关于 </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-desktop">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-desktop" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-desktop" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-desktop">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </span><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                    <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+                </a></div>
+        </div>
+    </div>
+</header><header class="mobile" id="header-mobile">
+    <div class="header-container">
+        <div class="header-wrapper">
+            <div class="header-title">
+                <a href="/" title="Masimaro&#39;s blog">My cool site</a>
+            </div>
+            <div class="menu-toggle" id="menu-toggle-mobile">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+        <div class="menu" id="menu-mobile"><div class="search-wrapper">
+                    <div class="search mobile" id="search-mobile">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-mobile">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-mobile" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-mobile" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-mobile">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </div>
+                    <a href="javascript:void(0);" class="search-cancel" id="search-cancel-mobile">
+                        Cancel
+                    </a>
+                </div><a class="menu-item" href="/posts/" title="文章列表">文章</a><a class="menu-item" href="/tags/" title="标签">标签</a><a class="menu-item" href="/categories/" title="分类">分类</a><a class="menu-item" href="/about" title="关于本站">关于</a><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+            </a></div>
+    </div>
+</header><div class="search-dropdown desktop">
+        <div id="search-dropdown-desktop"></div>
+    </div>
+    <div class="search-dropdown mobile">
+        <div id="search-dropdown-mobile"></div>
+    </div><main class="main">
+                <div class="container"><div class="toc" id="toc-auto">
+            <h2 class="toc-title">Contents</h2>
+            <div class="toc-content" id="toc-content-auto"></div>
+        </div><article class="page single"><h1 class="single-title animate__animated animate__flipInX">C++ 调用Python3</h1><div class="post-meta">
+            <div class="post-meta-line"><span class="post-author"><a href="https://www.masimaro.xyz" title="Author" target="_blank" rel="noopener noreffer author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Masimaro</a></span>&nbsp;<span class="post-category">included in <a href="/categories/c-%E8%AF%AD%E8%A8%80/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>C 语言</a></span></div>
+            <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw" aria-hidden="true"></i>&nbsp;<time datetime="2018-07-29">2018-07-29</time>&nbsp;<i class="fas fa-pencil-alt fa-fw" aria-hidden="true"></i>&nbsp;3433 words&nbsp;
+                <i class="far fa-clock fa-fw" aria-hidden="true"></i>&nbsp;7 minutes&nbsp;</div>
+        </div><div class="details toc" id="toc-static"  data-kept="true">
+                <div class="details-summary toc-title">
+                    <span>Contents</span>
+                    <span><i class="details-icon fas fa-angle-right" aria-hidden="true"></i></span>
+                </div>
+                <div class="details-content toc-content" id="toc-content-static"><nav id="TableOfContents">
+  <ul>
+    <li><a href="#初始化">初始化</a></li>
+    <li><a href="#调用python模块">调用Python模块</a>
+      <ul>
+        <li><a href="#简单调用python语句">简单调用Python语句</a></li>
+        <li><a href="#调用python模块中的函数">调用Python模块中的函数</a></li>
+      </ul>
+    </li>
+    <li><a href="#c数据类型与python对象的相互转化">C++数据类型与Python对象的相互转化</a></li>
+  </ul>
+</nav></div>
+            </div><div class="content" id="content"><p>作为一种胶水语言，Python 能够很容易地调用 C 、 C++ 等语言，也能够通过其他语言调用 Python 的模块。</p>
+<p>Python 提供了 C++ 库，使得开发者能很方便地从 C++ 程序中调用 Python 模块。</p>
+<p>具体操作可以参考: <a href="https://docs.python.org/2/extending/embedding.html" target="_blank" rel="noopener noreffer ">官方文档</a></p>
+<!-- raw HTML omitted -->
+<p>在调用Python模块时需要如下步骤:</p>
+<ol>
+<li>初始化Python调用环境</li>
+<li>加载对应的Python模块</li>
+<li>加载对应的Python函数</li>
+<li>将参数转化为Python元组类型</li>
+<li>调用Python函数并传入参数元组</li>
+<li>获取返回值</li>
+<li>根据Python函数的定义解析返回值</li>
+</ol>
+<h2 id="初始化">初始化</h2>
+<p>在调用Python模块时需要首先包含Python.h头文件，这个头文件一般在安装的Python目录中的 include文件中，所在VS中首先需要将这个路径加入到项目中</p>
+<p>包含完成之后可能会抱一个错误：找不到 inttypes.h文件，在个错误在Windows平台上很常见，如果报这个错误，需要去网上下载对应的inttypes.h文件然后放入到对应的目录中即可，我这放到VC的include目录中</p>
+<p>在包含这些文件完成之后可能还会抱一个错误，未找到Python36_d.lib 在Python环境中确实找不到这个文件，这个时候可以修改pyconfig.h文件，将这个lib改为python36.lib，具体操作请参考这个链接: <a href="https://blog.csdn.net/Chris_zhangrx/article/details/78947526" target="_blank" rel="noopener noreffer ">https://blog.csdn.net/Chris_zhangrx/article/details/78947526</a></p>
+<p>还有一点要注意，下载的Python环境必须的与目标程序的类型相同，比如你在VS 中新建一个Win32项目，在引用Python环境的时候就需要引用32位版本的Python</p>
+<p>这些准备工作做完后在调用Python前先调用Py_Initialize 函数来初始化Python环境，之后我们可以调用Py_IsInitialized来检测Python环境是否初始化成功
+下面是一个初始化Python环境的例子</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="n">BOOL</span> <span class="nf">Init</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">	<span class="n">Py_Initialize</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="k">return</span> <span class="n">Py_IsInitialized</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><h2 id="调用python模块">调用Python模块</h2>
+<p>调用Python模块可以简单的调用Python语句也可以调用Python模块中的函数。</p>
+<h3 id="简单调用python语句">简单调用Python语句</h3>
+<p>针对简单的Python语句（就好像我们在Python的交互式环境中输入的一条语句那样），可以直接调用 <code>PyRun_SimpleString</code> 函数来执行， 这个函数需要一个Python语句的ANSI字符串作为参数，返回int型的值。如果为0表示执行成功否则为失败</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="kt">void</span> <span class="nf">ChangePyWorkPath</span><span class="p">(</span><span class="n">LPCTSTR</span> <span class="n">lpWorkPath</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">	<span class="n">TCHAR</span> <span class="n">szWorkPath</span><span class="p">[</span><span class="n">MAX_PATH</span> <span class="o">+</span> <span class="mi">64</span><span class="p">]</span> <span class="o">=</span> <span class="n">_T</span><span class="p">(</span><span class="s">&#34;&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="n">StringCchCopy</span><span class="p">(</span><span class="n">szWorkPath</span><span class="p">,</span> <span class="n">MAX_PATH</span> <span class="o">+</span> <span class="mi">64</span><span class="p">,</span> <span class="n">_T</span><span class="p">(</span><span class="s">&#34;sys.path.append(</span><span class="se">\&#34;</span><span class="s">&#34;</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">	<span class="n">StringCchCat</span><span class="p">(</span><span class="n">szWorkPath</span><span class="p">,</span> <span class="n">MAX_PATH</span> <span class="o">+</span> <span class="mi">64</span><span class="p">,</span> <span class="n">lpWorkPath</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="n">StringCchCat</span><span class="p">(</span><span class="n">szWorkPath</span><span class="p">,</span> <span class="n">MAX_PATH</span> <span class="o">+</span> <span class="mi">64</span><span class="p">,</span> <span class="n">_T</span><span class="p">(</span><span class="s">&#34;</span><span class="se">\&#34;</span><span class="s">)&#34;</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="n">PyRun_SimpleString</span><span class="p">(</span><span class="s">&#34;import sys&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="n">USES_CONVERSION</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="kt">int</span> <span class="n">nRet</span> <span class="o">=</span> <span class="n">PyRun_SimpleString</span><span class="p">(</span><span class="n">T2A</span><span class="p">(</span><span class="n">szWorkPath</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">	<span class="k">if</span> <span class="p">(</span><span class="n">nRet</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">	<span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="k">return</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p>这个函数主要用来将传入的路径加入到当前Python的执行环境中，以便可以很方便的导入我们的自定义模块
+函数首先通过字符串拼接的方式组织了一个 &ldquo;sys.path.append(&lsquo;path&rsquo;)&rdquo; 这样的字符串，其中path是我们传进来的参数，然后调用PyRun_SimpleString执行Python的&quot;import sys&quot;语句来导入sys模块，接着执行之前拼接的语句，将对应路径加入到Python环境中</p>
+<h3 id="调用python模块中的函数">调用Python模块中的函数</h3>
+<p>调用Python模块中的函数需要执行之前说的2~7的步骤</p>
+<ol>
+<li>加载Python模块(自定义模块)</li>
+</ol>
+<p>加载Python的模块需要调用 <code>PyImport_ImportModule</code> 这个函数需要传入一个模块的名称作为参数，注意：这里需要传入的是模块的名称也就是py文件的名称，不能带.py后缀。</p>
+<p>这个函数会返回一个Python对象的指针，在C++中表示为PyObject。这里返回模块的对象指针</p>
+<ol start="2">
+<li>然后调用 <code>PyObject_GetAttrString</code> 函数来加载对应的Python模块中的方法，这个函数需要两个参数，第一个是之前获取到的对应模块的指针，第二个参数是函数名称的ANSI字符串。这个函数会返回一个对应Python函数的对象指针。后面需要利用这个指针来调用Python函数</li>
+</ol>
+<p>获取到函数的指针之后我们可以调用 <code>PyCallable_Check</code> 来检测一下对应的对象是否可以被调用，如果能被调用这个函数会返回true否则返回false</p>
+<ol start="3">
+<li>接着就是传入参数了，Python中函数的参数以元组的方式传入的，所以这里需要先将要传入的参数转化为元组，然后调用 <code>PyObject_CallObject</code> 函数来执行对应的Python函数。这个函数需要两个参数第一个是上面Python函数对象的指针，第二个参数是需要传入Python函数中的参数组成的元组。函数会返回Python的元组对象，这个元组就是Python函数的返回值</li>
+<li>获取到返回值之后就是解析参数了，我们可以使用对应的函数将Python元组转化为C++中的变量</li>
+<li>最后需要调用 <code>Py_DECREF</code> 来解除Python对象的引用，以便Python的垃圾回收器能正常的回收这些对象的内存</li>
+</ol>
+<p>下面是一个传入空参数的例子</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="kt">void</span> <span class="nf">GetModuleInformation</span><span class="p">(</span><span class="n">IN</span> <span class="n">LPCTSTR</span> <span class="n">lpPyFileName</span><span class="p">,</span> <span class="n">OUT</span> <span class="n">LPTSTR</span> <span class="n">lpVulName</span><span class="p">,</span> <span class="n">OUT</span> <span class="kt">long</span><span class="o">&amp;</span> <span class="n">level</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">	<span class="n">USES_CONVERSION</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="n">PyObject</span> <span class="o">*</span><span class="n">pModule</span> <span class="o">=</span> <span class="n">PyImport_ImportModule</span><span class="p">(</span><span class="n">T2A</span><span class="p">(</span><span class="n">lpPyFileName</span><span class="p">));</span> <span class="c1">//加载模块
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="k">if</span> <span class="p">(</span><span class="nb">NULL</span> <span class="o">==</span> <span class="n">pModule</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">	<span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="n">g_OutputString</span><span class="p">(</span><span class="n">_T</span><span class="p">(</span><span class="s">&#34;加载模块[%s]失败&#34;</span><span class="p">),</span> <span class="n">lpPyFileName</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">		<span class="k">goto</span> <span class="n">__CLEAN_UP</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="n">PyObject</span> <span class="o">*</span><span class="n">pGetInformationFunc</span> <span class="o">=</span> <span class="n">PyObject_GetAttrString</span><span class="p">(</span><span class="n">pModule</span><span class="p">,</span> <span class="s">&#34;getInformation&#34;</span><span class="p">);</span> <span class="c1">// 加载模块中的函数
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="k">if</span> <span class="p">(</span><span class="nb">NULL</span> <span class="o">==</span> <span class="n">pGetInformationFunc</span> <span class="o">||</span> <span class="o">!</span><span class="n">PyCallable_Check</span><span class="p">(</span><span class="n">pGetInformationFunc</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl">	<span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="n">g_OutputString</span><span class="p">(</span><span class="n">_T</span><span class="p">(</span><span class="s">&#34;加载函数[%s]失败&#34;</span><span class="p">),</span> <span class="n">_T</span><span class="p">(</span><span class="s">&#34;getInformation&#34;</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">		<span class="k">goto</span> <span class="n">__CLEAN_UP</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="n">PyObject</span> <span class="o">*</span><span class="n">PyResult</span> <span class="o">=</span> <span class="n">PyObject_CallObject</span><span class="p">(</span><span class="n">pGetInformationFunc</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="k">if</span> <span class="p">(</span><span class="nb">NULL</span> <span class="o">!=</span> <span class="n">PyResult</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">	<span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="n">PyObject</span> <span class="o">*</span><span class="n">pVulNameObj</span> <span class="o">=</span> <span class="n">PyTuple_GetItem</span><span class="p">(</span><span class="n">PyResult</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">		<span class="n">PyObject</span> <span class="o">*</span><span class="n">pVulLevelObj</span> <span class="o">=</span> <span class="n">PyTuple_GetItem</span><span class="p">(</span><span class="n">PyResult</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">		<span class="c1">//获取漏洞的名称信息
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>		<span class="kt">int</span> <span class="n">nStrSize</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">		<span class="n">LPTSTR</span> <span class="n">pVulName</span> <span class="o">=</span> <span class="n">PyUnicode_AsWideCharString</span><span class="p">(</span><span class="n">pVulNameObj</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">nStrSize</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">		<span class="n">StringCchCopy</span><span class="p">(</span><span class="n">lpVulName</span><span class="p">,</span> <span class="n">MAX_PATH</span><span class="p">,</span> <span class="n">pVulName</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">		<span class="n">PyMem_Free</span><span class="p">(</span><span class="n">pVulName</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">		<span class="c1">//获取漏洞的危险等级
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>		<span class="n">level</span> <span class="o">=</span> <span class="n">PyLong_AsLong</span><span class="p">(</span><span class="n">pVulLevelObj</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">		<span class="n">Py_DECREF</span><span class="p">(</span><span class="n">pVulNameObj</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">		<span class="n">Py_DECREF</span><span class="p">(</span><span class="n">pVulLevelObj</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="c1">//解除Python对象的引用, 以便Python进行垃圾回收
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="nl">__CLEAN_UP</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">	<span class="n">Py_DECREF</span><span class="p">(</span><span class="n">pModule</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="n">Py_DECREF</span><span class="p">(</span><span class="n">pGetInformationFunc</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="n">Py_DECREF</span><span class="p">(</span><span class="n">PyResult</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p>在示例中调用了一个叫 getInformation 的函数，这个函数的定义如下:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-Python" data-lang="Python"><span class="line"><span class="cl"><span class="k">def</span> <span class="nf">getInformation</span><span class="p">():</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="s2">&#34;测试脚本&#34;</span><span class="p">,</span> <span class="mi">1</span>
+</span></span></code></pre></div><p>下面是一个需要传入参数的函数调用</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="n">BOOL</span> <span class="nf">CallScanMethod</span><span class="p">(</span><span class="n">IN</span> <span class="n">LPPYTHON_MODULES_DATA</span> <span class="n">pPyModule</span><span class="p">,</span> <span class="n">IN</span> <span class="n">LPCTSTR</span> <span class="n">lpUrl</span><span class="p">,</span> <span class="n">IN</span> <span class="n">LPCTSTR</span> <span class="n">lpRequestMethod</span><span class="p">,</span> <span class="n">OUT</span> <span class="n">LPTSTR</span> <span class="n">lpHasVulUrl</span><span class="p">,</span> <span class="kt">int</span> <span class="n">BuffSize</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">	<span class="n">USES_CONVERSION</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="c1">//加载模块
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="n">PyObject</span><span class="o">*</span> <span class="n">pModule</span> <span class="o">=</span> <span class="n">PyImport_ImportModule</span><span class="p">(</span><span class="n">T2A</span><span class="p">(</span><span class="n">pPyModule</span><span class="o">-&gt;</span><span class="n">szModuleName</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">	<span class="k">if</span> <span class="p">(</span><span class="nb">NULL</span> <span class="o">==</span> <span class="n">pModule</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">	<span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="n">g_OutputString</span><span class="p">(</span><span class="n">_T</span><span class="p">(</span><span class="s">&#34;加载模块[%s]失败!!!&#34;</span><span class="p">),</span> <span class="n">pPyModule</span><span class="o">-&gt;</span><span class="n">szModuleName</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">		<span class="k">return</span> <span class="n">FALSE</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="c1">//加载模块
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="n">PyObject</span> <span class="o">*</span><span class="n">pyScanMethod</span> <span class="o">=</span> <span class="n">PyObject_GetAttrString</span><span class="p">(</span><span class="n">pModule</span><span class="p">,</span> <span class="s">&#34;startScan&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="k">if</span> <span class="p">(</span><span class="nb">NULL</span> <span class="o">==</span> <span class="n">pyScanMethod</span> <span class="o">||</span> <span class="o">!</span><span class="n">PyCallable_Check</span><span class="p">(</span><span class="n">pyScanMethod</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl">	<span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="n">Py_DECREF</span><span class="p">(</span><span class="n">pModule</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">		<span class="n">g_OutputString</span><span class="p">(</span><span class="n">_T</span><span class="p">(</span><span class="s">&#34;加载函数[%s]失败!!!&#34;</span><span class="p">),</span> <span class="n">_T</span><span class="p">(</span><span class="s">&#34;startScan&#34;</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">		<span class="k">return</span> <span class="n">FALSE</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="c1">//加载参数
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="n">PyObject</span><span class="o">*</span> <span class="n">pArgs</span> <span class="o">=</span> <span class="n">Py_BuildValue</span><span class="p">(</span><span class="s">&#34;ss&#34;</span><span class="p">,</span> <span class="n">T2A</span><span class="p">(</span><span class="n">lpUrl</span><span class="p">),</span> <span class="n">T2A</span><span class="p">(</span><span class="n">lpRequestMethod</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="n">PyObject</span> <span class="o">*</span><span class="n">pRes</span> <span class="o">=</span> <span class="n">PyObject_CallObject</span><span class="p">(</span><span class="n">pyScanMethod</span><span class="p">,</span> <span class="n">pArgs</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="n">Py_DECREF</span><span class="p">(</span><span class="n">pArgs</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="k">if</span> <span class="p">(</span><span class="nb">NULL</span> <span class="o">==</span> <span class="n">pRes</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">	<span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="n">g_OutputString</span><span class="p">(</span><span class="n">_T</span><span class="p">(</span><span class="s">&#34;调用函数[%s]失败!!!!&#34;</span><span class="p">),</span> <span class="n">_T</span><span class="p">(</span><span class="s">&#34;startScan&#34;</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">		<span class="k">return</span> <span class="n">FALSE</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="c1">//如果是元组，那么Python脚本返回的是两个参数，证明发现漏洞
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="k">if</span> <span class="p">(</span><span class="n">PyTuple_Check</span><span class="p">(</span><span class="n">pRes</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl">	<span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="n">PyObject</span><span class="o">*</span> <span class="n">pHasVul</span> <span class="o">=</span> <span class="n">PyTuple_GetItem</span><span class="p">(</span><span class="n">pRes</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">		<span class="kt">long</span> <span class="n">bHasVul</span> <span class="o">=</span> <span class="n">PyLong_AsLong</span><span class="p">(</span><span class="n">pHasVul</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">		<span class="n">Py_DECREF</span><span class="p">(</span><span class="n">pHasVul</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">		<span class="k">if</span> <span class="p">(</span><span class="n">bHasVul</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">		<span class="p">{</span>
+</span></span><span class="line"><span class="cl">			<span class="n">PyObject</span><span class="o">*</span> <span class="n">pyUrl</span> <span class="o">=</span> <span class="n">PyTuple_GetItem</span><span class="p">(</span><span class="n">pRes</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">			<span class="kt">int</span> <span class="n">nSize</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">			<span class="n">LPWSTR</span> <span class="n">pszUrl</span> <span class="o">=</span> <span class="n">PyUnicode_AsWideCharString</span><span class="p">(</span><span class="n">pyUrl</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">nSize</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">			<span class="n">Py_DECREF</span><span class="p">(</span><span class="n">pyUrl</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">			<span class="n">StringCchCopy</span><span class="p">(</span><span class="n">lpHasVulUrl</span><span class="p">,</span> <span class="n">BuffSize</span><span class="p">,</span> <span class="n">pszUrl</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">			<span class="n">PyMem_Free</span><span class="p">(</span><span class="n">pszUrl</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">			<span class="k">return</span> <span class="n">TRUE</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">		<span class="p">}</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="n">Py_DECREF</span><span class="p">(</span><span class="n">pRes</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="k">return</span> <span class="n">FALSE</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p>对应的Python函数如下:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="k">def</span> <span class="nf">startScan</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">method</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span><span class="p">(</span><span class="n">method</span> <span class="o">==</span> <span class="s2">&#34;GET&#34;</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">	    <span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="k">else</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">        <span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="n">response</span><span class="o">.</span><span class="n">status_code</span> <span class="o">==</span> <span class="mi">200</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="kc">True</span><span class="p">,</span> <span class="n">url</span>
+</span></span><span class="line"><span class="cl">    <span class="k">else</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="kc">False</span>
+</span></span></code></pre></div><h2 id="c数据类型与python对象的相互转化">C++数据类型与Python对象的相互转化</h2>
+<p>Python与C++结合的一个关键的内容就是C++与Python数据类型的相互转化，针对这个问题Python提供了一系列的函数。</p>
+<p>这些函数的格式为PyXXX_AsXXX 或者PyXXX_FromXXX,一般带有As的是将Python对象转化为C++数据类型的，而带有From的是将C++对象转化为Python，Py前面的XXX表示的是Python中的数据类型。比如 <code>PyUnicode_AsWideCharString</code> 是将Python中的字符串转化为C++中宽字符，而 <code>Pyunicode_FromWideChar</code> 是将C++的字符串转化为Python中的字符串。这里需要注意一个问题就是Python3废除了在2中的普通的字符串，它将所有字符串都当做Unicode了，所以在调用3的时候需要将所有字符串转化为Unicode的形式而不是像之前那样转化为String。具体的转化类型请参考Python官方的说明。</p>
+<p>上面介绍了基本数据类型的转化，除了这些Python中也有一些容器类型的数据，比如元组，字典等等。下面主要说说元组的操作。元组算是比较重要的操作，因为在调用函数的时候需要元组传参并且需要解析以便获取元组中的值。</p>
+<ol>
+<li>创建Python的元组对象</li>
+</ol>
+<p>创建元组对象可以使用 <code>PyTuple_New</code> 来创建一个元组的对象，这个函数需要一个参数用来表示元组中对象的个数。</p>
+<p>之后需要创建对应的Python对象，可以使用前面说的那些转化函数来创建普通Python对象，然后调用 <code>PyTuple_SetItem</code> 来设置元组中数据的内容，函数需要三个参数，分别是元组对象的指针，元组中的索引和对应的数据</p>
+<p>示例:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl">  <span class="n">PyObject</span><span class="o">*</span> <span class="n">args</span> <span class="o">=</span> <span class="n">PyTuple_New</span><span class="p">(</span><span class="mi">2</span><span class="p">);</span>   <span class="c1">// 2个参数
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="n">PyObject</span><span class="o">*</span> <span class="n">arg1</span> <span class="o">=</span> <span class="n">PyInt_FromLong</span><span class="p">(</span><span class="mi">4</span><span class="p">);</span>    <span class="c1">// 参数一设为4
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="n">PyObject</span><span class="o">*</span> <span class="n">arg2</span> <span class="o">=</span> <span class="n">PyInt_FromLong</span><span class="p">(</span><span class="mi">3</span><span class="p">);</span>    <span class="c1">// 参数二设为3
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="n">PyTuple_SetItem</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">arg1</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="n">PyTuple_SetItem</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">arg2</span><span class="p">);</span>
+</span></span></code></pre></div><p>或者如果元组中都是简单数据类型，可以直接使用 <code>PyObject* args = Py_BuildValue(4, 3);</code> 这种方式来创建元组</p>
+<ol start="2">
+<li>解析元组</li>
+</ol>
+<p>Python 函数返回的是元组，在C++中需要进行对应的解析，我们可以使用 <code>PyTuple_GetItem</code> 来获取元组中的数据成员，这个函数返回PyObject 的指针，之后再使用对应的转化函数将Python对象转化成C++数据类型即可</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="n">PyObject</span> <span class="o">*</span><span class="n">pVulNameObj</span> <span class="o">=</span> <span class="n">PyTuple_GetItem</span><span class="p">(</span><span class="n">PyResult</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="n">PyObject</span> <span class="o">*</span><span class="n">pVulLevelObj</span> <span class="o">=</span> <span class="n">PyTuple_GetItem</span><span class="p">(</span><span class="n">PyResult</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">//获取漏洞的名称信息
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kt">int</span> <span class="n">nStrSize</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="n">LPTSTR</span> <span class="n">pVulName</span> <span class="o">=</span> <span class="n">PyUnicode_AsWideCharString</span><span class="p">(</span><span class="n">pVulNameObj</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">nStrSize</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="n">StringCchCopy</span><span class="p">(</span><span class="n">lpVulName</span><span class="p">,</span> <span class="n">MAX_PATH</span><span class="p">,</span> <span class="n">pVulName</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="n">PyMem_Free</span><span class="p">(</span><span class="n">pVulName</span><span class="p">);</span> <span class="c1">//释放由PyUnicode_AsWideCharString分配出来的内存
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>
+</span></span><span class="line"><span class="cl"><span class="c1">//获取漏洞的危险等级
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="n">level</span> <span class="o">=</span> <span class="n">PyLong_AsLong</span><span class="p">(</span><span class="n">pVulLevelObj</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">//最后别忘了将Python对象解引用
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="n">Py_DECREF</span><span class="p">(</span><span class="n">pVulNameObj</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="n">Py_DECREF</span><span class="p">(</span><span class="n">pVulLevelObj</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="n">Py_DECREF</span><span class="p">(</span><span class="n">PyResult</span><span class="p">);</span>
+</span></span></code></pre></div><p>Python中针对具体数据类型操作的函数一般是以Py开头，后面跟上具体的数据类型的名称，比如操作元组的PyTuple系列函数和操作列表的PyList系列函数，后面如果想操作对应的数据类型只需要去官网搜索对应的名称即可。</p>
+<p>这些代码实例都是我之前写的一个Demo中的代码，Demo放到了Github上: <a href="https://github.com/aMonst/PyScanner" target="_blank" rel="noopener noreffer ">PyScanner</a></p>
+<!-- raw HTML omitted -->
+</div><div class="post-footer" id="post-footer">
+    <div class="post-info">
+        <div class="post-info-line">
+            <div class="post-info-mod">
+                <span>Updated on 2018-07-29</span>
+            </div></div>
+        <div class="post-info-line">
+            <div class="post-info-md"></div>
+            <div class="post-info-share">
+                <span><a href="javascript:void(0);" title="Share on Twitter" data-sharer="twitter" data-url="http://HaiLateBoy.github.io/posts/c-call-python/" data-title="C&#43;&#43; 调用Python3" data-hashtags="C&#43;&#43; 调用Python3"><i class="fab fa-twitter fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Facebook" data-sharer="facebook" data-url="http://HaiLateBoy.github.io/posts/c-call-python/" data-hashtag="C&#43;&#43; 调用Python3"><i class="fab fa-facebook-square fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Hacker News" data-sharer="hackernews" data-url="http://HaiLateBoy.github.io/posts/c-call-python/" data-title="C&#43;&#43; 调用Python3"><i class="fab fa-hacker-news fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Line" data-sharer="line" data-url="http://HaiLateBoy.github.io/posts/c-call-python/" data-title="C&#43;&#43; 调用Python3"><i data-svg-src="https://cdn.jsdelivr.net/npm/simple-icons@7.3.0/icons/line.svg" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on 微博" data-sharer="weibo" data-url="http://HaiLateBoy.github.io/posts/c-call-python/" data-title="C&#43;&#43; 调用Python3"><i class="fab fa-weibo fa-fw" aria-hidden="true"></i></a></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="post-info-more">
+        <section class="post-tags"><i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/c&#43;&#43;-%E8%B0%83%E7%94%A8python3/">C&#43;&#43; 调用Python3</a></section>
+        <section>
+            <span><a href="javascript:void(0);" onclick="window.history.back();">Back</a></span>&nbsp;|&nbsp;<span><a href="/">Home</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav"><a href="/posts/winsock2-api/" class="prev" rel="prev" title="WinSock2 API"><i class="fas fa-angle-left fa-fw" aria-hidden="true"></i>WinSock2 API</a>
+            <a href="/posts/socket-pool/" class="next" rel="next" title="WinSock Socket 池">WinSock Socket 池<i class="fas fa-angle-right fa-fw" aria-hidden="true"></i></a></div>
+</div>
+</article></div>
+            </main><footer class="footer">
+        <div class="footer-container"><div class="footer-line">Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener noreffer" title="Hugo 0.121.2">Hugo</a> | Theme - <a href="https://github.com/dillonzq/LoveIt" target="_blank" rel="noopener noreffer" title="LoveIt 0.2.11"><i class="far fa-kiss-wink-heart fa-fw" aria-hidden="true"></i> LoveIt</a>
+                </div><div class="footer-line" itemscope itemtype="http://schema.org/CreativeWork"><i class="far fa-copyright fa-fw" aria-hidden="true"></i><span itemprop="copyrightYear">2022 - 2024</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="https://www.masimaro.xyz" target="_blank">Masimaro</a></span></div>
+        </div>
+    </footer></div>
+
+        <div id="fixed-buttons"><a href="#" id="back-to-top" class="fixed-button" title="Back to Top">
+                <i class="fas fa-arrow-up fa-fw" aria-hidden="true"></i>
+            </a><a href="#" id="view-comments" class="fixed-button" title="View Comments">
+                <i class="fas fa-comment fa-fw" aria-hidden="true"></i>
+            </a>
+        </div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.css"><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/autocomplete.js@0.38.1/dist/autocomplete.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lunr@2.3.9/lunr.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lazysizes@5.3.2/lazysizes.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/clipboard@2.0.11/dist/clipboard.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/sharer.js@0.5.1/sharer.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/auto-render.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/copy-tex.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/mhchem.min.js"></script><script type="text/javascript">window.config={"code":{"copyTitle":"Copy to clipboard","maxShownLines":50},"comment":{},"math":{"delimiters":[{"display":true,"left":"$$","right":"$$"},{"display":true,"left":"\\[","right":"\\]"},{"display":true,"left":"\\begin{equation}","right":"\\end{equation}"},{"display":true,"left":"\\begin{equation*}","right":"\\end{equation*}"},{"display":true,"left":"\\begin{align}","right":"\\end{align}"},{"display":true,"left":"\\begin{align*}","right":"\\end{align*}"},{"display":true,"left":"\\begin{alignat}","right":"\\end{alignat}"},{"display":true,"left":"\\begin{alignat*}","right":"\\end{alignat*}"},{"display":true,"left":"\\begin{gather}","right":"\\end{gather}"},{"display":true,"left":"\\begin{CD}","right":"\\end{CD}"},{"display":false,"left":"$","right":"$"},{"display":false,"left":"\\(","right":"\\)"}],"strict":false},"search":{"highlightTag":"em","maxResultLength":10,"noResultsFound":"No results found","snippetLength":50}};</script><script type="text/javascript" src="/js/theme.min.js"></script></body>
+</html>

@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="robots" content="noodp" />
+        <title>从零开始配置vim(26)——LSP UI 美化 - Masimaro&#39;s blog</title><meta name="Description" content="这是我用于记录日常和学习的小站"><meta property="og:title" content="从零开始配置vim(26)——LSP UI 美化" />
+<meta property="og:description" content="之前我们通过几个实例演示如何配置其他语言的lsp服务，相信各位小伙伴碰到其他的编程语言也能熟练的配置它对应的lsp服务。本篇讲作为一个补充，" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://HaiLateBoy.github.io/posts/vim-config26/" /><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2022-10-14T14:03:11+08:00" />
+<meta property="article:modified_time" content="2022-10-14T14:03:11+08:00" /><meta property="og:site_name" content="Masimaro&#39;s blog" />
+
+<meta name="twitter:card" content="summary"/><meta name="twitter:title" content="从零开始配置vim(26)——LSP UI 美化"/>
+<meta name="twitter:description" content="之前我们通过几个实例演示如何配置其他语言的lsp服务，相信各位小伙伴碰到其他的编程语言也能熟练的配置它对应的lsp服务。本篇讲作为一个补充，"/>
+<meta name="application-name" content="My cool site">
+<meta name="apple-mobile-web-app-title" content="My cool site"><meta name="theme-color" content="#ffffff"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="manifest" href="/site.webmanifest"><link rel="canonical" href="http://HaiLateBoy.github.io/posts/vim-config26/" /><link rel="prev" href="http://HaiLateBoy.github.io/posts/vim-config25/" /><link rel="next" href="http://HaiLateBoy.github.io/posts/vim-config27/" /><link rel="stylesheet" href="/css/style.min.css"><link rel="preload" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css"></noscript><link rel="preload" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css"></noscript><script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "BlogPosting",
+        "headline": "从零开始配置vim(26)——LSP UI 美化",
+        "inLanguage": "zh-CN",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "http:\/\/HaiLateBoy.github.io\/posts\/vim-config26\/"
+        },"genre": "posts","keywords": "vim, 编辑工具, 文本处理, lua, 编辑器","wordcount":  930 ,
+        "url": "http:\/\/HaiLateBoy.github.io\/posts\/vim-config26\/","datePublished": "2022-10-14T14:03:11+08:00","dateModified": "2022-10-14T14:03:11+08:00","publisher": {
+            "@type": "Organization",
+            "name": ""},"author": {
+                "@type": "Person",
+                "name": "Masimaro"
+            },"description": ""
+    }
+    </script></head>
+    <body data-header-desktop="fixed" data-header-mobile="auto"><script type="text/javascript">(window.localStorage && localStorage.getItem('theme') ? localStorage.getItem('theme') === 'dark' : ('auto' === 'auto' ? window.matchMedia('(prefers-color-scheme: dark)').matches : 'auto' === 'dark')) && document.body.setAttribute('theme', 'dark');</script>
+
+        <div id="mask"></div><div class="wrapper"><header class="desktop" id="header-desktop">
+    <div class="header-wrapper">
+        <div class="header-title">
+            <a href="/" title="Masimaro&#39;s blog">My cool site</a>
+        </div>
+        <div class="menu">
+            <div class="menu-inner"><a class="menu-item" href="/posts/" title="文章列表"> 文章 </a><a class="menu-item" href="/tags/" title="标签"> 标签 </a><a class="menu-item" href="/categories/" title="分类"> 分类 </a><a class="menu-item" href="/about" title="关于本站"> 关于 </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-desktop">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-desktop" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-desktop" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-desktop">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </span><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                    <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+                </a></div>
+        </div>
+    </div>
+</header><header class="mobile" id="header-mobile">
+    <div class="header-container">
+        <div class="header-wrapper">
+            <div class="header-title">
+                <a href="/" title="Masimaro&#39;s blog">My cool site</a>
+            </div>
+            <div class="menu-toggle" id="menu-toggle-mobile">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+        <div class="menu" id="menu-mobile"><div class="search-wrapper">
+                    <div class="search mobile" id="search-mobile">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-mobile">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-mobile" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-mobile" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-mobile">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </div>
+                    <a href="javascript:void(0);" class="search-cancel" id="search-cancel-mobile">
+                        Cancel
+                    </a>
+                </div><a class="menu-item" href="/posts/" title="文章列表">文章</a><a class="menu-item" href="/tags/" title="标签">标签</a><a class="menu-item" href="/categories/" title="分类">分类</a><a class="menu-item" href="/about" title="关于本站">关于</a><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+            </a></div>
+    </div>
+</header><div class="search-dropdown desktop">
+        <div id="search-dropdown-desktop"></div>
+    </div>
+    <div class="search-dropdown mobile">
+        <div id="search-dropdown-mobile"></div>
+    </div><main class="main">
+                <div class="container"><div class="toc" id="toc-auto">
+            <h2 class="toc-title">Contents</h2>
+            <div class="toc-content" id="toc-content-auto"></div>
+        </div><article class="page single"><h1 class="single-title animate__animated animate__flipInX">从零开始配置vim(26)——LSP UI 美化</h1><div class="post-meta">
+            <div class="post-meta-line"><span class="post-author"><a href="https://www.masimaro.xyz" title="Author" target="_blank" rel="noopener noreffer author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Masimaro</a></span>&nbsp;<span class="post-category">included in <a href="/categories/vim-%E9%85%8D%E7%BD%AE/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>vim 配置</a></span></div>
+            <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw" aria-hidden="true"></i>&nbsp;<time datetime="2022-10-14">2022-10-14</time>&nbsp;<i class="fas fa-pencil-alt fa-fw" aria-hidden="true"></i>&nbsp;930 words&nbsp;
+                <i class="far fa-clock fa-fw" aria-hidden="true"></i>&nbsp;2 minutes&nbsp;</div>
+        </div><div class="details toc" id="toc-static"  data-kept="true">
+                <div class="details-summary toc-title">
+                    <span>Contents</span>
+                    <span><i class="details-icon fas fa-angle-right" aria-hidden="true"></i></span>
+                </div>
+                <div class="details-content toc-content" id="toc-content-static"><nav id="TableOfContents">
+  <ul>
+    <li><a href="#配置-ui">配置 UI</a></li>
+    <li><a href="#显示符号表">显示符号表</a></li>
+  </ul>
+</nav></div>
+            </div><div class="content" id="content"><p>之前我们通过几个实例演示如何配置其他语言的lsp服务，相信各位小伙伴碰到其他的编程语言也能熟练的配置它对应的lsp服务。本篇讲作为一个补充，我们来优化一下LSP 相关的显示</p>
+<h2 id="配置-ui">配置 UI</h2>
+<p>原始的 <code>lsp</code> 显示有点素，我们使用插件对它进行一些美化，这里使用插件 <code>lspsaga.nvim</code> 。使用如下的代码进行安装</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-lua" data-lang="lua"><span class="line"><span class="cl"><span class="n">use</span><span class="p">{</span><span class="s2">&#34;glepnir/lspsaga.nvim&#34;</span><span class="p">}</span>
+</span></span></code></pre></div><p>然后我们新建一个 <code>plugin-config/lspsaga.lua</code> 对它进行配置</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-lua" data-lang="lua"><span class="line"><span class="cl"><span class="kd">local</span> <span class="n">saga</span> <span class="o">=</span> <span class="n">require</span><span class="p">(</span><span class="s1">&#39;lspsaga&#39;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">saga.init_lsp_saga</span><span class="p">()</span>
+</span></span></code></pre></div><p>该插件对 <code>NeoVim</code> 原生 LSP 显示做了一些更改，并提供了一些方便的命令来实现LSP 相关的功能。我们将它对应的功能绑定到快捷键上替换原有的 LSP 对应的快捷键</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-lua" data-lang="lua"><span class="line"><span class="cl"><span class="n">lsp_keybinds.set_keymap</span> <span class="o">=</span> <span class="kr">function</span> <span class="p">(</span><span class="n">bufnr</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="n">print</span><span class="p">(</span><span class="s2">&#34;set lsp keymap&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">-- 跳转到声明</span>
+</span></span><span class="line"><span class="cl">    <span class="n">vim.api</span><span class="p">.</span><span class="n">nvim_buf_set_keymap</span><span class="p">(</span><span class="n">bufnr</span><span class="p">,</span> <span class="s2">&#34;n&#34;</span><span class="p">,</span> <span class="s2">&#34;gd&#34;</span><span class="p">,</span> <span class="s2">&#34;&lt;cmd&gt;Lspsaga peek_definition&lt;CR&gt;&#34;</span><span class="p">,</span> <span class="p">{</span><span class="n">silent</span> <span class="o">=</span> <span class="kc">true</span><span class="p">,</span> <span class="n">noremap</span> <span class="o">=</span> <span class="kc">true</span><span class="p">})</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">-- 跳转到定义</span>
+</span></span><span class="line"><span class="cl">    <span class="n">vim.api</span><span class="p">.</span><span class="n">nvim_buf_set_keymap</span><span class="p">(</span><span class="n">bufnr</span><span class="p">,</span> <span class="s2">&#34;n&#34;</span><span class="p">,</span> <span class="s2">&#34;gD&#34;</span><span class="p">,</span> <span class="s2">&#34;&lt;cmd&gt;lua vim.lsp.buf.definition()&lt;CR&gt;&#34;</span><span class="p">,</span> <span class="p">{</span><span class="n">silent</span> <span class="o">=</span> <span class="kc">true</span><span class="p">,</span> <span class="n">noremap</span> <span class="o">=</span> <span class="kc">true</span><span class="p">})</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">-- 显示注释文档</span>
+</span></span><span class="line"><span class="cl">    <span class="n">vim.api</span><span class="p">.</span><span class="n">nvim_buf_set_keymap</span><span class="p">(</span><span class="n">bufnr</span><span class="p">,</span> <span class="s2">&#34;n&#34;</span><span class="p">,</span> <span class="s2">&#34;gh&#34;</span><span class="p">,</span> <span class="s2">&#34;&lt;cmd&gt;Lspsaga lsp_finder&lt;CR&gt;&#34;</span><span class="p">,</span> <span class="p">{</span><span class="n">silent</span> <span class="o">=</span> <span class="kc">true</span><span class="p">,</span> <span class="n">noremap</span> <span class="o">=</span> <span class="kc">true</span><span class="p">})</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">-- 跳转到实现</span>
+</span></span><span class="line"><span class="cl">    <span class="n">vim.api</span><span class="p">.</span><span class="n">nvim_buf_set_keymap</span><span class="p">(</span><span class="n">bufnr</span><span class="p">,</span> <span class="s2">&#34;n&#34;</span><span class="p">,</span> <span class="s2">&#34;gi&#34;</span><span class="p">,</span> <span class="s2">&#34;&lt;cmd&gt;lua vim.lsp.buf.implementation()&lt;CR&gt;&#34;</span><span class="p">,</span> <span class="p">{</span><span class="n">silent</span> <span class="o">=</span> <span class="kc">true</span><span class="p">,</span> <span class="n">noremap</span> <span class="o">=</span> <span class="kc">true</span><span class="p">})</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">-- 跳转到引用位置</span>
+</span></span><span class="line"><span class="cl">    <span class="n">vim.api</span><span class="p">.</span><span class="n">nvim_buf_set_keymap</span><span class="p">(</span><span class="n">bufnr</span><span class="p">,</span> <span class="s2">&#34;n&#34;</span><span class="p">,</span> <span class="s2">&#34;gr&#34;</span><span class="p">,</span> <span class="s2">&#34;&lt;cmd&gt;Lspsaga rename&lt;CR&gt;&#34;</span><span class="p">,</span> <span class="p">{</span><span class="n">silent</span> <span class="o">=</span> <span class="kc">true</span><span class="p">,</span> <span class="n">noremap</span> <span class="o">=</span> <span class="kc">true</span><span class="p">})</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">-- 以浮窗形式显示错误</span>
+</span></span><span class="line"><span class="cl">    <span class="n">vim.api</span><span class="p">.</span><span class="n">nvim_buf_set_keymap</span><span class="p">(</span><span class="n">bufnr</span><span class="p">,</span> <span class="s2">&#34;n&#34;</span><span class="p">,</span> <span class="s2">&#34;go&#34;</span><span class="p">,</span> <span class="s2">&#34;&lt;cmd&gt;lua vim.diagnostic.open_float()&lt;CR&gt;&#34;</span><span class="p">,</span> <span class="p">{</span><span class="n">silent</span> <span class="o">=</span> <span class="kc">true</span><span class="p">,</span> <span class="n">noremap</span> <span class="o">=</span> <span class="kc">true</span><span class="p">})</span>
+</span></span><span class="line"><span class="cl">    <span class="n">vim.api</span><span class="p">.</span><span class="n">nvim_buf_set_keymap</span><span class="p">(</span><span class="n">bufnr</span><span class="p">,</span> <span class="s2">&#34;n&#34;</span><span class="p">,</span> <span class="s2">&#34;gp&#34;</span><span class="p">,</span> <span class="s2">&#34;&lt;cmd&gt;lua vim.diagnostic.goto_prev()&lt;CR&gt;&#34;</span><span class="p">,</span> <span class="p">{</span><span class="n">silent</span> <span class="o">=</span> <span class="kc">true</span><span class="p">,</span> <span class="n">noremap</span> <span class="o">=</span> <span class="kc">true</span><span class="p">})</span>
+</span></span><span class="line"><span class="cl">    <span class="n">vim.api</span><span class="p">.</span><span class="n">nvim_buf_set_keymap</span><span class="p">(</span><span class="n">bufnr</span><span class="p">,</span> <span class="s2">&#34;n&#34;</span><span class="p">,</span> <span class="s2">&#34;gn&#34;</span><span class="p">,</span> <span class="s2">&#34;&lt;cmd&gt;lua vim.diagnostic.goto_next()&lt;CR&gt;&#34;</span><span class="p">,</span> <span class="p">{</span><span class="n">silent</span> <span class="o">=</span> <span class="kc">true</span><span class="p">,</span> <span class="n">noremap</span> <span class="o">=</span> <span class="kc">true</span><span class="p">})</span>
+</span></span><span class="line"><span class="cl">    <span class="n">vim.api</span><span class="p">.</span><span class="n">nvim_buf_set_keymap</span><span class="p">(</span><span class="n">bufnr</span><span class="p">,</span> <span class="s2">&#34;n&#34;</span><span class="p">,</span> <span class="s2">&#34;&lt;leader&gt;cd&#34;</span><span class="p">,</span> <span class="s2">&#34;&lt;cmd&gt;Lspsaga show_cursor_diagnostics&lt;CR&gt;&#34;</span><span class="p">,</span> <span class="p">{</span><span class="n">silent</span> <span class="o">=</span> <span class="kc">true</span><span class="p">,</span> <span class="n">noremap</span> <span class="o">=</span> <span class="kc">true</span><span class="p">})</span>
+</span></span><span class="line"><span class="cl">    <span class="n">vim.api</span><span class="p">.</span><span class="n">nvim_buf_set_keymap</span><span class="p">(</span><span class="n">bufnr</span><span class="p">,</span> <span class="s2">&#34;n&#34;</span><span class="p">,</span> <span class="s2">&#34;&lt;leader&gt;cd&#34;</span><span class="p">,</span> <span class="s2">&#34;&lt;cmd&gt;Lspsaga show_line_diagnostics&lt;CR&gt;&#34;</span><span class="p">,</span> <span class="p">{</span><span class="n">silent</span> <span class="o">=</span> <span class="kc">true</span><span class="p">,</span> <span class="n">noremap</span> <span class="o">=</span> <span class="kc">true</span><span class="p">})</span>
+</span></span><span class="line"><span class="cl">    <span class="n">vim.api</span><span class="p">.</span><span class="n">nvim_buf_set_keymap</span><span class="p">(</span><span class="n">bufnr</span><span class="p">,</span> <span class="s2">&#34;n&#34;</span><span class="p">,</span> <span class="s2">&#34;&lt;leader&gt;ca&#34;</span><span class="p">,</span> <span class="s2">&#34;&lt;cmd&gt;Lspsaga code_action&lt;CR&gt;&#34;</span><span class="p">,</span> <span class="p">{</span><span class="n">silent</span> <span class="o">=</span> <span class="kc">true</span><span class="p">,</span> <span class="n">noremap</span> <span class="o">=</span> <span class="kc">true</span><span class="p">})</span>
+</span></span><span class="line"><span class="cl">    <span class="n">vim.api</span><span class="p">.</span><span class="n">nvim_buf_set_keymap</span><span class="p">(</span><span class="n">bufnr</span><span class="p">,</span> <span class="s2">&#34;v&#34;</span><span class="p">,</span> <span class="s2">&#34;&lt;leader&gt;ca&#34;</span><span class="p">,</span> <span class="s2">&#34;&lt;cmd&gt;Lspsaga code_action&lt;CR&gt;&#34;</span><span class="p">,</span> <span class="p">{</span><span class="n">silent</span> <span class="o">=</span> <span class="kc">true</span><span class="p">,</span> <span class="n">noremap</span> <span class="o">=</span> <span class="kc">true</span><span class="p">})</span>
+</span></span><span class="line"><span class="cl"><span class="kr">end</span>
+</span></span></code></pre></div><p>我们可以对比一下原生的 <code>lsp</code> 界面和 <code>lspsaga</code> 界面，我这里使用 <code>gh</code> 这个命令进行对比</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://img-blog.csdnimg.cn/8469cefab1714a57b42437a160902698.gif#pic_center"
+        data-srcset="https://img-blog.csdnimg.cn/8469cefab1714a57b42437a160902698.gif#pic_center, https://img-blog.csdnimg.cn/8469cefab1714a57b42437a160902698.gif#pic_center 1.5x, https://img-blog.csdnimg.cn/8469cefab1714a57b42437a160902698.gif#pic_center 2x"
+        data-sizes="auto"
+        alt="https://img-blog.csdnimg.cn/8469cefab1714a57b42437a160902698.gif#pic_center"
+        title="在这里插入图片描述" />
+<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://img-blog.csdnimg.cn/4f3412225c534538b23c362f57041ae3.gif#pic_center"
+        data-srcset="https://img-blog.csdnimg.cn/4f3412225c534538b23c362f57041ae3.gif#pic_center, https://img-blog.csdnimg.cn/4f3412225c534538b23c362f57041ae3.gif#pic_center 1.5x, https://img-blog.csdnimg.cn/4f3412225c534538b23c362f57041ae3.gif#pic_center 2x"
+        data-sizes="auto"
+        alt="https://img-blog.csdnimg.cn/4f3412225c534538b23c362f57041ae3.gif#pic_center"
+        title="在这里插入图片描述" />
+我们可以看到它能显示更丰富的信息，而且我们可以根据显示快速跳转到对应位置。对于我们查阅代码也是一个大的提升</p>
+<p>而且它还提供 <code>code action</code> 相关的功能。例如上面的截图中它在出现错误的一行代码的行号前以小灯泡的形式进行标记，体验类似与 VS Code。我们将光标放在对应位置，使用绑定的快捷键 <code>&lt;leader&gt;ca</code> 。它会显示出对应的修复方案
+<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://img-blog.csdnimg.cn/c056d5c5899e4896a9b0bc6098fb047c.gif#pic_center"
+        data-srcset="https://img-blog.csdnimg.cn/c056d5c5899e4896a9b0bc6098fb047c.gif#pic_center, https://img-blog.csdnimg.cn/c056d5c5899e4896a9b0bc6098fb047c.gif#pic_center 1.5x, https://img-blog.csdnimg.cn/c056d5c5899e4896a9b0bc6098fb047c.gif#pic_center 2x"
+        data-sizes="auto"
+        alt="https://img-blog.csdnimg.cn/c056d5c5899e4896a9b0bc6098fb047c.gif#pic_center"
+        title="在这里插入图片描述" />
+当然它的功能还不止于此，各位小伙伴可以去对应的官网上阅读相关文档，针对自己的需求进行进一步的配置</p>
+<h2 id="显示符号表">显示符号表</h2>
+<p>我们可以使用插件 <code>symbols-outline</code> 在窗口右侧显示当前 <code>buffer</code> 中出现的类、方法等符号，方便我们快速跳转到想去的地方。
+该插件仅支持 NeoVim7,0 以上的版本。使用下面的代码进行安装</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-lua" data-lang="lua"><span class="line"><span class="cl"><span class="n">use</span> <span class="p">{</span><span class="s1">&#39;simrat39/symbols-outline.nvim&#39;</span><span class="p">}</span>
+</span></span></code></pre></div><p>还是额外的给它创建一个文件保存它的配置</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-lua" data-lang="lua"><span class="line"><span class="cl"><span class="n">require</span><span class="p">(</span><span class="s2">&#34;symbols-outline&#34;</span><span class="p">).</span><span class="n">setup</span><span class="p">()</span>
+</span></span></code></pre></div><p>配置完成之后我们可以使用 <code>:SymbolsOutline</code> 命令来控制窗口的打开和关闭，为了方便我们可以绑定到一个快捷上</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-lua" data-lang="lua"><span class="line"><span class="cl"><span class="n">vim.api</span><span class="p">.</span><span class="n">nvim_set_keymap</span><span class="p">(</span><span class="s2">&#34;n&#34;</span><span class="p">,</span> <span class="s2">&#34;&lt;leader&gt;so&#34;</span><span class="p">,</span> <span class="s2">&#34;&lt;cmd&gt;SymbolsOutline&lt;CR&gt;&#34;</span><span class="p">,</span> <span class="p">{</span><span class="n">silent</span> <span class="o">=</span> <span class="kc">true</span><span class="p">,</span> <span class="n">noremap</span> <span class="o">=</span> <span class="kc">true</span><span class="p">})</span>
+</span></span></code></pre></div><p>最终的效果如下图所示
+<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://img-blog.csdnimg.cn/f8a0f2471ede44b5a1cfd08f2806176c.gif#pic_center"
+        data-srcset="https://img-blog.csdnimg.cn/f8a0f2471ede44b5a1cfd08f2806176c.gif#pic_center, https://img-blog.csdnimg.cn/f8a0f2471ede44b5a1cfd08f2806176c.gif#pic_center 1.5x, https://img-blog.csdnimg.cn/f8a0f2471ede44b5a1cfd08f2806176c.gif#pic_center 2x"
+        data-sizes="auto"
+        alt="https://img-blog.csdnimg.cn/f8a0f2471ede44b5a1cfd08f2806176c.gif#pic_center"
+        title="在这里插入图片描述" />本章我们对之前的LSP 配置进行了一定程度的优化，优化了使用的体验。截止到当前文章我们已经完成了代码的高亮、跳转、语法分析、代码补全、错误提示以及修复建议的相关配置。关于LSP的相关配置已经结束了，下一篇我们将要讨论如何使用代码片段进一步减少我们编码时输入的字符数。请各位敬请期待</p>
+</div><div class="post-footer" id="post-footer">
+    <div class="post-info">
+        <div class="post-info-line">
+            <div class="post-info-mod">
+                <span>Updated on 2022-10-14</span>
+            </div></div>
+        <div class="post-info-line">
+            <div class="post-info-md"></div>
+            <div class="post-info-share">
+                <span><a href="javascript:void(0);" title="Share on Twitter" data-sharer="twitter" data-url="http://HaiLateBoy.github.io/posts/vim-config26/" data-title="从零开始配置vim(26)——LSP UI 美化" data-hashtags="vim,编辑工具,文本处理,lua,编辑器"><i class="fab fa-twitter fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Facebook" data-sharer="facebook" data-url="http://HaiLateBoy.github.io/posts/vim-config26/" data-hashtag="vim"><i class="fab fa-facebook-square fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Hacker News" data-sharer="hackernews" data-url="http://HaiLateBoy.github.io/posts/vim-config26/" data-title="从零开始配置vim(26)——LSP UI 美化"><i class="fab fa-hacker-news fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Line" data-sharer="line" data-url="http://HaiLateBoy.github.io/posts/vim-config26/" data-title="从零开始配置vim(26)——LSP UI 美化"><i data-svg-src="https://cdn.jsdelivr.net/npm/simple-icons@7.3.0/icons/line.svg" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on 微博" data-sharer="weibo" data-url="http://HaiLateBoy.github.io/posts/vim-config26/" data-title="从零开始配置vim(26)——LSP UI 美化"><i class="fab fa-weibo fa-fw" aria-hidden="true"></i></a></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="post-info-more">
+        <section class="post-tags"><i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/vim/">vim</a>,&nbsp;<a href="/tags/%E7%BC%96%E8%BE%91%E5%B7%A5%E5%85%B7/">编辑工具</a>,&nbsp;<a href="/tags/%E6%96%87%E6%9C%AC%E5%A4%84%E7%90%86/">文本处理</a>,&nbsp;<a href="/tags/lua/">lua</a>,&nbsp;<a href="/tags/%E7%BC%96%E8%BE%91%E5%99%A8/">编辑器</a></section>
+        <section>
+            <span><a href="javascript:void(0);" onclick="window.history.back();">Back</a></span>&nbsp;|&nbsp;<span><a href="/">Home</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav"><a href="/posts/vim-config25/" class="prev" rel="prev" title="从零开始配置vim(25)——关于 c&#43;&#43; python 的配置"><i class="fas fa-angle-left fa-fw" aria-hidden="true"></i>从零开始配置vim(25)——关于 c++ python 的配置</a>
+            <a href="/posts/vim-config27/" class="next" rel="next" title="从零开始配置vim(27)——代码片段">从零开始配置vim(27)——代码片段<i class="fas fa-angle-right fa-fw" aria-hidden="true"></i></a></div>
+</div>
+</article></div>
+            </main><footer class="footer">
+        <div class="footer-container"><div class="footer-line">Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener noreffer" title="Hugo 0.121.2">Hugo</a> | Theme - <a href="https://github.com/dillonzq/LoveIt" target="_blank" rel="noopener noreffer" title="LoveIt 0.2.11"><i class="far fa-kiss-wink-heart fa-fw" aria-hidden="true"></i> LoveIt</a>
+                </div><div class="footer-line" itemscope itemtype="http://schema.org/CreativeWork"><i class="far fa-copyright fa-fw" aria-hidden="true"></i><span itemprop="copyrightYear">2022 - 2024</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="https://www.masimaro.xyz" target="_blank">Masimaro</a></span></div>
+        </div>
+    </footer></div>
+
+        <div id="fixed-buttons"><a href="#" id="back-to-top" class="fixed-button" title="Back to Top">
+                <i class="fas fa-arrow-up fa-fw" aria-hidden="true"></i>
+            </a><a href="#" id="view-comments" class="fixed-button" title="View Comments">
+                <i class="fas fa-comment fa-fw" aria-hidden="true"></i>
+            </a>
+        </div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.css"><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/autocomplete.js@0.38.1/dist/autocomplete.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lunr@2.3.9/lunr.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lazysizes@5.3.2/lazysizes.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/clipboard@2.0.11/dist/clipboard.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/sharer.js@0.5.1/sharer.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/auto-render.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/copy-tex.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/mhchem.min.js"></script><script type="text/javascript">window.config={"code":{"copyTitle":"Copy to clipboard","maxShownLines":50},"comment":{},"math":{"delimiters":[{"display":true,"left":"$$","right":"$$"},{"display":true,"left":"\\[","right":"\\]"},{"display":true,"left":"\\begin{equation}","right":"\\end{equation}"},{"display":true,"left":"\\begin{equation*}","right":"\\end{equation*}"},{"display":true,"left":"\\begin{align}","right":"\\end{align}"},{"display":true,"left":"\\begin{align*}","right":"\\end{align*}"},{"display":true,"left":"\\begin{alignat}","right":"\\end{alignat}"},{"display":true,"left":"\\begin{alignat*}","right":"\\end{alignat*}"},{"display":true,"left":"\\begin{gather}","right":"\\end{gather}"},{"display":true,"left":"\\begin{CD}","right":"\\end{CD}"},{"display":false,"left":"$","right":"$"},{"display":false,"left":"\\(","right":"\\)"}],"strict":false},"search":{"highlightTag":"em","maxResultLength":10,"noResultsFound":"No results found","snippetLength":50}};</script><script type="text/javascript" src="/js/theme.min.js"></script></body>
+</html>

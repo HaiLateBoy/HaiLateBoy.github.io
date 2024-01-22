@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="robots" content="noodp" />
+        <title>ATL模板库中的OLEDB与ADO - Masimaro&#39;s blog</title><meta name="Description" content="这是我用于记录日常和学习的小站"><meta property="og:title" content="ATL模板库中的OLEDB与ADO" />
+<meta property="og:description" content="上次将OLEDB的所有内容基本上都说完了，从之前的示例上来看OLEDB中有许多变量的定义，什么结果集对象、session对象、命令对象，还有" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://HaiLateBoy.github.io/posts/oledb-and-ado-16/" /><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2018-05-27T10:47:42+00:00" />
+<meta property="article:modified_time" content="2018-05-27T10:47:42+00:00" /><meta property="og:site_name" content="Masimaro&#39;s blog" />
+
+<meta name="twitter:card" content="summary"/><meta name="twitter:title" content="ATL模板库中的OLEDB与ADO"/>
+<meta name="twitter:description" content="上次将OLEDB的所有内容基本上都说完了，从之前的示例上来看OLEDB中有许多变量的定义，什么结果集对象、session对象、命令对象，还有"/>
+<meta name="application-name" content="My cool site">
+<meta name="apple-mobile-web-app-title" content="My cool site"><meta name="theme-color" content="#ffffff"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="manifest" href="/site.webmanifest"><link rel="canonical" href="http://HaiLateBoy.github.io/posts/oledb-and-ado-16/" /><link rel="prev" href="http://HaiLateBoy.github.io/posts/oledb-and-ado-15/" /><link rel="next" href="http://HaiLateBoy.github.io/posts/fbspider/" /><link rel="stylesheet" href="/css/style.min.css"><link rel="preload" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css"></noscript><link rel="preload" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css"></noscript><script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "BlogPosting",
+        "headline": "ATL模板库中的OLEDB与ADO",
+        "inLanguage": "zh-CN",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "http:\/\/HaiLateBoy.github.io\/posts\/oledb-and-ado-16\/"
+        },"genre": "posts","keywords": "OLEDB, 数据库编程, VC\u002b\u002b, 数据库, ATL, ADO","wordcount":  4245 ,
+        "url": "http:\/\/HaiLateBoy.github.io\/posts\/oledb-and-ado-16\/","datePublished": "2018-05-27T10:47:42+00:00","dateModified": "2018-05-27T10:47:42+00:00","publisher": {
+            "@type": "Organization",
+            "name": ""},"author": {
+                "@type": "Person",
+                "name": "Masimaro"
+            },"description": ""
+    }
+    </script></head>
+    <body data-header-desktop="fixed" data-header-mobile="auto"><script type="text/javascript">(window.localStorage && localStorage.getItem('theme') ? localStorage.getItem('theme') === 'dark' : ('auto' === 'auto' ? window.matchMedia('(prefers-color-scheme: dark)').matches : 'auto' === 'dark')) && document.body.setAttribute('theme', 'dark');</script>
+
+        <div id="mask"></div><div class="wrapper"><header class="desktop" id="header-desktop">
+    <div class="header-wrapper">
+        <div class="header-title">
+            <a href="/" title="Masimaro&#39;s blog">My cool site</a>
+        </div>
+        <div class="menu">
+            <div class="menu-inner"><a class="menu-item" href="/posts/" title="文章列表"> 文章 </a><a class="menu-item" href="/tags/" title="标签"> 标签 </a><a class="menu-item" href="/categories/" title="分类"> 分类 </a><a class="menu-item" href="/about" title="关于本站"> 关于 </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-desktop">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-desktop" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-desktop" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-desktop">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </span><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                    <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+                </a></div>
+        </div>
+    </div>
+</header><header class="mobile" id="header-mobile">
+    <div class="header-container">
+        <div class="header-wrapper">
+            <div class="header-title">
+                <a href="/" title="Masimaro&#39;s blog">My cool site</a>
+            </div>
+            <div class="menu-toggle" id="menu-toggle-mobile">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+        <div class="menu" id="menu-mobile"><div class="search-wrapper">
+                    <div class="search mobile" id="search-mobile">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-mobile">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-mobile" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-mobile" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-mobile">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </div>
+                    <a href="javascript:void(0);" class="search-cancel" id="search-cancel-mobile">
+                        Cancel
+                    </a>
+                </div><a class="menu-item" href="/posts/" title="文章列表">文章</a><a class="menu-item" href="/tags/" title="标签">标签</a><a class="menu-item" href="/categories/" title="分类">分类</a><a class="menu-item" href="/about" title="关于本站">关于</a><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+            </a></div>
+    </div>
+</header><div class="search-dropdown desktop">
+        <div id="search-dropdown-desktop"></div>
+    </div>
+    <div class="search-dropdown mobile">
+        <div id="search-dropdown-mobile"></div>
+    </div><main class="main">
+                <div class="container"><div class="toc" id="toc-auto">
+            <h2 class="toc-title">Contents</h2>
+            <div class="toc-content" id="toc-content-auto"></div>
+        </div><article class="page single"><h1 class="single-title animate__animated animate__flipInX">ATL模板库中的OLEDB与ADO</h1><div class="post-meta">
+            <div class="post-meta-line"><span class="post-author"><a href="https://www.masimaro.xyz" title="Author" target="_blank" rel="noopener noreffer author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Masimaro</a></span>&nbsp;<span class="post-category">included in <a href="/categories/windows-%E6%95%B0%E6%8D%AE%E5%BA%93%E7%BC%96%E7%A8%8B/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>windows 数据库编程</a></span></div>
+            <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw" aria-hidden="true"></i>&nbsp;<time datetime="2018-05-27">2018-05-27</time>&nbsp;<i class="fas fa-pencil-alt fa-fw" aria-hidden="true"></i>&nbsp;4245 words&nbsp;
+                <i class="far fa-clock fa-fw" aria-hidden="true"></i>&nbsp;9 minutes&nbsp;</div>
+        </div><div class="details toc" id="toc-static"  data-kept="true">
+                <div class="details-summary toc-title">
+                    <span>Contents</span>
+                    <span><i class="details-icon fas fa-angle-right" aria-hidden="true"></i></span>
+                </div>
+                <div class="details-content toc-content" id="toc-content-static"><nav id="TableOfContents">
+  <ul>
+    <li><a href="#atl-模板中的oledb">ATL 模板中的OLEDB</a>
+      <ul>
+        <li><a href="#atl主要封装的类">ATL主要封装的类</a></li>
+        <li><a href="#模板的使用">模板的使用</a></li>
+      </ul>
+    </li>
+    <li><a href="#ado">ADO</a></li>
+    <li><a href="#ado与oledb混合编程">ADO与OLEDB混合编程</a></li>
+  </ul>
+</nav></div>
+            </div><div class="content" id="content"><p>上次将OLEDB的所有内容基本上都说完了，从之前的示例上来看OLEDB中有许多变量的定义，什么结果集对象、session对象、命令对象，还有各种缓冲等等，总体上来说直接使用OLEDB写程序很麻烦，用很大的代码量带来的仅仅只是简单的功能。还要考虑各种缓冲的释放，各种对象的关闭，程序员的大量精力都浪费在无用的事情上，针对这些情况微软在OLEDB上提供了两种封装方式，一种是将其封装在ATL模板库中，一种是使用ActiveX控件来进行封装称之为ADO，这次主要写的是这两种方式</p>
+<!-- raw HTML omitted -->
+<h2 id="atl-模板中的oledb">ATL 模板中的OLEDB</h2>
+<p>由于ATL模板是开源的，这种方式封装简洁，调试简易（毕竟源代码都给你了），各个模块相对独立，但是它的缺点很明显就是使用门槛相对较高，只有对C++中的模板十分熟悉的开发人员才能使用的得心应手。
+ATL中的OLEDB主要有两大模块，提供者模块和消费者模块，顾名思义，提供者模块是数据库的开发人员使用的，它主要使用这个模块实现OLEDB中的接口，对外提供相应的数据库服务；消费者模块就是使用OLEDB在程序中操作数据库。这里主要说的是消费者模块</p>
+<h3 id="atl主要封装的类">ATL主要封装的类</h3>
+<p>ATL针对OLEDB封装的主要有这么几个重要的类：</p>
+<p>数据库对象</p>
+<ul>
+<li>CDataConnection 数据源连接类主要实现的是数据库的连接相关的功能，根据这个可以猜测出来它实际上封装的是OLEDB中的数据源对象和会话对象</li>
+<li>CDataSource：数据源对象</li>
+<li>CEnumerator: 架构结果集对象，主要用来查询数据库的相关信息，比如数据库中的表结构等信息</li>
+<li>CSession: 会话对象</li>
+</ul>
+<p>访问器对象：</p>
+<ul>
+<li>CAccessor: 常规的访问器对象</li>
+<li>CAccessorBase: 访问器对象的基类</li>
+<li>CDynamicAccessor：动态绑定的访问器</li>
+<li>CDynamicParamterAccessor:参数绑定的访问器,从之前博文的内容来看它应该是进行参数化查询等操作时使用的对象</li>
+<li>CDynamicStringAccessor:这个一般是要将查询结果显示为字符串时使用，它负责将数据库中的数据转化为字符串</li>
+</ul>
+<p>ALT中针对OLEDB的封装在头文件atldbcli.h中，在项目中只要包含它就行了</p>
+<h3 id="模板的使用">模板的使用</h3>
+<h4 id="静态绑定">静态绑定</h4>
+<p>针对静态绑定，VS提供了很好的向导程序帮助我们生成对应的类，方便了开发，使用的基本步骤如下:</p>
+<ol>
+<li>在项目上右键，选择添加类</li>
+<li>在类选择框中点击ATL并选择其中的ATL OLEDB使用者
+<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="/oledb-and-ado-16/%e9%80%89%e6%8b%a9OLEDB%e7%b1%bb.png"
+        data-srcset="/oledb-and-ado-16/%e9%80%89%e6%8b%a9OLEDB%e7%b1%bb.png, /oledb-and-ado-16/%e9%80%89%e6%8b%a9OLEDB%e7%b1%bb.png 1.5x, /oledb-and-ado-16/%e9%80%89%e6%8b%a9OLEDB%e7%b1%bb.png 2x"
+        data-sizes="auto"
+        alt="/oledb-and-ado-16/选择OLEDB类.png"
+        title="选择OLEDB类" /></li>
+<li>选择对应的数据源、数据库表和需要对数据库进行的操作
+<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="/oledb-and-ado-16/%e9%80%89%e6%8b%a9%e6%95%b0%e6%8d%ae%e5%ba%93.png"
+        data-srcset="/oledb-and-ado-16/%e9%80%89%e6%8b%a9%e6%95%b0%e6%8d%ae%e5%ba%93.png, /oledb-and-ado-16/%e9%80%89%e6%8b%a9%e6%95%b0%e6%8d%ae%e5%ba%93.png 1.5x, /oledb-and-ado-16/%e9%80%89%e6%8b%a9%e6%95%b0%e6%8d%ae%e5%ba%93.png 2x"
+        data-sizes="auto"
+        alt="/oledb-and-ado-16/选择数据库.png"
+        title="选择数据源" />
+注意如果要对数据库表进行增删改查等操作，一定要选这里的表选项</li>
+<li>点击数据源配置数据源连接的相关属性，最后点击完成。</li>
+</ol>
+<p>最终会在项目中生成对应的头文件
+这是最终生成的完整代码</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">Caa26Accessor</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl"><span class="k">public</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">  <span class="c1">//value
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="n">LONG</span> <span class="n">m_aac031</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">TCHAR</span> <span class="n">m_aaa146</span><span class="p">[</span><span class="mi">51</span><span class="p">];</span>
+</span></span><span class="line"><span class="cl">	<span class="n">LONG</span> <span class="n">m_aaa147</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">LONG</span> <span class="n">m_aaa148</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="c1">//status
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="n">DBSTATUS</span> <span class="n">m_dwaac031Status</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">DBSTATUS</span> <span class="n">m_dwaaa146Status</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">DBSTATUS</span> <span class="n">m_dwaaa147Status</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">DBSTATUS</span> <span class="n">m_dwaaa148Status</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="c1">//lenth
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="n">DBLENGTH</span> <span class="n">m_dwaac031Length</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">DBLENGTH</span> <span class="n">m_dwaaa146Length</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">DBLENGTH</span> <span class="n">m_dwaaa147Length</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">DBLENGTH</span> <span class="n">m_dwaaa148Length</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="kt">void</span> <span class="nf">GetRowsetProperties</span><span class="p">(</span><span class="n">CDBPropSet</span><span class="o">*</span> <span class="n">pPropSet</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">	<span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="n">pPropSet</span><span class="o">-&gt;</span><span class="n">AddProperty</span><span class="p">(</span><span class="n">DBPROP_CANFETCHBACKWARDS</span><span class="p">,</span> <span class="nb">true</span><span class="p">,</span> <span class="n">DBPROPOPTIONS_OPTIONAL</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">		<span class="n">pPropSet</span><span class="o">-&gt;</span><span class="n">AddProperty</span><span class="p">(</span><span class="n">DBPROP_CANSCROLLBACKWARDS</span><span class="p">,</span> <span class="nb">true</span><span class="p">,</span> <span class="n">DBPROPOPTIONS_OPTIONAL</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">		<span class="n">pPropSet</span><span class="o">-&gt;</span><span class="n">AddProperty</span><span class="p">(</span><span class="n">DBPROP_IRowsetChange</span><span class="p">,</span> <span class="nb">true</span><span class="p">,</span> <span class="n">DBPROPOPTIONS_OPTIONAL</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">		<span class="n">pPropSet</span><span class="o">-&gt;</span><span class="n">AddProperty</span><span class="p">(</span><span class="n">DBPROP_UPDATABILITY</span><span class="p">,</span> <span class="n">DBPROPVAL_UP_CHANGE</span> <span class="o">|</span> <span class="n">DBPROPVAL_UP_INSERT</span> <span class="o">|</span> <span class="n">DBPROPVAL_UP_DELETE</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="n">HRESULT</span> <span class="nf">OpenDataSource</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">	<span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="n">CDataSource</span> <span class="n">_db</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">		<span class="n">HRESULT</span> <span class="n">hr</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">		<span class="n">hr</span> <span class="o">=</span> <span class="n">_db</span><span class="p">.</span><span class="n">OpenFromInitializationString</span><span class="p">(</span><span class="sa">L</span><span class="s">&#34;Provider=SQLOLEDB.1;Persist Security Info=False;User ID=sa; Password=XXXXXX;Initial Catalog=study;Data Source=XXXX;Use Procedure for Prepare=1;Auto Translate=True;Packet Size=4096;Workstation ID=LIU-PC;Use Encryption for Data=False;Tag with column collation when possible=False&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">		<span class="k">if</span> <span class="p">(</span><span class="n">FAILED</span><span class="p">(</span><span class="n">hr</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl">		<span class="p">{</span>
+</span></span><span class="line"><span class="cl"><span class="cp">#ifdef _DEBUG
+</span></span></span><span class="line"><span class="cl"><span class="cp"></span>			<span class="n">AtlTraceErrorRecords</span><span class="p">(</span><span class="n">hr</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="cp">#endif
+</span></span></span><span class="line"><span class="cl"><span class="cp"></span>			<span class="k">return</span> <span class="n">hr</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">		<span class="p">}</span>
+</span></span><span class="line"><span class="cl">		<span class="k">return</span> <span class="n">m_session</span><span class="p">.</span><span class="n">Open</span><span class="p">(</span><span class="n">_db</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="kt">void</span> <span class="nf">CloseDataSource</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">	<span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="n">m_session</span><span class="p">.</span><span class="n">Close</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="k">operator</span> <span class="k">const</span> <span class="n">CSession</span><span class="o">&amp;</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">	<span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="k">return</span> <span class="n">m_session</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="n">CSession</span> <span class="n">m_session</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="n">DEFINE_COMMAND_EX</span><span class="p">(</span><span class="n">Caa26Accessor</span><span class="p">,</span> <span class="sa">L</span><span class="s">&#34; \
+</span></span></span><span class="line"><span class="cl"><span class="s">	SELECT \
+</span></span></span><span class="line"><span class="cl"><span class="s">		aac031, \
+</span></span></span><span class="line"><span class="cl"><span class="s">		aaa146, \
+</span></span></span><span class="line"><span class="cl"><span class="s">		aaa147, \
+</span></span></span><span class="line"><span class="cl"><span class="s">		aaa148 \
+</span></span></span><span class="line"><span class="cl"><span class="s">		FROM dbo.aa26&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="n">BEGIN_COLUMN_MAP</span><span class="p">(</span><span class="n">Caa26Accessor</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">		<span class="n">COLUMN_ENTRY_LENGTH_STATUS</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">m_aac031</span><span class="p">,</span> <span class="n">m_dwaac031Length</span><span class="p">,</span> <span class="n">m_dwaac031Status</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">		<span class="n">COLUMN_ENTRY_LENGTH_STATUS</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">m_aaa146</span><span class="p">,</span> <span class="n">m_dwaaa146Length</span><span class="p">,</span> <span class="n">m_dwaaa146Status</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">		<span class="n">COLUMN_ENTRY_LENGTH_STATUS</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="n">m_aaa147</span><span class="p">,</span> <span class="n">m_dwaaa147Length</span><span class="p">,</span> <span class="n">m_dwaaa147Status</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">		<span class="n">COLUMN_ENTRY_LENGTH_STATUS</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="n">m_aaa148</span><span class="p">,</span> <span class="n">m_dwaaa148Length</span><span class="p">,</span> <span class="n">m_dwaaa148Status</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">	<span class="n">END_COLUMN_MAP</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="p">};</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">Caa26</span> <span class="o">:</span> <span class="k">public</span> <span class="n">CCommand</span><span class="o">&lt;</span><span class="n">CAccessor</span><span class="o">&lt;</span><span class="n">Caa26Accessor</span><span class="o">&gt;</span> <span class="o">&gt;</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl"><span class="k">public</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">	<span class="n">HRESULT</span> <span class="n">OpenAll</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">	<span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="n">HRESULT</span> <span class="n">hr</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">		<span class="n">hr</span> <span class="o">=</span> <span class="n">OpenDataSource</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">		<span class="k">if</span> <span class="p">(</span><span class="n">FAILED</span><span class="p">(</span><span class="n">hr</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl">			<span class="k">return</span> <span class="n">hr</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">		<span class="n">__if_exists</span><span class="p">(</span><span class="n">GetRowsetProperties</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">		<span class="p">{</span>
+</span></span><span class="line"><span class="cl">			<span class="n">CDBPropSet</span> <span class="nf">propset</span><span class="p">(</span><span class="n">DBPROPSET_ROWSET</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">			<span class="n">__if_exists</span><span class="p">(</span><span class="n">HasBookmark</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">			<span class="p">{</span>
+</span></span><span class="line"><span class="cl">				<span class="k">if</span><span class="p">(</span> <span class="n">HasBookmark</span><span class="p">()</span> <span class="p">)</span>
+</span></span><span class="line"><span class="cl">					<span class="n">propset</span><span class="p">.</span><span class="n">AddProperty</span><span class="p">(</span><span class="n">DBPROP_IRowsetLocate</span><span class="p">,</span> <span class="nb">true</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">			<span class="p">}</span>
+</span></span><span class="line"><span class="cl">			<span class="n">GetRowsetProperties</span><span class="p">(</span><span class="o">&amp;</span><span class="n">propset</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">			<span class="k">return</span> <span class="nf">OpenRowset</span><span class="p">(</span><span class="o">&amp;</span><span class="n">propset</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">		<span class="p">}</span>
+</span></span><span class="line"><span class="cl">		<span class="n">__if_not_exists</span><span class="p">(</span><span class="n">GetRowsetProperties</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">		<span class="p">{</span>
+</span></span><span class="line"><span class="cl">			<span class="n">__if_exists</span><span class="p">(</span><span class="n">HasBookmark</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">			<span class="p">{</span>
+</span></span><span class="line"><span class="cl">				<span class="k">if</span><span class="p">(</span> <span class="n">HasBookmark</span><span class="p">()</span> <span class="p">)</span>
+</span></span><span class="line"><span class="cl">				<span class="p">{</span>
+</span></span><span class="line"><span class="cl">					<span class="n">CDBPropSet</span> <span class="nf">propset</span><span class="p">(</span><span class="n">DBPROPSET_ROWSET</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">					<span class="n">propset</span><span class="p">.</span><span class="n">AddProperty</span><span class="p">(</span><span class="n">DBPROP_IRowsetLocate</span><span class="p">,</span> <span class="nb">true</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">					<span class="k">return</span> <span class="nf">OpenRowset</span><span class="p">(</span><span class="o">&amp;</span><span class="n">propset</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">				<span class="p">}</span>
+</span></span><span class="line"><span class="cl">			<span class="p">}</span>
+</span></span><span class="line"><span class="cl">		<span class="p">}</span>
+</span></span><span class="line"><span class="cl">		<span class="k">return</span> <span class="nf">OpenRowset</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="n">HRESULT</span> <span class="nf">OpenRowset</span><span class="p">(</span><span class="n">DBPROPSET</span> <span class="o">*</span><span class="n">pPropSet</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">	<span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="n">HRESULT</span> <span class="n">hr</span> <span class="o">=</span> <span class="n">Open</span><span class="p">(</span><span class="n">m_session</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">,</span> <span class="n">pPropSet</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="cp">#ifdef _DEBUG
+</span></span></span><span class="line"><span class="cl"><span class="cp"></span>		<span class="k">if</span><span class="p">(</span><span class="n">FAILED</span><span class="p">(</span><span class="n">hr</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl">			<span class="n">AtlTraceErrorRecords</span><span class="p">(</span><span class="n">hr</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="cp">#endif
+</span></span></span><span class="line"><span class="cl"><span class="cp"></span>		<span class="k">return</span> <span class="n">hr</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="kt">void</span> <span class="nf">CloseAll</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">	<span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="n">Close</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">		<span class="n">ReleaseCommand</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">		<span class="n">CloseDataSource</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">};</span>
+</span></span></code></pre></div><p>从名字上来看Caa26Accessor主要是作为一个访问器，其实它的功能也是与访问器相关的，比如创建访问器和数据绑定都在最后这个映射中。而后面的Caa26类主要是用来执行sql语句并根据上面的访问器类来解析数据，其实我们使用上主要使用后面这个类，这些代码都很简单，有之前的OLEDB基础很容易就能理解它们，这里就不再在这块进行展开了</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="kt">int</span> <span class="nf">_tmain</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="n">TCHAR</span> <span class="o">*</span><span class="n">argv</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">	<span class="n">CoInitialize</span><span class="p">(</span><span class="nb">NULL</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="n">Caa26</span> <span class="n">aa26</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">HRESULT</span> <span class="n">hRes</span> <span class="o">=</span> <span class="n">aa26</span><span class="p">.</span><span class="n">OpenDataSource</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">	<span class="k">if</span> <span class="p">(</span><span class="n">FAILED</span><span class="p">(</span><span class="n">hRes</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl">	<span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="n">aa26</span><span class="p">.</span><span class="n">CloseAll</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">		<span class="n">CoUninitialize</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">		<span class="k">return</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="n">hRes</span> <span class="o">=</span> <span class="n">aa26</span><span class="p">.</span><span class="n">OpenRowset</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">	<span class="k">if</span> <span class="p">(</span><span class="n">FAILED</span><span class="p">(</span><span class="n">hRes</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl">	<span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="n">aa26</span><span class="p">.</span><span class="n">CloseAll</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">		<span class="n">CoUninitialize</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">		<span class="k">return</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="n">hRes</span> <span class="o">=</span> <span class="n">aa26</span><span class="p">.</span><span class="n">MoveNext</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">	<span class="n">COM_USEPRINTF</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">	<span class="k">do</span>
+</span></span><span class="line"><span class="cl">	<span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="n">COM_PRINTF</span><span class="p">(</span><span class="n">_T</span><span class="p">(</span><span class="s">&#34;|%-30u|%-30s|%-30u|%-30u|</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">),</span> <span class="n">aa26</span><span class="p">.</span><span class="n">m_aac031</span><span class="p">,</span> <span class="n">aa26</span><span class="p">.</span><span class="n">m_aaa146</span><span class="p">,</span> <span class="n">aa26</span><span class="p">.</span><span class="n">m_aaa147</span><span class="p">,</span> <span class="n">aa26</span><span class="p">.</span><span class="n">m_aaa148</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">		<span class="n">hRes</span> <span class="o">=</span> <span class="n">aa26</span><span class="p">.</span><span class="n">MoveNext</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span> <span class="k">while</span> <span class="p">(</span><span class="n">S_OK</span> <span class="o">==</span> <span class="n">hRes</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="n">aa26</span><span class="p">.</span><span class="n">CloseAll</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">	<span class="n">CoUninitialize</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">	<span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><h4 id="动态绑定">动态绑定</h4>
+<p>动态绑定主要是使用模板对相关的类进行拼装，所以这里需要关于模板的相关知识，只有掌握了这些才能正确的拼接出合适的类。
+一般需要拼接的是这样几个类</p>
+<ul>
+<li>结果集类，在结果集类的模板中填入对应的访问器类，表示该结果集将使用对应的访问器进行解析。访问器类可以系统预定义的，也向静态绑定那样自定义。</li>
+<li>Command类，在命令对象类的模板位置填入与命令相关的类，也就是执行命令生成的结果集、以及解析结果集所用的访问器，之后就主要使用Command类来进行数据库的相关操作了
+下面是一个使用的示例</li>
+</ul>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="k">typedef</span> <span class="n">CCommand</span><span class="o">&lt;</span><span class="n">CDynamicAccessor</span><span class="p">,</span> <span class="n">CRowset</span><span class="p">,</span> <span class="n">CMultipleResults</span><span class="o">&gt;</span> <span class="n">CComRowset</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="k">typedef</span> <span class="n">CTable</span><span class="o">&lt;</span><span class="n">CDynamicAccessor</span><span class="p">,</span> <span class="n">CRowset</span><span class="o">&gt;</span> <span class="n">CComTable</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="c1">//将所有绑定的数据类型转化为字符串
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="k">typedef</span> <span class="n">CTable</span><span class="o">&lt;</span><span class="n">CDynamicStringAccessor</span><span class="p">,</span> <span class="n">CRowset</span><span class="o">&gt;</span> <span class="n">CComTableString</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kt">int</span> <span class="nf">_tmain</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="n">TCHAR</span> <span class="o">*</span><span class="n">argv</span><span class="p">[])</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">	<span class="n">CoInitialize</span><span class="p">(</span><span class="nb">NULL</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="n">COM_USEPRINTF</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">	<span class="c1">//连接数据库，创建session对象
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="n">CDataSource</span> <span class="n">db</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">db</span><span class="p">.</span><span class="n">Open</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">	<span class="n">CSession</span> <span class="n">session</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">session</span><span class="p">.</span><span class="n">Open</span><span class="p">(</span><span class="n">db</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="c1">//打开数据库表
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="n">CComTableString</span> <span class="n">table</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">table</span><span class="p">.</span><span class="n">Open</span><span class="p">(</span><span class="n">session</span><span class="p">,</span> <span class="n">OLESTR</span><span class="p">(</span><span class="s">&#34;T_DecimalDemo&#34;</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">	<span class="n">HRESULT</span> <span class="n">hRes</span> <span class="o">=</span> <span class="n">table</span><span class="p">.</span><span class="n">MoveFirst</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">	<span class="k">if</span> <span class="p">(</span><span class="n">FAILED</span><span class="p">(</span><span class="n">hRes</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl">	<span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="n">COM_PRINTF</span><span class="p">(</span><span class="n">_T</span><span class="p">(</span><span class="s">&#34;表中没有数据,退出程序</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">		<span class="k">goto</span> <span class="n">__CLEAN_UP</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="cl">	<span class="k">do</span>
+</span></span><span class="line"><span class="cl">	<span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">//这里传入的参数是列的序号，注意一下，由于有第0列的行需要存在，所以真正的数据是从第一列开始的
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>		<span class="n">COM_PRINTF</span><span class="p">(</span><span class="n">_T</span><span class="p">(</span><span class="s">&#34;|%-10s|%-20s|%-20s|%-20s|</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">),</span> <span class="n">table</span><span class="p">.</span><span class="n">GetString</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span> <span class="n">table</span><span class="p">.</span><span class="n">GetString</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span> <span class="n">table</span><span class="p">.</span><span class="n">GetString</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span> <span class="n">table</span><span class="p">.</span><span class="n">GetString</span><span class="p">(</span><span class="mi">4</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">		<span class="n">hRes</span> <span class="o">=</span> <span class="n">table</span><span class="p">.</span><span class="n">MoveNext</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span> <span class="k">while</span> <span class="p">(</span><span class="n">S_OK</span> <span class="o">==</span> <span class="n">hRes</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="nl">__CLEAN_UP</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">	<span class="n">CoUninitialize</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">	<span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p>在上面的代码中我们定义了两个模板类，Ctable和CCommand类，没有发现需要的访问器类，查看CTable类可以发现它是继承于CAccessorRowset，而CAccessorRowset继承于TAccessor和 TRowset,也就是说它提供了访问器的相关功能
+而且它还可以使用OpenRowset方法不执行SQL直接打开数据表，因此在这里我们选择使用它
+在CTable的模板中填入CDynamicStringAccessor表示将会把得到的结果集中的数据转化为字符串。
+在使用上先使用CDataSource类的Open方法打开数据库连接，然后调用CTable的Open打开数据表，接着调用CTable的MoveFirst的方法将行句柄移动到首行。
+接着在循环中调用table的GetString方法得到各个字段的字符串值，并调用MoveNext方法移动到下一行
+其实在代码中并没有使用CCommand类，这是由于这里只是简单的使用直接打开数据表的方式，而并没有执行SQL语句，因此不需要它，在这里定义它只是简单的展示一下</p>
+<h2 id="ado">ADO</h2>
+<p>ATL针对OLEDB封装的确是方便了不少，但是对于像我这种将C++简单的作为带对象的C来看的人来说，它使用模板实在是太不友好了，说实话现在我现在对模板的认识实在太少，在代码中我也尽量避免使用模板。所以在我看来使用ATL还不如自己根据项目封装一套。
+好在微软实在太为开发者着想了，又提供了ADO这种针对ActiveX的封装方式。
+要使用ADO组件需要先导入，导入的语句如下:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="cp">#import &#34;C:\\Program Files\\Common Files\\System\\ado\\msado15.dll&#34; no_namespace rename(&#34;EOF&#34;, &#34;EndOfFile&#34;)
+</span></span></span></code></pre></div><p>这个路径一般是不会变化的，而EOF在C++中一般是用在文件中的，所以这里将它rename一下
+ADO中的主要对象和接口有:</p>
+<ul>
+<li>Connect ：数据库的连接对象，类似于OLEDB中的数据源对象和session对象</li>
+<li>Command：命令对象，用来执行sql语句，类似于OLEDB中的Command对象</li>
+<li>Recordset: 记录集对象，执行SQL语句返回的结果，类似于OLEDB中的结果集对象</li>
+<li>Record: 数据记录对象，一般都是从Recordset中取得，就好像OLEDB中从结果集对象通过访问器获取到具体的数据一样</li>
+<li>Field：记录中的一个字段，可以简单的看做就是一个表字段的值，一般一个记录集中有多条记录，而一条记录中有个Field对象</li>
+<li>Parameter：参数对象，一般用于参数化查询或者调用存储过程</li>
+<li>Property：属性，与之前OLEDB中的属性对应</li>
+<li></li>
+</ul>
+<p>在ADO中大量使用智能指针，所谓的智能指针是它的生命周期结束后会自动析构它所指向的对象，同时也封装了一些常见指针操作，虽然它是这个对象但是它的使用上与普通的指针基本上相同。ADO中的智能指针对象一般是在类名后加上Ptr。比如Connect对象的智能指针对象是_ConnectPtr
+智能指针有利也有弊，有利的地方在于它能够自动管理内存，不需要程序员进行额外的释放操作，而且它在使用上就像普通的指针，相比于使用类的普通指针更为方便，不利的地方在于为了方便它的使用一般都经过了大量的重载，因此很多地方表面上看是一个普通的寻址操作，而实际上却是一个函数调用，这样就降低了性能。所以在特别强调性能的场合要避免使用智能指针。
+在使用上，一般经过这样几个步骤：</p>
+<ol>
+<li>定义数据库连接的Connect对象</li>
+<li>调用Connect对象的Open方法连接数据库，这里使用的连接字串的方式</li>
+<li>创建Command对象并调用对象Execute方法执行SQL，并获取对应的记录集。这里执行SQL语句也可以使用Recordset对象的Open方法。</li>
+<li>循环调用Recordse对象的MoveNext不断取出对应行的行记录</li>
+</ol>
+<p>下面是一个使用的简单例子</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="cp">#import &#34;C:\\Program Files\\Common Files\\System\\ado\\msado15.dll&#34; no_namespace rename(&#34;EOF&#34;, &#34;EndOfFile&#34;)
+</span></span></span><span class="line"><span class="cl"><span class="cp"></span><span class="kt">int</span> <span class="nf">_tmain</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="n">TCHAR</span> <span class="o">*</span><span class="n">argv</span><span class="p">[])</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">	<span class="n">CoInitialize</span><span class="p">(</span><span class="nb">NULL</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="n">_ConnectionPtr</span> <span class="n">conn</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">_RecordsetPtr</span> <span class="n">rowset</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">_bstr_t</span> <span class="n">bstrConn</span> <span class="o">=</span> <span class="n">_T</span><span class="p">(</span><span class="s">&#34;Provider=SQLOLEDB.1;Persist Security Info=False;User ID=sa;Password = 123456;Initial Catalog=Study;Data Source=LIU-PC</span><span class="se">\\</span><span class="s">SQLEXPRESS;&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="n">conn</span><span class="p">.</span><span class="n">CreateInstance</span><span class="p">(</span><span class="n">_T</span><span class="p">(</span><span class="s">&#34;ADODB.Connection&#34;</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="n">conn</span><span class="o">-&gt;</span><span class="n">Open</span><span class="p">(</span><span class="n">bstrConn</span><span class="p">,</span> <span class="n">_T</span><span class="p">(</span><span class="s">&#34;sa&#34;</span><span class="p">),</span> <span class="n">_T</span><span class="p">(</span><span class="s">&#34;123456&#34;</span><span class="p">),</span> <span class="n">adModeUnknown</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="k">if</span> <span class="p">(</span><span class="n">conn</span><span class="o">-&gt;</span><span class="n">State</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">	<span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="n">COM_PRINTF</span><span class="p">(</span><span class="n">_T</span><span class="p">(</span><span class="s">&#34;连接到数据源成功</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span><span class="k">else</span>
+</span></span><span class="line"><span class="cl">	<span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="n">COM_PRINTF</span><span class="p">(</span><span class="n">_T</span><span class="p">(</span><span class="s">&#34;连接到数据源失败</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">		<span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="n">rowset</span><span class="p">.</span><span class="n">CreateInstance</span><span class="p">(</span><span class="n">__uuidof</span><span class="p">(</span><span class="n">Recordset</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">	<span class="n">rowset</span><span class="o">-&gt;</span><span class="n">Open</span><span class="p">(</span><span class="n">_T</span><span class="p">(</span><span class="s">&#34;select * from aa26;&#34;</span><span class="p">),</span> <span class="n">conn</span><span class="p">.</span><span class="n">GetInterfacePtr</span><span class="p">(),</span> <span class="n">adOpenStatic</span><span class="p">,</span> <span class="n">adLockOptimistic</span><span class="p">,</span> <span class="n">adCmdText</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="k">while</span> <span class="p">(</span><span class="o">!</span><span class="n">rowset</span><span class="o">-&gt;</span><span class="n">EndOfFile</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">	<span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="n">COM_PRINTF</span><span class="p">(</span><span class="n">_T</span><span class="p">(</span><span class="s">&#34;|%-30u|%-30s|%-30u|%-30u|</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">),</span>
+</span></span><span class="line"><span class="cl">			<span class="n">rowset</span><span class="o">-&gt;</span><span class="n">Fields</span><span class="o">-&gt;</span><span class="n">GetItem</span><span class="p">(</span><span class="n">_T</span><span class="p">(</span><span class="s">&#34;aac031&#34;</span><span class="p">))</span><span class="o">-&gt;</span><span class="n">Value</span><span class="p">.</span><span class="n">intVal</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">			<span class="n">rowset</span><span class="o">-&gt;</span><span class="n">Fields</span><span class="o">-&gt;</span><span class="n">GetItem</span><span class="p">(</span><span class="n">_T</span><span class="p">(</span><span class="s">&#34;aaa146&#34;</span><span class="p">))</span><span class="o">-&gt;</span><span class="n">Value</span><span class="p">.</span><span class="n">bstrVal</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">			<span class="n">rowset</span><span class="o">-&gt;</span><span class="n">Fields</span><span class="o">-&gt;</span><span class="n">GetItem</span><span class="p">(</span><span class="n">_T</span><span class="p">(</span><span class="s">&#34;aaa147&#34;</span><span class="p">))</span><span class="o">-&gt;</span><span class="n">Value</span><span class="p">.</span><span class="n">llVal</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">			<span class="n">rowset</span><span class="o">-&gt;</span><span class="n">Fields</span><span class="o">-&gt;</span><span class="n">GetItem</span><span class="p">(</span><span class="n">_T</span><span class="p">(</span><span class="s">&#34;aaa148&#34;</span><span class="p">))</span><span class="o">-&gt;</span><span class="n">Value</span><span class="p">.</span><span class="n">llVal</span>
+</span></span><span class="line"><span class="cl">			<span class="p">);</span>
+</span></span><span class="line"><span class="cl">		<span class="n">rowset</span><span class="o">-&gt;</span><span class="n">MoveNext</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="cl">	<span class="n">CoUninitialize</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">	<span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><h2 id="ado与oledb混合编程">ADO与OLEDB混合编程</h2>
+<p>ADO相比较OLEDB来说确实方便了不少，但是它也有它的问题，比如它是封装的ActiveX控件，从效率上肯定比不上OLEDB，而且ADO中记录集是一次性将结果中的所有数据加载到内存中，如果数据表比教大时这种方式很吃内存。而OLEDB是每次调用GetNextRow时加载一条记录到内存（其实根据之前的代码可以知道它加载的时机，加载的大小是可以控制的），它相对来说比教灵活。
+其实上述问题使用二者的混合编程就可以很好的解决，在处理结果集时使用OLEDB，而在其他操作时使用ADO这样既保留了ADO的简洁性也使用了OLEDB灵活管理结果集内存的能力。
+在ADO中，可以通过_Recordset查询出ADORecordsetConstruction接口，这个接口提供了将记录集转化为OLEDB中结果集，以及将结果集转化为Recordset对象的能力
+下面是一个简单的例子</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="n">CoInitialize</span><span class="p">(</span><span class="nb">NULL</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"> <span class="k">try</span>
+</span></span><span class="line"><span class="cl"> <span class="p">{</span>        
+</span></span><span class="line"><span class="cl">     <span class="n">_bstr_t</span> <span class="n">bsCnct</span><span class="p">(</span><span class="n">_T</span><span class="p">(</span><span class="s">&#34;Provider=SQLOLEDB.1;Persist Security Info=False;User ID=sa;Password = 123456;Initial Catalog=Study;Data Source=LIU-PC</span><span class="se">\\</span><span class="s">SQLEXPRESS;&#34;</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">     <span class="n">_RecordsetPtr</span>  <span class="nf">Rowset</span><span class="p">(</span><span class="n">__uuidof</span><span class="p">(</span><span class="n">Recordset</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">     <span class="n">Rowset</span><span class="o">-&gt;</span><span class="n">Open</span><span class="p">(</span><span class="n">_T</span><span class="p">(</span><span class="s">&#34;select * from aa26;&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">         <span class="p">,</span><span class="n">bsCnct</span><span class="p">,</span><span class="n">adOpenStatic</span><span class="p">,</span><span class="n">adLockOptimistic</span><span class="p">,</span><span class="n">adCmdText</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">     <span class="c1">//获取IRowset接口指针
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>     <span class="n">ADORecordsetConstruction</span><span class="o">*</span> <span class="n">padoRecordsetConstruct</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">     <span class="n">Rowset</span><span class="o">-&gt;</span><span class="n">QueryInterface</span><span class="p">(</span><span class="n">__uuidof</span><span class="p">(</span><span class="n">ADORecordsetConstruction</span><span class="p">),</span>
+</span></span><span class="line"><span class="cl">         <span class="p">(</span><span class="kt">void</span> <span class="o">**</span><span class="p">)</span> <span class="o">&amp;</span><span class="n">padoRecordsetConstruct</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">     <span class="n">IRowset</span> <span class="o">*</span> <span class="n">pIRowset</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">     <span class="n">padoRecordsetConstruct</span><span class="o">-&gt;</span><span class="n">get_Rowset</span><span class="p">((</span><span class="n">IUnknown</span> <span class="o">**</span><span class="p">)</span><span class="o">&amp;</span><span class="n">pIRowset</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">     <span class="n">padoRecordsetConstruct</span><span class="o">-&gt;</span><span class="n">Release</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">     <span class="n">DisplayRowSet</span><span class="p">(</span><span class="n">pIRowset</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">     <span class="n">pIRowset</span><span class="o">-&gt;</span><span class="n">Release</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">     <span class="n">GRS_PRINTF</span><span class="p">(</span><span class="n">_T</span><span class="p">(</span><span class="s">&#34;</span><span class="se">\n\n</span><span class="s">显示第二个结果集:</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">     <span class="c1">//使用OLEDB方法打开一个结果集
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>     <span class="n">IOpenRowset</span><span class="o">*</span>			<span class="n">pIOpenRowset</span>				<span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">     <span class="n">TCHAR</span><span class="o">*</span>					<span class="n">pszTableName</span>				<span class="o">=</span> <span class="n">_T</span><span class="p">(</span><span class="s">&#34;T_State&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">     <span class="n">DBID</span>					<span class="n">TableID</span>						<span class="o">=</span> <span class="p">{};</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">     <span class="n">CreateDBSession</span><span class="p">(</span><span class="n">pIOpenRowset</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">     <span class="n">TableID</span><span class="p">.</span><span class="n">eKind</span>           <span class="o">=</span> <span class="n">DBKIND_NAME</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">     <span class="n">TableID</span><span class="p">.</span><span class="n">uName</span><span class="p">.</span><span class="n">pwszName</span>  <span class="o">=</span> <span class="p">(</span><span class="n">LPOLESTR</span><span class="p">)</span><span class="n">pszTableName</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">     <span class="n">HRESULT</span> <span class="n">hr</span> <span class="o">=</span> <span class="n">pIOpenRowset</span><span class="o">-&gt;</span><span class="n">OpenRowset</span><span class="p">(</span><span class="nb">NULL</span><span class="p">,</span><span class="o">&amp;</span><span class="n">TableID</span><span class="p">,</span><span class="nb">NULL</span><span class="p">,</span><span class="n">IID_IRowset</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="nb">NULL</span><span class="p">,(</span><span class="n">IUnknown</span><span class="o">**</span><span class="p">)</span><span class="o">&amp;</span><span class="n">pIRowset</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">     <span class="k">if</span><span class="p">(</span><span class="n">FAILED</span><span class="p">(</span><span class="n">hr</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl">     <span class="p">{</span>
+</span></span><span class="line"><span class="cl">         <span class="n">_com_raise_error</span><span class="p">(</span><span class="n">hr</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">     <span class="p">}</span>
+</span></span><span class="line"><span class="cl">     <span class="c1">//创建一个新的ADO记录集对象
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>     <span class="n">_RecordsetPtr</span>  <span class="nf">Rowset2</span><span class="p">(</span><span class="n">__uuidof</span><span class="p">(</span><span class="n">Recordset</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">     <span class="n">Rowset2</span><span class="o">-&gt;</span><span class="n">QueryInterface</span><span class="p">(</span><span class="n">__uuidof</span><span class="p">(</span><span class="n">ADORecordsetConstruction</span><span class="p">),</span>
+</span></span><span class="line"><span class="cl">         <span class="p">(</span><span class="kt">void</span> <span class="o">**</span><span class="p">)</span> <span class="o">&amp;</span><span class="n">padoRecordsetConstruct</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">     <span class="c1">//将OLEDB的结果集放置到ADO记录集对象中
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>     <span class="n">padoRecordsetConstruct</span><span class="o">-&gt;</span><span class="n">put_Rowset</span><span class="p">(</span><span class="n">pIRowset</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">     <span class="n">ULONG</span> <span class="n">ulRow</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">     <span class="k">while</span><span class="p">(</span><span class="o">!</span><span class="n">Rowset2</span><span class="o">-&gt;</span><span class="n">EndOfFile</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">     <span class="p">{</span>
+</span></span><span class="line"><span class="cl">         <span class="n">COM_PRINTF</span><span class="p">(</span><span class="n">_T</span><span class="p">(</span><span class="s">&#34;|%10u|%10s|%-40s|</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">             <span class="p">,</span><span class="o">++</span><span class="n">ulRow</span>
+</span></span><span class="line"><span class="cl">             <span class="p">,</span><span class="n">Rowset2</span><span class="o">-&gt;</span><span class="n">Fields</span><span class="o">-&gt;</span><span class="n">GetItem</span><span class="p">(</span><span class="s">&#34;K_StateCode&#34;</span><span class="p">)</span><span class="o">-&gt;</span><span class="n">Value</span><span class="p">.</span><span class="n">bstrVal</span>
+</span></span><span class="line"><span class="cl">             <span class="p">,</span><span class="n">Rowset2</span><span class="o">-&gt;</span><span class="n">Fields</span><span class="o">-&gt;</span><span class="n">GetItem</span><span class="p">(</span><span class="s">&#34;F_StateName&#34;</span><span class="p">)</span><span class="o">-&gt;</span><span class="n">Value</span><span class="p">.</span><span class="n">bstrVal</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">         <span class="n">Rowset2</span><span class="o">-&gt;</span><span class="n">MoveNext</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">     <span class="p">}</span>
+</span></span><span class="line"><span class="cl"> <span class="p">}</span>
+</span></span><span class="line"><span class="cl"> <span class="k">catch</span><span class="p">(</span><span class="n">_com_error</span> <span class="o">&amp;</span> <span class="n">e</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">     <span class="n">COM_PRINTF</span><span class="p">(</span><span class="n">_T</span><span class="p">(</span><span class="s">&#34;发生错误:</span><span class="se">\n</span><span class="s"> Source : %s </span><span class="se">\n</span><span class="s"> Description : %s </span><span class="se">\n</span><span class="s">&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">         <span class="p">,(</span><span class="n">LPCTSTR</span><span class="p">)</span><span class="n">e</span><span class="p">.</span><span class="n">Source</span><span class="p">(),(</span><span class="n">LPCTSTR</span><span class="p">)</span><span class="n">e</span><span class="p">.</span><span class="n">Description</span><span class="p">());</span>
+</span></span><span class="line"><span class="cl"> <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"> <span class="n">_tsystem</span><span class="p">(</span><span class="n">_T</span><span class="p">(</span><span class="s">&#34;PAUSE&#34;</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl"> <span class="n">CoUninitialize</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl"> <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+</span></span></code></pre></div><p>这次就不再放上整体例子的链接了，有之前的基础应该很容易看懂这些，而且这次代码比较短，基本上将所有代码全粘贴了过来。</p>
+<!-- raw HTML omitted -->
+</div><div class="post-footer" id="post-footer">
+    <div class="post-info">
+        <div class="post-info-line">
+            <div class="post-info-mod">
+                <span>Updated on 2018-05-27</span>
+            </div></div>
+        <div class="post-info-line">
+            <div class="post-info-md"></div>
+            <div class="post-info-share">
+                <span><a href="javascript:void(0);" title="Share on Twitter" data-sharer="twitter" data-url="http://HaiLateBoy.github.io/posts/oledb-and-ado-16/" data-title="ATL模板库中的OLEDB与ADO" data-hashtags="OLEDB,数据库编程,VC&#43;&#43;,数据库,ATL,ADO"><i class="fab fa-twitter fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Facebook" data-sharer="facebook" data-url="http://HaiLateBoy.github.io/posts/oledb-and-ado-16/" data-hashtag="OLEDB"><i class="fab fa-facebook-square fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Hacker News" data-sharer="hackernews" data-url="http://HaiLateBoy.github.io/posts/oledb-and-ado-16/" data-title="ATL模板库中的OLEDB与ADO"><i class="fab fa-hacker-news fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Line" data-sharer="line" data-url="http://HaiLateBoy.github.io/posts/oledb-and-ado-16/" data-title="ATL模板库中的OLEDB与ADO"><i data-svg-src="https://cdn.jsdelivr.net/npm/simple-icons@7.3.0/icons/line.svg" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on 微博" data-sharer="weibo" data-url="http://HaiLateBoy.github.io/posts/oledb-and-ado-16/" data-title="ATL模板库中的OLEDB与ADO"><i class="fab fa-weibo fa-fw" aria-hidden="true"></i></a></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="post-info-more">
+        <section class="post-tags"><i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/oledb/">OLEDB</a>,&nbsp;<a href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93%E7%BC%96%E7%A8%8B/">数据库编程</a>,&nbsp;<a href="/tags/vc&#43;&#43;/">VC&#43;&#43;</a>,&nbsp;<a href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93/">数据库</a>,&nbsp;<a href="/tags/atl/">ATL</a>,&nbsp;<a href="/tags/ado/">ADO</a></section>
+        <section>
+            <span><a href="javascript:void(0);" onclick="window.history.back();">Back</a></span>&nbsp;|&nbsp;<span><a href="/">Home</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav"><a href="/posts/oledb-and-ado-15/" class="prev" rel="prev" title="OLEDB事务"><i class="fas fa-angle-left fa-fw" aria-hidden="true"></i>OLEDB事务</a>
+            <a href="/posts/fbspider/" class="next" rel="next" title="Facebook 爬虫">Facebook 爬虫<i class="fas fa-angle-right fa-fw" aria-hidden="true"></i></a></div>
+</div>
+</article></div>
+            </main><footer class="footer">
+        <div class="footer-container"><div class="footer-line">Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener noreffer" title="Hugo 0.121.2">Hugo</a> | Theme - <a href="https://github.com/dillonzq/LoveIt" target="_blank" rel="noopener noreffer" title="LoveIt 0.2.11"><i class="far fa-kiss-wink-heart fa-fw" aria-hidden="true"></i> LoveIt</a>
+                </div><div class="footer-line" itemscope itemtype="http://schema.org/CreativeWork"><i class="far fa-copyright fa-fw" aria-hidden="true"></i><span itemprop="copyrightYear">2022 - 2024</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="https://www.masimaro.xyz" target="_blank">Masimaro</a></span></div>
+        </div>
+    </footer></div>
+
+        <div id="fixed-buttons"><a href="#" id="back-to-top" class="fixed-button" title="Back to Top">
+                <i class="fas fa-arrow-up fa-fw" aria-hidden="true"></i>
+            </a><a href="#" id="view-comments" class="fixed-button" title="View Comments">
+                <i class="fas fa-comment fa-fw" aria-hidden="true"></i>
+            </a>
+        </div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.css"><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/autocomplete.js@0.38.1/dist/autocomplete.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lunr@2.3.9/lunr.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lazysizes@5.3.2/lazysizes.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/clipboard@2.0.11/dist/clipboard.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/sharer.js@0.5.1/sharer.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/auto-render.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/copy-tex.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/mhchem.min.js"></script><script type="text/javascript">window.config={"code":{"copyTitle":"Copy to clipboard","maxShownLines":50},"comment":{},"math":{"delimiters":[{"display":true,"left":"$$","right":"$$"},{"display":true,"left":"\\[","right":"\\]"},{"display":true,"left":"\\begin{equation}","right":"\\end{equation}"},{"display":true,"left":"\\begin{equation*}","right":"\\end{equation*}"},{"display":true,"left":"\\begin{align}","right":"\\end{align}"},{"display":true,"left":"\\begin{align*}","right":"\\end{align*}"},{"display":true,"left":"\\begin{alignat}","right":"\\end{alignat}"},{"display":true,"left":"\\begin{alignat*}","right":"\\end{alignat*}"},{"display":true,"left":"\\begin{gather}","right":"\\end{gather}"},{"display":true,"left":"\\begin{CD}","right":"\\end{CD}"},{"display":false,"left":"$","right":"$"},{"display":false,"left":"\\(","right":"\\)"}],"strict":false},"search":{"highlightTag":"em","maxResultLength":10,"noResultsFound":"No results found","snippetLength":50}};</script><script type="text/javascript" src="/js/theme.min.js"></script></body>
+</html>

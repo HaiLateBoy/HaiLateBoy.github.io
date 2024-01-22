@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="robots" content="noodp" />
+        <title>数据更新接口与延迟更新 - Masimaro&#39;s blog</title><meta name="Description" content="这是我用于记录日常和学习的小站"><meta property="og:title" content="数据更新接口与延迟更新" />
+<meta property="og:description" content="在日常使用中，更新数据库数据经常使用delete 、update等SQL语句进行，但是OLEDB接口提供了额外的接口，来直接修改和更新数据库数" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://HaiLateBoy.github.io/posts/oledb-and-ado-5/" /><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2018-02-12T14:29:35+00:00" />
+<meta property="article:modified_time" content="2018-02-12T14:29:35+00:00" /><meta property="og:site_name" content="Masimaro&#39;s blog" />
+
+<meta name="twitter:card" content="summary"/><meta name="twitter:title" content="数据更新接口与延迟更新"/>
+<meta name="twitter:description" content="在日常使用中，更新数据库数据经常使用delete 、update等SQL语句进行，但是OLEDB接口提供了额外的接口，来直接修改和更新数据库数"/>
+<meta name="application-name" content="My cool site">
+<meta name="apple-mobile-web-app-title" content="My cool site"><meta name="theme-color" content="#ffffff"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="manifest" href="/site.webmanifest"><link rel="canonical" href="http://HaiLateBoy.github.io/posts/oledb-and-ado-5/" /><link rel="prev" href="http://HaiLateBoy.github.io/posts/c-plus-polymorphism/" /><link rel="next" href="http://HaiLateBoy.github.io/posts/phy-use/" /><link rel="stylesheet" href="/css/style.min.css"><link rel="preload" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css"></noscript><link rel="preload" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css"></noscript><script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "BlogPosting",
+        "headline": "数据更新接口与延迟更新",
+        "inLanguage": "zh-CN",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "http:\/\/HaiLateBoy.github.io\/posts\/oledb-and-ado-5\/"
+        },"genre": "posts","keywords": "OLEDB, 数据库编程, VC\u002b\u002b, 数据库","wordcount":  4323 ,
+        "url": "http:\/\/HaiLateBoy.github.io\/posts\/oledb-and-ado-5\/","datePublished": "2018-02-12T14:29:35+00:00","dateModified": "2018-02-12T14:29:35+00:00","publisher": {
+            "@type": "Organization",
+            "name": ""},"author": {
+                "@type": "Person",
+                "name": "Masimaro"
+            },"description": ""
+    }
+    </script></head>
+    <body data-header-desktop="fixed" data-header-mobile="auto"><script type="text/javascript">(window.localStorage && localStorage.getItem('theme') ? localStorage.getItem('theme') === 'dark' : ('auto' === 'auto' ? window.matchMedia('(prefers-color-scheme: dark)').matches : 'auto' === 'dark')) && document.body.setAttribute('theme', 'dark');</script>
+
+        <div id="mask"></div><div class="wrapper"><header class="desktop" id="header-desktop">
+    <div class="header-wrapper">
+        <div class="header-title">
+            <a href="/" title="Masimaro&#39;s blog">My cool site</a>
+        </div>
+        <div class="menu">
+            <div class="menu-inner"><a class="menu-item" href="/posts/" title="文章列表"> 文章 </a><a class="menu-item" href="/tags/" title="标签"> 标签 </a><a class="menu-item" href="/categories/" title="分类"> 分类 </a><a class="menu-item" href="/about" title="关于本站"> 关于 </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-desktop">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-desktop" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-desktop" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-desktop">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </span><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                    <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+                </a></div>
+        </div>
+    </div>
+</header><header class="mobile" id="header-mobile">
+    <div class="header-container">
+        <div class="header-wrapper">
+            <div class="header-title">
+                <a href="/" title="Masimaro&#39;s blog">My cool site</a>
+            </div>
+            <div class="menu-toggle" id="menu-toggle-mobile">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+        <div class="menu" id="menu-mobile"><div class="search-wrapper">
+                    <div class="search mobile" id="search-mobile">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-mobile">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-mobile" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-mobile" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-mobile">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </div>
+                    <a href="javascript:void(0);" class="search-cancel" id="search-cancel-mobile">
+                        Cancel
+                    </a>
+                </div><a class="menu-item" href="/posts/" title="文章列表">文章</a><a class="menu-item" href="/tags/" title="标签">标签</a><a class="menu-item" href="/categories/" title="分类">分类</a><a class="menu-item" href="/about" title="关于本站">关于</a><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+            </a></div>
+    </div>
+</header><div class="search-dropdown desktop">
+        <div id="search-dropdown-desktop"></div>
+    </div>
+    <div class="search-dropdown mobile">
+        <div id="search-dropdown-mobile"></div>
+    </div><main class="main">
+                <div class="container"><div class="toc" id="toc-auto">
+            <h2 class="toc-title">Contents</h2>
+            <div class="toc-content" id="toc-content-auto"></div>
+        </div><article class="page single"><h1 class="single-title animate__animated animate__flipInX">数据更新接口与延迟更新</h1><div class="post-meta">
+            <div class="post-meta-line"><span class="post-author"><a href="https://www.masimaro.xyz" title="Author" target="_blank" rel="noopener noreffer author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Masimaro</a></span>&nbsp;<span class="post-category">included in <a href="/categories/windows-%E6%95%B0%E6%8D%AE%E5%BA%93%E7%BC%96%E7%A8%8B/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>windows 数据库编程</a></span></div>
+            <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw" aria-hidden="true"></i>&nbsp;<time datetime="2018-02-12">2018-02-12</time>&nbsp;<i class="fas fa-pencil-alt fa-fw" aria-hidden="true"></i>&nbsp;4323 words&nbsp;
+                <i class="far fa-clock fa-fw" aria-hidden="true"></i>&nbsp;9 minutes&nbsp;</div>
+        </div><div class="details toc" id="toc-static"  data-kept="true">
+                <div class="details-summary toc-title">
+                    <span>Contents</span>
+                    <span><i class="details-icon fas fa-angle-right" aria-hidden="true"></i></span>
+                </div>
+                <div class="details-content toc-content" id="toc-content-static"><nav id="TableOfContents">
+  <ul>
+    <li><a href="#为何不使用sql语句进行数据更新">为何不使用SQL语句进行数据更新</a></li>
+    <li><a href="#数据修改的相关接口">数据修改的相关接口</a></li>
+    <li><a href="#更新数据">更新数据</a></li>
+  </ul>
+
+  <ul>
+    <li><a href="#延迟更新">延迟更新</a></li>
+    <li><a href="#打开延迟更新的接口">打开延迟更新的接口</a></li>
+  </ul>
+</nav></div>
+            </div><div class="content" id="content"><p>在日常使用中，更新数据库数据经常使用delete 、update等SQL语句进行，但是OLEDB接口提供了额外的接口，来直接修改和更新数据库数据。</p>
+<!-- raw HTML omitted -->
+<h1 id="oledb数据源更新接口">OLEDB数据源更新接口</h1>
+<h2 id="为何不使用sql语句进行数据更新">为何不使用SQL语句进行数据更新</h2>
+<p>常规情况下，使用SQL语句比较简单，利用OLEDB中执行SQL语句的方法似乎已经可以进行数据库的任何操作，普通的增删改查操作似乎已经够用了。确实，在某种情况下，这些内容已经够了，能够执行SQL语句并得到结果集已经够了，但是某些情况下并不合适使用SQL语句。
+<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="/oledb-and-ado-5/SQL-Exec.png"
+        data-srcset="/oledb-and-ado-5/SQL-Exec.png, /oledb-and-ado-5/SQL-Exec.png 1.5x, /oledb-and-ado-5/SQL-Exec.png 2x"
+        data-sizes="auto"
+        alt="/oledb-and-ado-5/SQL-Exec.png"
+        title="SQL数据执行过程" />
+SQL语句的执行一般经过这样几个步骤：</p>
+<ol>
+<li>数据库通过sql语句对SQL语句进行分析，生成一些可以被数据库识别的步骤，在这里我们叫它计划任务</li>
+<li>数据库根据计划任务中的相关操作，调用对应的核心组件来执行SQL语句中规定的操作。</li>
+<li>将操作得到的结果集返回到应用程序</li>
+</ol>
+<p>我们可以简单的将SQL语句理解为一种运行在数据库平台上的一个脚本语言，它与一般的脚本语言一样需要对每句话进行解释执行。根据解释的内容调用对应的功能模块来完成用户的请求。如果我们能够跳过SQL语句的解释，直接调用对应的核心组件，那么就能大幅度的提升程序的性能。OLEDB中的数据更新的相关接口就是完成这个操作的。
+至此我们可能有点明白为什么不用SQL语句而是用OLEDB的相关接口来实现对应的更新操作。主要是为了提高效率。</p>
+<h2 id="数据修改的相关接口">数据修改的相关接口</h2>
+<p>数据修改的相关接口主要是IRowsetChange,接口中提供的主要方法如下：</p>
+<ul>
+<li>DeleteRows: 删除某行</li>
+<li>InsertRows: 插入行</li>
+<li>SetData: 更新行</li>
+</ul>
+<p>通过这些接口就可以直接对数据库进行相关的增删改操作，而由于查询的操作条件复杂特别是涉及到多表查询的时候，所以OLEDB没有提供对应的查询接口。</p>
+<h2 id="更新数据">更新数据</h2>
+<p>更新数据需要IRowsetChange接口，而打开该接口需要设置结果集的相关属性。
+一般需要设置下面两个属性：</p>
+<ol>
+<li>DBPROP_UPDATABILITY:该属性表示是否允许对数据进行更新，它是一个INT型的数值，该属性有3个标志的候选值：DBPROPVAL_UP_CHANGE，允许对数据进行更新，也就是打开SetData方法；DBPROPVAL_UP_DELETE：允许对数据进行删除，打开的是DeleteRows方法。DBPROPVAL_UP_INSERT，允许插入新行，该标志打开InsertRows方法。这3个值一般使用或操作设置对应的标识位。</li>
+<li>DBPROP_IRowsetUpdate：该属性是一个BOOL值，表示是否打开IRowsetChange接口。如果要使用IRowsetChange接口，需要将该属性设置为TRUE。</li>
+</ol>
+<p>它们属于属性集DBPROPSET_ROWSET。使用命令对象来设置
+设置完属性后，调用Execute执行SQL语句并获取到接口IRowsetChange。
+** PS:使用IRowsetChange接口有一个特殊的要求，必须使用IRowsetChange替代IRowset等接口,作为创建并打开结果集对象的第一个接口。也就是说Execute方法中的最后一个表示结果集对象的参数必须是IRowsetChange。**</p>
+<h1 id="数据更新模式">数据更新模式</h1>
+<p>一般来说，使用OLEDB的接口对数据库中的数据进行操作时，操作的结果是实时的反映到数据库中的。
+对于一般的应用程序来说。采用数据更新的接口虽然在一定程度上解决的效率的问题，但是使用实时更新的模式仍然有一些问题：</p>
+<ol>
+<li>修改立即反映到数据库中，不利于数据库中数据完整性维护和数据安全</li>
+<li>如果是网络中的数据库，会形成很多小的网络数据包传输，造成网络传输效率低下。</li>
+</ol>
+<p>因此OLEDB提供了另外一种更新模式——延迟更新</p>
+<h2 id="延迟更新">延迟更新</h2>
+<p>延迟更新本质上提供了一种将所有更新都在本地中缓存起来，最后再一口气将所有更新都一次性提交的机制，它与数据库中的事务不同，事务是将一组操作组织起来，当其中某一步操作失败，那么回滚事务中的所有数据，强调的是一个完整性维护，而延迟提交并不会自己校验某一步是否错误，它强调的是将某些更改一次性的提交。
+延迟提交与实时提交有下面几个优点：</p>
+<ol>
+<li>当多个客户端都在修改数据库中的数据时，有机会将某些客户端对数据的修改通知到其他客户端。</li>
+<li>可以合并对一行数据多列的修改并一次提交到数据源上</li>
+<li>网络数据库中可以将对不同表的不同操作合并成一个大的网络数据包，提高网络的使用效率。</li>
+<li>当更新不合适的时候有机会进行回滚</li>
+</ol>
+<h2 id="打开延迟更新的接口">打开延迟更新的接口</h2>
+<p>要使用延迟更新必须申请打开OLEDB的IRowsetUpdate接口，这个申请主要通过设置结果集的DBPROP_IRowsetUpdate属性来实现，这个属性是一个bool类型的值。
+同时要打开延迟更新的接口必须先打开IRowsetChange接口，所以它们二者一般都是同时打开的。
+另外为了方便操作一般也会将结果集的DBPROP_CANHOLDROWS属性打开，该属性允许在上一次对某行数据的更改未提交的情况下插入新行。如果不设置该属性，那么在调用SetData方法进行更新后就必须调用IRowsetUpdate的Update接口进行提交，否则在提交之前数据库不允许进行Insert操作（但是允许进行SetData操作）
+在使用延迟更新的时候需要注意一个问题。当我们使用了DBPROP_CANHOLDROWS属性后，数据源为了维护方便，会额外返回一个第0行的数据。通常改行数据是一个INT型，由数据提供者进行维护，它一般是只读的，如果尝试对它进行修改可能会返回一个错误造成对数据的其他修改操作也失败。在这种情况下，可以考虑建立2个访问器，一个包含第0行，只用来做显示使用，而另外一个更新的访问器不绑定第0行。
+一般情况下可以通过检测返回结果集中的列信息中的标志字段来确定哪些列可以进行变更,哪些列是只读列等标志来创建多个不同用途的行访问器
+下面是延迟更新的例子：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="n">BOOL</span> <span class="nf">ExecSql</span><span class="p">(</span><span class="n">IOpenRowset</span> <span class="o">*</span><span class="n">pIOpenRowset</span><span class="p">,</span> <span class="n">IRowsetChange</span><span class="o">*</span> <span class="o">&amp;</span><span class="n">pIRowsetChange</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">COM_DECLARE_BUFFER</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">    <span class="n">COM_DECALRE_INTERFACE</span><span class="p">(</span><span class="n">IDBCreateCommand</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">COM_DECALRE_INTERFACE</span><span class="p">(</span><span class="n">ICommandText</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">COM_DECALRE_INTERFACE</span><span class="p">(</span><span class="n">ICommandProperties</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="n">LPOLESTR</span> <span class="n">lpSql</span> <span class="o">=</span> <span class="n">OLESTR</span><span class="p">(</span><span class="s">&#34;select * from aa26;&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">BOOL</span> <span class="n">bRet</span> <span class="o">=</span> <span class="n">FALSE</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="c1">//TODO：query出ICommandProperties接口并设置对应属性
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1">//设置属性，允许返回的结果集对数据进行增删改操作
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="n">dbProp</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">colid</span> <span class="o">=</span> <span class="n">DB_NULLID</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">dbProp</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">dwOptions</span> <span class="o">=</span> <span class="n">DBPROPOPTIONS_REQUIRED</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">dbProp</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">dwPropertyID</span> <span class="o">=</span> <span class="n">DBPROP_UPDATABILITY</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">dbProp</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">vValue</span><span class="p">.</span><span class="n">vt</span> <span class="o">=</span> <span class="n">VT_I4</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">dbProp</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">vValue</span><span class="p">.</span><span class="n">intVal</span> <span class="o">=</span> <span class="n">DBPROPVAL_UP_CHANGE</span> <span class="o">|</span> <span class="n">DBPROPVAL_UP_DELETE</span> <span class="o">|</span> <span class="n">DBPROPVAL_UP_INSERT</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="c1">//设置属性，打开IRowsetUpdate接口实现延迟更新
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="n">dbProp</span><span class="p">[</span><span class="mi">1</span><span class="p">].</span><span class="n">colid</span> <span class="o">=</span> <span class="n">DB_NULLID</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">dbProp</span><span class="p">[</span><span class="mi">1</span><span class="p">].</span><span class="n">dwOptions</span> <span class="o">=</span> <span class="n">DBPROPOPTIONS_REQUIRED</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">dbProp</span><span class="p">[</span><span class="mi">1</span><span class="p">].</span><span class="n">dwPropertyID</span> <span class="o">=</span> <span class="n">DBPROP_IRowsetUpdate</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">dbProp</span><span class="p">[</span><span class="mi">1</span><span class="p">].</span><span class="n">vValue</span><span class="p">.</span><span class="n">vt</span> <span class="o">=</span> <span class="n">VT_BOOL</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">dbProp</span><span class="p">[</span><span class="mi">1</span><span class="p">].</span><span class="n">vValue</span><span class="p">.</span><span class="n">boolVal</span> <span class="o">=</span> <span class="n">VARIANT_TRUE</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="c1">//设置属性，允许结果集在不提交上次行的更改的情况下插入行
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="n">dbProp</span><span class="p">[</span><span class="mi">2</span><span class="p">].</span><span class="n">colid</span> <span class="o">=</span> <span class="n">DB_NULLID</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">dbProp</span><span class="p">[</span><span class="mi">2</span><span class="p">].</span><span class="n">dwOptions</span> <span class="o">=</span> <span class="n">DBPROPOPTIONS_REQUIRED</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">dbProp</span><span class="p">[</span><span class="mi">2</span><span class="p">].</span><span class="n">dwPropertyID</span> <span class="o">=</span> <span class="n">DBPROP_CANHOLDROWS</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">dbProp</span><span class="p">[</span><span class="mi">2</span><span class="p">].</span><span class="n">vValue</span><span class="p">.</span><span class="n">vt</span> <span class="o">=</span> <span class="n">VT_BOOL</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">dbProp</span><span class="p">[</span><span class="mi">2</span><span class="p">].</span><span class="n">vValue</span><span class="p">.</span><span class="n">boolVal</span> <span class="o">=</span> <span class="n">VARIANT_TRUE</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="n">dbPropset</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">cProperties</span> <span class="o">=</span> <span class="mi">3</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">dbPropset</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">guidPropertySet</span> <span class="o">=</span> <span class="n">DBPROPSET_ROWSET</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">dbPropset</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">rgProperties</span> <span class="o">=</span> <span class="n">dbProp</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="n">hRes</span> <span class="o">=</span> <span class="n">pICommandProperties</span><span class="o">-&gt;</span><span class="n">SetProperties</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">dbPropset</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">COM_SUCCESS</span><span class="p">(</span><span class="n">hRes</span><span class="p">,</span> <span class="n">_T</span><span class="p">(</span><span class="s">&#34;设置属性失败,错误码为:%08x</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">),</span> <span class="n">hRes</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="n">hRes</span> <span class="o">=</span> <span class="n">pICommandText</span><span class="o">-&gt;</span><span class="n">SetCommandText</span><span class="p">(</span><span class="n">DBGUID_DEFAULT</span><span class="p">,</span> <span class="n">lpSql</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">COM_SUCCESS</span><span class="p">(</span><span class="n">hRes</span><span class="p">,</span> <span class="n">_T</span><span class="p">(</span><span class="s">&#34;设置SQL失败,错误码为:%08x</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">),</span> <span class="n">hRes</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="n">hRes</span> <span class="o">=</span> <span class="n">pICommandText</span><span class="o">-&gt;</span><span class="n">Execute</span><span class="p">(</span><span class="nb">NULL</span><span class="p">,</span> <span class="n">IID_IRowsetChange</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">,</span> <span class="p">(</span><span class="n">IUnknown</span><span class="o">**</span><span class="p">)</span><span class="o">&amp;</span><span class="n">pIRowsetChange</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">COM_SUCCESS</span><span class="p">(</span><span class="n">hRes</span><span class="p">,</span> <span class="n">_T</span><span class="p">(</span><span class="s">&#34;执行SQL语句失败,错误码为:%08x</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">),</span> <span class="n">hRes</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">bRet</span> <span class="o">=</span> <span class="n">TRUE</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="nl">__CLEAR_UP</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">    <span class="n">SAFE_RELEASE</span><span class="p">(</span><span class="n">pIDBCreateCommand</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">SAFE_RELEASE</span><span class="p">(</span><span class="n">pICommandText</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">SAFE_RELEASE</span><span class="p">(</span><span class="n">pICommandProperties</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="n">bRet</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kt">int</span> <span class="nf">_tmain</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="n">TCHAR</span><span class="o">*</span> <span class="n">argv</span><span class="p">[])</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">CoInitialize</span><span class="p">(</span><span class="nb">NULL</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">COM_DECLARE_BUFFER</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">    <span class="n">COM_DECALRE_INTERFACE</span><span class="p">(</span><span class="n">IOpenRowset</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">COM_DECALRE_INTERFACE</span><span class="p">(</span><span class="n">IRowsetChange</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">COM_DECALRE_INTERFACE</span><span class="p">(</span><span class="n">IColumnsInfo</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">COM_DECALRE_INTERFACE</span><span class="p">(</span><span class="n">IAccessor</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">COM_DECALRE_INTERFACE</span><span class="p">(</span><span class="n">IRowset</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">COM_DECALRE_INTERFACE</span><span class="p">(</span><span class="n">IRowsetUpdate</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="n">HRESULT</span> <span class="n">hRes</span> <span class="o">=</span> <span class="n">S_FALSE</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">DBORDINAL</span> <span class="n">cColumns</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">DBCOLUMNINFO</span><span class="o">*</span> <span class="n">ColumnsInfo</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">OLECHAR</span> <span class="o">*</span><span class="n">pColumnsName</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">DBBINDING</span> <span class="o">*</span><span class="n">pDBBindinfo</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">HACCESSOR</span> <span class="n">hAccessor</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">HROW</span><span class="o">*</span> <span class="n">phRow</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">HROW</span> <span class="n">hNewRow</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">DBCOUNTITEM</span> <span class="n">cRows</span> <span class="o">=</span> <span class="mi">10</span><span class="p">;</span> <span class="c1">//一次读取10行
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="n">DBCOUNTITEM</span> <span class="n">dbObtained</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="c1">//真实读取的行数
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>
+</span></span><span class="line"><span class="cl">    <span class="n">LPVOID</span> <span class="n">pInsertData</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">LPVOID</span> <span class="n">pData</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">LPVOID</span> <span class="n">pCurrData</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="n">DWORD</span> <span class="n">dwOffset</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="n">CreateSession</span><span class="p">(</span><span class="n">pIOpenRowset</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">COM_PRINTF</span><span class="p">(</span><span class="n">_T</span><span class="p">(</span><span class="s">&#34;创建回话对象失败</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">        <span class="k">goto</span> <span class="n">__CLEAR_UP</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">ExecSql</span><span class="p">(</span><span class="n">pIOpenRowset</span><span class="p">,</span> <span class="n">pIRowsetChange</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">COM_PRINTF</span><span class="p">(</span><span class="n">_T</span><span class="p">(</span><span class="s">&#34;执行SQL语句失败</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">        <span class="k">goto</span> <span class="n">__CLEAR_UP</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="n">hRes</span> <span class="o">=</span> <span class="n">pIRowsetChange</span><span class="o">-&gt;</span><span class="n">QueryInterface</span><span class="p">(</span><span class="n">IID_IRowset</span><span class="p">,</span> <span class="p">(</span><span class="kt">void</span><span class="o">**</span><span class="p">)</span><span class="o">&amp;</span><span class="n">pIRowset</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">COM_SUCCESS</span><span class="p">(</span><span class="n">hRes</span><span class="p">,</span> <span class="n">_T</span><span class="p">(</span><span class="s">&#34;查询接口IRowsets失败,错误码为:%08x</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">),</span> <span class="n">hRes</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="n">hRes</span> <span class="o">=</span> <span class="n">pIRowset</span><span class="o">-&gt;</span><span class="n">QueryInterface</span><span class="p">(</span><span class="n">IID_IColumnsInfo</span><span class="p">,</span> <span class="p">(</span><span class="kt">void</span><span class="o">**</span><span class="p">)</span><span class="o">&amp;</span><span class="n">pIColumnsInfo</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">COM_SUCCESS</span><span class="p">(</span><span class="n">hRes</span><span class="p">,</span> <span class="n">_T</span><span class="p">(</span><span class="s">&#34;查询接口IColumnsInfo失败,错误码为:%08x</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">),</span> <span class="n">hRes</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="n">hRes</span> <span class="o">=</span> <span class="n">pIColumnsInfo</span><span class="o">-&gt;</span><span class="n">GetColumnInfo</span><span class="p">(</span><span class="o">&amp;</span><span class="n">cColumns</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">ColumnsInfo</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">pColumnsName</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">COM_SUCCESS</span><span class="p">(</span><span class="n">hRes</span><span class="p">,</span> <span class="n">_T</span><span class="p">(</span><span class="s">&#34;获取结果集列信息失败,错误码为:%08x</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">),</span> <span class="n">hRes</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="n">pDBBindinfo</span> <span class="o">=</span> <span class="p">(</span><span class="n">DBBINDING</span><span class="o">*</span><span class="p">)</span><span class="n">MALLOC</span><span class="p">(</span><span class="k">sizeof</span><span class="p">(</span><span class="n">DBBINDING</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">cColumns</span> <span class="o">-</span> <span class="mi">1</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">    <span class="k">for</span><span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">cColumns</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="c1">//取消第0行的绑定，防止修改数据时出错
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="k">if</span> <span class="p">(</span><span class="n">ColumnsInfo</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">iOrdinal</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="p">{</span>
+</span></span><span class="line"><span class="cl">            <span class="k">continue</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="p">}</span>
+</span></span><span class="line"><span class="cl">        <span class="n">pDBBindinfo</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">].</span><span class="n">iOrdinal</span> <span class="o">=</span> <span class="n">ColumnsInfo</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">iOrdinal</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="n">pDBBindinfo</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">].</span><span class="n">bPrecision</span> <span class="o">=</span> <span class="n">ColumnsInfo</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">bPrecision</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="n">pDBBindinfo</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">].</span><span class="n">bScale</span> <span class="o">=</span> <span class="n">ColumnsInfo</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">bScale</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="n">pDBBindinfo</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">].</span><span class="n">cbMaxLen</span> <span class="o">=</span> <span class="n">ColumnsInfo</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">ulColumnSize</span> <span class="o">*</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">WCHAR</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="k">if</span> <span class="p">(</span><span class="n">ColumnsInfo</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">wType</span> <span class="o">==</span> <span class="n">DBTYPE_I4</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="p">{</span>
+</span></span><span class="line"><span class="cl">            <span class="c1">//整型数据转化为字符串时4个字节不够，需要根据表中的长度来分配对应的空间
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>            <span class="c1">//数据库中表示行政单位的数据长度为6个字节
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>            <span class="n">pDBBindinfo</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">].</span><span class="n">cbMaxLen</span> <span class="o">=</span> <span class="mi">7</span> <span class="o">*</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">WCHAR</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">        <span class="n">pDBBindinfo</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">].</span><span class="n">dwMemOwner</span> <span class="o">=</span> <span class="n">DBMEMOWNER_CLIENTOWNED</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="n">pDBBindinfo</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">].</span><span class="n">dwPart</span> <span class="o">=</span> <span class="n">DBPART_STATUS</span> <span class="o">|</span> <span class="n">DBPART_LENGTH</span> <span class="o">|</span> <span class="n">DBPART_VALUE</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="n">pDBBindinfo</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">].</span><span class="n">eParamIO</span> <span class="o">=</span> <span class="n">DBPARAMIO_NOTPARAM</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="n">pDBBindinfo</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">].</span><span class="n">obStatus</span> <span class="o">=</span> <span class="n">dwOffset</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="n">pDBBindinfo</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">].</span><span class="n">obLength</span> <span class="o">=</span> <span class="n">dwOffset</span> <span class="o">+</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">DBSTATUS</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="n">pDBBindinfo</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">].</span><span class="n">obValue</span> <span class="o">=</span> <span class="n">dwOffset</span> <span class="o">+</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">DBSTATUS</span><span class="p">)</span> <span class="o">+</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">ULONG</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="n">pDBBindinfo</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">].</span><span class="n">wType</span> <span class="o">=</span> <span class="n">DBTYPE_WSTR</span><span class="p">;</span> <span class="c1">//为了方便，类型由数据库进行转化
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="n">dwOffset</span> <span class="o">=</span> <span class="n">dwOffset</span> <span class="o">+</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">DBSTATUS</span><span class="p">)</span> <span class="o">+</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">ULONG</span><span class="p">)</span> <span class="o">+</span> <span class="n">pDBBindinfo</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">].</span><span class="n">cbMaxLen</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="n">dwOffset</span> <span class="o">=</span> <span class="n">COM_UPROUND</span><span class="p">(</span><span class="n">dwOffset</span><span class="p">,</span> <span class="mi">8</span><span class="p">);</span> <span class="c1">//8字节对齐
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="c1">//读取数据
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="n">hRes</span> <span class="o">=</span> <span class="n">pIRowsetChange</span><span class="o">-&gt;</span><span class="n">QueryInterface</span><span class="p">(</span><span class="n">IID_IAccessor</span><span class="p">,</span> <span class="p">(</span><span class="kt">void</span><span class="o">**</span><span class="p">)</span><span class="o">&amp;</span><span class="n">pIAccessor</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">COM_SUCCESS</span><span class="p">(</span><span class="n">hRes</span><span class="p">,</span> <span class="n">_T</span><span class="p">(</span><span class="s">&#34;查询IAccessor接口失败,错误码为:%08x</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">),</span> <span class="n">hRes</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">hRes</span> <span class="o">=</span> <span class="n">pIAccessor</span><span class="o">-&gt;</span><span class="n">CreateAccessor</span><span class="p">(</span><span class="n">DBACCESSOR_ROWDATA</span><span class="p">,</span> <span class="n">cColumns</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">pDBBindinfo</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">hAccessor</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">COM_SUCCESS</span><span class="p">(</span><span class="n">hRes</span><span class="p">,</span> <span class="n">_T</span><span class="p">(</span><span class="s">&#34;创建访问器失败,错误码为:%08x</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">),</span> <span class="n">hRes</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">hRes</span> <span class="o">=</span> <span class="n">pIRowset</span><span class="o">-&gt;</span><span class="n">GetNextRows</span><span class="p">(</span><span class="n">DB_NULL_HCHAPTER</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">cRows</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">dbObtained</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">phRow</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">COM_SUCCESS</span><span class="p">(</span><span class="n">hRes</span><span class="p">,</span> <span class="n">_T</span><span class="p">(</span><span class="s">&#34;获取行数据失败，错误码为:%08x</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">),</span> <span class="n">hRes</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="n">pData</span> <span class="o">=</span> <span class="n">MALLOC</span><span class="p">(</span><span class="n">cRows</span> <span class="o">*</span> <span class="n">dwOffset</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">dbObtained</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">pCurrData</span> <span class="o">=</span> <span class="p">(</span><span class="n">BYTE</span><span class="o">*</span><span class="p">)</span><span class="n">pData</span> <span class="o">+</span> <span class="n">dwOffset</span> <span class="o">*</span> <span class="n">i</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="n">hRes</span> <span class="o">=</span> <span class="n">pIRowset</span><span class="o">-&gt;</span><span class="n">GetData</span><span class="p">(</span><span class="n">phRow</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">hAccessor</span><span class="p">,</span> <span class="n">pCurrData</span><span class="p">);</span> <span class="c1">//获取当前行
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="n">COM_SUCCESS</span><span class="p">(</span><span class="n">hRes</span><span class="p">,</span> <span class="n">_T</span><span class="p">(</span><span class="s">&#34;获取数据失败, 错误码为:%08x</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">),</span> <span class="n">hRes</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">        <span class="n">DisplayColumnData</span><span class="p">(</span><span class="n">pDBBindinfo</span><span class="p">,</span> <span class="n">cColumns</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">pCurrData</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">//      将前10行第3列的数据修改为中国
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="n">LPOLESTR</span> <span class="n">pUpdateData</span> <span class="o">=</span> <span class="p">(</span><span class="n">LPOLESTR</span><span class="p">)((</span><span class="n">BYTE</span><span class="o">*</span><span class="p">)</span><span class="n">pCurrData</span> <span class="o">+</span> <span class="n">pDBBindinfo</span><span class="p">[</span><span class="mi">1</span><span class="p">].</span><span class="n">obValue</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="n">ULONG</span><span class="o">*</span> <span class="n">pLen</span> <span class="o">=</span> <span class="p">(</span><span class="n">ULONG</span><span class="o">*</span><span class="p">)((</span><span class="n">BYTE</span><span class="o">*</span><span class="p">)</span><span class="n">pCurrData</span> <span class="o">+</span> <span class="n">pDBBindinfo</span><span class="p">[</span><span class="mi">1</span><span class="p">].</span><span class="n">obLength</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="o">*</span><span class="n">pLen</span> <span class="o">=</span> <span class="mi">4</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="n">StringCchCopy</span><span class="p">(</span><span class="n">pUpdateData</span><span class="p">,</span> <span class="n">pDBBindinfo</span><span class="p">[</span><span class="mi">1</span><span class="p">].</span><span class="n">cbMaxLen</span><span class="p">,</span> <span class="n">_T</span><span class="p">(</span><span class="s">&#34;中国&#34;</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">        <span class="n">hRes</span> <span class="o">=</span> <span class="n">pIRowsetChange</span><span class="o">-&gt;</span><span class="n">SetData</span><span class="p">(</span><span class="n">phRow</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">hAccessor</span><span class="p">,</span> <span class="n">pCurrData</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="n">COM_SUCCESS</span><span class="p">(</span><span class="n">hRes</span><span class="p">,</span> <span class="n">_T</span><span class="p">(</span><span class="s">&#34;修改数据失败, 错误码为:%08x</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">),</span> <span class="n">hRes</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="c1">//插入一行数据
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="n">pInsertData</span> <span class="o">=</span> <span class="n">MALLOC</span><span class="p">(</span><span class="n">dwOffset</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">ZeroMemory</span><span class="p">(</span><span class="n">pInsertData</span><span class="p">,</span> <span class="n">dwOffset</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="c1">//为了方便直接在原来数据的基础上进行修改
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="n">CopyMemory</span><span class="p">(</span><span class="n">pInsertData</span><span class="p">,</span> <span class="n">pData</span><span class="p">,</span> <span class="n">dwOffset</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">DBSTATUS</span> <span class="n">status</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="mi">0</span><span class="p">};</span>
+</span></span><span class="line"><span class="cl">    <span class="n">ULONG</span> <span class="n">uSize</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="mi">0</span><span class="p">};</span>
+</span></span><span class="line"><span class="cl">    <span class="n">LPOLESTR</span> <span class="n">lpValues</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="mi">0</span><span class="p">};</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="mi">4</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">status</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="o">*</span><span class="p">(</span><span class="n">DBSTATUS</span><span class="o">*</span><span class="p">)((</span><span class="n">BYTE</span><span class="o">*</span><span class="p">)</span><span class="n">pInsertData</span> <span class="o">+</span> <span class="n">pDBBindinfo</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">obStatus</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="n">uSize</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="o">*</span><span class="p">(</span><span class="n">DBSTATUS</span><span class="o">*</span><span class="p">)((</span><span class="n">BYTE</span><span class="o">*</span><span class="p">)</span><span class="n">pInsertData</span> <span class="o">+</span> <span class="n">pDBBindinfo</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">obLength</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="n">lpValues</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">LPOLESTR</span><span class="p">)((</span><span class="n">BYTE</span><span class="o">*</span><span class="p">)</span><span class="n">pInsertData</span> <span class="o">+</span> <span class="n">pDBBindinfo</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">obValue</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="n">StringCchCopy</span><span class="p">(</span><span class="n">lpValues</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">pDBBindinfo</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">cbMaxLen</span><span class="p">,</span> <span class="n">_T</span><span class="p">(</span><span class="s">&#34;100001&#34;</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">    <span class="n">StringCchCopy</span><span class="p">(</span><span class="n">lpValues</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">pDBBindinfo</span><span class="p">[</span><span class="mi">1</span><span class="p">].</span><span class="n">cbMaxLen</span><span class="p">,</span> <span class="n">_T</span><span class="p">(</span><span class="s">&#34;测试&#34;</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">    <span class="n">hRes</span> <span class="o">=</span> <span class="n">pIRowsetChange</span><span class="o">-&gt;</span><span class="n">InsertRow</span><span class="p">(</span><span class="nb">NULL</span><span class="p">,</span> <span class="n">hAccessor</span><span class="p">,</span> <span class="n">pInsertData</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">hNewRow</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">COM_SUCCESS</span><span class="p">(</span><span class="n">hRes</span><span class="p">,</span> <span class="n">_T</span><span class="p">(</span><span class="s">&#34;插入数据失败, 错误码为:%08x</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">),</span> <span class="n">hRes</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="c1">//删除一行数据
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="n">hRes</span> <span class="o">=</span> <span class="n">pIRowsetChange</span><span class="o">-&gt;</span><span class="n">DeleteRows</span><span class="p">(</span><span class="nb">NULL</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">phRow</span><span class="p">[</span><span class="mi">9</span><span class="p">],</span> <span class="nb">NULL</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">COM_SUCCESS</span><span class="p">(</span><span class="n">hRes</span><span class="p">,</span> <span class="n">_T</span><span class="p">(</span><span class="s">&#34;查询IRowsetChange接口失败,错误码为:%08x</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">),</span> <span class="n">hRes</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="n">hRes</span> <span class="o">=</span> <span class="n">pIRowsetChange</span><span class="o">-&gt;</span><span class="n">QueryInterface</span><span class="p">(</span><span class="n">IID_IRowsetUpdate</span><span class="p">,</span> <span class="p">(</span><span class="kt">void</span><span class="o">**</span><span class="p">)</span><span class="o">&amp;</span><span class="n">pIRowsetUpdate</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">COM_SUCCESS</span><span class="p">(</span><span class="n">hRes</span><span class="p">,</span> <span class="n">_T</span><span class="p">(</span><span class="s">&#34;查询IRowsetChange接口失败,错误码为:%08x</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">),</span> <span class="n">hRes</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">////提交上述修改
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="n">hRes</span> <span class="o">=</span> <span class="n">pIRowsetUpdate</span><span class="o">-&gt;</span><span class="n">Update</span><span class="p">(</span><span class="n">DB_NULL_HCHAPTER</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">COM_SUCCESS</span><span class="p">(</span><span class="n">hRes</span><span class="p">,</span> <span class="n">_T</span><span class="p">(</span><span class="s">&#34;提交数据更新失败, 错误码为:%08x</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">),</span> <span class="n">hRes</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="c1">//取消修改
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1">//hRes = pIRowsetUpdate-&gt;Undo(DB_NULL_HCHAPTER, 0, NULL, NULL, NULL, NULL);
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="n">COM_SUCCESS</span><span class="p">(</span><span class="n">hRes</span><span class="p">,</span> <span class="n">_T</span><span class="p">(</span><span class="s">&#34;取消更新失败, 错误码为:%08x</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">),</span> <span class="n">hRes</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">pIRowset</span><span class="o">-&gt;</span><span class="n">ReleaseRows</span><span class="p">(</span><span class="n">dbObtained</span><span class="p">,</span> <span class="n">phRow</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">pIRowset</span><span class="o">-&gt;</span><span class="n">ReleaseRows</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">hNewRow</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="nl">__CLEAR_UP</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">    <span class="n">SAFE_RELEASE</span><span class="p">(</span><span class="n">pIOpenRowset</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">SAFE_RELEASE</span><span class="p">(</span><span class="n">pIRowsetChange</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">SAFE_RELEASE</span><span class="p">(</span><span class="n">pIColumnsInfo</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">SAFE_RELEASE</span><span class="p">(</span><span class="n">pIRowsetUpdate</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">SAFE_RELEASE</span><span class="p">(</span><span class="n">pIRowset</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">SAFE_RELEASE</span><span class="p">(</span><span class="n">pIAccessor</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="n">CoTaskMemFree</span><span class="p">(</span><span class="n">ColumnsInfo</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">CoTaskMemFree</span><span class="p">(</span><span class="n">pColumnsName</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="n">FREE</span><span class="p">(</span><span class="n">pInsertData</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">FREE</span><span class="p">(</span><span class="n">pData</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">FREE</span><span class="p">(</span><span class="n">pDBBindinfo</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">CoUninitialize</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p>在例子中仍然是首先进行数据库连接，创建出Session对象，创建Command对象，设置结果集对象的相关属性并执行sql语句。但是与之前不同的是，在执行SQL语句时不再返回IRowset接口而是返回IRowsetChange接口。然后利用IRowsetChange接口Query出其他需要的接口。接着仍然是绑定，与之前不同的是，在绑定中加了一个判断。跳过了第0行的绑定，以免它影响到后面的更新操作，然后打印输出对应的查询结果。并且在显示每行数据之后，调用SetData对数据进行更改。
+接着准备一个对应的缓冲，放入插入新行的数据。在这为了方便我们直接先拷贝了之前的返回的结果集中的一行的数据，然后再在里面进行修改，修改后调用InsertRows，插入一行数据。
+插入操作完成后，调用DeleteRows函数删除一行数据
+最后调用IRowsetUpdate接口的Update方法提交之前的更新，或者调用Undo取消之前的更改
+<a href="https://gitee.com/masimaro/codes/vypocjnkabdu6wz8gfh0m36#OLEDB-Delay" target="_blank" rel="noopener noreffer ">源代码查看</a></p>
+<!-- raw HTML omitted -->
+</div><div class="post-footer" id="post-footer">
+    <div class="post-info">
+        <div class="post-info-line">
+            <div class="post-info-mod">
+                <span>Updated on 2018-02-12</span>
+            </div></div>
+        <div class="post-info-line">
+            <div class="post-info-md"></div>
+            <div class="post-info-share">
+                <span><a href="javascript:void(0);" title="Share on Twitter" data-sharer="twitter" data-url="http://HaiLateBoy.github.io/posts/oledb-and-ado-5/" data-title="数据更新接口与延迟更新" data-hashtags="OLEDB,数据库编程,VC&#43;&#43;,数据库"><i class="fab fa-twitter fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Facebook" data-sharer="facebook" data-url="http://HaiLateBoy.github.io/posts/oledb-and-ado-5/" data-hashtag="OLEDB"><i class="fab fa-facebook-square fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Hacker News" data-sharer="hackernews" data-url="http://HaiLateBoy.github.io/posts/oledb-and-ado-5/" data-title="数据更新接口与延迟更新"><i class="fab fa-hacker-news fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Line" data-sharer="line" data-url="http://HaiLateBoy.github.io/posts/oledb-and-ado-5/" data-title="数据更新接口与延迟更新"><i data-svg-src="https://cdn.jsdelivr.net/npm/simple-icons@7.3.0/icons/line.svg" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on 微博" data-sharer="weibo" data-url="http://HaiLateBoy.github.io/posts/oledb-and-ado-5/" data-title="数据更新接口与延迟更新"><i class="fab fa-weibo fa-fw" aria-hidden="true"></i></a></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="post-info-more">
+        <section class="post-tags"><i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/oledb/">OLEDB</a>,&nbsp;<a href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93%E7%BC%96%E7%A8%8B/">数据库编程</a>,&nbsp;<a href="/tags/vc&#43;&#43;/">VC&#43;&#43;</a>,&nbsp;<a href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93/">数据库</a></section>
+        <section>
+            <span><a href="javascript:void(0);" onclick="window.history.back();">Back</a></span>&nbsp;|&nbsp;<span><a href="/">Home</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav"><a href="/posts/c-plus-polymorphism/" class="prev" rel="prev" title="C&#43;&#43;多态"><i class="fas fa-angle-left fa-fw" aria-hidden="true"></i>C++多态</a>
+            <a href="/posts/phy-use/" class="next" rel="next" title="使用pyh生成HTML文档">使用pyh生成HTML文档<i class="fas fa-angle-right fa-fw" aria-hidden="true"></i></a></div>
+</div>
+</article></div>
+            </main><footer class="footer">
+        <div class="footer-container"><div class="footer-line">Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener noreffer" title="Hugo 0.121.2">Hugo</a> | Theme - <a href="https://github.com/dillonzq/LoveIt" target="_blank" rel="noopener noreffer" title="LoveIt 0.2.11"><i class="far fa-kiss-wink-heart fa-fw" aria-hidden="true"></i> LoveIt</a>
+                </div><div class="footer-line" itemscope itemtype="http://schema.org/CreativeWork"><i class="far fa-copyright fa-fw" aria-hidden="true"></i><span itemprop="copyrightYear">2022 - 2024</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="https://www.masimaro.xyz" target="_blank">Masimaro</a></span></div>
+        </div>
+    </footer></div>
+
+        <div id="fixed-buttons"><a href="#" id="back-to-top" class="fixed-button" title="Back to Top">
+                <i class="fas fa-arrow-up fa-fw" aria-hidden="true"></i>
+            </a><a href="#" id="view-comments" class="fixed-button" title="View Comments">
+                <i class="fas fa-comment fa-fw" aria-hidden="true"></i>
+            </a>
+        </div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.css"><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/autocomplete.js@0.38.1/dist/autocomplete.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lunr@2.3.9/lunr.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lazysizes@5.3.2/lazysizes.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/clipboard@2.0.11/dist/clipboard.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/sharer.js@0.5.1/sharer.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/auto-render.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/copy-tex.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/mhchem.min.js"></script><script type="text/javascript">window.config={"code":{"copyTitle":"Copy to clipboard","maxShownLines":50},"comment":{},"math":{"delimiters":[{"display":true,"left":"$$","right":"$$"},{"display":true,"left":"\\[","right":"\\]"},{"display":true,"left":"\\begin{equation}","right":"\\end{equation}"},{"display":true,"left":"\\begin{equation*}","right":"\\end{equation*}"},{"display":true,"left":"\\begin{align}","right":"\\end{align}"},{"display":true,"left":"\\begin{align*}","right":"\\end{align*}"},{"display":true,"left":"\\begin{alignat}","right":"\\end{alignat}"},{"display":true,"left":"\\begin{alignat*}","right":"\\end{alignat*}"},{"display":true,"left":"\\begin{gather}","right":"\\end{gather}"},{"display":true,"left":"\\begin{CD}","right":"\\end{CD}"},{"display":false,"left":"$","right":"$"},{"display":false,"left":"\\(","right":"\\)"}],"strict":false},"search":{"highlightTag":"em","maxResultLength":10,"noResultsFound":"No results found","snippetLength":50}};</script><script type="text/javascript" src="/js/theme.min.js"></script></body>
+</html>

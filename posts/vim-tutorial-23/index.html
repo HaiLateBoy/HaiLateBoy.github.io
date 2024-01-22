@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="robots" content="noodp" />
+        <title>vim 从嫌弃到依赖(22)——自动补全 - Masimaro&#39;s blog</title><meta name="Description" content="这是我用于记录日常和学习的小站"><meta property="og:title" content="vim 从嫌弃到依赖(22)——自动补全" />
+<meta property="og:description" content="这篇文章我们将讨论 vim 自带的自动补全功能。当然，针对自动补全功能有许多好用的插件，但是了解vim自带的功能有助于我们更好的用来插件的补全功能。" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://HaiLateBoy.github.io/posts/vim-tutorial-23/" /><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2022-07-04T15:59:07+08:00" />
+<meta property="article:modified_time" content="2022-07-04T15:59:07+08:00" /><meta property="og:site_name" content="Masimaro&#39;s blog" />
+
+<meta name="twitter:card" content="summary"/><meta name="twitter:title" content="vim 从嫌弃到依赖(22)——自动补全"/>
+<meta name="twitter:description" content="这篇文章我们将讨论 vim 自带的自动补全功能。当然，针对自动补全功能有许多好用的插件，但是了解vim自带的功能有助于我们更好的用来插件的补全功能。"/>
+<meta name="application-name" content="My cool site">
+<meta name="apple-mobile-web-app-title" content="My cool site"><meta name="theme-color" content="#ffffff"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="manifest" href="/site.webmanifest"><link rel="canonical" href="http://HaiLateBoy.github.io/posts/vim-tutorial-23/" /><link rel="prev" href="http://HaiLateBoy.github.io/posts/vim-tutorial-22/" /><link rel="next" href="http://HaiLateBoy.github.io/posts/vim-tutorial-24/" /><link rel="stylesheet" href="/css/style.min.css"><link rel="preload" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css"></noscript><link rel="preload" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css"></noscript><script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "BlogPosting",
+        "headline": "vim 从嫌弃到依赖(22)——自动补全",
+        "inLanguage": "zh-CN",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "http:\/\/HaiLateBoy.github.io\/posts\/vim-tutorial-23\/"
+        },"genre": "posts","keywords": "vim, 编辑工具, 文本处理","wordcount":  2928 ,
+        "url": "http:\/\/HaiLateBoy.github.io\/posts\/vim-tutorial-23\/","datePublished": "2022-07-04T15:59:07+08:00","dateModified": "2022-07-04T15:59:07+08:00","publisher": {
+            "@type": "Organization",
+            "name": ""},"author": {
+                "@type": "Person",
+                "name": "Masimaro"
+            },"description": ""
+    }
+    </script></head>
+    <body data-header-desktop="fixed" data-header-mobile="auto"><script type="text/javascript">(window.localStorage && localStorage.getItem('theme') ? localStorage.getItem('theme') === 'dark' : ('auto' === 'auto' ? window.matchMedia('(prefers-color-scheme: dark)').matches : 'auto' === 'dark')) && document.body.setAttribute('theme', 'dark');</script>
+
+        <div id="mask"></div><div class="wrapper"><header class="desktop" id="header-desktop">
+    <div class="header-wrapper">
+        <div class="header-title">
+            <a href="/" title="Masimaro&#39;s blog">My cool site</a>
+        </div>
+        <div class="menu">
+            <div class="menu-inner"><a class="menu-item" href="/posts/" title="文章列表"> 文章 </a><a class="menu-item" href="/tags/" title="标签"> 标签 </a><a class="menu-item" href="/categories/" title="分类"> 分类 </a><a class="menu-item" href="/about" title="关于本站"> 关于 </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-desktop">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-desktop" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-desktop" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-desktop">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </span><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                    <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+                </a></div>
+        </div>
+    </div>
+</header><header class="mobile" id="header-mobile">
+    <div class="header-container">
+        <div class="header-wrapper">
+            <div class="header-title">
+                <a href="/" title="Masimaro&#39;s blog">My cool site</a>
+            </div>
+            <div class="menu-toggle" id="menu-toggle-mobile">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+        <div class="menu" id="menu-mobile"><div class="search-wrapper">
+                    <div class="search mobile" id="search-mobile">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-mobile">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-mobile" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-mobile" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-mobile">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </div>
+                    <a href="javascript:void(0);" class="search-cancel" id="search-cancel-mobile">
+                        Cancel
+                    </a>
+                </div><a class="menu-item" href="/posts/" title="文章列表">文章</a><a class="menu-item" href="/tags/" title="标签">标签</a><a class="menu-item" href="/categories/" title="分类">分类</a><a class="menu-item" href="/about" title="关于本站">关于</a><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+            </a></div>
+    </div>
+</header><div class="search-dropdown desktop">
+        <div id="search-dropdown-desktop"></div>
+    </div>
+    <div class="search-dropdown mobile">
+        <div id="search-dropdown-mobile"></div>
+    </div><main class="main">
+                <div class="container"><div class="toc" id="toc-auto">
+            <h2 class="toc-title">Contents</h2>
+            <div class="toc-content" id="toc-content-auto"></div>
+        </div><article class="page single"><h1 class="single-title animate__animated animate__flipInX">vim 从嫌弃到依赖(22)——自动补全</h1><div class="post-meta">
+            <div class="post-meta-line"><span class="post-author"><a href="https://www.masimaro.xyz" title="Author" target="_blank" rel="noopener noreffer author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Masimaro</a></span>&nbsp;<span class="post-category">included in <a href="/categories/vim/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>vim</a></span></div>
+            <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw" aria-hidden="true"></i>&nbsp;<time datetime="2022-07-04">2022-07-04</time>&nbsp;<i class="fas fa-pencil-alt fa-fw" aria-hidden="true"></i>&nbsp;2928 words&nbsp;
+                <i class="far fa-clock fa-fw" aria-hidden="true"></i>&nbsp;6 minutes&nbsp;</div>
+        </div><div class="details toc" id="toc-static"  data-kept="true">
+                <div class="details-summary toc-title">
+                    <span>Contents</span>
+                    <span><i class="details-icon fas fa-angle-right" aria-hidden="true"></i></span>
+                </div>
+                <div class="details-content toc-content" id="toc-content-static"><nav id="TableOfContents">
+  <ul>
+    <li><a href="#make-命令">make 命令</a></li>
+    <li><a href="#自动补全">自动补全</a></li>
+    <li><a href="#自定义补全项来源">自定义补全项来源</a></li>
+    <li><a href="#使用字典文件">使用字典文件</a></li>
+    <li><a href="#补全整行">补全整行</a></li>
+    <li><a href="#补全文件名">补全文件名</a></li>
+    <li><a href="#根据具体编程语言生成补全">根据具体编程语言生成补全</a></li>
+    <li><a href="#最后的总结">最后的总结</a></li>
+  </ul>
+</nav></div>
+            </div><div class="content" id="content"><p>这篇文章我们将讨论 vim 自带的自动补全功能。当然，针对自动补全功能有许多好用的插件，但是了解vim自带的功能有助于我们更好的用来插件的补全功能。因为我见过有的配置文件将插件的功能配置的比原有的更难用，而且只用基本的功能不一定有原版的好用。所以这里也介绍一下原始版本用法，算是帮助各位在以后的配置中提供一个标杆。</p>
+<h2 id="make-命令">make 命令</h2>
+<p>在了解自动补全之前，让我们先简单聊聊 <code>:make</code> 这个命令，它与上一篇文章中介绍的 <code>:grep</code> 命令类似，也是对 <code>shell</code> 命令的一个封装。它默认封装的是 <code>make</code> 命令。</p>
+<p>我们对 <code>c/c++</code> 语言执行 <code>:make</code> 也就是在调用 <code>shell</code> 中的 <code>make</code> 命令。它会将编译产生的错误信息存储在 <code>quickfix</code> 列表中。我们上一节中介绍了如何操作 <code>quickfix</code> 列表。也介绍了如何对 <code>:grep</code> 命令进行改造。同样的 <code>:make</code> 也支持使用相同的方法进行改造。</p>
+<p><code>:make</code> 命令中，使用 <code>makeprg</code> 来执行外部命令，使用 <code>errorformat</code> 来格式化输出到 <code>quickfix</code> 中。它们默认的值如下:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-vim" data-lang="vim"><span class="line"><span class="cl"><span class="nx">makeprg</span><span class="p">=</span><span class="s2">&#34;make&#34;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="nx">errorformag</span><span class="p">=</span><span class="s2">&#34;errorformat=%*[^&#34;</span>]<span class="s2">&#34;%f&#34;</span>%*\<span class="nx">D</span>%<span class="nx">l</span>: %<span class="nx">m</span><span class="p">,</span><span class="s2">&#34;%f&#34;</span>%*\<span class="nx">D</span>%<span class="nx">l</span>: %<span class="nx">m</span><span class="p">,</span>%<span class="p">-</span><span class="nx">G</span>%<span class="nx">f</span>:%<span class="nx">l</span>: <span class="p">(</span><span class="nx">Each</span> <span class="nx">undeclared</span> <span class="nx">identifier</span> <span class="nx">is</span> <span class="nx">reported</span> <span class="nx">only</span> <span class="nx">once</span><span class="p">,</span>%<span class="p">-</span><span class="nx">G</span>%<span class="nx">f</span>:%<span class="nx">l</span>:
+</span></span><span class="line"><span class="cl"><span class="nx">for</span> <span class="nx">each</span> <span class="k">function</span> <span class="nx">it</span> <span class="nx">appears</span> <span class="nx">in</span>.<span class="p">),</span>%<span class="p">-</span><span class="nx">GIn</span> <span class="nx">file</span> <span class="nx">included</span> <span class="nx">from</span> %<span class="nx">f</span>:%<span class="nx">l</span>:%<span class="nx">c</span>:<span class="p">,</span>%<span class="p">-</span><span class="nx">GIn</span> <span class="nx">file</span> <span class="nx">included</span> <span class="nx">from</span> %<span class="nx">f</span>:%<span class="nx">l</span>:%<span class="nx">c</span>\<span class="p">,,</span>%<span class="p">-</span><span class="nx">GIn</span> <span class="nx">file</span> <span class="nx">incl</span>
+</span></span><span class="line"><span class="cl"><span class="nx">uded</span> <span class="nx">from</span> %<span class="nx">f</span>:%<span class="nx">l</span>:%<span class="nx">c</span><span class="p">,</span>%<span class="p">-</span><span class="nx">GIn</span> <span class="nx">file</span> <span class="nx">included</span> <span class="nx">from</span> %<span class="nx">f</span>:%<span class="nx">l</span><span class="p">,</span>%<span class="p">-</span><span class="nx">G</span>%*[ ]<span class="nx">from</span> %<span class="nx">f</span>:%<span class="nx">l</span>:%<span class="nx">c</span><span class="p">,</span>%<span class="p">-</span><span class="nx">G</span>%*[ ]<span class="nx">from</span> %<span class="nx">f</span>:%<span class="nx">l</span>:<span class="p">,</span>%<span class="p">-</span><span class="nx">G</span>%*[ ]<span class="nx">from</span> %<span class="nx">f</span>:%<span class="nx">l</span>\<span class="p">,,</span>%<span class="p">-</span><span class="nx">G</span>%*[
+</span></span><span class="line"><span class="cl">]<span class="nx">from</span> %<span class="nx">f</span>:%<span class="nx">l</span><span class="p">,</span>%<span class="nx">f</span>:%<span class="nx">l</span>:%<span class="nx">c</span>:%<span class="nx">m</span><span class="p">,</span>%<span class="nx">f</span><span class="p">(</span>%<span class="nx">l</span><span class="p">)</span>:%<span class="nx">m</span><span class="p">,</span>%<span class="nx">f</span>:%<span class="nx">l</span>:%<span class="nx">m</span><span class="p">,</span><span class="s2">&#34;%f&#34;</span>\<span class="p">,</span> <span class="nx">line</span> %<span class="nx">l</span>%*\<span class="nx">D</span>%<span class="nx">c</span>%*[^ ] %<span class="nx">m</span><span class="p">,</span>%<span class="nx">D</span>%*\<span class="nx">a</span>[%*\<span class="nx">d</span>]: <span class="nx">Entering</span> <span class="nx">directory</span> %*[`<span class="s1">&#39;]%f&#39;</span><span class="p">,</span>%<span class="nx">X</span>%*
+</span></span><span class="line"><span class="cl">\<span class="nx">a</span>[%*\<span class="nx">d</span>]: <span class="nx">Leaving</span> <span class="nx">directory</span> %*[`<span class="s1">&#39;]%f&#39;</span><span class="p">,</span>%<span class="nx">D</span>%*\<span class="nx">a</span>: <span class="nx">Entering</span> <span class="nx">directory</span> %*[`<span class="s1">&#39;]%f&#39;</span><span class="p">,</span>%<span class="nx">X</span>%*\<span class="nx">a</span>: <span class="nx">Leaving</span> <span class="nx">directory</span> %*[`<span class="s1">&#39;]%f&#39;</span><span class="p">,</span>%<span class="nx">DMaking</span>
+</span></span><span class="line"><span class="cl">%*\<span class="nx">a</span> <span class="nx">in</span> %<span class="nx">f</span><span class="p">,</span>%<span class="nx">f</span><span class="p">|</span>%<span class="nx">l</span><span class="p">|</span> %<span class="nx">m</span>&#34;
+</span></span></code></pre></div><p>可以调整它们的值来适配不同的外部命令。这里就不再详细展开了，相信阅读过上一篇文章的小伙伴对这个应该不陌生。本来 <code>:make</code> 命令是vim中十分有用的一个命令，应该单独写一篇文章的。但是它于 <code>:grep</code> 重复度太高了，所以我决定在介绍其他内容的时候一笔带过。想了解详细信息的可以参考vim的用户手册。</p>
+<h2 id="自动补全">自动补全</h2>
+<p>自动补全可以在插入模式下触发，当我们触发补全功能的时候，vim会根据当前编辑会话中所有缓冲区的内容建立一张补全列表，然后根据当前光标左侧的字符进行检测，看在表中能否找到单词的一部分，能找到则会用这个未完成的单词对补全列表进行过滤，所以不是以它为开头的单词都被过滤掉，剩余的组成一个弹出式菜单供用户选择。效果如下：
+<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://img-blog.csdnimg.cn/423466dcd3b8422899d4773e0fc68984.gif#pic_center"
+        data-srcset="https://img-blog.csdnimg.cn/423466dcd3b8422899d4773e0fc68984.gif#pic_center, https://img-blog.csdnimg.cn/423466dcd3b8422899d4773e0fc68984.gif#pic_center 1.5x, https://img-blog.csdnimg.cn/423466dcd3b8422899d4773e0fc68984.gif#pic_center 2x"
+        data-sizes="auto"
+        alt="https://img-blog.csdnimg.cn/423466dcd3b8422899d4773e0fc68984.gif#pic_center"
+        title="在这里插入图片描述" />
+上述例子中，因为以 <code>re</code> 开头的原本只有 <code>require</code> 一项，为了展示补全效果这里我们新增一个以 <code>re</code> 开头的 <code>return</code>
+我们使用 <code>&lt;Ctrl +p&gt;</code> 和 <code>&lt;Ctrl + n&gt;</code> 来切换补全菜单中的上一条和下一条。除了这个，我们还有其他的用于操作补全菜单的快捷键。</p>
+<ul>
+<li><code>&lt;Ctrl - n&gt;</code> : 使用来自补全列表中的下一项内容(next)</li>
+<li><code>&lt;Ctrl - p&gt;</code> : 使用来自补全列表中的上一项内容(prev)</li>
+<li><code>&lt;Down&gt;</code> : 与 <code>&lt;Ctrl -n&gt;</code> 相同</li>
+<li><code>&lt;Up&gt;</code>: 与 <code>&lt;Ctrl - p&gt;</code> 相同</li>
+<li><code>&lt;Ctrl -y&gt;</code> : 确认使用当前选中的匹配项</li>
+<li><code>&lt;Ctrl - e&gt;</code> : 还原最初的输入项</li>
+<li><code>&lt;Ctrl -h&gt;</code> : 从当前匹配项中删除一个字符</li>
+<li><code>&lt;Ctrl - l&gt;</code> : 从当前匹配项中增加一个字符</li>
+</ul>
+<p>一般在输入字符的时候，如果有匹配项可以匹配vim会自动弹出，或者也可以手动使用 <code>&lt;Ctrl - n&gt;</code> 弹出匹配项菜单。在确定要使用的匹配后可以使用 <code>&lt;Ctrl-y&gt;</code> 来确认</p>
+<p>有时候虽然弹出了匹配项菜单，但是匹配项太多了，而你需要的单词又在列表的太后面，这个时候可以使用 <code>&lt;Ctrl - e&gt;</code> 来退出菜单，手动输入几个字符使匹配项更加精确。或者也可以输入 <code>&lt;Ctrl -p&gt;</code> 到达最开始的项，即我们目前的输入，然后再次输入字符来精简菜单项，接着使用 <code>&lt;Ctrl - n&gt;</code> 弹出菜单。使用这种方式来一步一步的逼近我们想要的结果</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://img-blog.csdnimg.cn/2b35259568344c8e869b8047b7666c0f.gif#pic_center"
+        data-srcset="https://img-blog.csdnimg.cn/2b35259568344c8e869b8047b7666c0f.gif#pic_center, https://img-blog.csdnimg.cn/2b35259568344c8e869b8047b7666c0f.gif#pic_center 1.5x, https://img-blog.csdnimg.cn/2b35259568344c8e869b8047b7666c0f.gif#pic_center 2x"
+        data-sizes="auto"
+        alt="https://img-blog.csdnimg.cn/2b35259568344c8e869b8047b7666c0f.gif#pic_center"
+        title="在这里插入图片描述" /></p>
+<h2 id="自定义补全项来源">自定义补全项来源</h2>
+<p>默认情况下，vim 补全项主要来源于以下几个地方：</p>
+<ol>
+<li>缓冲区列表：vim补全项最基本的来源就是当前的缓冲区列表。它可以通过 <code>&lt;Ctrl - x&gt;&lt;Ctrl - n&gt;</code> 来触发该项。</li>
+<li>包含文件，所有的编程语言都有包含文件的概念，例如 <code>c/c++</code>中的 <code>#include</code> , <code>python</code> 中的 <code>import</code> 。使用 <code>&lt;Ctrl-x&gt;&lt;Ctrl-i&gt;</code> 可以触发这个选项，让vim从被包含文件中提取补全项。vim本身使用 <code>c</code> 语言编写的，它能够识别 <code>c/c++</code> 语言中的关键字，我们可以指定 <code>include</code> 项来使 vim认识其他不同的关键字。一般常用的编程语言 vim 都能够识别，因此不需要修改 <code>include</code> 项。</li>
+<li>标签文件，我们使用 <code>ctags</code> 或者类似的插件的时候会生成一个标签文件，该文件会将扫描到代码中的关键字、函数、变量等的索引放入到一个文件中以供后续进行跳转。同时他们也会产生一系列的补全项到补全列表中。可以使用 <code>&lt;Ctrl+x&gt;&lt;Ctrl+]&gt;</code> 来触发</li>
+</ol>
+<p>一般直接使用 <code>&lt;Ctrl + n&gt;</code> 触发的是当前缓冲区列表中的补全项，使用 <code>&lt;Ctrl+x&gt;</code> 作为前缀，可以触发其他类型的补全项。这么做有一个好处是尽量精简补全列表，减少了我们手动遍历的过程。但是有时候我们并不知道我想要的内容该从哪里来，有没有什么办法能做到，用 <code>&lt;Ctrl + n&gt;</code> 这个按钮就可以调用其他所有来源的补全项呢？</p>
+<p>要做到这点，可以使用 <code>complete</code> 这个配置项。该项包含一组由逗号分隔的单个字符表示的参数，当参数出现时表示需要扫描该参数代表的位置。使用 <code>set complete?</code> 可以看到，缺省项为 <code>complete=.,w,b,u,t</code> 。我们可以使用 <code>set complete-=i</code> 或者 <code>set complete+=k</code> 来删除或者添加某个扫描位置。常见的位置参数如下所示：</p>
+<ul>
+<li><code>.</code> : 表示当前以打开的缓冲区</li>
+<li><code>w</code> : 当前打开的窗口</li>
+<li><code>b</code> : 当前缓冲区列表</li>
+<li><code>u</code> : 当前处于缓冲区列表中，但是未打开的缓冲区</li>
+<li><code>t</code> : 当前标签文件</li>
+<li><code>U</code> : 当前打开的，不属于缓冲区列表中的缓冲区</li>
+<li><code>k</code> : 从字典文件中加载的补全项</li>
+<li><code>i</code> : 从当前文件和包含文件中读取</li>
+<li><code>d</code> : 从当前文件和包含文件中读取使用 define定义的宏</li>
+</ul>
+<p>完整的内容可以使用 <code>:h 'complete'</code> 来查看。</p>
+<h2 id="使用字典文件">使用字典文件</h2>
+<p>在上面的论述中，我们可以知道 vim 是可以自定义补全的字典文件，然后从字典中产生匹配的。我们可以使用 <code>&lt;Ctrl-x&gt;&lt;Ctrl-k&gt;</code> 来加载字典中的匹配项。</p>
+<p>我们可以使用 set spell来启动拼写检查，拼写检查也会产生新的字典文件。如果不想使用该项，也可以使用 set dictionary来指定含有一个或者多个单词的字典文件。</p>
+<p>在这个例子中我们在 <code>nvim-config</code> 目录中新建一个 <code>spell.txt</code> 文件，我们在里面写入如下内容</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-txt" data-lang="txt"><span class="line"><span class="cl">require
+</span></span><span class="line"><span class="cl">return
+</span></span><span class="line"><span class="cl">request
+</span></span></code></pre></div><p>然后使用 <code>set dictionary=./spell.txt</code> ，接着删除 <code>init.lua</code> 中的 <code>return</code> ，输入 <code>re</code> 然后使用 <code>&lt;Ctrl+x&gt;&lt;Ctrl+k&gt;</code> 这个时候我们发现它已经加载了
+<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://img-blog.csdnimg.cn/d6d7524dfd2b45f9813cdae968660aaf.gif#pic_center"
+        data-srcset="https://img-blog.csdnimg.cn/d6d7524dfd2b45f9813cdae968660aaf.gif#pic_center, https://img-blog.csdnimg.cn/d6d7524dfd2b45f9813cdae968660aaf.gif#pic_center 1.5x, https://img-blog.csdnimg.cn/d6d7524dfd2b45f9813cdae968660aaf.gif#pic_center 2x"
+        data-sizes="auto"
+        alt="https://img-blog.csdnimg.cn/d6d7524dfd2b45f9813cdae968660aaf.gif#pic_center"
+        title="在这里插入图片描述" /></p>
+<h2 id="补全整行">补全整行</h2>
+<p>除了补全单词，vim还可以补全整行的内容，使用 <code>&lt;Ctrl+x&gt;&lt;Ctrl+l&gt;</code> 可以触发补全整行的操作。
+补全行的补全项来源与补全单词相同，需要注意的是补全行的操作会自动忽略行首的缩进。
+<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://img-blog.csdnimg.cn/5f60408395504d708f2235236a6f2635.gif#pic_center"
+        data-srcset="https://img-blog.csdnimg.cn/5f60408395504d708f2235236a6f2635.gif#pic_center, https://img-blog.csdnimg.cn/5f60408395504d708f2235236a6f2635.gif#pic_center 1.5x, https://img-blog.csdnimg.cn/5f60408395504d708f2235236a6f2635.gif#pic_center 2x"
+        data-sizes="auto"
+        alt="https://img-blog.csdnimg.cn/5f60408395504d708f2235236a6f2635.gif#pic_center"
+        title="在这里插入图片描述" /></p>
+<p>补全行的操作与之前介绍的 <code>yy</code> 或者 <code>:t</code> 产生的效果相同，我们应该要根据实际情况分别使用。</p>
+<h2 id="补全文件名">补全文件名</h2>
+<p>在 shell中输入命令可以使用  <code>&lt;Tab&gt;</code> 键来自动补全文件路径，vim中使用 <code>&lt;Ctrl+x&gt;&lt;Ctrl+f&gt;</code> 来对文件路径和文件名进行补全。</p>
+<p>需要注意的是当我们使用相对路径来补全文件名时，使用的是工作目录，也就是你从哪个目录中进入的vim。我们可以在 vim中使用:cd来切换工作目录。例如我在 nvim-config这个工程的根目录执行 nvim init.lua，我们在这个文件中希望快速补全 basic/settings.lua这项，我们发现它在补全的时候报错
+<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://img-blog.csdnimg.cn/884275f13ea44ac2a3ff24181f308311.gif#pic_center"
+        data-srcset="https://img-blog.csdnimg.cn/884275f13ea44ac2a3ff24181f308311.gif#pic_center, https://img-blog.csdnimg.cn/884275f13ea44ac2a3ff24181f308311.gif#pic_center 1.5x, https://img-blog.csdnimg.cn/884275f13ea44ac2a3ff24181f308311.gif#pic_center 2x"
+        data-sizes="auto"
+        alt="https://img-blog.csdnimg.cn/884275f13ea44ac2a3ff24181f308311.gif#pic_center"
+        title="在这里插入图片描述" />
+这个时候我们可以使用 <code>:cd lua</code> 来切换工作目录到 <code>nvim-config/lua</code> 。这个时候再执行补全命令就可以了。</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://img-blog.csdnimg.cn/e2ac0afe858b45da8e39a74fdd923584.gif#pic_center"
+        data-srcset="https://img-blog.csdnimg.cn/e2ac0afe858b45da8e39a74fdd923584.gif#pic_center, https://img-blog.csdnimg.cn/e2ac0afe858b45da8e39a74fdd923584.gif#pic_center 1.5x, https://img-blog.csdnimg.cn/e2ac0afe858b45da8e39a74fdd923584.gif#pic_center 2x"
+        data-sizes="auto"
+        alt="https://img-blog.csdnimg.cn/e2ac0afe858b45da8e39a74fdd923584.gif#pic_center"
+        title="在这里插入图片描述" /></p>
+<h2 id="根据具体编程语言生成补全">根据具体编程语言生成补全</h2>
+<p>上述补全在编辑普通文本的时候显的有点用处，但是作为程序员平时在写代码如果只能使用上述方式进行补全肯定会抓狂的。好在vim 提供了像其他IDE那样的基于编程语言的补全方式。使用该补全方式的快捷键为 <code>&lt;Ctrl+x&gt;&lt;Ctrl+o&gt;</code> 要启用该方式，需要启动文件类型识别。</p>
+<p>nvim 中已经启用了这一特性，因此不必特意进行设置，但是这里我还是给出它的配置。</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-lua" data-lang="lua"><span class="line"><span class="cl"><span class="n">vim.o</span><span class="p">.</span><span class="n">filetype</span><span class="o">=</span><span class="s2">&#34;plugin&#34;</span>
+</span></span></code></pre></div><p>或者vim中可以使用如下代码</p>
+<pre tabindex="0"><code class="language-vimscript" data-lang="vimscript">set filetype=plugin
+set nocompatiable # 设置与vi 不兼容
+</code></pre><p>例如我们可以尝试着在 <code>css</code> 文件中使用补全
+<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://img-blog.csdnimg.cn/6a387eba478142e7b3f4332d55f0e9cd.gif#pic_center"
+        data-srcset="https://img-blog.csdnimg.cn/6a387eba478142e7b3f4332d55f0e9cd.gif#pic_center, https://img-blog.csdnimg.cn/6a387eba478142e7b3f4332d55f0e9cd.gif#pic_center 1.5x, https://img-blog.csdnimg.cn/6a387eba478142e7b3f4332d55f0e9cd.gif#pic_center 2x"
+        data-sizes="auto"
+        alt="https://img-blog.csdnimg.cn/6a387eba478142e7b3f4332d55f0e9cd.gif#pic_center"
+        title="在这里插入图片描述" />
+vim 本身也确实支持很多语言的自动补全，但是为了获得完整的体验还是推荐使用各种专门的补全插件获得更好的体验</p>
+<h2 id="最后的总结">最后的总结</h2>
+<p>在这边文章中，介绍了vim中补全项主要的几个来源分别是：当前缓冲区和缓冲区列表、包含文件、外部程序生成的标签等等。同时也介绍了如何使用快捷键来进行不同项的补全，现在对这些快捷键总结如下：</p>
+<ul>
+<li><code>&lt;Ctrl + n&gt;</code> : 普通关键字补全，主要来源自缓冲区列表和当前缓冲区</li>
+<li><code>&lt;Ctrl+x&gt;&lt;Ctrl+n&gt;</code> : 与 &lt;Ctrl+n&gt;作用相同</li>
+<li><code>&lt;Ctrl+x&gt;&lt;Ctrl+i&gt;</code> : 从包含文件中获取补全项</li>
+<li><code>&lt;Ctrl+x&gt;&lt;Ctrl+]&gt;</code> : 从外部标签中获取补全项</li>
+<li><code>&lt;Ctrl+x&gt;&lt;Ctrl+k&gt;</code> : 从字典文件中获取补全项</li>
+<li><code>&lt;Ctrl+x&gt;&lt;Ctrl+l&gt;</code> : 补全整行</li>
+<li><code>&lt;Ctrl+x&gt;&lt;Ctrl+f&gt;</code> : 补全文件名</li>
+<li><code>&lt;Ctrl+x&gt;&lt;Ctrl+o&gt;</code> : 根据编程语言来进行补全</li>
+</ul>
+</div><div class="post-footer" id="post-footer">
+    <div class="post-info">
+        <div class="post-info-line">
+            <div class="post-info-mod">
+                <span>Updated on 2022-07-04</span>
+            </div></div>
+        <div class="post-info-line">
+            <div class="post-info-md"></div>
+            <div class="post-info-share">
+                <span><a href="javascript:void(0);" title="Share on Twitter" data-sharer="twitter" data-url="http://HaiLateBoy.github.io/posts/vim-tutorial-23/" data-title="vim 从嫌弃到依赖(22)——自动补全" data-hashtags="vim,编辑工具,文本处理"><i class="fab fa-twitter fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Facebook" data-sharer="facebook" data-url="http://HaiLateBoy.github.io/posts/vim-tutorial-23/" data-hashtag="vim"><i class="fab fa-facebook-square fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Hacker News" data-sharer="hackernews" data-url="http://HaiLateBoy.github.io/posts/vim-tutorial-23/" data-title="vim 从嫌弃到依赖(22)——自动补全"><i class="fab fa-hacker-news fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Line" data-sharer="line" data-url="http://HaiLateBoy.github.io/posts/vim-tutorial-23/" data-title="vim 从嫌弃到依赖(22)——自动补全"><i data-svg-src="https://cdn.jsdelivr.net/npm/simple-icons@7.3.0/icons/line.svg" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on 微博" data-sharer="weibo" data-url="http://HaiLateBoy.github.io/posts/vim-tutorial-23/" data-title="vim 从嫌弃到依赖(22)——自动补全"><i class="fab fa-weibo fa-fw" aria-hidden="true"></i></a></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="post-info-more">
+        <section class="post-tags"><i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/vim/">vim</a>,&nbsp;<a href="/tags/%E7%BC%96%E8%BE%91%E5%B7%A5%E5%85%B7/">编辑工具</a>,&nbsp;<a href="/tags/%E6%96%87%E6%9C%AC%E5%A4%84%E7%90%86/">文本处理</a></section>
+        <section>
+            <span><a href="javascript:void(0);" onclick="window.history.back();">Back</a></span>&nbsp;|&nbsp;<span><a href="/">Home</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav"><a href="/posts/vim-tutorial-22/" class="prev" rel="prev" title="vim 从嫌弃到依赖(21)——跨文件搜索"><i class="fas fa-angle-left fa-fw" aria-hidden="true"></i>vim 从嫌弃到依赖(21)——跨文件搜索</a>
+            <a href="/posts/vim-tutorial-24/" class="next" rel="next" title="vim 从嫌弃到依赖(23)——最后的闲扯">vim 从嫌弃到依赖(23)——最后的闲扯<i class="fas fa-angle-right fa-fw" aria-hidden="true"></i></a></div>
+</div>
+</article></div>
+            </main><footer class="footer">
+        <div class="footer-container"><div class="footer-line">Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener noreffer" title="Hugo 0.121.2">Hugo</a> | Theme - <a href="https://github.com/dillonzq/LoveIt" target="_blank" rel="noopener noreffer" title="LoveIt 0.2.11"><i class="far fa-kiss-wink-heart fa-fw" aria-hidden="true"></i> LoveIt</a>
+                </div><div class="footer-line" itemscope itemtype="http://schema.org/CreativeWork"><i class="far fa-copyright fa-fw" aria-hidden="true"></i><span itemprop="copyrightYear">2022 - 2024</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="https://www.masimaro.xyz" target="_blank">Masimaro</a></span></div>
+        </div>
+    </footer></div>
+
+        <div id="fixed-buttons"><a href="#" id="back-to-top" class="fixed-button" title="Back to Top">
+                <i class="fas fa-arrow-up fa-fw" aria-hidden="true"></i>
+            </a><a href="#" id="view-comments" class="fixed-button" title="View Comments">
+                <i class="fas fa-comment fa-fw" aria-hidden="true"></i>
+            </a>
+        </div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.css"><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/autocomplete.js@0.38.1/dist/autocomplete.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lunr@2.3.9/lunr.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lazysizes@5.3.2/lazysizes.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/clipboard@2.0.11/dist/clipboard.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/sharer.js@0.5.1/sharer.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/auto-render.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/copy-tex.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/mhchem.min.js"></script><script type="text/javascript">window.config={"code":{"copyTitle":"Copy to clipboard","maxShownLines":50},"comment":{},"math":{"delimiters":[{"display":true,"left":"$$","right":"$$"},{"display":true,"left":"\\[","right":"\\]"},{"display":true,"left":"\\begin{equation}","right":"\\end{equation}"},{"display":true,"left":"\\begin{equation*}","right":"\\end{equation*}"},{"display":true,"left":"\\begin{align}","right":"\\end{align}"},{"display":true,"left":"\\begin{align*}","right":"\\end{align*}"},{"display":true,"left":"\\begin{alignat}","right":"\\end{alignat}"},{"display":true,"left":"\\begin{alignat*}","right":"\\end{alignat*}"},{"display":true,"left":"\\begin{gather}","right":"\\end{gather}"},{"display":true,"left":"\\begin{CD}","right":"\\end{CD}"},{"display":false,"left":"$","right":"$"},{"display":false,"left":"\\(","right":"\\)"}],"strict":false},"search":{"highlightTag":"em","maxResultLength":10,"noResultsFound":"No results found","snippetLength":50}};</script><script type="text/javascript" src="/js/theme.min.js"></script></body>
+</html>

@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="robots" content="noodp" />
+        <title>C&#43;&#43;类的构造函数与析构函数 - Masimaro&#39;s blog</title><meta name="Description" content="这是我用于记录日常和学习的小站"><meta property="og:title" content="C&#43;&#43;类的构造函数与析构函数" />
+<meta property="og:description" content="C&#43;&#43;中每个类都有其构造与析构函数，它们负责对象的创建和对象的清理和回收，即使我们不写这两个，编译器也会默认为我们提供这些构造函数。下面仍然" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://HaiLateBoy.github.io/posts/c-plus-structure-and-destruct/" /><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2018-02-06T21:17:57+00:00" />
+<meta property="article:modified_time" content="2018-02-06T21:17:57+00:00" /><meta property="og:site_name" content="Masimaro&#39;s blog" />
+
+<meta name="twitter:card" content="summary"/><meta name="twitter:title" content="C&#43;&#43;类的构造函数与析构函数"/>
+<meta name="twitter:description" content="C&#43;&#43;中每个类都有其构造与析构函数，它们负责对象的创建和对象的清理和回收，即使我们不写这两个，编译器也会默认为我们提供这些构造函数。下面仍然"/>
+<meta name="application-name" content="My cool site">
+<meta name="apple-mobile-web-app-title" content="My cool site"><meta name="theme-color" content="#ffffff"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="manifest" href="/site.webmanifest"><link rel="canonical" href="http://HaiLateBoy.github.io/posts/c-plus-structure-and-destruct/" /><link rel="prev" href="http://HaiLateBoy.github.io/posts/c-struct-and-class/" /><link rel="next" href="http://HaiLateBoy.github.io/posts/c-plus-polymorphism/" /><link rel="stylesheet" href="/css/style.min.css"><link rel="preload" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css"></noscript><link rel="preload" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css"></noscript><script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "BlogPosting",
+        "headline": "C++类的构造函数与析构函数",
+        "inLanguage": "zh-CN",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "http:\/\/HaiLateBoy.github.io\/posts\/c-plus-structure-and-destruct\/"
+        },"genre": "posts","keywords": "VC\u002b\u002b, 反汇编, C\u002b\u002b实现原理","wordcount":  3704 ,
+        "url": "http:\/\/HaiLateBoy.github.io\/posts\/c-plus-structure-and-destruct\/","datePublished": "2018-02-06T21:17:57+00:00","dateModified": "2018-02-06T21:17:57+00:00","publisher": {
+            "@type": "Organization",
+            "name": ""},"author": {
+                "@type": "Person",
+                "name": "Masimaro"
+            },"description": ""
+    }
+    </script></head>
+    <body data-header-desktop="fixed" data-header-mobile="auto"><script type="text/javascript">(window.localStorage && localStorage.getItem('theme') ? localStorage.getItem('theme') === 'dark' : ('auto' === 'auto' ? window.matchMedia('(prefers-color-scheme: dark)').matches : 'auto' === 'dark')) && document.body.setAttribute('theme', 'dark');</script>
+
+        <div id="mask"></div><div class="wrapper"><header class="desktop" id="header-desktop">
+    <div class="header-wrapper">
+        <div class="header-title">
+            <a href="/" title="Masimaro&#39;s blog">My cool site</a>
+        </div>
+        <div class="menu">
+            <div class="menu-inner"><a class="menu-item" href="/posts/" title="文章列表"> 文章 </a><a class="menu-item" href="/tags/" title="标签"> 标签 </a><a class="menu-item" href="/categories/" title="分类"> 分类 </a><a class="menu-item" href="/about" title="关于本站"> 关于 </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-desktop">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-desktop" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-desktop" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-desktop">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </span><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                    <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+                </a></div>
+        </div>
+    </div>
+</header><header class="mobile" id="header-mobile">
+    <div class="header-container">
+        <div class="header-wrapper">
+            <div class="header-title">
+                <a href="/" title="Masimaro&#39;s blog">My cool site</a>
+            </div>
+            <div class="menu-toggle" id="menu-toggle-mobile">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+        <div class="menu" id="menu-mobile"><div class="search-wrapper">
+                    <div class="search mobile" id="search-mobile">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-mobile">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-mobile" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-mobile" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-mobile">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </div>
+                    <a href="javascript:void(0);" class="search-cancel" id="search-cancel-mobile">
+                        Cancel
+                    </a>
+                </div><a class="menu-item" href="/posts/" title="文章列表">文章</a><a class="menu-item" href="/tags/" title="标签">标签</a><a class="menu-item" href="/categories/" title="分类">分类</a><a class="menu-item" href="/about" title="关于本站">关于</a><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+            </a></div>
+    </div>
+</header><div class="search-dropdown desktop">
+        <div id="search-dropdown-desktop"></div>
+    </div>
+    <div class="search-dropdown mobile">
+        <div id="search-dropdown-mobile"></div>
+    </div><main class="main">
+                <div class="container"><div class="toc" id="toc-auto">
+            <h2 class="toc-title">Contents</h2>
+            <div class="toc-content" id="toc-content-auto"></div>
+        </div><article class="page single"><h1 class="single-title animate__animated animate__flipInX">C++类的构造函数与析构函数</h1><div class="post-meta">
+            <div class="post-meta-line"><span class="post-author"><a href="https://www.masimaro.xyz" title="Author" target="_blank" rel="noopener noreffer author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Masimaro</a></span>&nbsp;<span class="post-category">included in <a href="/categories/vc++%E5%8F%8D%E6%B1%87%E7%BC%96%E5%88%86%E6%9E%90/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>VC++反汇编分析</a></span></div>
+            <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw" aria-hidden="true"></i>&nbsp;<time datetime="2018-02-06">2018-02-06</time>&nbsp;<i class="fas fa-pencil-alt fa-fw" aria-hidden="true"></i>&nbsp;3704 words&nbsp;
+                <i class="far fa-clock fa-fw" aria-hidden="true"></i>&nbsp;8 minutes&nbsp;</div>
+        </div><div class="details toc" id="toc-static"  data-kept="true">
+                <div class="details-summary toc-title">
+                    <span>Contents</span>
+                    <span><i class="details-icon fas fa-angle-right" aria-hidden="true"></i></span>
+                </div>
+                <div class="details-content toc-content" id="toc-content-static"><nav id="TableOfContents">
+  <ul>
+    <li><a href="#不带参构造">不带参构造</a></li>
+  </ul>
+
+  <ul>
+    <li><a href="#作为函数参数">作为函数参数</a></li>
+    <li><a href="#作为函数的返回值">作为函数的返回值</a></li>
+  </ul>
+
+  <ul>
+    <li><a href="#参数对象">参数对象</a></li>
+    <li><a href="#函数返回对象">函数返回对象</a></li>
+  </ul>
+</nav></div>
+            </div><div class="content" id="content"><p>C++中每个类都有其构造与析构函数，它们负责对象的创建和对象的清理和回收，即使我们不写这两个，编译器也会默认为我们提供这些构造函数。下面仍然是通过反汇编的方式来说明C++中构造和析构函数是如何工作的。</p>
+<!-- raw HTML omitted -->
+<h1 id="编译器是否真的会默认提供构造与析构函数">编译器是否真的会默认提供构造与析构函数</h1>
+<p>在一般讲解C++的书籍中都会提及到当我们不为类提供任何构造与析构函数时编译器会默认提供这样六种成员函数：不带参构造，拷贝构造，“=”的重载函数，析构函数，以及带const和不带const的取地址符重载。但是编译器具体是怎么做的，下面来对其中的部分进行说明</p>
+<h2 id="不带参构造">不带参构造</h2>
+<p>下面是一个例子：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">test</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl"><span class="k">private</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">char</span> <span class="n">szBuf</span><span class="p">[</span><span class="mi">255</span><span class="p">];</span>
+</span></span><span class="line"><span class="cl"><span class="k">public</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">    <span class="k">static</span> <span class="kt">void</span> <span class="n">print</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">cout</span><span class="o">&lt;&lt;</span><span class="s">&#34;hello world&#34;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>   
+</span></span><span class="line"><span class="cl"><span class="p">};</span>
+</span></span><span class="line"><span class="cl"><span class="kt">void</span> <span class="nf">printhello</span><span class="p">(</span><span class="n">test</span> <span class="n">t</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">t</span><span class="p">.</span><span class="n">print</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span><span class="o">*</span> <span class="n">argv</span><span class="p">[])</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">test</span> <span class="n">t</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">printhello</span><span class="p">(</span><span class="n">t</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p>下面是对应的汇编源码：</p>
+<pre tabindex="0"><code>00401400   push        ebp
+00401401   mov         ebp,esp
+00401403   sub         esp,140h;栈顶向上抬了140h的空间用于存储类对象的数据
+00401409   push        ebx
+0040140A   push        esi
+0040140B   push        edi
+0040140C   lea         edi,[ebp-140h]
+00401412   mov         ecx,50h
+00401417   mov         eax,0CCCCCCCCh
+0040141C   rep stos    dword ptr [edi]
+26:       test t;
+27:       printhello(t);
+0040141E   sub         esp,100h
+</code></pre><p>从上面可以看到，在定义类的对象时并没有进行任何的函数调用，在进行对象的内存空间分配时仅仅是将栈容量扩大，就好像定义一个普通变量一样，也就是说在默认情况下编译器并不会提供不带参的构造函数，在初始化对象时仅仅将其作为一个普通变量，在编译之前计算出它所占内存的大小，然后分配，并不调用函数。
+再看下面一个例子：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">test</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl"><span class="k">private</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">char</span> <span class="n">szBuf</span><span class="p">[</span><span class="mi">255</span><span class="p">];</span>
+</span></span><span class="line"><span class="cl"><span class="k">public</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">    <span class="k">virtual</span> <span class="kt">void</span> <span class="n">sayhello</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">cout</span><span class="o">&lt;&lt;</span><span class="s">&#34;hello world&#34;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="k">static</span> <span class="kt">void</span> <span class="nf">print</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">cout</span><span class="o">&lt;&lt;</span><span class="s">&#34;hello world&#34;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>   
+</span></span><span class="line"><span class="cl"><span class="p">};</span>
+</span></span><span class="line"><span class="cl"><span class="kt">void</span> <span class="nf">printhello</span><span class="p">(</span><span class="n">test</span> <span class="n">t</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">t</span><span class="p">.</span><span class="n">print</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span><span class="o">*</span> <span class="n">argv</span><span class="p">[])</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">test</span> <span class="n">t</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">printhello</span><span class="p">(</span><span class="n">t</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><pre tabindex="0"><code>30:       test t;
+0040143E   lea         ecx,[ebp-104h]
+00401444   call        @ILT+140(test::test) (00401091)
+
+;构造函数
+004014A0   push        ebp
+004014A1   mov         ebp,esp
+004014A3   sub         esp,44h
+004014A6   push        ebx
+004014A7   push        esi
+004014A8   push        edi
+004014A9   push        ecx
+004014AA   lea         edi,[ebp-44h]
+004014AD   mov         ecx,11h
+004014B2   mov         eax,0CCCCCCCCh
+004014B7   rep stos    dword ptr [edi]
+004014B9   pop         ecx
+004014BA   mov         dword ptr [ebp-4],ecx
+004014BD   mov         eax,dword ptr [ebp-4]
+004014C0   mov         dword ptr [eax],offset test::`vftable&#39; (0042f02c)
+004014C6   mov         eax,dword ptr [ebp-4]
+004014C9   pop         edi
+004014CA   pop         esi
+004014CB   pop         ebx
+004014CC   mov         esp,ebp
+004014CE   pop         ebp
+</code></pre><p>这段C++代码与之前的仅仅是多了一个虚函数，这个时候编译器为这个类定义了一个默认的构造函数，从汇编代码中可以看到，这个构造函数主要初始化了类对象的头4个字节，将虚函数表的地址放入到这个4个字节中，因此我们得出结论，一般编译器不会提供不带参的构造函数，除非类中有虚函数。
+下面请看这样一个例子：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">Parent</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl"><span class="k">public</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">    <span class="n">Parent</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">cout</span><span class="o">&lt;&lt;</span><span class="s">&#34;parent!&#34;</span><span class="o">&lt;&lt;</span><span class="n">endl</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">};</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">child</span><span class="o">:</span> <span class="k">public</span> <span class="n">Parent</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl"><span class="k">private</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">char</span> <span class="n">szBuf</span><span class="p">[</span><span class="mi">10</span><span class="p">];</span>
+</span></span><span class="line"><span class="cl"><span class="p">};</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kt">int</span> <span class="nf">main</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">child</span> <span class="n">c</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p>下面是它的汇编代码：</p>
+<pre tabindex="0"><code>27:       child c;
+004013A8   lea         ecx,[ebp-0Ch]
+004013AB   call        @ILT+100(child::child) (00401069)
+;构造函数
+;函数初始化代码略
+004013E9   pop         ecx
+004013EA   mov         dword ptr [ebp-4],ecx
+004013ED   mov         ecx,dword ptr [ebp-4]
+004013F0   call        @ILT+80(Parent::Parent) (00401055)
+;最后函数的收尾工作，代码略
+</code></pre><p>从上面的代码看，当父类存在构造函数时，编译器会默认为子类添加构造函数，子类的构造函数主要是调用父类的构造函数。</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">Parent</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl"><span class="k">public</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">    <span class="k">virtual</span> <span class="n">sayhello</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">cout</span><span class="o">&lt;&lt;</span><span class="s">&#34;hello&#34;</span><span class="o">&lt;&lt;</span><span class="n">endl</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">};</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">child</span><span class="o">:</span> <span class="k">public</span> <span class="n">Parent</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl"><span class="k">private</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">char</span> <span class="n">szBuf</span><span class="p">[</span><span class="mi">10</span><span class="p">];</span>
+</span></span><span class="line"><span class="cl"><span class="p">};</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kt">int</span> <span class="nf">main</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">child</span> <span class="n">c</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><pre tabindex="0"><code>27:       child c;
+004013B8   lea         ecx,[ebp-10h]
+004013BB   call        @ILT+100(child::child) (00401069)
+;构造函数
+004013FA   mov         dword ptr [ebp-4],ecx
+004013FD   mov         ecx,dword ptr [ebp-4]
+00401400   call        @ILT+80(Parent::Parent) (00401055);调用父类的构造函数
+00401405   mov         eax,dword ptr [ebp-4]
+00401408   mov         dword ptr [eax],offset child::`vftable&#39; (0042f01c);初始化虚函数表
+0040140E   mov         eax,dword ptr [ebp-4]
+</code></pre><p>从上面的代码中可以看到，当父类有虚函数时，编译器也会提供构造函数，主要用于初始化头四个字节的虚函数表的指针。</p>
+<h1 id="拷贝构造">拷贝构造</h1>
+<p>当我们不写拷贝构造的时候，仍然能用一个对象初始化另一个对象，下面是这样的一段代码</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span><span class="o">*</span> <span class="n">argv</span><span class="p">[])</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">test</span> <span class="n">t1</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">test</span> <span class="n">t</span><span class="p">(</span><span class="n">t1</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">printhello</span><span class="p">(</span><span class="n">t</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p>我们还是用之前定义的那个test类，将类中的虚函数去掉，下面是对应的反汇编代码</p>
+<pre tabindex="0"><code>30:       test t1;
+31:       test t(t1);
+0040141E   mov         ecx,3Fh
+00401423   lea         esi,[ebp-100h]
+00401429   lea         edi,[ebp-200h]
+0040142F   rep movs    dword ptr [edi],dword ptr [esi]
+00401431   movs        word ptr [edi],word ptr [esi]
+00401433   movs        byte ptr [edi],byte ptr [esi]
+</code></pre><p>从这段代码中可以看到，利用一个已有的类对象来初始化一个新的对象时，编译器仍然没有为其提供所谓的默认拷贝构造函数，在初始化时利用串操作，将一个对象的内容拷贝到另一个对象。
+当类中有虚函数时，会提供一个拷贝构造，主要用于初始化头四个字节的虚函数表，在进行对象初始化时仍然采用的是直接内存拷贝的方式。
+由于默认的拷贝构造是进行简单的内存拷贝，所以当类中的成员中有指针变量时尽量自己定义拷贝构造，进行深拷贝，否则在以后进行析构时会崩溃。
+另外几种就不再一一进行说明，它们的情况与上面的相似，有兴趣的可以自己编写代码验证。另外需要注意的是，只要定义了任何一个类型的构造函数，那么编译器就不会提供默认的构造函数。
+最后总结一下默认情况下编译器不提供这些函数，只有父类自身有构造函数，或者自身或父类有虚函数时，编译器才会提供默认的构造函数。</p>
+<h1 id="何时会调用构造函数">何时会调用构造函数</h1>
+<p>当对一个类进行实例化，也就是创建一个类的对象时，会调用其构造函数。
+对于栈中的局部对象，当定义一个对象时会调用构造函数
+对于堆对象，当用户调用new新建对象时调用构造函数
+对于全局对象和静态对象，当程序运行之处会调用构造函数
+下面重点说明当对象作为函数参数和返回值时的情况</p>
+<h2 id="作为函数参数">作为函数参数</h2>
+<p>当对象作为函数参数时调用的是拷贝构造，而不是普通的构造函数
+下面是一个例子代码：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">CA</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl"><span class="k">public</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">    <span class="n">CA</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">cout</span><span class="o">&lt;&lt;</span><span class="s">&#34;构造函数&#34;</span><span class="o">&lt;&lt;</span><span class="n">endl</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="n">CA</span><span class="p">(</span><span class="n">CA</span> <span class="o">&amp;</span><span class="n">ca</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">cout</span><span class="o">&lt;&lt;</span><span class="s">&#34;拷贝构造&#34;</span><span class="o">&lt;&lt;</span><span class="n">endl</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="k">private</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">char</span> <span class="n">szBuf</span><span class="p">[</span><span class="mi">255</span><span class="p">];</span>
+</span></span><span class="line"><span class="cl"><span class="p">};</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kt">void</span> <span class="nf">Test</span><span class="p">(</span><span class="n">CA</span> <span class="n">a</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="kt">int</span> <span class="nf">main</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">CA</span> <span class="n">a</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">Test</span><span class="p">(</span><span class="n">a</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p>对应的汇编代码如下：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-asm" data-lang="asm"><span class="line"><span class="cl"><span class="err">33:</span>       <span class="nf">Test</span><span class="p">(</span><span class="no">a</span><span class="p">)</span><span class="c1">;
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">004013</span><span class="nf">F9</span>   <span class="no">sub</span>         <span class="no">esp</span><span class="p">,</span><span class="mi">100</span><span class="no">h</span>
+</span></span><span class="line"><span class="cl"><span class="err">004013</span><span class="nf">FF</span>   <span class="no">mov</span>         <span class="no">ecx</span><span class="p">,</span><span class="no">esp</span>
+</span></span><span class="line"><span class="cl"><span class="err">00401401</span>   <span class="nf">lea</span>         <span class="no">eax</span><span class="p">,[</span><span class="no">ebp-100h</span><span class="p">]</span><span class="c1">;eax保存对象的首地址
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">00401407</span>   <span class="nf">push</span>        <span class="no">eax</span>
+</span></span><span class="line"><span class="cl"><span class="err">00401408</span>   <span class="nf">call</span>        <span class="err">@</span><span class="no">ILT</span><span class="err">+</span><span class="mi">15</span><span class="p">(</span><span class="no">CA</span><span class="p">::</span><span class="no">CA</span><span class="p">)</span> <span class="p">(</span><span class="mi">00401014</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="err">0040140</span><span class="nf">D</span>   <span class="no">call</span>        <span class="err">@</span><span class="no">ILT</span><span class="err">+</span><span class="mi">35</span><span class="p">(</span><span class="no">Test</span><span class="p">)</span> <span class="p">(</span><span class="mi">00401028</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="c1">;拷贝构造代码
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="nf">cout</span><span class="err">&lt;&lt;&#34;拷贝构造&#34;&lt;&lt;</span><span class="no">endl</span><span class="c1">;
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">0040152</span><span class="nf">D</span>   <span class="no">push</span>        <span class="no">offset</span> <span class="err">@</span><span class="no">ILT</span><span class="err">+</span><span class="mi">50</span><span class="p">(</span><span class="no">std</span><span class="p">::</span><span class="no">endl</span><span class="p">)</span> <span class="p">(</span><span class="mi">00401037</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="err">00401532</span>   <span class="nf">push</span>        <span class="no">offset</span> <span class="no">string</span> <span class="err">&#34;\</span><span class="no">xbf</span><span class="err">\</span><span class="no">xbd</span><span class="err">\</span><span class="no">xb1</span><span class="err">\</span><span class="no">xb4</span><span class="err">\</span><span class="no">xb9</span><span class="err">\</span><span class="no">xb9</span><span class="err">\</span><span class="no">xd4</span><span class="err">\</span><span class="no">xec</span><span class="err">&#34;</span> <span class="p">(</span><span class="mi">0042</span><span class="no">f028</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="err">00401537</span>   <span class="nf">push</span>        <span class="no">offset</span> <span class="no">std</span><span class="p">::</span><span class="no">cout</span> <span class="p">(</span><span class="mi">00434088</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="err">0040153</span><span class="nf">C</span>   <span class="no">call</span>        <span class="err">@</span><span class="no">ILT</span><span class="err">+</span><span class="mi">170</span><span class="p">(</span><span class="no">std</span><span class="p">::</span><span class="no">operator</span><span class="err">&lt;&lt;</span><span class="p">)</span> <span class="p">(</span><span class="mi">004010</span><span class="no">af</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="err">00401541</span>   <span class="nf">add</span>         <span class="no">esp</span><span class="p">,</span><span class="mi">8</span>
+</span></span><span class="line"><span class="cl"><span class="err">00401544</span>   <span class="nf">mov</span>         <span class="no">ecx</span><span class="p">,</span><span class="no">eax</span>
+</span></span><span class="line"><span class="cl"><span class="err">00401546</span>   <span class="nf">call</span>        <span class="err">@</span><span class="no">ILT</span><span class="err">+</span><span class="mi">125</span><span class="p">(</span><span class="no">std</span><span class="p">::</span><span class="no">basic_ostream</span><span class="err">&lt;</span><span class="no">char</span><span class="p">,</span><span class="no">std</span><span class="p">::</span><span class="no">char_traits</span><span class="err">&lt;</span><span class="no">char</span><span class="err">&gt;</span> <span class="err">&gt;</span><span class="p">::</span><span class="no">operator</span><span class="err">&lt;&lt;</span><span class="p">)</span> <span class="p">(</span><span class="mi">00401082</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="err">21:</span>       <span class="err">}</span>
+</span></span><span class="line"><span class="cl"><span class="err">0040154</span><span class="nf">B</span>   <span class="no">mov</span>         <span class="no">eax</span><span class="p">,</span><span class="no">dword</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">ebp-4</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="err">0040154</span><span class="nf">E</span>   <span class="no">pop</span>         <span class="no">edi</span>
+</span></span><span class="line"><span class="cl"><span class="err">0040154</span><span class="nf">F</span>   <span class="no">pop</span>         <span class="no">esi</span>
+</span></span><span class="line"><span class="cl"><span class="err">00401550</span>   <span class="nf">pop</span>         <span class="no">ebx</span>
+</span></span><span class="line"><span class="cl"><span class="err">00401551</span>   <span class="nf">add</span>         <span class="no">esp</span><span class="p">,</span><span class="mi">44</span><span class="no">h</span>
+</span></span><span class="line"><span class="cl"><span class="err">00401554</span>   <span class="nf">cmp</span>         <span class="no">ebp</span><span class="p">,</span><span class="no">esp</span>
+</span></span><span class="line"><span class="cl"><span class="err">00401556</span>   <span class="nf">call</span>        <span class="no">__chkesp</span> <span class="p">(</span><span class="mi">004025</span><span class="no">d0</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="err">0040155</span><span class="nf">B</span>   <span class="no">mov</span>         <span class="no">esp</span><span class="p">,</span><span class="no">ebp</span>
+</span></span><span class="line"><span class="cl"><span class="err">0040155</span><span class="nf">D</span>   <span class="no">pop</span>         <span class="no">ebp</span>
+</span></span><span class="line"><span class="cl"><span class="err">0040155</span><span class="nf">E</span>   <span class="no">ret</span>         <span class="mi">4</span>
+</span></span></code></pre></div><p>从上面的代码来看，当对象作为函数参数时，首先调用构造函数，将参数进行拷贝。</p>
+<h2 id="作为函数的返回值">作为函数的返回值</h2>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">CA</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl"><span class="k">public</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">    <span class="n">CA</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">cout</span><span class="o">&lt;&lt;</span><span class="s">&#34;构造函数&#34;</span><span class="o">&lt;&lt;</span><span class="n">endl</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="n">CA</span><span class="p">(</span><span class="n">CA</span> <span class="o">&amp;</span><span class="n">ca</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">cout</span><span class="o">&lt;&lt;</span><span class="s">&#34;拷贝构造&#34;</span><span class="o">&lt;&lt;</span><span class="n">endl</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="k">private</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">char</span> <span class="n">szBuf</span><span class="p">[</span><span class="mi">255</span><span class="p">];</span>
+</span></span><span class="line"><span class="cl"><span class="p">};</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">CA</span> <span class="nf">Test</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">CA</span> <span class="n">a</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="n">a</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kt">int</span> <span class="nf">main</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">CA</span> <span class="n">a</span> <span class="o">=</span> <span class="n">Test</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-asm" data-lang="asm"><span class="line"><span class="cl"><span class="err">34:</span>       <span class="nf">CA</span> <span class="no">a</span> <span class="err">=</span> <span class="no">Test</span><span class="p">()</span><span class="c1">;
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">0040155</span><span class="nf">E</span>   <span class="no">lea</span>         <span class="no">eax</span><span class="p">,[</span><span class="no">ebp-200h</span><span class="p">]</span><span class="c1">;eax保存的是对象a 的首地址
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">00401564</span>   <span class="nf">push</span>        <span class="no">eax</span>
+</span></span><span class="line"><span class="cl"><span class="err">00401565</span>   <span class="nf">call</span>        <span class="err">@</span><span class="no">ILT</span><span class="err">+</span><span class="mi">145</span><span class="p">(</span><span class="no">Test</span><span class="p">)</span> <span class="p">(</span><span class="mi">00401096</span><span class="p">)</span><span class="c1">;调用test函数
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">0040156</span><span class="nf">A</span>   <span class="no">add</span>         <span class="no">esp</span><span class="p">,</span><span class="mi">4</span>
+</span></span><span class="line"><span class="cl"><span class="err">0040156</span><span class="nf">D</span>   <span class="no">push</span>        <span class="no">eax</span><span class="c1">;函数返回的临时存储区的地址
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">0040156</span><span class="nf">E</span>   <span class="no">lea</span>         <span class="no">ecx</span><span class="p">,[</span><span class="no">ebp-100h</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="err">00401574</span>   <span class="nf">call</span>        <span class="err">@</span><span class="no">ILT</span><span class="err">+</span><span class="mi">15</span><span class="p">(</span><span class="no">CA</span><span class="p">::</span><span class="no">CA</span><span class="p">)</span> <span class="p">(</span><span class="mi">00401014</span><span class="p">)</span><span class="c1">;调用拷贝构造
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>
+</span></span><span class="line"><span class="cl"><span class="c1">;test函数
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">28:</span>       <span class="nf">CA</span> <span class="no">a</span><span class="c1">;
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">004013</span><span class="nf">BE</span>   <span class="no">lea</span>         <span class="no">ecx</span><span class="p">,[</span><span class="no">ebp-100h</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="err">004013</span><span class="nf">C4</span>   <span class="no">call</span>        <span class="err">@</span><span class="no">ILT</span><span class="err">+</span><span class="mi">10</span><span class="p">(</span><span class="no">CA</span><span class="p">::</span><span class="no">CA</span><span class="p">)</span> <span class="p">(</span><span class="mi">0040100</span><span class="no">f</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="err">29:</span>       <span class="nf">return</span> <span class="no">a</span><span class="c1">;
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">004013</span><span class="nf">C9</span>   <span class="no">lea</span>         <span class="no">eax</span><span class="p">,[</span><span class="no">ebp-100h</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="err">004013</span><span class="nf">CF</span>   <span class="no">push</span>        <span class="no">eax</span>
+</span></span><span class="line"><span class="cl"><span class="err">004013</span><span class="nf">D0</span>   <span class="no">mov</span>         <span class="no">ecx</span><span class="p">,</span><span class="no">dword</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">ebp</span><span class="err">+</span><span class="mi">8</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="err">004013</span><span class="nf">D3</span>   <span class="no">call</span>        <span class="err">@</span><span class="no">ILT</span><span class="err">+</span><span class="mi">15</span><span class="p">(</span><span class="no">CA</span><span class="p">::</span><span class="no">CA</span><span class="p">)</span> <span class="p">(</span><span class="mi">00401014</span><span class="p">)</span><span class="c1">;调用拷贝构造
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">004013</span><span class="nf">D8</span>   <span class="no">mov</span>         <span class="no">eax</span><span class="p">,</span><span class="no">dword</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">ebp</span><span class="err">+</span><span class="mi">8</span><span class="p">]</span><span class="c1">;ebp + 8是用来存储对象的临时存储区
+</span></span></span></code></pre></div><p>通过上面的反汇编代码可以看到，在函数返回时会首先调用拷贝构造，将对象的内容拷贝到一个临时存储区中，然后通过eax寄存器返回，在需要利用函数返回值时再次调用拷贝构造，将eax中的内容拷贝到对象中。
+另外从这些反汇编代码中可以看到，拷贝构造以对象的首地址为参数，返回新建立的对象的地址。
+当需要对对象的内存进行拷贝时调用拷贝构造，拷贝构造只能传递对象的地址或者引用，不能传递对象本身，我们知道对象作为函数参数时会调用拷贝构造，如果以对象作为拷贝构造的参数，那么回造成拷贝构造的无限递归。</p>
+<h1 id="何时调用析构函数">何时调用析构函数</h1>
+<p>对于析构函数的调用我们仍然分为以下几个部分：
+局部类对象：当对象所在的生命周期结束后，即一般语句块结束或者函数结束时会调用
+全局对象和静态类对象：当程序结束时会调用构造函数
+堆对象：当程序员显式调用delete释放空间时调用</p>
+<h2 id="参数对象">参数对象</h2>
+<p>下面是一个例子代码：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">CA</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl"><span class="k">public</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">    <span class="o">~</span><span class="n">CA</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">printf</span><span class="p">(</span><span class="s">&#34;~CA()</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="k">private</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">char</span> <span class="n">szBuf</span><span class="p">[</span><span class="mi">255</span><span class="p">];</span>
+</span></span><span class="line"><span class="cl"><span class="p">};</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kt">void</span> <span class="nf">Test</span><span class="p">(</span><span class="n">CA</span> <span class="n">a</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">printf</span><span class="p">(</span><span class="s">&#34;test()</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kt">int</span> <span class="nf">main</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">CA</span> <span class="n">a</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">Test</span><span class="p">(</span><span class="n">a</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p>下面是它的反汇编代码</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-asm" data-lang="asm"><span class="line"><span class="cl"><span class="c1">;Test(a)
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">0040133</span><span class="nf">A</span>   <span class="no">sub</span>         <span class="no">esp</span><span class="p">,</span><span class="mi">100</span><span class="no">h</span><span class="c1">;在main函数栈外开辟一段内存空间用于保存函数参数
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">00401340</span>   <span class="nf">mov</span>         <span class="no">ecx</span><span class="p">,</span><span class="mi">3</span><span class="no">Fh</span><span class="c1">;类大小为255个字节，为了复制这块内存，每次复制4字节，共需要63次
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">00401345</span>   <span class="nf">lea</span>         <span class="no">esi</span><span class="p">,[</span><span class="no">ebp-10Ch</span><span class="p">]</span><span class="c1">;esi保存的是对象的首地址
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">0040134</span><span class="nf">B</span>   <span class="no">mov</span>         <span class="no">edi</span><span class="p">,</span><span class="no">esp</span><span class="c1">;参数首地址
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">0040134</span><span class="nf">D</span>   <span class="no">rep</span> <span class="no">movs</span>    <span class="no">dword</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">edi</span><span class="p">],</span><span class="no">dword</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">esi</span><span class="p">]</span><span class="c1">;执行复制操作
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">0040134</span><span class="nf">F</span>   <span class="no">movs</span>        <span class="no">word</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">edi</span><span class="p">],</span><span class="no">word</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">esi</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="err">00401351</span>   <span class="nf">movs</span>        <span class="no">byte</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">edi</span><span class="p">],</span><span class="no">byte</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">esi</span><span class="p">]</span><span class="c1">;将剩余几个字节也复制
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">00401352</span>   <span class="nf">call</span>        <span class="err">@</span><span class="no">ILT</span><span class="err">+</span><span class="mi">5</span><span class="p">(</span><span class="no">Test</span><span class="p">)</span> <span class="p">(</span><span class="mi">0040100</span><span class="no">a</span><span class="p">)</span><span class="c1">;调用test函数
+</span></span></span><span class="line"><span class="cl"><span class="c1">;调用Test函数
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">23:</span>       <span class="nf">printf</span><span class="p">(</span><span class="err">&#34;</span><span class="no">test</span><span class="p">()</span><span class="err">\</span><span class="no">n</span><span class="err">&#34;</span><span class="p">)</span><span class="c1">;
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">00401278</span>   <span class="nf">push</span>        <span class="no">offset</span> <span class="no">string</span> <span class="err">&#34;</span><span class="no">test</span><span class="p">()</span><span class="err">\</span><span class="no">n</span><span class="err">&#34;</span> <span class="p">(</span><span class="mi">0042</span><span class="no">f01c</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="err">0040127</span><span class="nf">D</span>   <span class="no">call</span>        <span class="no">printf</span> <span class="p">(</span><span class="mi">00401640</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="err">00401282</span>   <span class="nf">add</span>         <span class="no">esp</span><span class="p">,</span><span class="mi">4</span>
+</span></span><span class="line"><span class="cl"><span class="err">24:</span>   <span class="err">}</span>
+</span></span><span class="line"><span class="cl"><span class="err">00401285</span>   <span class="nf">lea</span>         <span class="no">ecx</span><span class="p">,[</span><span class="no">ebp</span><span class="err">+</span><span class="mi">8</span><span class="p">]</span><span class="c1">;参数首地址
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">00401288</span>   <span class="nf">call</span>        <span class="err">@</span><span class="no">ILT</span><span class="err">+</span><span class="mi">0</span><span class="p">(</span><span class="no">CA</span><span class="p">::</span><span class="err">~</span><span class="no">CA</span><span class="p">)</span> <span class="p">(</span><span class="mi">00401005</span><span class="p">)</span>
+</span></span></code></pre></div><p>从上面的代码看，当类对象作为函数参数时，首先会调用拷贝构造（当程序不提供拷贝构造时，系统默认在对象之间进行简单的内存复制，这个就是提供的默认拷贝构造函数）然后当函数结束，程序执行到函数大括号初时，首先调用析构完成对象内存的释放，然后执行函数返回和做最后的清理工作</p>
+<h2 id="函数返回对象">函数返回对象</h2>
+<p>下面是函数返回对象的代码：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">CA</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl"><span class="k">public</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">    <span class="o">~</span><span class="n">CA</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">printf</span><span class="p">(</span><span class="s">&#34;~CA()</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="k">private</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">char</span> <span class="n">szBuf</span><span class="p">[</span><span class="mi">255</span><span class="p">];</span>
+</span></span><span class="line"><span class="cl"><span class="p">};</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">CA</span> <span class="nf">Test</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">printf</span><span class="p">(</span><span class="s">&#34;test()</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">CA</span> <span class="n">a</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="n">a</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kt">int</span> <span class="nf">main</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">CA</span> <span class="n">a</span> <span class="o">=</span> <span class="n">Test</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-asm" data-lang="asm"><span class="line"><span class="cl"><span class="err">30:</span>       <span class="nf">CA</span> <span class="no">a</span> <span class="err">=</span> <span class="no">Test</span><span class="p">()</span><span class="c1">;
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">0040138</span><span class="nf">E</span>   <span class="no">lea</span>         <span class="no">eax</span><span class="p">,[</span><span class="no">ebp-100h</span><span class="p">]</span><span class="c1">;eax保存了对象的地址
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">00401394</span>   <span class="nf">push</span>        <span class="no">eax</span>
+</span></span><span class="line"><span class="cl"><span class="err">00401395</span>   <span class="nf">call</span>        <span class="err">@</span><span class="no">ILT</span><span class="err">+</span><span class="mi">20</span><span class="p">(</span><span class="no">Test</span><span class="p">)</span> <span class="p">(</span><span class="mi">00401019</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="err">0040139</span><span class="nf">A</span>   <span class="no">add</span>         <span class="no">esp</span><span class="p">,</span><span class="mi">4</span>
+</span></span><span class="line"><span class="cl"><span class="err">31:</span>       <span class="nf">return</span> <span class="mi">0</span><span class="c1">;
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">0040139</span><span class="nf">D</span>   <span class="no">mov</span>         <span class="no">dword</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">ebp-104h</span><span class="p">],</span><span class="mi">0</span>
+</span></span><span class="line"><span class="cl"><span class="err">004013</span><span class="nf">A7</span>   <span class="no">lea</span>         <span class="no">ecx</span><span class="p">,[</span><span class="no">ebp-100h</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="err">004013</span><span class="nf">AD</span>   <span class="no">call</span>        <span class="err">@</span><span class="no">ILT</span><span class="err">+</span><span class="mi">0</span><span class="p">(</span><span class="no">CA</span><span class="p">::</span><span class="err">~</span><span class="no">CA</span><span class="p">)</span> <span class="p">(</span><span class="mi">00401005</span><span class="p">)</span><span class="c1">;调用类的析构函数
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">004013</span><span class="nf">B2</span>   <span class="no">mov</span>         <span class="no">eax</span><span class="p">,</span><span class="no">dword</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">ebp-104h</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="err">32:</span>   <span class="err">}</span>
+</span></span><span class="line"><span class="cl"><span class="c1">;test函数
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">24:</span>       <span class="nf">CA</span> <span class="no">a</span><span class="c1">;
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">25:</span>       <span class="nf">return</span> <span class="no">a</span><span class="c1">;
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">004012</span><span class="nf">AA</span>   <span class="no">mov</span>         <span class="no">ecx</span><span class="p">,</span><span class="mi">3</span><span class="no">Fh</span>
+</span></span><span class="line"><span class="cl"><span class="err">004012</span><span class="nf">AF</span>   <span class="no">lea</span>         <span class="no">esi</span><span class="p">,[</span><span class="no">ebp-10Ch</span><span class="p">]</span><span class="c1">;esi保存的是类对象的首地址
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">004012</span><span class="nf">B5</span>   <span class="no">mov</span>         <span class="no">edi</span><span class="p">,</span><span class="no">dword</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">ebp</span><span class="err">+</span><span class="mi">8</span><span class="p">]</span><span class="c1">;ebp+8是当初调用这个函数时传进来的类的首地址
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">004012</span><span class="nf">B8</span>   <span class="no">rep</span> <span class="no">movs</span>    <span class="no">dword</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">edi</span><span class="p">],</span><span class="no">dword</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">esi</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="err">004012</span><span class="nf">BA</span>   <span class="no">movs</span>        <span class="no">word</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">edi</span><span class="p">],</span><span class="no">word</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">esi</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="err">004012</span><span class="nf">BC</span>   <span class="no">movs</span>        <span class="no">byte</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">edi</span><span class="p">],</span><span class="no">byte</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">esi</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="err">004012</span><span class="nf">BD</span>   <span class="no">mov</span>         <span class="no">eax</span><span class="p">,</span><span class="no">dword</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">ebp-110h</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="err">004012</span><span class="nf">C3</span>   <span class="no">or</span>          <span class="no">al</span><span class="p">,</span><span class="mi">1</span>
+</span></span><span class="line"><span class="cl"><span class="err">004012</span><span class="nf">C5</span>   <span class="no">mov</span>         <span class="no">dword</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">ebp-110h</span><span class="p">],</span><span class="no">eax</span>
+</span></span><span class="line"><span class="cl"><span class="err">004012</span><span class="nf">CB</span>   <span class="no">lea</span>         <span class="no">ecx</span><span class="p">,[</span><span class="no">ebp-10Ch</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="err">004012</span><span class="nf">D1</span>   <span class="no">call</span>        <span class="err">@</span><span class="no">ILT</span><span class="err">+</span><span class="mi">0</span><span class="p">(</span><span class="no">CA</span><span class="p">::</span><span class="err">~</span><span class="no">CA</span><span class="p">)</span> <span class="p">(</span><span class="mi">00401005</span><span class="p">)</span><span class="c1">;调用析构函数
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">004012</span><span class="nf">D6</span>   <span class="no">mov</span>         <span class="no">eax</span><span class="p">,</span><span class="no">dword</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">ebp</span><span class="err">+</span><span class="mi">8</span><span class="p">]</span>
+</span></span></code></pre></div><p>当类作为返回值返回时，如果定义了一个变量来接收这个返回值，那么在调用函数时会首先保存这个值，然后直接复制到这个内存中，但是接着执行类的析构函数析构在函数中定义的类对象，接受返回值得这块内存一直等到它所在的语句块结束才调用析构
+如果不要这个返回值时又如何呢,下面的代码说明了这个问题</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="kt">int</span> <span class="nf">main</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">Test</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">    <span class="n">printf</span><span class="p">(</span><span class="s">&#34;main()</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-asm" data-lang="asm"><span class="line"><span class="cl"><span class="err">30:</span>       <span class="nf">Test</span><span class="p">()</span><span class="c1">;
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">0040138</span><span class="nf">E</span>   <span class="no">lea</span>         <span class="no">eax</span><span class="p">,[</span><span class="no">ebp-100h</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="err">00401394</span>   <span class="nf">push</span>        <span class="no">eax</span>
+</span></span><span class="line"><span class="cl"><span class="err">00401395</span>   <span class="nf">call</span>        <span class="err">@</span><span class="no">ILT</span><span class="err">+</span><span class="mi">20</span><span class="p">(</span><span class="no">Test</span><span class="p">)</span> <span class="p">(</span><span class="mi">00401019</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="err">0040139</span><span class="nf">A</span>   <span class="no">add</span>         <span class="no">esp</span><span class="p">,</span><span class="mi">4</span>
+</span></span><span class="line"><span class="cl"><span class="err">0040139</span><span class="nf">D</span>   <span class="no">lea</span>         <span class="no">ecx</span><span class="p">,[</span><span class="no">ebp-100h</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="err">004013</span><span class="nf">A3</span>   <span class="no">call</span>        <span class="err">@</span><span class="no">ILT</span><span class="err">+</span><span class="mi">0</span><span class="p">(</span><span class="no">CA</span><span class="p">::</span><span class="err">~</span><span class="no">CA</span><span class="p">)</span> <span class="p">(</span><span class="mi">00401005</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="err">31:</span>       <span class="nf">printf</span><span class="p">(</span><span class="err">&#34;</span><span class="no">main</span><span class="p">()</span><span class="err">\</span><span class="no">n</span><span class="err">&#34;</span><span class="p">)</span><span class="c1">;
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">004013</span><span class="nf">A8</span>   <span class="no">push</span>        <span class="no">offset</span> <span class="no">string</span> <span class="err">&#34;</span><span class="no">main</span><span class="p">()</span><span class="err">\</span><span class="no">n</span><span class="err">&#34;</span> <span class="p">(</span><span class="mi">0042</span><span class="no">f030</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="err">004013</span><span class="nf">AD</span>   <span class="no">call</span>        <span class="no">printf</span> <span class="p">(</span><span class="mi">00401660</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="err">004013</span><span class="nf">B2</span>   <span class="no">add</span>         <span class="no">esp</span><span class="p">,</span><span class="mi">4</span>
+</span></span></code></pre></div><p>同样可以看到当我们不需要这个返回值时，函数仍然会将对象拷贝到这块临时存储区中，但是会立即进行析构对这块内存进行回收。</p>
+<!-- raw HTML omitted -->
+</div><div class="post-footer" id="post-footer">
+    <div class="post-info">
+        <div class="post-info-line">
+            <div class="post-info-mod">
+                <span>Updated on 2018-02-06</span>
+            </div></div>
+        <div class="post-info-line">
+            <div class="post-info-md"></div>
+            <div class="post-info-share">
+                <span><a href="javascript:void(0);" title="Share on Twitter" data-sharer="twitter" data-url="http://HaiLateBoy.github.io/posts/c-plus-structure-and-destruct/" data-title="C&#43;&#43;类的构造函数与析构函数" data-hashtags="VC&#43;&#43;,反汇编,C&#43;&#43;实现原理"><i class="fab fa-twitter fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Facebook" data-sharer="facebook" data-url="http://HaiLateBoy.github.io/posts/c-plus-structure-and-destruct/" data-hashtag="VC&#43;&#43;"><i class="fab fa-facebook-square fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Hacker News" data-sharer="hackernews" data-url="http://HaiLateBoy.github.io/posts/c-plus-structure-and-destruct/" data-title="C&#43;&#43;类的构造函数与析构函数"><i class="fab fa-hacker-news fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Line" data-sharer="line" data-url="http://HaiLateBoy.github.io/posts/c-plus-structure-and-destruct/" data-title="C&#43;&#43;类的构造函数与析构函数"><i data-svg-src="https://cdn.jsdelivr.net/npm/simple-icons@7.3.0/icons/line.svg" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on 微博" data-sharer="weibo" data-url="http://HaiLateBoy.github.io/posts/c-plus-structure-and-destruct/" data-title="C&#43;&#43;类的构造函数与析构函数"><i class="fab fa-weibo fa-fw" aria-hidden="true"></i></a></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="post-info-more">
+        <section class="post-tags"><i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/vc&#43;&#43;/">VC&#43;&#43;</a>,&nbsp;<a href="/tags/%E5%8F%8D%E6%B1%87%E7%BC%96/">反汇编</a>,&nbsp;<a href="/tags/c&#43;&#43;%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86/">C&#43;&#43;实现原理</a></section>
+        <section>
+            <span><a href="javascript:void(0);" onclick="window.history.back();">Back</a></span>&nbsp;|&nbsp;<span><a href="/">Home</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav"><a href="/posts/c-struct-and-class/" class="prev" rel="prev" title="结构体和类"><i class="fas fa-angle-left fa-fw" aria-hidden="true"></i>结构体和类</a>
+            <a href="/posts/c-plus-polymorphism/" class="next" rel="next" title="C&#43;&#43;多态">C++多态<i class="fas fa-angle-right fa-fw" aria-hidden="true"></i></a></div>
+</div>
+</article></div>
+            </main><footer class="footer">
+        <div class="footer-container"><div class="footer-line">Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener noreffer" title="Hugo 0.121.2">Hugo</a> | Theme - <a href="https://github.com/dillonzq/LoveIt" target="_blank" rel="noopener noreffer" title="LoveIt 0.2.11"><i class="far fa-kiss-wink-heart fa-fw" aria-hidden="true"></i> LoveIt</a>
+                </div><div class="footer-line" itemscope itemtype="http://schema.org/CreativeWork"><i class="far fa-copyright fa-fw" aria-hidden="true"></i><span itemprop="copyrightYear">2022 - 2024</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="https://www.masimaro.xyz" target="_blank">Masimaro</a></span></div>
+        </div>
+    </footer></div>
+
+        <div id="fixed-buttons"><a href="#" id="back-to-top" class="fixed-button" title="Back to Top">
+                <i class="fas fa-arrow-up fa-fw" aria-hidden="true"></i>
+            </a><a href="#" id="view-comments" class="fixed-button" title="View Comments">
+                <i class="fas fa-comment fa-fw" aria-hidden="true"></i>
+            </a>
+        </div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.css"><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/autocomplete.js@0.38.1/dist/autocomplete.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lunr@2.3.9/lunr.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lazysizes@5.3.2/lazysizes.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/clipboard@2.0.11/dist/clipboard.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/sharer.js@0.5.1/sharer.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/auto-render.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/copy-tex.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/mhchem.min.js"></script><script type="text/javascript">window.config={"code":{"copyTitle":"Copy to clipboard","maxShownLines":50},"comment":{},"math":{"delimiters":[{"display":true,"left":"$$","right":"$$"},{"display":true,"left":"\\[","right":"\\]"},{"display":true,"left":"\\begin{equation}","right":"\\end{equation}"},{"display":true,"left":"\\begin{equation*}","right":"\\end{equation*}"},{"display":true,"left":"\\begin{align}","right":"\\end{align}"},{"display":true,"left":"\\begin{align*}","right":"\\end{align*}"},{"display":true,"left":"\\begin{alignat}","right":"\\end{alignat}"},{"display":true,"left":"\\begin{alignat*}","right":"\\end{alignat*}"},{"display":true,"left":"\\begin{gather}","right":"\\end{gather}"},{"display":true,"left":"\\begin{CD}","right":"\\end{CD}"},{"display":false,"left":"$","right":"$"},{"display":false,"left":"\\(","right":"\\)"}],"strict":false},"search":{"highlightTag":"em","maxResultLength":10,"noResultsFound":"No results found","snippetLength":50}};</script><script type="text/javascript" src="/js/theme.min.js"></script></body>
+</html>

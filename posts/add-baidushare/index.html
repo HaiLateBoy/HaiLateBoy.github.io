@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="robots" content="noodp" />
+        <title>hexo next主题为博客添加分享功能 - Masimaro&#39;s blog</title><meta name="Description" content="这是我用于记录日常和学习的小站"><meta property="og:title" content="hexo next主题为博客添加分享功能" />
+<meta property="og:description" content="今天心血来潮，决定给博客添加分享功能，百度上首先是找到了使用shareSDK的分享功能，最后在实践的过程中发现它添加时步骤比较多，添加完成后效果比较丑（就是一个长条的浅蓝色按钮），而且点击后想要退出分享比较麻烦（它的取消按钮实在太难找了，它在页面最下方的位置，呈现浅灰色，这个设计太反人类了，决定放弃它了）。在next主题的官方的文档中发现它自身集成了百度分享的功能，所以决定采用百度了。" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://HaiLateBoy.github.io/posts/add-baidushare/" /><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2018-01-06T20:20:02+00:00" />
+<meta property="article:modified_time" content="2018-01-06T20:20:02+00:00" /><meta property="og:site_name" content="Masimaro&#39;s blog" />
+
+<meta name="twitter:card" content="summary"/><meta name="twitter:title" content="hexo next主题为博客添加分享功能"/>
+<meta name="twitter:description" content="今天心血来潮，决定给博客添加分享功能，百度上首先是找到了使用shareSDK的分享功能，最后在实践的过程中发现它添加时步骤比较多，添加完成后效果比较丑（就是一个长条的浅蓝色按钮），而且点击后想要退出分享比较麻烦（它的取消按钮实在太难找了，它在页面最下方的位置，呈现浅灰色，这个设计太反人类了，决定放弃它了）。在next主题的官方的文档中发现它自身集成了百度分享的功能，所以决定采用百度了。"/>
+<meta name="application-name" content="My cool site">
+<meta name="apple-mobile-web-app-title" content="My cool site"><meta name="theme-color" content="#ffffff"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="manifest" href="/site.webmanifest"><link rel="canonical" href="http://HaiLateBoy.github.io/posts/add-baidushare/" /><link rel="prev" href="http://HaiLateBoy.github.io/posts/oledb-and-ado-1/" /><link rel="next" href="http://HaiLateBoy.github.io/posts/crazy-programmer-read/" /><link rel="stylesheet" href="/css/style.min.css"><link rel="preload" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css"></noscript><link rel="preload" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css"></noscript><script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "BlogPosting",
+        "headline": "hexo next主题为博客添加分享功能",
+        "inLanguage": "zh-CN",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "http:\/\/HaiLateBoy.github.io\/posts\/add-baidushare\/"
+        },"genre": "posts","keywords": "hexo博客, 博客配置","wordcount":  2260 ,
+        "url": "http:\/\/HaiLateBoy.github.io\/posts\/add-baidushare\/","datePublished": "2018-01-06T20:20:02+00:00","dateModified": "2018-01-06T20:20:02+00:00","publisher": {
+            "@type": "Organization",
+            "name": ""},"author": {
+                "@type": "Person",
+                "name": "Masimaro"
+            },"description": ""
+    }
+    </script></head>
+    <body data-header-desktop="fixed" data-header-mobile="auto"><script type="text/javascript">(window.localStorage && localStorage.getItem('theme') ? localStorage.getItem('theme') === 'dark' : ('auto' === 'auto' ? window.matchMedia('(prefers-color-scheme: dark)').matches : 'auto' === 'dark')) && document.body.setAttribute('theme', 'dark');</script>
+
+        <div id="mask"></div><div class="wrapper"><header class="desktop" id="header-desktop">
+    <div class="header-wrapper">
+        <div class="header-title">
+            <a href="/" title="Masimaro&#39;s blog">My cool site</a>
+        </div>
+        <div class="menu">
+            <div class="menu-inner"><a class="menu-item" href="/posts/" title="文章列表"> 文章 </a><a class="menu-item" href="/tags/" title="标签"> 标签 </a><a class="menu-item" href="/categories/" title="分类"> 分类 </a><a class="menu-item" href="/about" title="关于本站"> 关于 </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-desktop">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-desktop" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-desktop" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-desktop">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </span><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                    <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+                </a></div>
+        </div>
+    </div>
+</header><header class="mobile" id="header-mobile">
+    <div class="header-container">
+        <div class="header-wrapper">
+            <div class="header-title">
+                <a href="/" title="Masimaro&#39;s blog">My cool site</a>
+            </div>
+            <div class="menu-toggle" id="menu-toggle-mobile">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+        <div class="menu" id="menu-mobile"><div class="search-wrapper">
+                    <div class="search mobile" id="search-mobile">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-mobile">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-mobile" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-mobile" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-mobile">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </div>
+                    <a href="javascript:void(0);" class="search-cancel" id="search-cancel-mobile">
+                        Cancel
+                    </a>
+                </div><a class="menu-item" href="/posts/" title="文章列表">文章</a><a class="menu-item" href="/tags/" title="标签">标签</a><a class="menu-item" href="/categories/" title="分类">分类</a><a class="menu-item" href="/about" title="关于本站">关于</a><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+            </a></div>
+    </div>
+</header><div class="search-dropdown desktop">
+        <div id="search-dropdown-desktop"></div>
+    </div>
+    <div class="search-dropdown mobile">
+        <div id="search-dropdown-mobile"></div>
+    </div><main class="main">
+                <div class="container"><div class="toc" id="toc-auto">
+            <h2 class="toc-title">Contents</h2>
+            <div class="toc-content" id="toc-content-auto"></div>
+        </div><article class="page single"><h1 class="single-title animate__animated animate__flipInX">hexo next主题为博客添加分享功能</h1><div class="post-meta">
+            <div class="post-meta-line"><span class="post-author"><a href="https://www.masimaro.xyz" title="Author" target="_blank" rel="noopener noreffer author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Masimaro</a></span>&nbsp;<span class="post-category">included in <a href="/categories/hexo-next%E4%B8%BB%E9%A2%98%E9%85%8D%E7%BD%AE/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>hexo next主题配置</a></span></div>
+            <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw" aria-hidden="true"></i>&nbsp;<time datetime="2018-01-06">2018-01-06</time>&nbsp;<i class="fas fa-pencil-alt fa-fw" aria-hidden="true"></i>&nbsp;2260 words&nbsp;
+                <i class="far fa-clock fa-fw" aria-hidden="true"></i>&nbsp;5 minutes&nbsp;</div>
+        </div><div class="details toc" id="toc-static"  data-kept="true">
+                <div class="details-summary toc-title">
+                    <span>Contents</span>
+                    <span><i class="details-icon fas fa-angle-right" aria-hidden="true"></i></span>
+                </div>
+                <div class="details-content toc-content" id="toc-content-static"><nav id="TableOfContents"></nav></div>
+            </div><div class="content" id="content"><p>今天心血来潮，决定给博客添加分享功能，百度上首先是找到了使用shareSDK的分享功能，最后在实践的过程中发现它添加时步骤比较多，添加完成后效果比较丑（就是一个长条的浅蓝色按钮），而且点击后想要退出分享比较麻烦（它的取消按钮实在太难找了，它在页面最下方的位置，呈现浅灰色，这个设计太反人类了，决定放弃它了）。在next主题的官方的文档中发现它自身集成了百度分享的功能，所以决定采用百度了。</p>
+<h1 id="解决思路">解决思路</h1>
+<p>根据官方文档的说法，只需要添加/修改字段 baidushare，值为 true。即可
+<a href="http://theme-next.iissnan.com/third-party-services.html" target="_blank" rel="noopener noreffer ">官方文档</a>
+但是我自己改了之后发现并没有出现分享功能，下面是我的主体配置文件的部分代码</p>
+<pre tabindex="0"><code class="language-markdonw" data-lang="markdonw"># Baidu Share
+# Available value:
+#    button | slide
+# Warning: Baidu Share does not support https.
+#baidushare:
+  #type: button
+baidushare: true
+</code></pre><p>网上也没找到什么靠谱的资料，没办法，自己来分析源代码，找找问题在哪吧
+由于hexo本身是使用node.js将Markdown渲染成静态页面，所以百度分享的相关代码必然会出现在HTML页面中，我们通过查看生成的HTML发现并没有对应的分享的代码，也就是说配置并没有启用。现在初步估计问题应该是出现在Markdown转化为HTML的过程中。
+hexo中文章使用的模板是主题目录中的layout/post.swig文件，文件中关于分享功能的代码大致出现在第16行</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-html" data-lang="html"><span class="line"><span class="cl"><span class="p">&lt;</span><span class="nt">div</span> <span class="na">class</span><span class="o">=</span><span class="s">&#34;post-spread&#34;</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">      {% if theme.jiathis %}
+</span></span><span class="line"><span class="cl">        {% include &#39;_partials/share/jiathis.swig&#39; %}
+</span></span><span class="line"><span class="cl">      {% elseif theme.baidushare %}
+</span></span><span class="line"><span class="cl">        {% include &#39;_partials/share/baidushare.swig&#39; %}
+</span></span><span class="line"><span class="cl">      {% elseif theme.add_this_id %}
+</span></span><span class="line"><span class="cl">        {% include &#39;_partials/share/add-this.swig&#39; %}
+</span></span><span class="line"><span class="cl">      {% elseif theme.duoshuo_shortname and theme.duoshuo_share %}
+</span></span><span class="line"><span class="cl">        {% include &#39;_partials/share/duoshuo_share.swig&#39; %}
+</span></span><span class="line"><span class="cl">        <span class="c">&lt;!--后面的两句是我为了使用sharesdk的分享功能而添加的，原版没有--&gt;</span>
+</span></span><span class="line"><span class="cl">      {% elseif theme.sharesdk %}
+</span></span><span class="line"><span class="cl">        {% include &#39;_partials/share/sharesdk.swig&#39; %}
+</span></span><span class="line"><span class="cl">      {% endif %}
+</span></span><span class="line"><span class="cl"><span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+</span></span></code></pre></div><p>从代码上看，next主题支持许多中分享方式。它会先判断配置文件中对应的配置打开与否执行相应的代码，其中theme代表的是主题的配置文件。</p>
+<ul>
+<li>ps:当时我在配置sharesdk的时候发现只有注释掉其他的分享功能才能正常启用sharesdk，从代码上来看如果其他的打开了，根本就不会加载sharesdk的配置文件，要正常使用sharesdk的分享功能，要么修改判断的顺序，要么在配置文件中注释掉其他的分享功能 *</li>
+</ul>
+<p>百度分享功能加载的是文件配置文件目录下的_partials/share/baidushare.swig,打开该文件：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-html" data-lang="html"><span class="line"><span class="cl">{% if theme.baidushare.type === &#34;button&#34; %}
+</span></span><span class="line"><span class="cl">  <span class="p">&lt;</span><span class="nt">div</span> <span class="na">class</span><span class="o">=</span><span class="s">&#34;bdsharebuttonbox&#34;</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">&lt;</span><span class="nt">a</span> <span class="na">href</span><span class="o">=</span><span class="s">&#34;#&#34;</span> <span class="na">class</span><span class="o">=</span><span class="s">&#34;bds_tsina&#34;</span> <span class="na">data-cmd</span><span class="o">=</span><span class="s">&#34;tsina&#34;</span> <span class="na">title</span><span class="o">=</span><span class="s">&#34;分享到新浪微博&#34;</span><span class="p">&gt;&lt;/</span><span class="nt">a</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">&lt;</span><span class="nt">a</span> <span class="na">href</span><span class="o">=</span><span class="s">&#34;#&#34;</span> <span class="na">class</span><span class="o">=</span><span class="s">&#34;bds_douban&#34;</span> <span class="na">data-cmd</span><span class="o">=</span><span class="s">&#34;douban&#34;</span> <span class="na">title</span><span class="o">=</span><span class="s">&#34;分享到豆瓣网&#34;</span><span class="p">&gt;&lt;/</span><span class="nt">a</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">&lt;</span><span class="nt">a</span> <span class="na">href</span><span class="o">=</span><span class="s">&#34;#&#34;</span> <span class="na">class</span><span class="o">=</span><span class="s">&#34;bds_sqq&#34;</span> <span class="na">data-cmd</span><span class="o">=</span><span class="s">&#34;sqq&#34;</span> <span class="na">title</span><span class="o">=</span><span class="s">&#34;分享到QQ好友&#34;</span><span class="p">&gt;&lt;/</span><span class="nt">a</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">&lt;</span><span class="nt">a</span> <span class="na">href</span><span class="o">=</span><span class="s">&#34;#&#34;</span> <span class="na">class</span><span class="o">=</span><span class="s">&#34;bds_qzone&#34;</span> <span class="na">data-cmd</span><span class="o">=</span><span class="s">&#34;qzone&#34;</span> <span class="na">title</span><span class="o">=</span><span class="s">&#34;分享到QQ空间&#34;</span><span class="p">&gt;&lt;/</span><span class="nt">a</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">&lt;</span><span class="nt">a</span> <span class="na">href</span><span class="o">=</span><span class="s">&#34;#&#34;</span> <span class="na">class</span><span class="o">=</span><span class="s">&#34;bds_weixin&#34;</span> <span class="na">data-cmd</span><span class="o">=</span><span class="s">&#34;weixin&#34;</span> <span class="na">title</span><span class="o">=</span><span class="s">&#34;分享到微信&#34;</span><span class="p">&gt;&lt;/</span><span class="nt">a</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">&lt;</span><span class="nt">a</span> <span class="na">href</span><span class="o">=</span><span class="s">&#34;#&#34;</span> <span class="na">class</span><span class="o">=</span><span class="s">&#34;bds_tieba&#34;</span> <span class="na">data-cmd</span><span class="o">=</span><span class="s">&#34;tieba&#34;</span> <span class="na">title</span><span class="o">=</span><span class="s">&#34;分享到百度贴吧&#34;</span><span class="p">&gt;&lt;/</span><span class="nt">a</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">&lt;</span><span class="nt">a</span> <span class="na">href</span><span class="o">=</span><span class="s">&#34;#&#34;</span> <span class="na">class</span><span class="o">=</span><span class="s">&#34;bds_twi&#34;</span> <span class="na">data-cmd</span><span class="o">=</span><span class="s">&#34;twi&#34;</span> <span class="na">title</span><span class="o">=</span><span class="s">&#34;分享到Twitter&#34;</span><span class="p">&gt;&lt;/</span><span class="nt">a</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">&lt;</span><span class="nt">a</span> <span class="na">href</span><span class="o">=</span><span class="s">&#34;#&#34;</span> <span class="na">class</span><span class="o">=</span><span class="s">&#34;bds_fbook&#34;</span> <span class="na">data-cmd</span><span class="o">=</span><span class="s">&#34;fbook&#34;</span> <span class="na">title</span><span class="o">=</span><span class="s">&#34;分享到Facebook&#34;</span><span class="p">&gt;&lt;/</span><span class="nt">a</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">&lt;</span><span class="nt">a</span> <span class="na">href</span><span class="o">=</span><span class="s">&#34;#&#34;</span> <span class="na">class</span><span class="o">=</span><span class="s">&#34;bds_more&#34;</span> <span class="na">data-cmd</span><span class="o">=</span><span class="s">&#34;more&#34;</span><span class="p">&gt;&lt;/</span><span class="nt">a</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">&lt;</span><span class="nt">a</span> <span class="na">class</span><span class="o">=</span><span class="s">&#34;bds_count&#34;</span> <span class="na">data-cmd</span><span class="o">=</span><span class="s">&#34;count&#34;</span><span class="p">&gt;&lt;/</span><span class="nt">a</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">  <span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">....
+</span></span><span class="line"><span class="cl">{% endif %}
+</span></span></code></pre></div><p>代码中先判断了theme.baidushare.type的值，如果为button则执行后面的代码，原始代码中判断了两种情况一种是theme.baidushare.type为button，另一种是为slide，只有为这两种值才会执行代码，再次检查配置文件看看它的类型值是否正确。最后发现baidushare以及它下面的type被注释掉了，由于它没有读取到这个值，所以这两中情况都不满足，也就不会生成对应的分享代码，所以打开这两行的代码，最终这块的配置如下：</p>
+<pre tabindex="0"><code class="language-swig" data-lang="swig">baidushare:
+  type: button
+  baidushare: true
+</code></pre><p>重新生成一下，发现百度分享的按钮出现了。
+至此问题解决了。</p>
+<h1 id="总结">总结</h1>
+<p>百度了很久没有解决，还是还是带着绝望的心情看源码看出了点头绪。最后我想说：RTFSC大法好（Linus大神说的：Read The Fucking Source Code&hellip;.）
+<a href="add-baidushare.html" rel="">实际效果请移步到此</a></p>
+<h1 id="最后的最后">最后的最后</h1>
+<p>最后说点题外话，关于求助这件事，其实很多时候看源代码或者帮助文档能解决我们差不多很多问题，如果实在没有，一般你遇到的问题别人可能也遇到过，善用搜索引擎能解决所有问题，之前看到一个说法:普通程序员 + google = 超级程序员。所以在平时要养成一些习惯，仔细阅读帮助文档，阅读源码，善用搜索引擎，再实在没辙了再上论坛提问。
+下面是经常见到的在一些问答网站回答的一些缩写，我觉得很有趣也很有用，在此将其列举出来：</p>
+<ul>
+<li>RTFSC(Read the fucking source code)</li>
+<li>RTFM(Read the fucking manual)</li>
+<li>UTFH (“Use The Fucking Help”)</li>
+<li>STFW (“Search The Fucking Web”)</li>
+<li>STFG (“Search The Fucking Google” or “Search The Fantastic Google”)</li>
+<li>GIYF (“Google Is Your Friend”)</li>
+<li>JFGI (“Just Fucking Google It”)</li>
+<li>UTSL (“Use The Source Luke”—alternately, RTFS)</li>
+<li>RTFA (“Read The Fucking Article”—common on news forums such as Fark.com[3] and Slashdot)</li>
+<li>RTFE (“Read The Fucking Email”)</li>
+<li>RTFC (“Read The Fucking Code,” or “Reboot The Fucking Computer”)</li>
+<li>RTFQ (“Read The Fucking Question”)</li>
+<li>LMGTFY (“Let Me Google That For You”)</li>
+<li>WIDGI (“When In Doubt Google It” - Also occasionally ‘WIDGIT’)</li>
+<li>FIOTI (“Find It On The Internet”)</li>
+</ul>
+<p>通常，给出这些答案的人已经通过这些办法找到了解决问题的关键，正在一边看一边敲键盘。这些回复意味着他认为：第一，你要的信息很容易找到。第二，自已找 要比别人喂到嘴里能学得更多。你不应该觉得这样就被冒犯了，按黑客的标准，他没有不理你就是在向你表示某种尊敬，你反而应该感谢他热切地想帮助你。</p>
+<p><em>PS 最近升级到hugo了，这个效果暂时失效了，等我想起来做hugo的分享链接再写一篇</em></p></div><div class="post-footer" id="post-footer">
+    <div class="post-info">
+        <div class="post-info-line">
+            <div class="post-info-mod">
+                <span>Updated on 2018-01-06</span>
+            </div></div>
+        <div class="post-info-line">
+            <div class="post-info-md"></div>
+            <div class="post-info-share">
+                <span><a href="javascript:void(0);" title="Share on Twitter" data-sharer="twitter" data-url="http://HaiLateBoy.github.io/posts/add-baidushare/" data-title="hexo next主题为博客添加分享功能" data-hashtags="hexo博客,博客配置"><i class="fab fa-twitter fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Facebook" data-sharer="facebook" data-url="http://HaiLateBoy.github.io/posts/add-baidushare/" data-hashtag="hexo博客"><i class="fab fa-facebook-square fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Hacker News" data-sharer="hackernews" data-url="http://HaiLateBoy.github.io/posts/add-baidushare/" data-title="hexo next主题为博客添加分享功能"><i class="fab fa-hacker-news fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Line" data-sharer="line" data-url="http://HaiLateBoy.github.io/posts/add-baidushare/" data-title="hexo next主题为博客添加分享功能"><i data-svg-src="https://cdn.jsdelivr.net/npm/simple-icons@7.3.0/icons/line.svg" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on 微博" data-sharer="weibo" data-url="http://HaiLateBoy.github.io/posts/add-baidushare/" data-title="hexo next主题为博客添加分享功能"><i class="fab fa-weibo fa-fw" aria-hidden="true"></i></a></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="post-info-more">
+        <section class="post-tags"><i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/hexo%E5%8D%9A%E5%AE%A2/">hexo博客</a>,&nbsp;<a href="/tags/%E5%8D%9A%E5%AE%A2%E9%85%8D%E7%BD%AE/">博客配置</a></section>
+        <section>
+            <span><a href="javascript:void(0);" onclick="window.history.back();">Back</a></span>&nbsp;|&nbsp;<span><a href="/">Home</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav"><a href="/posts/oledb-and-ado-1/" class="prev" rel="prev" title="Windows数据库编程接口简介"><i class="fas fa-angle-left fa-fw" aria-hidden="true"></i>Windows数据库编程接口简介</a>
+            <a href="/posts/crazy-programmer-read/" class="next" rel="next" title="《疯狂的程序员》读后感">《疯狂的程序员》读后感<i class="fas fa-angle-right fa-fw" aria-hidden="true"></i></a></div>
+</div>
+</article></div>
+            </main><footer class="footer">
+        <div class="footer-container"><div class="footer-line">Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener noreffer" title="Hugo 0.121.2">Hugo</a> | Theme - <a href="https://github.com/dillonzq/LoveIt" target="_blank" rel="noopener noreffer" title="LoveIt 0.2.11"><i class="far fa-kiss-wink-heart fa-fw" aria-hidden="true"></i> LoveIt</a>
+                </div><div class="footer-line" itemscope itemtype="http://schema.org/CreativeWork"><i class="far fa-copyright fa-fw" aria-hidden="true"></i><span itemprop="copyrightYear">2022 - 2024</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="https://www.masimaro.xyz" target="_blank">Masimaro</a></span></div>
+        </div>
+    </footer></div>
+
+        <div id="fixed-buttons"><a href="#" id="back-to-top" class="fixed-button" title="Back to Top">
+                <i class="fas fa-arrow-up fa-fw" aria-hidden="true"></i>
+            </a><a href="#" id="view-comments" class="fixed-button" title="View Comments">
+                <i class="fas fa-comment fa-fw" aria-hidden="true"></i>
+            </a>
+        </div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.css"><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/autocomplete.js@0.38.1/dist/autocomplete.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lunr@2.3.9/lunr.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lazysizes@5.3.2/lazysizes.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/clipboard@2.0.11/dist/clipboard.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/sharer.js@0.5.1/sharer.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/auto-render.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/copy-tex.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/mhchem.min.js"></script><script type="text/javascript">window.config={"code":{"copyTitle":"Copy to clipboard","maxShownLines":50},"comment":{},"math":{"delimiters":[{"display":true,"left":"$$","right":"$$"},{"display":true,"left":"\\[","right":"\\]"},{"display":true,"left":"\\begin{equation}","right":"\\end{equation}"},{"display":true,"left":"\\begin{equation*}","right":"\\end{equation*}"},{"display":true,"left":"\\begin{align}","right":"\\end{align}"},{"display":true,"left":"\\begin{align*}","right":"\\end{align*}"},{"display":true,"left":"\\begin{alignat}","right":"\\end{alignat}"},{"display":true,"left":"\\begin{alignat*}","right":"\\end{alignat*}"},{"display":true,"left":"\\begin{gather}","right":"\\end{gather}"},{"display":true,"left":"\\begin{CD}","right":"\\end{CD}"},{"display":false,"left":"$","right":"$"},{"display":false,"left":"\\(","right":"\\)"}],"strict":false},"search":{"highlightTag":"em","maxResultLength":10,"noResultsFound":"No results found","snippetLength":50}};</script><script type="text/javascript" src="/js/theme.min.js"></script></body>
+</html>

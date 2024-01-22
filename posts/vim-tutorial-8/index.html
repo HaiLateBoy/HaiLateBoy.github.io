@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="robots" content="noodp" />
+        <title>vim 从嫌弃到依赖(7)——可视模式 - Masimaro&#39;s blog</title><meta name="Description" content="这是我用于记录日常和学习的小站"><meta property="og:title" content="vim 从嫌弃到依赖(7)——可视模式" />
+<meta property="og:description" content="vim 的可视模式下可以选择一个区域，然后针对区域进行操作。可视模式有点类似于在其他编辑器上使用鼠标选中一块区域然后针对区域进行操作。 vim中有3" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://HaiLateBoy.github.io/posts/vim-tutorial-8/" /><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2022-04-25T12:46:40+08:00" />
+<meta property="article:modified_time" content="2022-04-25T12:46:40+08:00" /><meta property="og:site_name" content="Masimaro&#39;s blog" />
+
+<meta name="twitter:card" content="summary"/><meta name="twitter:title" content="vim 从嫌弃到依赖(7)——可视模式"/>
+<meta name="twitter:description" content="vim 的可视模式下可以选择一个区域，然后针对区域进行操作。可视模式有点类似于在其他编辑器上使用鼠标选中一块区域然后针对区域进行操作。 vim中有3"/>
+<meta name="application-name" content="My cool site">
+<meta name="apple-mobile-web-app-title" content="My cool site"><meta name="theme-color" content="#ffffff"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="manifest" href="/site.webmanifest"><link rel="canonical" href="http://HaiLateBoy.github.io/posts/vim-tutorial-8/" /><link rel="prev" href="http://HaiLateBoy.github.io/posts/vim-tutorial-7/" /><link rel="next" href="http://HaiLateBoy.github.io/posts/vim-tutorial-9/" /><link rel="stylesheet" href="/css/style.min.css"><link rel="preload" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css"></noscript><link rel="preload" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css"></noscript><script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "BlogPosting",
+        "headline": "vim 从嫌弃到依赖(7)——可视模式",
+        "inLanguage": "zh-CN",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "http:\/\/HaiLateBoy.github.io\/posts\/vim-tutorial-8\/"
+        },"genre": "posts","keywords": "vim, 编辑工具, 文本处理","wordcount":  2847 ,
+        "url": "http:\/\/HaiLateBoy.github.io\/posts\/vim-tutorial-8\/","datePublished": "2022-04-25T12:46:40+08:00","dateModified": "2022-04-25T12:46:40+08:00","publisher": {
+            "@type": "Organization",
+            "name": ""},"author": {
+                "@type": "Person",
+                "name": "Masimaro"
+            },"description": ""
+    }
+    </script></head>
+    <body data-header-desktop="fixed" data-header-mobile="auto"><script type="text/javascript">(window.localStorage && localStorage.getItem('theme') ? localStorage.getItem('theme') === 'dark' : ('auto' === 'auto' ? window.matchMedia('(prefers-color-scheme: dark)').matches : 'auto' === 'dark')) && document.body.setAttribute('theme', 'dark');</script>
+
+        <div id="mask"></div><div class="wrapper"><header class="desktop" id="header-desktop">
+    <div class="header-wrapper">
+        <div class="header-title">
+            <a href="/" title="Masimaro&#39;s blog">My cool site</a>
+        </div>
+        <div class="menu">
+            <div class="menu-inner"><a class="menu-item" href="/posts/" title="文章列表"> 文章 </a><a class="menu-item" href="/tags/" title="标签"> 标签 </a><a class="menu-item" href="/categories/" title="分类"> 分类 </a><a class="menu-item" href="/about" title="关于本站"> 关于 </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-desktop">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-desktop" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-desktop" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-desktop">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </span><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                    <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+                </a></div>
+        </div>
+    </div>
+</header><header class="mobile" id="header-mobile">
+    <div class="header-container">
+        <div class="header-wrapper">
+            <div class="header-title">
+                <a href="/" title="Masimaro&#39;s blog">My cool site</a>
+            </div>
+            <div class="menu-toggle" id="menu-toggle-mobile">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+        <div class="menu" id="menu-mobile"><div class="search-wrapper">
+                    <div class="search mobile" id="search-mobile">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-mobile">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-mobile" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-mobile" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-mobile">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </div>
+                    <a href="javascript:void(0);" class="search-cancel" id="search-cancel-mobile">
+                        Cancel
+                    </a>
+                </div><a class="menu-item" href="/posts/" title="文章列表">文章</a><a class="menu-item" href="/tags/" title="标签">标签</a><a class="menu-item" href="/categories/" title="分类">分类</a><a class="menu-item" href="/about" title="关于本站">关于</a><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+            </a></div>
+    </div>
+</header><div class="search-dropdown desktop">
+        <div id="search-dropdown-desktop"></div>
+    </div>
+    <div class="search-dropdown mobile">
+        <div id="search-dropdown-mobile"></div>
+    </div><main class="main">
+                <div class="container"><div class="toc" id="toc-auto">
+            <h2 class="toc-title">Contents</h2>
+            <div class="toc-content" id="toc-content-auto"></div>
+        </div><article class="page single"><h1 class="single-title animate__animated animate__flipInX">vim 从嫌弃到依赖(7)——可视模式</h1><div class="post-meta">
+            <div class="post-meta-line"><span class="post-author"><a href="https://www.masimaro.xyz" title="Author" target="_blank" rel="noopener noreffer author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Masimaro</a></span>&nbsp;<span class="post-category">included in <a href="/categories/vim/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>vim</a></span></div>
+            <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw" aria-hidden="true"></i>&nbsp;<time datetime="2022-04-25">2022-04-25</time>&nbsp;<i class="fas fa-pencil-alt fa-fw" aria-hidden="true"></i>&nbsp;2847 words&nbsp;
+                <i class="far fa-clock fa-fw" aria-hidden="true"></i>&nbsp;6 minutes&nbsp;</div>
+        </div><div class="details toc" id="toc-static"  data-kept="true">
+                <div class="details-summary toc-title">
+                    <span>Contents</span>
+                    <span><i class="details-icon fas fa-angle-right" aria-hidden="true"></i></span>
+                </div>
+                <div class="details-content toc-content" id="toc-content-static"><nav id="TableOfContents">
+  <ul>
+    <li><a href="#可视模式的3种子模式">可视模式的3种子模式</a></li>
+    <li><a href="#重新选择选中区域">重新选择选中区域</a></li>
+  </ul>
+
+  <ul>
+    <li><a href="#示例1缩进python代码">示例1：缩进Python代码</a></li>
+    <li><a href="#示例2处理列的可视模式的初步使用">示例2：处理列的可视模式的初步使用</a></li>
+    <li><a href="#示例3添加注释">示例3：添加注释</a></li>
+    <li><a href="#示例3在每行代码后添加一个分号">示例3：在每行代码后添加一个分号</a></li>
+  </ul>
+</nav></div>
+            </div><div class="content" id="content"><p><code>vim</code> 的可视模式下可以选择一个区域，然后针对区域进行操作。可视模式有点类似于在其他编辑器上使用鼠标选中一块区域然后针对区域进行操作。</p>
+<p>vim中有3种可视模式，分别用来处理不同范围的文本：</p>
+<ul>
+<li>处理字符的可视模式</li>
+<li>处理行的可视模式</li>
+<li>处理列块的可视模式</li>
+</ul>
+<p>在普通的文本编辑器中，例如在写博客的时候会发现有些地方表述不太正确，这个时候一般会选择先用鼠标选择一句或者一段，然后按退格或者删除键删除所选内容。vim的可视模式也是相同的逻辑，先选区然后对选区进行操作。选区时可以使用之前介绍的<code>motion</code> 来移动光标进行选区，操作选区的时候可以使用 <code>operator</code> 进行。</p>
+<p>直接说可能有点抽象，下面看一个例子：我们将 <code>there is one more line</code> 改为 <code>there is one line</code>。
+<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://img-blog.csdnimg.cn/678fa85d0ceb4124ab0eede9b4174bc8.gif#pic_center"
+        data-srcset="https://img-blog.csdnimg.cn/678fa85d0ceb4124ab0eede9b4174bc8.gif#pic_center, https://img-blog.csdnimg.cn/678fa85d0ceb4124ab0eede9b4174bc8.gif#pic_center 1.5x, https://img-blog.csdnimg.cn/678fa85d0ceb4124ab0eede9b4174bc8.gif#pic_center 2x"
+        data-sizes="auto"
+        alt="https://img-blog.csdnimg.cn/678fa85d0ceb4124ab0eede9b4174bc8.gif#pic_center"
+        title="可视模式的例子" />
+在上述例子中，我们使用 <code>v</code> 进入可视模式，在处理字符的可视模式下会在左下方显示 <code>VISUAL</code> 字样表示进入了处理字符的可视模式。在该模式中使用<code>e</code> 选中一个单词，然后使用<code>d</code> 删除它</p>
+<p>我们发现在可视模式下操作的逻辑与在普通模式下的操作逻辑不太相同，可视模式下先使用<code>motion</code> 移动光标选中部分内容，然后调用<code>operator</code> 来对选中部分做操作。而普通模式下先调用 <code>operator</code> 声明需要进行的操作，再使用<code>motion</code> 传入要操作的文本范围。但是可视模式下的操作逻辑确与一般的文本编辑器类似，都是现选中一个部分，然后再针对这部分进行操作。</p>
+<h1 id="选择模式">选择模式</h1>
+<p>在一般的编辑器中，选中一段文本后，输入任意字符会先删除选中部分然后再插入输入的字符，但是vim的可视模式并没有这么做。从上面的例子也可以看出来，vim的可视模式保持了普通模式中使用操作符操作区域的逻辑。但是vim也提供了类似于普通编辑器一样的体验，这个体验就是选择模式。</p>
+<p>在可视模式下使用 <code>&lt;Ctrl +g&gt;</code> 进入选择模式，下面是一个选择模式的例子
+<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://img-blog.csdnimg.cn/df62be2ccaa543f29140f3071a23df66.gif#pic_center"
+        data-srcset="https://img-blog.csdnimg.cn/df62be2ccaa543f29140f3071a23df66.gif#pic_center, https://img-blog.csdnimg.cn/df62be2ccaa543f29140f3071a23df66.gif#pic_center 1.5x, https://img-blog.csdnimg.cn/df62be2ccaa543f29140f3071a23df66.gif#pic_center 2x"
+        data-sizes="auto"
+        alt="https://img-blog.csdnimg.cn/df62be2ccaa543f29140f3071a23df66.gif#pic_center"
+        title="选择模式" />
+在进入可视模式后，使用<code>&lt;Ctrl +g&gt;</code> 进入选择模式，此时左下角的字样已经变为 <code>SELECT</code>，表示此时进入了选择模式。在选择模式中，随便输入一个字符，它会删除选中然后输入对应的内容。</p>
+<p>相信能看到这里的小伙伴已经很熟练的使用vim进行文本操作了。这个模式主要是为了迎合那些想让 <code>vim</code> 像其他编辑器那样的用户。这种模式效率并不高，而且也不太推荐使用这种模式。</p>
+<h2 id="可视模式的3种子模式">可视模式的3种子模式</h2>
+<p>可视模式下有3种处理不同情况的子模式，分别为：处理字符的可视模式、处理行的可视模式、处理列的可视模式</p>
+<p>处理字符的可视模式与普通的<code>motion</code> 配合使用，可以选中光标移动所经过的字符。可以在普通模式下按<code>v</code> 进入</p>
+<p>处理行的可视模式可以与行操作的<code>motion</code> 配合，一次选中一行，可以在普通模式下按 <code>V</code> 进入</p>
+<p>处理列的可视模式可以与一般的<code>motion</code> 配合，一次选中一列，行操作可以选中多列，而<code>h l</code> 则可以选中多列。</p>
+<p>3种模式下可以互相转化，按键与上面介绍的相同。例如从处理字符的选择模式切换到处理行的可以使用<code>V</code> ,从处理列的选择模式切换到处理行的，可以使用<code>v</code>。但是如果处在处理字符的可是模式下再次按下<code>v</code> 则会退回到普通模式，在其他模式下类似。</p>
+<h2 id="重新选择选中区域">重新选择选中区域</h2>
+<p>如果选择到一半发现我们选择错了该怎么办呢？一种方式是退回到普通模式下，然后再重新进入选择模式。但是在这里要介绍一种新的方式——可以按 <code>o</code> 重新选择选区的活动段。选择模式下选区一段固定，另一端可以移动。通过多次按下<code>o</code> 来变更需要移动哪一段</p>
+<p>例如下面的例子
+<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://img-blog.csdnimg.cn/d89ec8509f63448bb276f44c1f21ce35.gif#pic_center"
+        data-srcset="https://img-blog.csdnimg.cn/d89ec8509f63448bb276f44c1f21ce35.gif#pic_center, https://img-blog.csdnimg.cn/d89ec8509f63448bb276f44c1f21ce35.gif#pic_center 1.5x, https://img-blog.csdnimg.cn/d89ec8509f63448bb276f44c1f21ce35.gif#pic_center 2x"
+        data-sizes="auto"
+        alt="https://img-blog.csdnimg.cn/d89ec8509f63448bb276f44c1f21ce35.gif#pic_center"
+        title="调整选区" /></p>
+<h1 id="示例">示例</h1>
+<p>上面叽里呱啦说了一堆，可能各位小伙伴都没怎么记住，下面给出一些例子，帮助大家来理解之前说到的一些内容</p>
+<h2 id="示例1缩进python代码">示例1：缩进Python代码</h2>
+<p>假设有这么一段<code>Python</code>代码</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="k">def</span> <span class="nf">fib</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">    <span class="n">a</span> <span class="p">,</span> <span class="n">b</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span>
+</span></span><span class="line"><span class="cl">    <span class="k">while</span> <span class="n">a</span> <span class="o">&lt;</span> <span class="n">n</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl"><span class="nb">print</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">a</span> <span class="p">,</span> <span class="n">b</span> <span class="o">=</span> <span class="n">b</span><span class="p">,</span> <span class="n">a</span> <span class="o">+</span> <span class="n">b</span>
+</span></span><span class="line"><span class="cl"><span class="n">fib</span><span class="p">(</span><span class="mi">42</span><span class="p">)</span>
+</span></span></code></pre></div><p>要将中间两行缩进两次，变为下面的代码</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="k">def</span> <span class="nf">fib</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">    <span class="n">a</span> <span class="p">,</span> <span class="n">b</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span>
+</span></span><span class="line"><span class="cl">    <span class="k">while</span> <span class="n">a</span> <span class="o">&lt;</span> <span class="n">n</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">        <span class="nb">print</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="n">a</span> <span class="p">,</span> <span class="n">b</span> <span class="o">=</span> <span class="n">b</span><span class="p">,</span> <span class="n">a</span> <span class="o">+</span> <span class="n">b</span>
+</span></span><span class="line"><span class="cl"><span class="n">fib</span><span class="p">(</span><span class="mi">42</span><span class="p">)</span>
+</span></span></code></pre></div><ul>
+<li>解法1： 可以在普通模式下，在对应位置使用 <code>2&gt;&gt;</code> 将两行缩进一次，然后使用 <code>.</code>命令再重复一次
+<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://img-blog.csdnimg.cn/d584b9a0d55843e3b00f499464f6c842.gif#pic_center"
+        data-srcset="https://img-blog.csdnimg.cn/d584b9a0d55843e3b00f499464f6c842.gif#pic_center, https://img-blog.csdnimg.cn/d584b9a0d55843e3b00f499464f6c842.gif#pic_center 1.5x, https://img-blog.csdnimg.cn/d584b9a0d55843e3b00f499464f6c842.gif#pic_center 2x"
+        data-sizes="auto"
+        alt="https://img-blog.csdnimg.cn/d584b9a0d55843e3b00f499464f6c842.gif#pic_center"
+        title="解法1" /></li>
+<li>解法2：使用<code>&gt;j</code> 缩进两行，然后使用 <code>.</code> 重复，效果与上面的解法1一样，这里就不演示了</li>
+<li>解法3：使用 <code>V</code> 选中一行，然后使用<code>2&gt;</code> 缩进2次，移动到下一行后使用 <code>.</code>重复
+<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://img-blog.csdnimg.cn/2495ba5f025c41cdbc16d1eb93ab5161.gif#pic_center"
+        data-srcset="https://img-blog.csdnimg.cn/2495ba5f025c41cdbc16d1eb93ab5161.gif#pic_center, https://img-blog.csdnimg.cn/2495ba5f025c41cdbc16d1eb93ab5161.gif#pic_center 1.5x, https://img-blog.csdnimg.cn/2495ba5f025c41cdbc16d1eb93ab5161.gif#pic_center 2x"
+        data-sizes="auto"
+        alt="https://img-blog.csdnimg.cn/2495ba5f025c41cdbc16d1eb93ab5161.gif#pic_center"
+        title="解法3" /></li>
+<li>解法4：使用<code>V</code> 选中一行，然后使用<code>j</code> 再选中一行，接着使用<code>2&gt;&gt;</code> 将选中两行一次缩进两次
+<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://img-blog.csdnimg.cn/bc4b886f17564b9fab00c67a1590c8e2.gif#pic_center"
+        data-srcset="https://img-blog.csdnimg.cn/bc4b886f17564b9fab00c67a1590c8e2.gif#pic_center, https://img-blog.csdnimg.cn/bc4b886f17564b9fab00c67a1590c8e2.gif#pic_center 1.5x, https://img-blog.csdnimg.cn/bc4b886f17564b9fab00c67a1590c8e2.gif#pic_center 2x"
+        data-sizes="auto"
+        alt="https://img-blog.csdnimg.cn/bc4b886f17564b9fab00c67a1590c8e2.gif#pic_center"
+        title="解法4" /></li>
+<li>解法5：这里介绍一个在可视模式下的新命令——<code>gv</code> 它可以选中上次选中的区域。结合这个命令可以这么操作，先选择两行,再使用<code>&gt;</code> 缩进一次，然后使用 <code>gv</code> 选中上次选中的两行，再次使用 <code>&gt;</code>
+<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://img-blog.csdnimg.cn/afe9cd23775f4eb7a9708c17ee5b2f2e.gif#pic_center"
+        data-srcset="https://img-blog.csdnimg.cn/afe9cd23775f4eb7a9708c17ee5b2f2e.gif#pic_center, https://img-blog.csdnimg.cn/afe9cd23775f4eb7a9708c17ee5b2f2e.gif#pic_center 1.5x, https://img-blog.csdnimg.cn/afe9cd23775f4eb7a9708c17ee5b2f2e.gif#pic_center 2x"
+        data-sizes="auto"
+        alt="https://img-blog.csdnimg.cn/afe9cd23775f4eb7a9708c17ee5b2f2e.gif#pic_center"
+        title="解法5" />
+针对示例1，我给出了5种解法，有利用普通模式加<code>.</code> 命令的方式，也有利用现学的可视模式的解法。当然也有其他的解法，各位小伙伴有好的方式也可以在底下评论。</li>
+</ul>
+<p>上面不管哪种解法，大部分都使用了<code>.</code>命令，这里也可以看出<code>.</code> 在处理重复操作时候的威力。虽然它很好用，但是也需要注意：在基于字符的可视模式下 <code>.</code> 命令操作的字符数与上次修改中操作的字符数相等。例如</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="cl">world
+</span></span><span class="line"><span class="cl">world1
+</span></span><span class="line"><span class="cl">world11
+</span></span><span class="line"><span class="cl">world111
+</span></span></code></pre></div><p>当我们在第一行使用 <code>v</code> 进入选择模式，然后使用<code>e</code> 选中一个单词删除它之后，再在下一行执行<code>.</code> 命令的时候，并没有删除一行，只删除了world这个单词
+<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://img-blog.csdnimg.cn/9a7701c57b3e4cc389b98f599cca6ad3.gif#pic_center"
+        data-srcset="https://img-blog.csdnimg.cn/9a7701c57b3e4cc389b98f599cca6ad3.gif#pic_center, https://img-blog.csdnimg.cn/9a7701c57b3e4cc389b98f599cca6ad3.gif#pic_center 1.5x, https://img-blog.csdnimg.cn/9a7701c57b3e4cc389b98f599cca6ad3.gif#pic_center 2x"
+        data-sizes="auto"
+        alt="https://img-blog.csdnimg.cn/9a7701c57b3e4cc389b98f599cca6ad3.gif#pic_center"
+        title=".命令的问题" />
+针对示例1给出的几个解法，我们发现使用可视模式在效率上有时候还不如在普通模式下配合<code>.</code> 来使用，这么说是不是说可视模式就失去了它的价值呢？其实也不是，在平时处理文本的操作中，并不是每个任务都需要进行重复，在处理一次性操作的任务时，vim的可视模式在效率上于普通模式其实差距不大，而且有时候要修改的文本所在区域无法准确的通过一两个<code>motion</code> 表达出来，这种情况下可视模式就大大的派上用场了。下面几个列子就可以说明这点。</p>
+<h2 id="示例2处理列的可视模式的初步使用">示例2：处理列的可视模式的初步使用</h2>
+<p>假设我们要将下列代码</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="n">Print</span><span class="p">(</span><span class="s2">&#34;hello world&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">Print</span><span class="p">(</span><span class="s2">&#34;hello world&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">Print</span><span class="p">(</span><span class="s2">&#34;hello world&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">Print</span><span class="p">(</span><span class="s2">&#34;hello world&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">Print</span><span class="p">(</span><span class="s2">&#34;hello world&#34;</span><span class="p">)</span>
+</span></span></code></pre></div><p>变为</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="nf">print</span><span class="p">(</span><span class="s">&#34;hello world&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="nf">print</span><span class="p">(</span><span class="s">&#34;hello world&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="nf">print</span><span class="p">(</span><span class="s">&#34;hello world&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="nf">print</span><span class="p">(</span><span class="s">&#34;hello world&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="nf">print</span><span class="p">(</span><span class="s">&#34;hello world&#34;</span><span class="p">)</span>
+</span></span></code></pre></div><p>可以使用 <code>&lt;Ctrl + v&gt;</code> 进入处理列的可视模式，然后选中所有的<code>P</code>，接着使用 <code>u</code> 将其变为小写
+<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://img-blog.csdnimg.cn/9697a34aa95746149eef449648e4d2b2.gif#pic_center"
+        data-srcset="https://img-blog.csdnimg.cn/9697a34aa95746149eef449648e4d2b2.gif#pic_center, https://img-blog.csdnimg.cn/9697a34aa95746149eef449648e4d2b2.gif#pic_center 1.5x, https://img-blog.csdnimg.cn/9697a34aa95746149eef449648e4d2b2.gif#pic_center 2x"
+        data-sizes="auto"
+        alt="https://img-blog.csdnimg.cn/9697a34aa95746149eef449648e4d2b2.gif#pic_center"
+        title="列可视模式" /></p>
+<h2 id="示例3添加注释">示例3：添加注释</h2>
+<p>假设现在有一些Python代码需要添加注释，即将下列代码</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="nb">print</span><span class="p">(</span><span class="s2">&#34;hello world&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="nb">print</span><span class="p">(</span><span class="s2">&#34;hello world&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="nb">print</span><span class="p">(</span><span class="s2">&#34;hello world&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="nb">print</span><span class="p">(</span><span class="s2">&#34;hello world&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="nb">print</span><span class="p">(</span><span class="s2">&#34;hello world&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="nb">print</span><span class="p">(</span><span class="s2">&#34;hello world&#34;</span><span class="p">)</span>
+</span></span></code></pre></div><p>变为</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="c1">#print(&#34;hello world&#34;)</span>
+</span></span><span class="line"><span class="cl"><span class="c1">#print(&#34;hello world&#34;)</span>
+</span></span><span class="line"><span class="cl"><span class="c1">#print(&#34;hello world&#34;)</span>
+</span></span><span class="line"><span class="cl"><span class="c1">#print(&#34;hello world&#34;)</span>
+</span></span><span class="line"><span class="cl"><span class="c1">#print(&#34;hello world&#34;)</span>
+</span></span><span class="line"><span class="cl"><span class="c1">#print(&#34;hello world&#34;)</span>
+</span></span></code></pre></div><p>可以使用 <code>&lt;Ctrl + v&gt;</code> 进入处理列的可视模式，然后选中所有的<code>p</code>，然后使用 <code>I</code> 在行首进入插入模式，接着输入 <code>#</code> 注释代码，最后使用 <code>&lt;Esc&gt;</code> 退回到普通模式，我们可以看到在插入时它只显示了一行的变化，但是最后回到普通模式后，针对第一行的变化作用到了所有选中行</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://img-blog.csdnimg.cn/5fe484ce8e3e45f1963fa411bcfc0cd6.gif#pic_center"
+        data-srcset="https://img-blog.csdnimg.cn/5fe484ce8e3e45f1963fa411bcfc0cd6.gif#pic_center, https://img-blog.csdnimg.cn/5fe484ce8e3e45f1963fa411bcfc0cd6.gif#pic_center 1.5x, https://img-blog.csdnimg.cn/5fe484ce8e3e45f1963fa411bcfc0cd6.gif#pic_center 2x"
+        data-sizes="auto"
+        alt="https://img-blog.csdnimg.cn/5fe484ce8e3e45f1963fa411bcfc0cd6.gif#pic_center"
+        title="添加注释" /></p>
+<h2 id="示例3在每行代码后添加一个分号">示例3：在每行代码后添加一个分号</h2>
+<p>还是将之前介绍<code>.</code> 命令的那个例子来作为示例，但是这里提供一个使用列处理的可视模式的方式</p>
+<p>在下列代码的每一行行尾添加一个分号</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="line"><span class="cl"><span class="kd">var</span> <span class="nx">foot</span> <span class="o">=</span> <span class="s2">&#34;foot&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="kd">var</span> <span class="nx">ball</span> <span class="o">=</span> <span class="s2">&#34;ball&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="kd">var</span> <span class="nx">football</span> <span class="o">=</span> <span class="nx">foot</span> <span class="o">+</span> <span class="nx">ball</span>
+</span></span></code></pre></div><p>变为</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="line"><span class="cl"><span class="kd">var</span> <span class="nx">foot</span> <span class="o">=</span> <span class="s2">&#34;foot&#34;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="kd">var</span> <span class="nx">ball</span> <span class="o">=</span> <span class="s2">&#34;ball&#34;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="kd">var</span> <span class="nx">football</span> <span class="o">=</span> <span class="nx">foot</span> <span class="o">+</span> <span class="nx">ball</span><span class="p">;</span>
+</span></span></code></pre></div><p>现将光标移动到第一行的最后一列，然后使用<code>&lt;Ctrl v&gt;</code> 进入到处理列的可视模式中，然后移动光标到最后一行的行尾。接着使用<code>A</code> 进入插入模式，输入分号，最后使用<code>&lt;Esc&gt;</code> 回到普通模式。这个时候我们发现vim在被选中区域每一行的尾部都添加了一个分号
+<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://img-blog.csdnimg.cn/123aec5069e64e978da437134a3ebd1e.gif#pic_center"
+        data-srcset="https://img-blog.csdnimg.cn/123aec5069e64e978da437134a3ebd1e.gif#pic_center, https://img-blog.csdnimg.cn/123aec5069e64e978da437134a3ebd1e.gif#pic_center 1.5x, https://img-blog.csdnimg.cn/123aec5069e64e978da437134a3ebd1e.gif#pic_center 2x"
+        data-sizes="auto"
+        alt="https://img-blog.csdnimg.cn/123aec5069e64e978da437134a3ebd1e.gif#pic_center"
+        title="在这里插入图片描述" /></p>
+<p>在普通模式下 <code>i I a A</code> 都有自己的用途，而在处理列的可视模式下我们都只是在用 <code>I</code> 和 <code>A</code> ，而且他们的含义与在普通模式下有所不同，在处理列的可视模式中，<code>A</code> 表示在选择区的每个行尾进行同样的操作，而<code>I</code> 表示在选择区的行首进行同样的操作。至于<code>a</code> 和 <code>i</code> 这里则代表要处理的文本对象。</p>
+<p>到此我们介绍完了vim中又一个常用的模式，再下一篇中，将介绍vim的另一种常用的模式——命令模式。</p>
+</div><div class="post-footer" id="post-footer">
+    <div class="post-info">
+        <div class="post-info-line">
+            <div class="post-info-mod">
+                <span>Updated on 2022-04-25</span>
+            </div></div>
+        <div class="post-info-line">
+            <div class="post-info-md"></div>
+            <div class="post-info-share">
+                <span><a href="javascript:void(0);" title="Share on Twitter" data-sharer="twitter" data-url="http://HaiLateBoy.github.io/posts/vim-tutorial-8/" data-title="vim 从嫌弃到依赖(7)——可视模式" data-hashtags="vim,编辑工具,文本处理"><i class="fab fa-twitter fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Facebook" data-sharer="facebook" data-url="http://HaiLateBoy.github.io/posts/vim-tutorial-8/" data-hashtag="vim"><i class="fab fa-facebook-square fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Hacker News" data-sharer="hackernews" data-url="http://HaiLateBoy.github.io/posts/vim-tutorial-8/" data-title="vim 从嫌弃到依赖(7)——可视模式"><i class="fab fa-hacker-news fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Line" data-sharer="line" data-url="http://HaiLateBoy.github.io/posts/vim-tutorial-8/" data-title="vim 从嫌弃到依赖(7)——可视模式"><i data-svg-src="https://cdn.jsdelivr.net/npm/simple-icons@7.3.0/icons/line.svg" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on 微博" data-sharer="weibo" data-url="http://HaiLateBoy.github.io/posts/vim-tutorial-8/" data-title="vim 从嫌弃到依赖(7)——可视模式"><i class="fab fa-weibo fa-fw" aria-hidden="true"></i></a></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="post-info-more">
+        <section class="post-tags"><i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/vim/">vim</a>,&nbsp;<a href="/tags/%E7%BC%96%E8%BE%91%E5%B7%A5%E5%85%B7/">编辑工具</a>,&nbsp;<a href="/tags/%E6%96%87%E6%9C%AC%E5%A4%84%E7%90%86/">文本处理</a></section>
+        <section>
+            <span><a href="javascript:void(0);" onclick="window.history.back();">Back</a></span>&nbsp;|&nbsp;<span><a href="/">Home</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav"><a href="/posts/vim-tutorial-7/" class="prev" rel="prev" title="vim 从嫌弃到依赖(6)——插入模式"><i class="fas fa-angle-left fa-fw" aria-hidden="true"></i>vim 从嫌弃到依赖(6)——插入模式</a>
+            <a href="/posts/vim-tutorial-9/" class="next" rel="next" title="vim 从嫌弃到依赖(8)——使用命令模式编辑文本">vim 从嫌弃到依赖(8)——使用命令模式编辑文本<i class="fas fa-angle-right fa-fw" aria-hidden="true"></i></a></div>
+</div>
+</article></div>
+            </main><footer class="footer">
+        <div class="footer-container"><div class="footer-line">Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener noreffer" title="Hugo 0.121.2">Hugo</a> | Theme - <a href="https://github.com/dillonzq/LoveIt" target="_blank" rel="noopener noreffer" title="LoveIt 0.2.11"><i class="far fa-kiss-wink-heart fa-fw" aria-hidden="true"></i> LoveIt</a>
+                </div><div class="footer-line" itemscope itemtype="http://schema.org/CreativeWork"><i class="far fa-copyright fa-fw" aria-hidden="true"></i><span itemprop="copyrightYear">2022 - 2024</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="https://www.masimaro.xyz" target="_blank">Masimaro</a></span></div>
+        </div>
+    </footer></div>
+
+        <div id="fixed-buttons"><a href="#" id="back-to-top" class="fixed-button" title="Back to Top">
+                <i class="fas fa-arrow-up fa-fw" aria-hidden="true"></i>
+            </a><a href="#" id="view-comments" class="fixed-button" title="View Comments">
+                <i class="fas fa-comment fa-fw" aria-hidden="true"></i>
+            </a>
+        </div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.css"><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/autocomplete.js@0.38.1/dist/autocomplete.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lunr@2.3.9/lunr.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lazysizes@5.3.2/lazysizes.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/clipboard@2.0.11/dist/clipboard.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/sharer.js@0.5.1/sharer.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/auto-render.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/copy-tex.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/mhchem.min.js"></script><script type="text/javascript">window.config={"code":{"copyTitle":"Copy to clipboard","maxShownLines":50},"comment":{},"math":{"delimiters":[{"display":true,"left":"$$","right":"$$"},{"display":true,"left":"\\[","right":"\\]"},{"display":true,"left":"\\begin{equation}","right":"\\end{equation}"},{"display":true,"left":"\\begin{equation*}","right":"\\end{equation*}"},{"display":true,"left":"\\begin{align}","right":"\\end{align}"},{"display":true,"left":"\\begin{align*}","right":"\\end{align*}"},{"display":true,"left":"\\begin{alignat}","right":"\\end{alignat}"},{"display":true,"left":"\\begin{alignat*}","right":"\\end{alignat*}"},{"display":true,"left":"\\begin{gather}","right":"\\end{gather}"},{"display":true,"left":"\\begin{CD}","right":"\\end{CD}"},{"display":false,"left":"$","right":"$"},{"display":false,"left":"\\(","right":"\\)"}],"strict":false},"search":{"highlightTag":"em","maxResultLength":10,"noResultsFound":"No results found","snippetLength":50}};</script><script type="text/javascript" src="/js/theme.min.js"></script></body>
+</html>

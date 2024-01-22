@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="robots" content="noodp" />
+        <title>从零开始配置vim(21)——会话管理 - Masimaro&#39;s blog</title><meta name="Description" content="这是我用于记录日常和学习的小站"><meta property="og:title" content="从零开始配置vim(21)——会话管理" />
+<meta property="og:description" content="很多代码编辑器都有这么一个功能，重新进入编辑器之后能恢复上次打开的所有文件，窗口布局，有的甚至是上次设置的一些配置。那么vim是否也可以实现" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://HaiLateBoy.github.io/posts/vim-config21/" /><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2022-09-05T13:46:16+08:00" />
+<meta property="article:modified_time" content="2022-09-05T13:46:16+08:00" /><meta property="og:site_name" content="Masimaro&#39;s blog" />
+
+<meta name="twitter:card" content="summary"/><meta name="twitter:title" content="从零开始配置vim(21)——会话管理"/>
+<meta name="twitter:description" content="很多代码编辑器都有这么一个功能，重新进入编辑器之后能恢复上次打开的所有文件，窗口布局，有的甚至是上次设置的一些配置。那么vim是否也可以实现"/>
+<meta name="application-name" content="My cool site">
+<meta name="apple-mobile-web-app-title" content="My cool site"><meta name="theme-color" content="#ffffff"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="manifest" href="/site.webmanifest"><link rel="canonical" href="http://HaiLateBoy.github.io/posts/vim-config21/" /><link rel="prev" href="http://HaiLateBoy.github.io/posts/vim-config20/" /><link rel="next" href="http://HaiLateBoy.github.io/posts/vim-config22/" /><link rel="stylesheet" href="/css/style.min.css"><link rel="preload" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css"></noscript><link rel="preload" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css"></noscript><script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "BlogPosting",
+        "headline": "从零开始配置vim(21)——会话管理",
+        "inLanguage": "zh-CN",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "http:\/\/HaiLateBoy.github.io\/posts\/vim-config21\/"
+        },"genre": "posts","keywords": "vim, 编辑工具, 文本处理, lua, 编辑器","wordcount":  2685 ,
+        "url": "http:\/\/HaiLateBoy.github.io\/posts\/vim-config21\/","datePublished": "2022-09-05T13:46:16+08:00","dateModified": "2022-09-05T13:46:16+08:00","publisher": {
+            "@type": "Organization",
+            "name": ""},"author": {
+                "@type": "Person",
+                "name": "Masimaro"
+            },"description": ""
+    }
+    </script></head>
+    <body data-header-desktop="fixed" data-header-mobile="auto"><script type="text/javascript">(window.localStorage && localStorage.getItem('theme') ? localStorage.getItem('theme') === 'dark' : ('auto' === 'auto' ? window.matchMedia('(prefers-color-scheme: dark)').matches : 'auto' === 'dark')) && document.body.setAttribute('theme', 'dark');</script>
+
+        <div id="mask"></div><div class="wrapper"><header class="desktop" id="header-desktop">
+    <div class="header-wrapper">
+        <div class="header-title">
+            <a href="/" title="Masimaro&#39;s blog">My cool site</a>
+        </div>
+        <div class="menu">
+            <div class="menu-inner"><a class="menu-item" href="/posts/" title="文章列表"> 文章 </a><a class="menu-item" href="/tags/" title="标签"> 标签 </a><a class="menu-item" href="/categories/" title="分类"> 分类 </a><a class="menu-item" href="/about" title="关于本站"> 关于 </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-desktop">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-desktop" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-desktop" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-desktop">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </span><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                    <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+                </a></div>
+        </div>
+    </div>
+</header><header class="mobile" id="header-mobile">
+    <div class="header-container">
+        <div class="header-wrapper">
+            <div class="header-title">
+                <a href="/" title="Masimaro&#39;s blog">My cool site</a>
+            </div>
+            <div class="menu-toggle" id="menu-toggle-mobile">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+        <div class="menu" id="menu-mobile"><div class="search-wrapper">
+                    <div class="search mobile" id="search-mobile">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-mobile">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-mobile" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-mobile" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-mobile">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </div>
+                    <a href="javascript:void(0);" class="search-cancel" id="search-cancel-mobile">
+                        Cancel
+                    </a>
+                </div><a class="menu-item" href="/posts/" title="文章列表">文章</a><a class="menu-item" href="/tags/" title="标签">标签</a><a class="menu-item" href="/categories/" title="分类">分类</a><a class="menu-item" href="/about" title="关于本站">关于</a><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+            </a></div>
+    </div>
+</header><div class="search-dropdown desktop">
+        <div id="search-dropdown-desktop"></div>
+    </div>
+    <div class="search-dropdown mobile">
+        <div id="search-dropdown-mobile"></div>
+    </div><main class="main">
+                <div class="container"><div class="toc" id="toc-auto">
+            <h2 class="toc-title">Contents</h2>
+            <div class="toc-content" id="toc-content-auto"></div>
+        </div><article class="page single"><h1 class="single-title animate__animated animate__flipInX">从零开始配置vim(21)——会话管理</h1><div class="post-meta">
+            <div class="post-meta-line"><span class="post-author"><a href="https://www.masimaro.xyz" title="Author" target="_blank" rel="noopener noreffer author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Masimaro</a></span>&nbsp;<span class="post-category">included in <a href="/categories/vim-%E9%85%8D%E7%BD%AE/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>vim 配置</a></span></div>
+            <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw" aria-hidden="true"></i>&nbsp;<time datetime="2022-09-05">2022-09-05</time>&nbsp;<i class="fas fa-pencil-alt fa-fw" aria-hidden="true"></i>&nbsp;2685 words&nbsp;
+                <i class="far fa-clock fa-fw" aria-hidden="true"></i>&nbsp;6 minutes&nbsp;</div>
+        </div><div class="details toc" id="toc-static"  data-kept="true">
+                <div class="details-summary toc-title">
+                    <span>Contents</span>
+                    <span><i class="details-icon fas fa-angle-right" aria-hidden="true"></i></span>
+                </div>
+                <div class="details-content toc-content" id="toc-content-static"><nav id="TableOfContents">
+  <ul>
+    <li><a href="#会话">会话</a></li>
+    <li><a href="#viminfo-文件">viminfo 文件</a></li>
+    <li><a href="#简单的配置">简单的配置</a></li>
+    <li><a href="#auto-session-插件">auto-session 插件</a></li>
+  </ul>
+</nav></div>
+            </div><div class="content" id="content"><p>很多代码编辑器都有这么一个功能，重新进入编辑器之后能恢复上次打开的所有文件，窗口布局，有的甚至是上次设置的一些配置。那么vim是否也可以实现这样的功能呢？答案是肯定的。使用vim自带的会话管理和 <code>viminfo</code> 可以实现恢复上次打开文件和布局以及重置上次的配置</p>
+<p>它们二者分别保存了不同的内容，一般会将它们联合起来使用。</p>
+<ul>
+<li>会话一般保留上次打开的文件、窗口布局、以及一些全局设置</li>
+<li><code>viminfo</code> 保留的是历史命令行记录、搜索替换模式记录、标签、非空寄存器的值、缓冲区列表、全局信息等等</li>
+</ul>
+<p>看起来很好像显的很杂一样，但是我觉得这些都不是需要记忆的，我们只需要知道使用使用 <code>viminfo</code> 和<code>session</code>可以恢复所有我们关心的内容即可，无需分辨哪些内容保存在哪个位置。我们使用自动命令来保存和加载它们，你甚至可能会忘记它们的存在。</p>
+<h2 id="会话">会话</h2>
+<p>我们还是按照惯例，先来试试vim原生的内容
+我们可以使用 <code>:mksession [file]</code> 来保存一个当前的会话。再重新进入<code>vim</code> 的时候可以使用 <code>:source session-file</code> 来加载一个会话文件。</p>
+<p>在实际生成会话文件时，我们可以省略这个文件名，这个时候vim会自动生成一个采用默认文件名的会话文件。vim会默认在当前工作目录下生成一个 Session.vim的文件，我们打开这个文件发现它本质上就是一个vim的脚本，跟我们写的配置文件是一回事。各位小伙伴可以打开看看，试着读一下它里面具体在干嘛。</p>
+<p>我们来试着做一下这个实验，就以当前正在使用的 <code>vim</code> 配置这个工程。我们随机打开几个文件，然后执行 <code>:mksession</code> ，然后退出
+<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://img-blog.csdnimg.cn/ab1cec59abe346089d8e4a16b135e79b.gif#pic_center"
+        data-srcset="https://img-blog.csdnimg.cn/ab1cec59abe346089d8e4a16b135e79b.gif#pic_center, https://img-blog.csdnimg.cn/ab1cec59abe346089d8e4a16b135e79b.gif#pic_center 1.5x, https://img-blog.csdnimg.cn/ab1cec59abe346089d8e4a16b135e79b.gif#pic_center 2x"
+        data-sizes="auto"
+        alt="https://img-blog.csdnimg.cn/ab1cec59abe346089d8e4a16b135e79b.gif#pic_center"
+        title="在这里插入图片描述" />
+关闭vim之后，我们发现在项目的根目录也就是 <code>~/.config/nvim</code> 下，生成一个了一个 <code>Session.vim</code> 。有兴趣的小伙伴可以打开来看看里面的内容。它其实就是一个vim脚本，跟我们写的配置是一回事</p>
+<p>接着我们试着在终端输入 <code>nvim</code> 不带任何参数，直接打开我们的欢迎界面，在该界面中输入 <code>:source Session.vim</code> 。执行完成之后我们发现，它帮助我们将显示还原成了上次退出之前的样子
+<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://img-blog.csdnimg.cn/a2e4d43ee22b49d3a44b63e0ae195bcf.gif#pic_center"
+        data-srcset="https://img-blog.csdnimg.cn/a2e4d43ee22b49d3a44b63e0ae195bcf.gif#pic_center, https://img-blog.csdnimg.cn/a2e4d43ee22b49d3a44b63e0ae195bcf.gif#pic_center 1.5x, https://img-blog.csdnimg.cn/a2e4d43ee22b49d3a44b63e0ae195bcf.gif#pic_center 2x"
+        data-sizes="auto"
+        alt="https://img-blog.csdnimg.cn/a2e4d43ee22b49d3a44b63e0ae195bcf.gif#pic_center"
+        title="在这里插入图片描述" />
+默认<code>session</code>要保存 哪些内容是由一个名为 <code>sessionoption</code>的变量决定的。不知道小伙伴还记不记得如何来查看一个变量现在的值？(<code>:set sessionoption?</code>) 。使用<code>set</code>在对应变量后面加上一个 <code>?</code> 表示查询当前变量值。我们看到它目前保存这些内容 <code>sessionoptions=blank,buffers,curdir,folds,help,tabpages,winsize</code>。他们分别代表着空窗口、所有缓冲区、当前目录、折叠、帮助窗口、标签页、窗口大小。</p>
+<h2 id="viminfo-文件">viminfo 文件</h2>
+<p>vim每次在退出时会自动在用户的家目录保存一个名为 <code>.viminfo</code> 的文件，每次退出后都会发生覆盖行为。有时我们在编辑项目之后又重新打开<code>vim</code>编辑了另外一些内容，这个时候就有可能发生覆盖行为，把我们项目相关的内容给覆盖掉了，那这个时候该怎么办呢？</p>
+<p>好在<code>vim</code>提供了 <code>:wviminfo</code>命令来指定写入到哪个<code>viminfo</code>文件中。我们可以使用 <code>:rviminfo</code>来读入指定的<code>viminfo</code>文件。</p>
+<p>小伙伴可能有一个问题。既然<code>Session.vim</code> 是一个vim脚本，为什么不把所有设置都写在配置文件里面呢？我们可以这么做，但是提供一个额外的<code>session</code>功能可以根据项目来灵活的调整配置，我们将所有项目的通用配置保存在我们自己的配置文件里面，将某些项目特有的配置放到<code>session</code>中，由<code>vim</code>自己维护，这样<code>vim</code>能更好的适应不同的使用场合。</p>
+<p>viminfo 保存的是命令行，搜索记录这些，而且每次打开都会自动加载，所以就不像<code>session</code> 这样能很明显的看出效果。很明显的一个特征就是，即使我们这次打开仅仅只用了 <code>:q</code> 这一个命令，但是我们通过 <code>q:</code> 仍然可以看到之前几次打开时执行过的命令</p>
+<h2 id="简单的配置">简单的配置</h2>
+<p>为了防止小伙伴做无用功，我这里事先声明一下，针对会话管理我们是有专门的插件的。这里所做的配置在后面都会被我们弃用的，小伙伴可以不往自己的配置里面加了。但是想试试也可以，有些事只有自己亲手做了才能更好的理解</p>
+<p>首先我们希望它在退出的时候能自动保存Session和viminfo文件到对应的项目根目录下。在启动时能重新加载这些文件。自然要自动进行这些内容，我们想到的就是自动命令了。
+我们先来定义一个函数来保存这两个文件</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-lua" data-lang="lua"><span class="line"><span class="cl"><span class="kr">function</span> <span class="nf">save_session</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">    <span class="kd">local</span> <span class="n">curdir</span> <span class="o">=</span> <span class="n">vim.api</span><span class="p">.</span><span class="n">nvim_eval</span><span class="p">(</span><span class="s">[[getcwd()]]</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="kd">local</span> <span class="n">session_file</span> <span class="o">=</span> <span class="n">curdir</span> <span class="o">..</span> <span class="s2">&#34;/Session.vim&#34;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">vim.cmd</span><span class="p">(</span><span class="s">[[mksession ]]</span> <span class="o">..</span> <span class="n">session_file</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="kd">local</span> <span class="n">viminfo</span> <span class="o">=</span> <span class="n">curdir</span> <span class="o">..</span> <span class="s2">&#34;/.viminfo&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="kr">end</span>
+</span></span></code></pre></div><p>在该函数中，我们使用 <code>vim</code>的 <code>getcwd</code> 命令来获取当前<code>vim</code>所在的工作目录。工作目录的概念我们在之前介绍<code>vim</code>的时候已经介绍过了，忘记的小伙伴请自行折回去复习。然后我们拼接一个字符串，让<code>vim</code>保存<code>session</code>和<code>viminfo</code>文件到当前工作目录中</p>
+<p>我们再来添加一个函数用来加载 <code>session</code> 内容。</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-lua" data-lang="lua"><span class="line"><span class="cl"><span class="kr">function</span> <span class="nf">load_session</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">    <span class="kd">local</span> <span class="n">curdir</span> <span class="o">=</span> <span class="n">vim.api</span><span class="p">.</span><span class="n">nvim_eval</span><span class="p">(</span><span class="s">[[getcwd()]]</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="kd">local</span> <span class="n">session_file</span> <span class="o">=</span> <span class="n">curdir</span> <span class="o">..</span> <span class="s2">&#34;/Session.vim&#34;</span>
+</span></span><span class="line"><span class="cl">    <span class="kd">local</span> <span class="n">viminfo</span> <span class="o">=</span> <span class="n">curdir</span> <span class="o">..</span> <span class="s2">&#34;/.viminfo&#34;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">file</span><span class="p">,</span> <span class="n">err</span> <span class="o">=</span> <span class="n">io.open</span><span class="p">(</span><span class="n">session_file</span><span class="p">,</span> <span class="s2">&#34;r&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="kr">if</span> <span class="n">err</span> <span class="o">==</span> <span class="kc">nil</span> <span class="kr">then</span>
+</span></span><span class="line"><span class="cl">        <span class="n">file</span><span class="p">:</span><span class="n">close</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">        <span class="n">vim.cmd</span><span class="p">(</span><span class="s">[[source ]]</span> <span class="o">..</span> <span class="n">session_file</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="kr">end</span>
+</span></span><span class="line"><span class="cl">    <span class="n">file</span><span class="p">,</span> <span class="n">err</span> <span class="o">=</span> <span class="n">io.open</span><span class="p">(</span><span class="n">viminfo</span><span class="p">,</span> <span class="s2">&#34;r&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="kr">if</span> <span class="n">err</span> <span class="o">==</span> <span class="kc">nil</span> <span class="kr">then</span>
+</span></span><span class="line"><span class="cl">        <span class="n">file</span><span class="p">:</span><span class="n">close</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">        <span class="n">vim.cmd</span><span class="p">(</span><span class="s">[[rviminfo ]]</span> <span class="o">..</span> <span class="n">viminfo</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="kr">end</span>
+</span></span><span class="line"><span class="cl"><span class="kr">end</span>
+</span></span></code></pre></div><p>与保存函数不同的是，我这里加了一个判断文件是否存在的代码，因为我们无法得知用户会在哪个目录下打开vim，无法事先知道该目录是否有这些文件，所以这里先判断一下，如果没有文件就不进行任何操作。</p>
+<p>最后我们添加一个自动命令组来自动保存和加载 <code>session</code> 文件和 <code>viminfo</code>文件。</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-lua" data-lang="lua"><span class="line"><span class="cl"><span class="kd">local</span> <span class="n">auto_save_session</span> <span class="o">=</span> <span class="n">vim.api</span><span class="p">.</span><span class="n">nvim_create_augroup</span><span class="p">(</span><span class="s2">&#34;AUTO_SAVE_SESSION&#34;</span><span class="p">,</span> <span class="p">{</span><span class="n">clear</span> <span class="o">=</span> <span class="kc">true</span><span class="p">})</span>
+</span></span><span class="line"><span class="cl"><span class="n">vim.api</span><span class="p">.</span><span class="n">nvim_create_autocmd</span><span class="p">({</span><span class="s2">&#34;ExitPre&#34;</span><span class="p">},</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">pattern</span> <span class="o">=</span> <span class="s2">&#34;*&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">group</span> <span class="o">=</span> <span class="n">auto_save_session</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">callback</span> <span class="o">=</span> <span class="n">save_session</span>
+</span></span><span class="line"><span class="cl"><span class="p">})</span>
+</span></span><span class="line"><span class="cl"><span class="n">vim.api</span><span class="p">.</span><span class="n">nvim_create_autocmd</span><span class="p">({</span><span class="s2">&#34;VimEnter&#34;</span><span class="p">},</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">pattern</span> <span class="o">=</span> <span class="s2">&#34;*&#34;</span><span class="p">,</span>                                                                       
+</span></span><span class="line"><span class="cl">    <span class="n">group</span> <span class="o">=</span> <span class="n">auto_save_session</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">callback</span> <span class="o">=</span> <span class="n">load_session</span>
+</span></span><span class="line"><span class="cl"><span class="p">})</span>
+</span></span></code></pre></div><p>我们在终端直接输入 <code>nvim</code> 发现它自动恢复了上次打开的所有缓冲区。我们来试一下效果，先删除上一次生成的 <code>Session.vim</code> 文件，接着退出然后再次打开 <code>vim</code> ，我们发现它恢复到了打开之前的样子
+<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://img-blog.csdnimg.cn/0c756e460b9c4fa6aacb1f7efa5f806f.gif#pic_center"
+        data-srcset="https://img-blog.csdnimg.cn/0c756e460b9c4fa6aacb1f7efa5f806f.gif#pic_center, https://img-blog.csdnimg.cn/0c756e460b9c4fa6aacb1f7efa5f806f.gif#pic_center 1.5x, https://img-blog.csdnimg.cn/0c756e460b9c4fa6aacb1f7efa5f806f.gif#pic_center 2x"
+        data-sizes="auto"
+        alt="https://img-blog.csdnimg.cn/0c756e460b9c4fa6aacb1f7efa5f806f.gif#pic_center"
+        title="在这里插入图片描述" /></p>
+<p>到此我们已经有了一个简单的自动加载<code>session</code> 和上次配置的功能。如果希望有更多的定制可以考虑使用插件，但是如果只是简单的需要此功能的，可以就这么配置或者自己改改配置达到自己的需求。</p>
+<h2 id="auto-session-插件">auto-session 插件</h2>
+<p>上面我们已经定义了可以自动加载和保存上次会话的功能。有的小伙伴可能觉得这个功能太简单了，我希望能给我提供更方便、更加灵活的使用方式，而且我们上面的配置有一个很大的问题，我输入 <code>nvim init.lua</code> 已经指定了要打开的文件，它仍然会打开之前保存的 <code>session</code> ，这里我再介绍一个能够管理 <code>session</code> 的插件—— <code>auto-session</code> ，它能有效的避免上面的问题。</p>
+<p>我们使用如下的语句来安装 <code>auto-session</code></p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-lua" data-lang="lua"><span class="line"><span class="cl"><span class="n">use</span> <span class="p">{</span><span class="s1">&#39;rmagatti/auto-session&#39;</span><span class="p">}</span>
+</span></span></code></pre></div><p>然后按照惯例，新建文件并且添加配置</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-lua" data-lang="lua"><span class="line"><span class="cl"><span class="n">require</span><span class="p">(</span><span class="s2">&#34;auto-session&#34;</span><span class="p">).</span><span class="n">setup</span><span class="p">({</span>
+</span></span><span class="line"><span class="cl">    <span class="n">log_level</span> <span class="o">=</span> <span class="s2">&#34;error&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">-- 打开这些目录里面的内容时，不加载会话</span>
+</span></span><span class="line"><span class="cl">    <span class="n">auto_session_suppress_dirs</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&#34;~/&#34;</span><span class="p">,</span> <span class="s2">&#34;~/Projects&#34;</span><span class="p">,</span> <span class="s2">&#34;~/Downloads&#34;</span><span class="p">,</span> <span class="s2">&#34;/&#34;</span><span class="p">,</span> <span class="s2">&#34;/ect&#34;</span><span class="p">,</span> <span class="s2">&#34;/usr&#34;</span><span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="n">auto_session_enable_last_session</span> <span class="o">=</span> <span class="kc">false</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">-- 保存session文件到 ~/.local/share/nvim/sessions目录</span>
+</span></span><span class="line"><span class="cl">    <span class="n">auto_session_root_dir</span> <span class="o">=</span> <span class="n">vim.fn</span><span class="p">.</span><span class="n">stdpath</span><span class="p">(</span><span class="s1">&#39;data&#39;</span><span class="p">)</span><span class="o">..</span><span class="s2">&#34;/sessions/&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">auto_session_enabled</span> <span class="o">=</span> <span class="kc">true</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">auto_save_enabled</span> <span class="o">=</span> <span class="kc">nil</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">auto_restore_enabled</span> <span class="o">=</span> <span class="kc">nil</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">auto_session_use_git_branch</span> <span class="o">=</span> <span class="kc">nil</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">-- the configs below are lua only</span>
+</span></span><span class="line"><span class="cl">    <span class="n">bypass_session_save_file_types</span> <span class="o">=</span> <span class="kc">nil</span>
+</span></span><span class="line"><span class="cl"><span class="p">})</span>
+</span></span></code></pre></div><p>我们可以在 <code>lualine</code> 的配置文件中 <code>sections</code> 一节中添加 <code>lualine_c = {require('auto-session-library').current_session_name}</code> 来显示当前打开的会话名称</p>
+<p>最后根据官方的提示，我们可以给<code>sessionoption</code> 赋值，多保存两个内容</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-lua" data-lang="lua"><span class="line"><span class="cl"><span class="n">vim.o</span><span class="p">.</span><span class="n">sessionoptions</span><span class="o">=</span><span class="s2">&#34;blank,buffers,curdir,folds,help,tabpages,winsize,winpos,terminal&#34;</span>
+</span></span></code></pre></div><p>这样我们如果打开了终端，下次进入时还可以恢复终端窗口</p>
+<p>最后我们再来补充一下之前 <code>dashboard</code> 的功能，之前定义的有一个恢复上次会话的功能</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-lua" data-lang="lua"><span class="line"><span class="cl"><span class="p">{</span><span class="n">icon</span> <span class="o">=</span> <span class="s2">&#34;  &#34;</span><span class="p">,</span> <span class="n">desc</span> <span class="o">=</span> <span class="s1">&#39;Recently lastest session    &#39;</span><span class="p">,</span> <span class="n">shortcut</span> <span class="o">=</span> <span class="s2">&#34;Leader s l&#34;</span><span class="p">,</span> <span class="n">action</span> <span class="o">=</span> <span class="s2">&#34;RestoreSession&#34;</span><span class="p">}</span>
+</span></span></code></pre></div><p>我们可以在 custom_center 中添加这么一行，具体的位置可以看我提交到github中的仓库</p>
+<p>到此为止，关于session的配置就结束了。</p>
+</div><div class="post-footer" id="post-footer">
+    <div class="post-info">
+        <div class="post-info-line">
+            <div class="post-info-mod">
+                <span>Updated on 2022-09-05</span>
+            </div></div>
+        <div class="post-info-line">
+            <div class="post-info-md"></div>
+            <div class="post-info-share">
+                <span><a href="javascript:void(0);" title="Share on Twitter" data-sharer="twitter" data-url="http://HaiLateBoy.github.io/posts/vim-config21/" data-title="从零开始配置vim(21)——会话管理" data-hashtags="vim,编辑工具,文本处理,lua,编辑器"><i class="fab fa-twitter fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Facebook" data-sharer="facebook" data-url="http://HaiLateBoy.github.io/posts/vim-config21/" data-hashtag="vim"><i class="fab fa-facebook-square fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Hacker News" data-sharer="hackernews" data-url="http://HaiLateBoy.github.io/posts/vim-config21/" data-title="从零开始配置vim(21)——会话管理"><i class="fab fa-hacker-news fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Line" data-sharer="line" data-url="http://HaiLateBoy.github.io/posts/vim-config21/" data-title="从零开始配置vim(21)——会话管理"><i data-svg-src="https://cdn.jsdelivr.net/npm/simple-icons@7.3.0/icons/line.svg" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on 微博" data-sharer="weibo" data-url="http://HaiLateBoy.github.io/posts/vim-config21/" data-title="从零开始配置vim(21)——会话管理"><i class="fab fa-weibo fa-fw" aria-hidden="true"></i></a></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="post-info-more">
+        <section class="post-tags"><i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/vim/">vim</a>,&nbsp;<a href="/tags/%E7%BC%96%E8%BE%91%E5%B7%A5%E5%85%B7/">编辑工具</a>,&nbsp;<a href="/tags/%E6%96%87%E6%9C%AC%E5%A4%84%E7%90%86/">文本处理</a>,&nbsp;<a href="/tags/lua/">lua</a>,&nbsp;<a href="/tags/%E7%BC%96%E8%BE%91%E5%99%A8/">编辑器</a></section>
+        <section>
+            <span><a href="javascript:void(0);" onclick="window.history.back();">Back</a></span>&nbsp;|&nbsp;<span><a href="/">Home</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav"><a href="/posts/vim-config20/" class="prev" rel="prev" title="从零开始配置vim(20)——模糊查询"><i class="fas fa-angle-left fa-fw" aria-hidden="true"></i>从零开始配置vim(20)——模糊查询</a>
+            <a href="/posts/vim-config22/" class="next" rel="next" title="从零开始配置vim(22)——lsp简介与treesitter 配置">从零开始配置vim(22)——lsp简介与treesitter 配置<i class="fas fa-angle-right fa-fw" aria-hidden="true"></i></a></div>
+</div>
+</article></div>
+            </main><footer class="footer">
+        <div class="footer-container"><div class="footer-line">Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener noreffer" title="Hugo 0.121.2">Hugo</a> | Theme - <a href="https://github.com/dillonzq/LoveIt" target="_blank" rel="noopener noreffer" title="LoveIt 0.2.11"><i class="far fa-kiss-wink-heart fa-fw" aria-hidden="true"></i> LoveIt</a>
+                </div><div class="footer-line" itemscope itemtype="http://schema.org/CreativeWork"><i class="far fa-copyright fa-fw" aria-hidden="true"></i><span itemprop="copyrightYear">2022 - 2024</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="https://www.masimaro.xyz" target="_blank">Masimaro</a></span></div>
+        </div>
+    </footer></div>
+
+        <div id="fixed-buttons"><a href="#" id="back-to-top" class="fixed-button" title="Back to Top">
+                <i class="fas fa-arrow-up fa-fw" aria-hidden="true"></i>
+            </a><a href="#" id="view-comments" class="fixed-button" title="View Comments">
+                <i class="fas fa-comment fa-fw" aria-hidden="true"></i>
+            </a>
+        </div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.css"><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/autocomplete.js@0.38.1/dist/autocomplete.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lunr@2.3.9/lunr.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lazysizes@5.3.2/lazysizes.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/clipboard@2.0.11/dist/clipboard.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/sharer.js@0.5.1/sharer.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/auto-render.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/copy-tex.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/mhchem.min.js"></script><script type="text/javascript">window.config={"code":{"copyTitle":"Copy to clipboard","maxShownLines":50},"comment":{},"math":{"delimiters":[{"display":true,"left":"$$","right":"$$"},{"display":true,"left":"\\[","right":"\\]"},{"display":true,"left":"\\begin{equation}","right":"\\end{equation}"},{"display":true,"left":"\\begin{equation*}","right":"\\end{equation*}"},{"display":true,"left":"\\begin{align}","right":"\\end{align}"},{"display":true,"left":"\\begin{align*}","right":"\\end{align*}"},{"display":true,"left":"\\begin{alignat}","right":"\\end{alignat}"},{"display":true,"left":"\\begin{alignat*}","right":"\\end{alignat*}"},{"display":true,"left":"\\begin{gather}","right":"\\end{gather}"},{"display":true,"left":"\\begin{CD}","right":"\\end{CD}"},{"display":false,"left":"$","right":"$"},{"display":false,"left":"\\(","right":"\\)"}],"strict":false},"search":{"highlightTag":"em","maxResultLength":10,"noResultsFound":"No results found","snippetLength":50}};</script><script type="text/javascript" src="/js/theme.min.js"></script></body>
+</html>

@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="robots" content="noodp" />
+        <title>jsp - Masimaro&#39;s blog</title><meta name="Description" content="这是我用于记录日常和学习的小站"><meta property="og:title" content="jsp" />
+<meta property="og:description" content="之前聊过用java处理web请求，处理cookie和session等等，但是唯独没有提及如何返回信息。作为一个web程序，肯定需要使用HTM" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://HaiLateBoy.github.io/posts/javase-4/" /><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2019-11-17T11:18:57+00:00" />
+<meta property="article:modified_time" content="2019-11-17T11:18:57+00:00" /><meta property="og:site_name" content="Masimaro&#39;s blog" />
+
+<meta name="twitter:card" content="summary"/><meta name="twitter:title" content="jsp"/>
+<meta name="twitter:description" content="之前聊过用java处理web请求，处理cookie和session等等，但是唯独没有提及如何返回信息。作为一个web程序，肯定需要使用HTM"/>
+<meta name="application-name" content="My cool site">
+<meta name="apple-mobile-web-app-title" content="My cool site"><meta name="theme-color" content="#ffffff"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="manifest" href="/site.webmanifest"><link rel="canonical" href="http://HaiLateBoy.github.io/posts/javase-4/" /><link rel="prev" href="http://HaiLateBoy.github.io/posts/javase-3/" /><link rel="next" href="http://HaiLateBoy.github.io/posts/javase-5/" /><link rel="stylesheet" href="/css/style.min.css"><link rel="preload" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css"></noscript><link rel="preload" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css"></noscript><script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "BlogPosting",
+        "headline": "jsp",
+        "inLanguage": "zh-CN",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "http:\/\/HaiLateBoy.github.io\/posts\/javase-4\/"
+        },"genre": "posts","keywords": "java web, jsp","wordcount":  2280 ,
+        "url": "http:\/\/HaiLateBoy.github.io\/posts\/javase-4\/","datePublished": "2019-11-17T11:18:57+00:00","dateModified": "2019-11-17T11:18:57+00:00","publisher": {
+            "@type": "Organization",
+            "name": ""},"author": {
+                "@type": "Person",
+                "name": "Masimaro"
+            },"description": ""
+    }
+    </script></head>
+    <body data-header-desktop="fixed" data-header-mobile="auto"><script type="text/javascript">(window.localStorage && localStorage.getItem('theme') ? localStorage.getItem('theme') === 'dark' : ('auto' === 'auto' ? window.matchMedia('(prefers-color-scheme: dark)').matches : 'auto' === 'dark')) && document.body.setAttribute('theme', 'dark');</script>
+
+        <div id="mask"></div><div class="wrapper"><header class="desktop" id="header-desktop">
+    <div class="header-wrapper">
+        <div class="header-title">
+            <a href="/" title="Masimaro&#39;s blog">My cool site</a>
+        </div>
+        <div class="menu">
+            <div class="menu-inner"><a class="menu-item" href="/posts/" title="文章列表"> 文章 </a><a class="menu-item" href="/tags/" title="标签"> 标签 </a><a class="menu-item" href="/categories/" title="分类"> 分类 </a><a class="menu-item" href="/about" title="关于本站"> 关于 </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-desktop">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-desktop" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-desktop" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-desktop">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </span><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                    <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+                </a></div>
+        </div>
+    </div>
+</header><header class="mobile" id="header-mobile">
+    <div class="header-container">
+        <div class="header-wrapper">
+            <div class="header-title">
+                <a href="/" title="Masimaro&#39;s blog">My cool site</a>
+            </div>
+            <div class="menu-toggle" id="menu-toggle-mobile">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+        <div class="menu" id="menu-mobile"><div class="search-wrapper">
+                    <div class="search mobile" id="search-mobile">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-mobile">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-mobile" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-mobile" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-mobile">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </div>
+                    <a href="javascript:void(0);" class="search-cancel" id="search-cancel-mobile">
+                        Cancel
+                    </a>
+                </div><a class="menu-item" href="/posts/" title="文章列表">文章</a><a class="menu-item" href="/tags/" title="标签">标签</a><a class="menu-item" href="/categories/" title="分类">分类</a><a class="menu-item" href="/about" title="关于本站">关于</a><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+            </a></div>
+    </div>
+</header><div class="search-dropdown desktop">
+        <div id="search-dropdown-desktop"></div>
+    </div>
+    <div class="search-dropdown mobile">
+        <div id="search-dropdown-mobile"></div>
+    </div><main class="main">
+                <div class="container"><div class="toc" id="toc-auto">
+            <h2 class="toc-title">Contents</h2>
+            <div class="toc-content" id="toc-content-auto"></div>
+        </div><article class="page single"><h1 class="single-title animate__animated animate__flipInX">jsp</h1><div class="post-meta">
+            <div class="post-meta-line"><span class="post-author"><a href="https://www.masimaro.xyz" title="Author" target="_blank" rel="noopener noreffer author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Masimaro</a></span>&nbsp;<span class="post-category">included in <a href="/categories/java/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>Java</a></span></div>
+            <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw" aria-hidden="true"></i>&nbsp;<time datetime="2019-11-17">2019-11-17</time>&nbsp;<i class="fas fa-pencil-alt fa-fw" aria-hidden="true"></i>&nbsp;2280 words&nbsp;
+                <i class="far fa-clock fa-fw" aria-hidden="true"></i>&nbsp;5 minutes&nbsp;</div>
+        </div><div class="details toc" id="toc-static"  data-kept="true">
+                <div class="details-summary toc-title">
+                    <span>Contents</span>
+                    <span><i class="details-icon fas fa-angle-right" aria-hidden="true"></i></span>
+                </div>
+                <div class="details-content toc-content" id="toc-content-static"><nav id="TableOfContents">
+  <ul>
+    <li><a href="#jsp概述">JSP概述</a></li>
+    <li><a href="#jsp原理分析">JSP原理分析</a></li>
+    <li><a href="#jsp语法">jsp语法</a>
+      <ul>
+        <li><a href="#jsp内置对象">jsp内置对象</a></li>
+        <li><a href="#指令">指令</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav></div>
+            </div><div class="content" id="content"><p>之前聊过用java处理web请求，处理cookie和session等等，但是唯独没有提及如何返回信息。作为一个web程序，肯定需要使用HTML作为用户界面，这个界面需要由服务端返回。返回信息可以使用HttpResponse中的OutputStream对象来写入数据。但是既要在里面写入HTML，又要写入相应的值，造成程序很难编写，同时HTML代码长了也不容易维护。我们需要一种机制来专门处理返回给浏览器的信息。JSP就是用来专门处理这种需求的。</p>
+<!-- raw HTML omitted -->
+<h2 id="jsp概述">JSP概述</h2>
+<p>JSP (Java Server Page):Java 服务端页面。是由 Sun Microsystems 公司倡导和许多公司参与共同创建的一种使软件开发者可以响应客户端请求，而动态生成 HTML、XML 或其他格式文档的Web网页的技术标准。jsp可以很方便的在页面中通过java代码嵌入动态页面</p>
+<h2 id="jsp原理分析">JSP原理分析</h2>
+<p>下面是一个简单的hello world程序</p>
+<pre tabindex="0"><code class="language-jsp" data-lang="jsp">&lt;%@ page contentType=&#34;text/html;charset=UTF-8&#34; language=&#34;java&#34; %&gt;
+&lt;html&gt;
+  &lt;head&gt;
+    &lt;title&gt;index&lt;/title&gt;
+  &lt;/head&gt;
+  &lt;body&gt;
+    &lt;%
+      out.println(&#34;hello world&#34;);
+    %&gt;
+  &lt;/body&gt;
+&lt;/html&gt;
+</code></pre><p>我们将其部署到tomcat服务器上，启动并访问它之后会在tomcat所在目录的 <code>work\Catalina\localhost\JSPDemo\org\apache\jsp</code> (其中JSPDemo是项目名称), 在这个目录下面可以看到生成了一个index_jsp.java、index_jsp.class</p>
+<p>下面是这个jsp生成的部分源码</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-java" data-lang="java"><span class="line"><span class="cl"><span class="kn">package</span><span class="w"> </span><span class="nn">org.apache.jsp</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="kn">import</span><span class="w"> </span><span class="nn">javax.servlet.*</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="kn">import</span><span class="w"> </span><span class="nn">javax.servlet.http.*</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="kn">import</span><span class="w"> </span><span class="nn">javax.servlet.jsp.*</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="kd">public</span><span class="w"> </span><span class="kd">final</span><span class="w"> </span><span class="kd">class</span> <span class="nc">index_jsp</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">org</span><span class="p">.</span><span class="na">apache</span><span class="p">.</span><span class="na">jasper</span><span class="p">.</span><span class="na">runtime</span><span class="p">.</span><span class="na">HttpJspBase</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">implements</span><span class="w"> </span><span class="n">org</span><span class="p">.</span><span class="na">apache</span><span class="p">.</span><span class="na">jasper</span><span class="p">.</span><span class="na">runtime</span><span class="p">.</span><span class="na">JspSourceDependent</span><span class="p">,</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                 </span><span class="n">org</span><span class="p">.</span><span class="na">apache</span><span class="p">.</span><span class="na">jasper</span><span class="p">.</span><span class="na">runtime</span><span class="p">.</span><span class="na">JspSourceImports</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="kd">static</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="n">_jspx_imports_packages</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">java</span><span class="p">.</span><span class="na">util</span><span class="p">.</span><span class="na">HashSet</span><span class="o">&lt;&gt;</span><span class="p">();</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="n">_jspx_imports_packages</span><span class="p">.</span><span class="na">add</span><span class="p">(</span><span class="s">&#34;javax.servlet&#34;</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="n">_jspx_imports_packages</span><span class="p">.</span><span class="na">add</span><span class="p">(</span><span class="s">&#34;javax.servlet.http&#34;</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="n">_jspx_imports_packages</span><span class="p">.</span><span class="na">add</span><span class="p">(</span><span class="s">&#34;javax.servlet.jsp&#34;</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="n">_jspx_imports_classes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">null</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">_jspInit</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">_jspDestroy</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">_jspService</span><span class="p">(</span><span class="kd">final</span><span class="w"> </span><span class="n">javax</span><span class="p">.</span><span class="na">servlet</span><span class="p">.</span><span class="na">http</span><span class="p">.</span><span class="na">HttpServletRequest</span><span class="w"> </span><span class="n">request</span><span class="p">,</span><span class="w"> </span><span class="kd">final</span><span class="w"> </span><span class="n">javax</span><span class="p">.</span><span class="na">servlet</span><span class="p">.</span><span class="na">http</span><span class="p">.</span><span class="na">HttpServletResponse</span><span class="w"> </span><span class="n">response</span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="kd">throws</span><span class="w"> </span><span class="n">java</span><span class="p">.</span><span class="na">io</span><span class="p">.</span><span class="na">IOException</span><span class="p">,</span><span class="w"> </span><span class="n">javax</span><span class="p">.</span><span class="na">servlet</span><span class="p">.</span><span class="na">ServletException</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">final</span><span class="w"> </span><span class="n">javax</span><span class="p">.</span><span class="na">servlet</span><span class="p">.</span><span class="na">jsp</span><span class="p">.</span><span class="na">PageContext</span><span class="w"> </span><span class="n">pageContext</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="n">javax</span><span class="p">.</span><span class="na">servlet</span><span class="p">.</span><span class="na">http</span><span class="p">.</span><span class="na">HttpSession</span><span class="w"> </span><span class="n">session</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">null</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">final</span><span class="w"> </span><span class="n">javax</span><span class="p">.</span><span class="na">servlet</span><span class="p">.</span><span class="na">ServletContext</span><span class="w"> </span><span class="n">application</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">final</span><span class="w"> </span><span class="n">javax</span><span class="p">.</span><span class="na">servlet</span><span class="p">.</span><span class="na">ServletConfig</span><span class="w"> </span><span class="n">config</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="n">javax</span><span class="p">.</span><span class="na">servlet</span><span class="p">.</span><span class="na">jsp</span><span class="p">.</span><span class="na">JspWriter</span><span class="w"> </span><span class="n">out</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">null</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">final</span><span class="w"> </span><span class="n">java</span><span class="p">.</span><span class="na">lang</span><span class="p">.</span><span class="na">Object</span><span class="w"> </span><span class="n">page</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">this</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="n">javax</span><span class="p">.</span><span class="na">servlet</span><span class="p">.</span><span class="na">jsp</span><span class="p">.</span><span class="na">JspWriter</span><span class="w"> </span><span class="n">_jspx_out</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">null</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="n">javax</span><span class="p">.</span><span class="na">servlet</span><span class="p">.</span><span class="na">jsp</span><span class="p">.</span><span class="na">PageContext</span><span class="w"> </span><span class="n">_jspx_page_context</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">null</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="k">try</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="n">response</span><span class="p">.</span><span class="na">setContentType</span><span class="p">(</span><span class="s">&#34;text/html;charset=UTF-8&#34;</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="n">out</span><span class="p">.</span><span class="na">write</span><span class="p">(</span><span class="s">&#34;\n&#34;</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="n">out</span><span class="p">.</span><span class="na">write</span><span class="p">(</span><span class="s">&#34;\n&#34;</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="n">out</span><span class="p">.</span><span class="na">write</span><span class="p">(</span><span class="s">&#34;&lt;html&gt;\n&#34;</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="n">out</span><span class="p">.</span><span class="na">write</span><span class="p">(</span><span class="s">&#34;  &lt;head&gt;\n&#34;</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="n">out</span><span class="p">.</span><span class="na">write</span><span class="p">(</span><span class="s">&#34;    &lt;title&gt;index&lt;/title&gt;\n&#34;</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="n">out</span><span class="p">.</span><span class="na">write</span><span class="p">(</span><span class="s">&#34;  &lt;/head&gt;\n&#34;</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="n">out</span><span class="p">.</span><span class="na">write</span><span class="p">(</span><span class="s">&#34;  &lt;body&gt;\n&#34;</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="n">out</span><span class="p">.</span><span class="na">write</span><span class="p">(</span><span class="s">&#34;    &#34;</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="c1">//这里是java代码的开始</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="n">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">&#34;hello world&#34;</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="c1">//这里是java代码的结尾</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="n">out</span><span class="p">.</span><span class="na">write</span><span class="p">(</span><span class="s">&#34;\n&#34;</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="n">out</span><span class="p">.</span><span class="na">write</span><span class="p">(</span><span class="s">&#34;  &lt;/body&gt;\n&#34;</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="n">out</span><span class="p">.</span><span class="na">write</span><span class="p">(</span><span class="s">&#34;&lt;/html&gt;\n&#34;</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="p">}</span><span class="w"> </span><span class="k">catch</span><span class="w"> </span><span class="p">(</span><span class="n">java</span><span class="p">.</span><span class="na">lang</span><span class="p">.</span><span class="na">Throwable</span><span class="w"> </span><span class="n">t</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="c1">//todo someting</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="p">}</span><span class="w"> </span><span class="k">finally</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="c1">//todo someting</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span></code></pre></div><p>我们查询一下HttpJspBase这个类可以得到如下继承关系</p>
+<pre tabindex="0"><code>java.lang.Object
+  |
+  +--javax.servlet.GenericServlet
+        |
+        +--javax.servlet.http.HttpServlet
+              |
+              +--org.apache.jasper.runtime.HttpJspBase
+</code></pre><p>也就是说jsp本质上还是一个Servlet类，当我们第一次访问这个jsp页面时，服务器会根据jsp代码生成一个Servlet类的<code>.java</code>源码文件然后编译。对比jsp代码可以看得出来，在翻译的时候它逐行翻译，将html代码采用out.write进行输出，对应的java代码则原封不动的放在对应的位置。</p>
+<p>既然它是一个servlet，那么他的生命周期与相关注意事项就与Servlet相同了。</p>
+<h2 id="jsp语法">jsp语法</h2>
+<p>jsp确实简化了用户界面的编写，但是如果只知道原理，而不知道如何使用它仍然是白瞎，这部分来简单聊聊如何使用它</p>
+<p>jsp的代码主要放在3种标签中</p>
+<ol>
+<li>&lt;% code %&gt;: 这种格式中的代码，主要放的是要执行的java代码，它们最后会被解析到类的service方法中</li>
+<li>&lt;%! code %&gt;: 这种格式中的代码，主要包含的是成员变量的定义，它们最后会被解析到类的成员变量定义中</li>
+<li>&lt;%= code %&gt;: 这种格式中的代码，最终会被输出到页面上，会被解析到 out.print中进行输出</li>
+</ol>
+<p>下面我们对index.jsp进行改造，做一个简单的统计页面访问量的功能:</p>
+<pre tabindex="0"><code class="language-jsp" data-lang="jsp">&lt;%@ page contentType=&#34;text/html;charset=UTF-8&#34; language=&#34;java&#34; %&gt;
+&lt;html&gt;
+  &lt;head&gt;
+    &lt;title&gt;index&lt;/title&gt;
+  &lt;/head&gt;
+  &lt;body&gt;
+    &lt;%!
+      private int totalVisited = 0;
+    %&gt;
+
+    &lt;%
+      totalVisited++;
+    %&gt;
+
+    &lt;%=
+      &#34;客户请求次数:&#34; + totalVisited
+    %&gt;
+  &lt;/body&gt;
+&lt;/html&gt;
+</code></pre><p>然后再看看生成的java代码</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-java" data-lang="java"><span class="line"><span class="cl"><span class="kd">public</span><span class="w"> </span><span class="kd">final</span><span class="w"> </span><span class="kd">class</span> <span class="nc">index_jsp</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">org</span><span class="p">.</span><span class="na">apache</span><span class="p">.</span><span class="na">jasper</span><span class="p">.</span><span class="na">runtime</span><span class="p">.</span><span class="na">HttpJspBase</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">implements</span><span class="w"> </span><span class="n">org</span><span class="p">.</span><span class="na">apache</span><span class="p">.</span><span class="na">jasper</span><span class="p">.</span><span class="na">runtime</span><span class="p">.</span><span class="na">JspSourceDependent</span><span class="p">,</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                 </span><span class="n">org</span><span class="p">.</span><span class="na">apache</span><span class="p">.</span><span class="na">jasper</span><span class="p">.</span><span class="na">runtime</span><span class="p">.</span><span class="na">JspSourceImports</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="kd">private</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">totalVisited</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">0</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">_jspInit</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">_jspDestroy</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">_jspService</span><span class="p">(</span><span class="kd">final</span><span class="w"> </span><span class="n">javax</span><span class="p">.</span><span class="na">servlet</span><span class="p">.</span><span class="na">http</span><span class="p">.</span><span class="na">HttpServletRequest</span><span class="w"> </span><span class="n">request</span><span class="p">,</span><span class="w"> </span><span class="kd">final</span><span class="w"> </span><span class="n">javax</span><span class="p">.</span><span class="na">servlet</span><span class="p">.</span><span class="na">http</span><span class="p">.</span><span class="na">HttpServletResponse</span><span class="w"> </span><span class="n">response</span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="kd">throws</span><span class="w"> </span><span class="n">java</span><span class="p">.</span><span class="na">io</span><span class="p">.</span><span class="na">IOException</span><span class="p">,</span><span class="w"> </span><span class="n">javax</span><span class="p">.</span><span class="na">servlet</span><span class="p">.</span><span class="na">ServletException</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">final</span><span class="w"> </span><span class="n">java</span><span class="p">.</span><span class="na">lang</span><span class="p">.</span><span class="na">String</span><span class="w"> </span><span class="n">_jspx_method</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">request</span><span class="p">.</span><span class="na">getMethod</span><span class="p">();</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">final</span><span class="w"> </span><span class="n">javax</span><span class="p">.</span><span class="na">servlet</span><span class="p">.</span><span class="na">jsp</span><span class="p">.</span><span class="na">PageContext</span><span class="w"> </span><span class="n">pageContext</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="n">javax</span><span class="p">.</span><span class="na">servlet</span><span class="p">.</span><span class="na">http</span><span class="p">.</span><span class="na">HttpSession</span><span class="w"> </span><span class="n">session</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">null</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">final</span><span class="w"> </span><span class="n">javax</span><span class="p">.</span><span class="na">servlet</span><span class="p">.</span><span class="na">ServletContext</span><span class="w"> </span><span class="n">application</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">final</span><span class="w"> </span><span class="n">javax</span><span class="p">.</span><span class="na">servlet</span><span class="p">.</span><span class="na">ServletConfig</span><span class="w"> </span><span class="n">config</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="n">javax</span><span class="p">.</span><span class="na">servlet</span><span class="p">.</span><span class="na">jsp</span><span class="p">.</span><span class="na">JspWriter</span><span class="w"> </span><span class="n">out</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">null</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">final</span><span class="w"> </span><span class="n">java</span><span class="p">.</span><span class="na">lang</span><span class="p">.</span><span class="na">Object</span><span class="w"> </span><span class="n">page</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">this</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="n">javax</span><span class="p">.</span><span class="na">servlet</span><span class="p">.</span><span class="na">jsp</span><span class="p">.</span><span class="na">JspWriter</span><span class="w"> </span><span class="n">_jspx_out</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">null</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="n">javax</span><span class="p">.</span><span class="na">servlet</span><span class="p">.</span><span class="na">jsp</span><span class="p">.</span><span class="na">PageContext</span><span class="w"> </span><span class="n">_jspx_page_context</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">null</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="k">try</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="n">response</span><span class="p">.</span><span class="na">setContentType</span><span class="p">(</span><span class="s">&#34;text/html;charset=UTF-8&#34;</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="n">out</span><span class="p">.</span><span class="na">write</span><span class="p">(</span><span class="s">&#34;\n&#34;</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="n">out</span><span class="p">.</span><span class="na">write</span><span class="p">(</span><span class="s">&#34;\n&#34;</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="n">out</span><span class="p">.</span><span class="na">write</span><span class="p">(</span><span class="s">&#34;&lt;html&gt;\n&#34;</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="n">out</span><span class="p">.</span><span class="na">write</span><span class="p">(</span><span class="s">&#34;  &lt;head&gt;\n&#34;</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="n">out</span><span class="p">.</span><span class="na">write</span><span class="p">(</span><span class="s">&#34;    &lt;title&gt;index&lt;/title&gt;\n&#34;</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="n">out</span><span class="p">.</span><span class="na">write</span><span class="p">(</span><span class="s">&#34;  &lt;/head&gt;\n&#34;</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="n">out</span><span class="p">.</span><span class="na">write</span><span class="p">(</span><span class="s">&#34;  &lt;body&gt;\n&#34;</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="n">out</span><span class="p">.</span><span class="na">write</span><span class="p">(</span><span class="s">&#34;    &#34;</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="n">out</span><span class="p">.</span><span class="na">write</span><span class="p">(</span><span class="s">&#34;\n&#34;</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="n">out</span><span class="p">.</span><span class="na">write</span><span class="p">(</span><span class="s">&#34;\n&#34;</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="n">out</span><span class="p">.</span><span class="na">write</span><span class="p">(</span><span class="s">&#34;    &#34;</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="n">totalVisited</span><span class="o">++</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="n">out</span><span class="p">.</span><span class="na">write</span><span class="p">(</span><span class="s">&#34;\n&#34;</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="n">out</span><span class="p">.</span><span class="na">write</span><span class="p">(</span><span class="s">&#34;\n&#34;</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="n">out</span><span class="p">.</span><span class="na">write</span><span class="p">(</span><span class="s">&#34;    &#34;</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="n">out</span><span class="p">.</span><span class="na">print</span><span class="p">(</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="s">&#34;客户请求次数:&#34;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">totalVisited</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="n">out</span><span class="p">.</span><span class="na">write</span><span class="p">(</span><span class="s">&#34;\n&#34;</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="n">out</span><span class="p">.</span><span class="na">write</span><span class="p">(</span><span class="s">&#34;  &lt;/body&gt;\n&#34;</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="n">out</span><span class="p">.</span><span class="na">write</span><span class="p">(</span><span class="s">&#34;&lt;/html&gt;\n&#34;</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span></code></pre></div><h3 id="jsp内置对象">jsp内置对象</h3>
+<p>我们在写jsp页面时关注的其实是Servlet的service 方法，谈及jsp内置对象的时候主要关注的是service中定义的相关变量，从生成的代码上来看，我们可以使用的是service方法中的输入参数request和response 再加它事先定义好的9个局部变量。它们的含义如下:</p>
+<ol>
+<li>HttpServletRequest request: 请求对象，之前在HttpServlet中已经了解了它该如何使用</li>
+<li>javax.servlet.jsp.PageContext pageContext: 页面的上下文，提供对JSP页面所有对象以及命名空间的访问。可以用它拿到request、cookie、session等一系列页面中可以访问到的对象</li>
+<li>HttpSession session: 当前会话</li>
+<li>ServletContext application: servlet上下文，我们可以拿到servlet的相关对象。比如获取当前servlet对象的名称，然后拼接一个路径。这样就不用考虑如何部署的问题</li>
+<li>JspWriter out: 输出对象</li>
+<li>HttpServletResponse response: HTTP响应对象</li>
+<li>Object page: 从定义和初始化值来看，它代表的是当前Servlet对象</li>
+<li>ServletConfig config: ServletConfig类的实例,获取当前servlet的配置信息</li>
+<li>Except: 当前异常，只有当jsp页面是错误页面是才能使用这个对象。</li>
+</ol>
+<p>其他的东西基本上用不上，这里也就不再介绍了。</p>
+<h3 id="指令">指令</h3>
+<p>通过上面的相关知识点，现在已经能写相关的jsp代码了，但是既然本质上是servlet类，那么java其他的操作，比如导入相关库文件怎么办呢？这就需要用到对应的jsp指令。jsp指令放在 &lt;%@ code %&gt;中，jsp指令主要有3大类：</p>
+<ol>
+<li>page: 定义网页依赖属性，比如脚本语言、error页面、缓存需求等等</li>
+<li>include: 包含其他文件,可以利用这个属性事先抽取出页面的公共部分（比如页面的头部导航栏和页脚部分），最后再用include做拼接。</li>
+<li>taglib: 引入标签库的定义, 这个在使用jstl 和es表达式等第三方jsp扩展库的时候使用</li>
+</ol>
+<p>每条指令可以有多个属性，page 指令的相关属性如下:</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">属性</th>
+<th style="text-align:left">含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">contentType</td>
+<td style="text-align:left">等同于 response.setContentType方法，用于设置响应头的Content-Type属性</td>
+</tr>
+<tr>
+<td style="text-align:left">pageEncoding</td>
+<td style="text-align:left">设置jsp页面自身的编码方式</td>
+</tr>
+<tr>
+<td style="text-align:left">language</td>
+<td style="text-align:left">定义jsp脚本所使用的语言，目前只支持java 语言</td>
+</tr>
+<tr>
+<td style="text-align:left">import</td>
+<td style="text-align:left">导入java包</td>
+</tr>
+<tr>
+<td style="text-align:left">errorPage</td>
+<td style="text-align:left">当前页面发生异常后会自动跳转到指定错误页面</td>
+</tr>
+<tr>
+<td style="text-align:left">isErrorPage</td>
+<td style="text-align:left">标识当前页面是否是错误页面，错误页面中可以使用exception 对象，用来捕获异常</td>
+</tr>
+</tbody>
+</table>
+<p>include 指令的相关属性如下:</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">属性</th>
+<th style="text-align:left">含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">file</td>
+<td style="text-align:left">包含的文件路径</td>
+</tr>
+</tbody>
+</table>
+<p>taglib 的属性如下:</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">属性</th>
+<th style="text-align:left">含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">prefix</td>
+<td style="text-align:left">前缀，它们是自定义的，将来要用lib中的标签时用它作为前缀</td>
+</tr>
+<tr>
+<td style="text-align:left">uri</td>
+<td style="text-align:left">第三方库所在路径</td>
+</tr>
+</tbody>
+</table>
+<!-- raw HTML omitted -->
+</div><div class="post-footer" id="post-footer">
+    <div class="post-info">
+        <div class="post-info-line">
+            <div class="post-info-mod">
+                <span>Updated on 2019-11-17</span>
+            </div></div>
+        <div class="post-info-line">
+            <div class="post-info-md"></div>
+            <div class="post-info-share">
+                <span><a href="javascript:void(0);" title="Share on Twitter" data-sharer="twitter" data-url="http://HaiLateBoy.github.io/posts/javase-4/" data-title="jsp" data-hashtags="java web,jsp"><i class="fab fa-twitter fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Facebook" data-sharer="facebook" data-url="http://HaiLateBoy.github.io/posts/javase-4/" data-hashtag="java web"><i class="fab fa-facebook-square fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Hacker News" data-sharer="hackernews" data-url="http://HaiLateBoy.github.io/posts/javase-4/" data-title="jsp"><i class="fab fa-hacker-news fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Line" data-sharer="line" data-url="http://HaiLateBoy.github.io/posts/javase-4/" data-title="jsp"><i data-svg-src="https://cdn.jsdelivr.net/npm/simple-icons@7.3.0/icons/line.svg" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on 微博" data-sharer="weibo" data-url="http://HaiLateBoy.github.io/posts/javase-4/" data-title="jsp"><i class="fab fa-weibo fa-fw" aria-hidden="true"></i></a></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="post-info-more">
+        <section class="post-tags"><i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/java-web/">java web</a>,&nbsp;<a href="/tags/jsp/">jsp</a></section>
+        <section>
+            <span><a href="javascript:void(0);" onclick="window.history.back();">Back</a></span>&nbsp;|&nbsp;<span><a href="/">Home</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav"><a href="/posts/javase-3/" class="prev" rel="prev" title="Servlet 会话"><i class="fas fa-angle-left fa-fw" aria-hidden="true"></i>Servlet 会话</a>
+            <a href="/posts/javase-5/" class="next" rel="next" title="EL表达式与JSTL">EL表达式与JSTL<i class="fas fa-angle-right fa-fw" aria-hidden="true"></i></a></div>
+</div>
+</article></div>
+            </main><footer class="footer">
+        <div class="footer-container"><div class="footer-line">Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener noreffer" title="Hugo 0.121.2">Hugo</a> | Theme - <a href="https://github.com/dillonzq/LoveIt" target="_blank" rel="noopener noreffer" title="LoveIt 0.2.11"><i class="far fa-kiss-wink-heart fa-fw" aria-hidden="true"></i> LoveIt</a>
+                </div><div class="footer-line" itemscope itemtype="http://schema.org/CreativeWork"><i class="far fa-copyright fa-fw" aria-hidden="true"></i><span itemprop="copyrightYear">2022 - 2024</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="https://www.masimaro.xyz" target="_blank">Masimaro</a></span></div>
+        </div>
+    </footer></div>
+
+        <div id="fixed-buttons"><a href="#" id="back-to-top" class="fixed-button" title="Back to Top">
+                <i class="fas fa-arrow-up fa-fw" aria-hidden="true"></i>
+            </a><a href="#" id="view-comments" class="fixed-button" title="View Comments">
+                <i class="fas fa-comment fa-fw" aria-hidden="true"></i>
+            </a>
+        </div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.css"><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/autocomplete.js@0.38.1/dist/autocomplete.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lunr@2.3.9/lunr.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lazysizes@5.3.2/lazysizes.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/clipboard@2.0.11/dist/clipboard.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/sharer.js@0.5.1/sharer.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/auto-render.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/copy-tex.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/mhchem.min.js"></script><script type="text/javascript">window.config={"code":{"copyTitle":"Copy to clipboard","maxShownLines":50},"comment":{},"math":{"delimiters":[{"display":true,"left":"$$","right":"$$"},{"display":true,"left":"\\[","right":"\\]"},{"display":true,"left":"\\begin{equation}","right":"\\end{equation}"},{"display":true,"left":"\\begin{equation*}","right":"\\end{equation*}"},{"display":true,"left":"\\begin{align}","right":"\\end{align}"},{"display":true,"left":"\\begin{align*}","right":"\\end{align*}"},{"display":true,"left":"\\begin{alignat}","right":"\\end{alignat}"},{"display":true,"left":"\\begin{alignat*}","right":"\\end{alignat*}"},{"display":true,"left":"\\begin{gather}","right":"\\end{gather}"},{"display":true,"left":"\\begin{CD}","right":"\\end{CD}"},{"display":false,"left":"$","right":"$"},{"display":false,"left":"\\(","right":"\\)"}],"strict":false},"search":{"highlightTag":"em","maxResultLength":10,"noResultsFound":"No results found","snippetLength":50}};</script><script type="text/javascript" src="/js/theme.min.js"></script></body>
+</html>

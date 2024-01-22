@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="robots" content="noodp" />
+        <title>vim 从嫌弃到依赖(15)——寄存器 - Masimaro&#39;s blog</title><meta name="Description" content="这是我用于记录日常和学习的小站"><meta property="og:title" content="vim 从嫌弃到依赖(15)——寄存器" />
+<meta property="og:description" content="在计算机里面也有寄存器，计算机中的寄存器是看得见，摸得着的实体，寄存器中存储需要经常访问的一些数据。而vim中也有寄存器的概念，vim中的寄存器是一个虚拟的概念，更像是一块专门用来存储数据的内存缓冲区。在使用vim的过程中离不开寄存器，而且我们很早就用到了寄存器，只是没有发现罢了。这篇文章将深入介绍寄存器，这样我们对之前使用的命令将会有更深的认识。" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://HaiLateBoy.github.io/posts/vim-tutorial-16/" /><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2022-06-02T09:53:43+08:00" />
+<meta property="article:modified_time" content="2022-06-02T09:53:43+08:00" /><meta property="og:site_name" content="Masimaro&#39;s blog" />
+
+<meta name="twitter:card" content="summary"/><meta name="twitter:title" content="vim 从嫌弃到依赖(15)——寄存器"/>
+<meta name="twitter:description" content="在计算机里面也有寄存器，计算机中的寄存器是看得见，摸得着的实体，寄存器中存储需要经常访问的一些数据。而vim中也有寄存器的概念，vim中的寄存器是一个虚拟的概念，更像是一块专门用来存储数据的内存缓冲区。在使用vim的过程中离不开寄存器，而且我们很早就用到了寄存器，只是没有发现罢了。这篇文章将深入介绍寄存器，这样我们对之前使用的命令将会有更深的认识。"/>
+<meta name="application-name" content="My cool site">
+<meta name="apple-mobile-web-app-title" content="My cool site"><meta name="theme-color" content="#ffffff"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="manifest" href="/site.webmanifest"><link rel="canonical" href="http://HaiLateBoy.github.io/posts/vim-tutorial-16/" /><link rel="prev" href="http://HaiLateBoy.github.io/posts/vim-tutorial-15/" /><link rel="next" href="http://HaiLateBoy.github.io/posts/vim-tutorial-17/" /><link rel="stylesheet" href="/css/style.min.css"><link rel="preload" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css"></noscript><link rel="preload" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css"></noscript><script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "BlogPosting",
+        "headline": "vim 从嫌弃到依赖(15)——寄存器",
+        "inLanguage": "zh-CN",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "http:\/\/HaiLateBoy.github.io\/posts\/vim-tutorial-16\/"
+        },"genre": "posts","keywords": "vim, 编辑工具, 文本处理","wordcount":  3032 ,
+        "url": "http:\/\/HaiLateBoy.github.io\/posts\/vim-tutorial-16\/","datePublished": "2022-06-02T09:53:43+08:00","dateModified": "2022-06-02T09:53:43+08:00","publisher": {
+            "@type": "Organization",
+            "name": ""},"author": {
+                "@type": "Person",
+                "name": "Masimaro"
+            },"description": ""
+    }
+    </script></head>
+    <body data-header-desktop="fixed" data-header-mobile="auto"><script type="text/javascript">(window.localStorage && localStorage.getItem('theme') ? localStorage.getItem('theme') === 'dark' : ('auto' === 'auto' ? window.matchMedia('(prefers-color-scheme: dark)').matches : 'auto' === 'dark')) && document.body.setAttribute('theme', 'dark');</script>
+
+        <div id="mask"></div><div class="wrapper"><header class="desktop" id="header-desktop">
+    <div class="header-wrapper">
+        <div class="header-title">
+            <a href="/" title="Masimaro&#39;s blog">My cool site</a>
+        </div>
+        <div class="menu">
+            <div class="menu-inner"><a class="menu-item" href="/posts/" title="文章列表"> 文章 </a><a class="menu-item" href="/tags/" title="标签"> 标签 </a><a class="menu-item" href="/categories/" title="分类"> 分类 </a><a class="menu-item" href="/about" title="关于本站"> 关于 </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-desktop">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-desktop" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-desktop" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-desktop">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </span><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                    <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+                </a></div>
+        </div>
+    </div>
+</header><header class="mobile" id="header-mobile">
+    <div class="header-container">
+        <div class="header-wrapper">
+            <div class="header-title">
+                <a href="/" title="Masimaro&#39;s blog">My cool site</a>
+            </div>
+            <div class="menu-toggle" id="menu-toggle-mobile">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+        <div class="menu" id="menu-mobile"><div class="search-wrapper">
+                    <div class="search mobile" id="search-mobile">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-mobile">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-mobile" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-mobile" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-mobile">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </div>
+                    <a href="javascript:void(0);" class="search-cancel" id="search-cancel-mobile">
+                        Cancel
+                    </a>
+                </div><a class="menu-item" href="/posts/" title="文章列表">文章</a><a class="menu-item" href="/tags/" title="标签">标签</a><a class="menu-item" href="/categories/" title="分类">分类</a><a class="menu-item" href="/about" title="关于本站">关于</a><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+            </a></div>
+    </div>
+</header><div class="search-dropdown desktop">
+        <div id="search-dropdown-desktop"></div>
+    </div>
+    <div class="search-dropdown mobile">
+        <div id="search-dropdown-mobile"></div>
+    </div><main class="main">
+                <div class="container"><div class="toc" id="toc-auto">
+            <h2 class="toc-title">Contents</h2>
+            <div class="toc-content" id="toc-content-auto"></div>
+        </div><article class="page single"><h1 class="single-title animate__animated animate__flipInX">vim 从嫌弃到依赖(15)——寄存器</h1><div class="post-meta">
+            <div class="post-meta-line"><span class="post-author"><a href="https://www.masimaro.xyz" title="Author" target="_blank" rel="noopener noreffer author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Masimaro</a></span>&nbsp;<span class="post-category">included in <a href="/categories/vim/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>vim</a></span></div>
+            <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw" aria-hidden="true"></i>&nbsp;<time datetime="2022-06-02">2022-06-02</time>&nbsp;<i class="fas fa-pencil-alt fa-fw" aria-hidden="true"></i>&nbsp;3032 words&nbsp;
+                <i class="far fa-clock fa-fw" aria-hidden="true"></i>&nbsp;7 minutes&nbsp;</div>
+        </div><div class="details toc" id="toc-static"  data-kept="true">
+                <div class="details-summary toc-title">
+                    <span>Contents</span>
+                    <span><i class="details-icon fas fa-angle-right" aria-hidden="true"></i></span>
+                </div>
+                <div class="details-content toc-content" id="toc-content-static"><nav id="TableOfContents">
+  <ul>
+    <li><a href="#几种寄存器类型">几种寄存器类型</a>
+      <ul>
+        <li><a href="#无名寄存器">无名寄存器</a></li>
+        <li><a href="#有名寄存器">有名寄存器</a></li>
+        <li><a href="#复制寄存器">复制寄存器</a></li>
+        <li><a href="#黑洞寄存器">黑洞寄存器</a></li>
+        <li><a href="#系统剪切板">系统剪切板</a></li>
+        <li><a href="#表达式寄存器">表达式寄存器</a></li>
+      </ul>
+    </li>
+    <li><a href="#示例">示例</a>
+      <ul>
+        <li><a href="#示例1复制粘贴的使用">示例1：复制粘贴的使用</a></li>
+        <li><a href="#示例2插入模式中使用寄存器">示例2：插入模式中使用寄存器</a></li>
+        <li><a href="#示例三-处理粘贴混乱的问题">示例三： 处理粘贴混乱的问题</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav></div>
+            </div><div class="content" id="content"><p>在计算机里面也有寄存器，计算机中的寄存器是看得见，摸得着的实体，寄存器中存储需要经常访问的一些数据。而vim中也有寄存器的概念，vim中的寄存器是一个虚拟的概念，更像是一块专门用来存储数据的内存缓冲区。在使用vim的过程中离不开寄存器，而且我们很早就用到了寄存器，只是没有发现罢了。这篇文章将深入介绍寄存器，这样我们对之前使用的命令将会有更深的认识。</p>
+<h2 id="几种寄存器类型">几种寄存器类型</h2>
+<h3 id="无名寄存器">无名寄存器</h3>
+<p>在之前介绍过，可以使用<code>d</code>来删除一段内容，使用<code>p</code>来粘贴，使用<code>y</code>来复制， vim中其他的带有删除功能的<code>operator</code> 像 <code>x</code>、<code>c</code>、<code>s</code> 之类的，vim在删除之前会将被删除内容先放到无名寄存器中，然后执行删除操作。严格意义上来说，他们并不是删除而是剪切。后续可以通过<code>p</code> 命令来粘贴之前被删除的内容
+例如</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="nb">print</span><span class="p">(</span><span class="s2">&#34;hello world&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="nb">print</span><span class="p">(</span><span class="s2">&#34;&#34;</span><span class="p">)</span>
+</span></span></code></pre></div><p>改为</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="nb">print</span><span class="p">(</span><span class="s2">&#34;&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="nb">print</span><span class="p">(</span><span class="s2">&#34;hello world&#34;</span><span class="p">)</span>
+</span></span></code></pre></div><p>就可以在第一行通过di&quot;，将被删除的内容存储到无名寄存器中，然后在第二行对应位置执行 <code>p</code> (或者<code>P</code>) 命令取出无名寄存器中的内容。
+<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://img-blog.csdnimg.cn/9f61a1cd60234b6c84eb124b5fe269bc.gif#pic_center"
+        data-srcset="https://img-blog.csdnimg.cn/9f61a1cd60234b6c84eb124b5fe269bc.gif#pic_center, https://img-blog.csdnimg.cn/9f61a1cd60234b6c84eb124b5fe269bc.gif#pic_center 1.5x, https://img-blog.csdnimg.cn/9f61a1cd60234b6c84eb124b5fe269bc.gif#pic_center 2x"
+        data-sizes="auto"
+        alt="https://img-blog.csdnimg.cn/9f61a1cd60234b6c84eb124b5fe269bc.gif#pic_center"
+        title="删除复制" />
+这里在使用<code>h</code> 移动光标之后，光标所在位置在后一个引号的位置，为了减少一次光标移动，我直接使用<code>P</code> 在光标所在位置之前进行粘贴操作。</p>
+<p>这里插一个题外话，vim中的命令都是某些有意义的单词的首字母或者几个字母的缩写，像<code>d</code>代表delete、<code>y</code>代表<code>yank</code>，那么<code>p</code>又代表什么呢，粘贴的英文是<code>paste</code>，但是知道寄存器以及复制粘贴在vim的表现，我觉得应该是<code>put</code>，就是将寄存器中的内存拿出来。好在他们的首字母相同，不影响记忆。</p>
+<h3 id="有名寄存器">有名寄存器</h3>
+<p>它是对应无名寄存器来说的，无名寄存器虽然说使用方便，但是有一个很大的问题，那就是如果我们连续两次执行了删除或者复制操作，那么前一次保存的内容将会被后一次的给覆盖掉。为了解决这个问题，一个思路就是使用有名寄存器。
+vim中提供了由a到z的有名寄存器，可以在使用<code>operator</code> 的操作前面指定需要使用的寄存器，引用一个寄存器可以使用 <code>&quot; + 寄存器名</code>的格式。这个时候我们之前的公式就又可以扩展了</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="cl">&#34; + regester + operator + motion
+</span></span></code></pre></div><p>例如在执行删除的时候 <code>&quot;add</code> 将一行删除的内容放到a寄存器中，再次执行<code>&quot;bdd</code>将内容放到b寄存器中，执行粘贴的时候，可以使用<code>&quot;ap</code>和 <code>&quot;bp</code>来分别使用 a和b寄存器的内容。
+<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://img-blog.csdnimg.cn/9532bc3dce4f4ec986e7a08af56b1d8e.gif#pic_center"
+        data-srcset="https://img-blog.csdnimg.cn/9532bc3dce4f4ec986e7a08af56b1d8e.gif#pic_center, https://img-blog.csdnimg.cn/9532bc3dce4f4ec986e7a08af56b1d8e.gif#pic_center 1.5x, https://img-blog.csdnimg.cn/9532bc3dce4f4ec986e7a08af56b1d8e.gif#pic_center 2x"
+        data-sizes="auto"
+        alt="https://img-blog.csdnimg.cn/9532bc3dce4f4ec986e7a08af56b1d8e.gif#pic_center"
+        title="有名寄存器" /></p>
+<p>无名寄存器有一个专用的符号，使用 <code>&quot;</code>来表示。也就是说<code>dd</code> 命令其实等效为 <code>&quot;&quot;dd</code>。但是为了偷懒和方便，还是少输几个字符的好。</p>
+<h3 id="复制寄存器">复制寄存器</h3>
+<p>前面说到使用 <code>dd</code> 之类的命令会将被删除的内容放到无名的寄存器中，它的行为有点像普通编辑器中的剪切，那它是不是剪切呢，那么多教程都把它叫做删除，是不是有问题呢。它确实是删除指定，教程说的也没错，vim中有专门存储复制内容的寄存器。普通的删除命令会把被删除的内容保存到无名寄存器中，但是这些内容不会被保存到复制寄存器中。复制寄存器使用 0来表示。即我们可以使用 &ldquo;0p来将复制寄存器的内容取出。也可以通过命令 :reg 0来查看这个寄存器的内容。
+<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://img-blog.csdnimg.cn/1bf518224f19405192d7533957668f2d.gif#pic_center"
+        data-srcset="https://img-blog.csdnimg.cn/1bf518224f19405192d7533957668f2d.gif#pic_center, https://img-blog.csdnimg.cn/1bf518224f19405192d7533957668f2d.gif#pic_center 1.5x, https://img-blog.csdnimg.cn/1bf518224f19405192d7533957668f2d.gif#pic_center 2x"
+        data-sizes="auto"
+        alt="https://img-blog.csdnimg.cn/1bf518224f19405192d7533957668f2d.gif#pic_center"
+        title="复制寄存器" />
+在上述例子中，我们先在第一行执行 <code>yy</code> 操作进行复制，这个时候数据会被同时保存到无名寄存器和复制寄存器。然后在第二行执行 <code>dd</code> 删除，这个时候第二行的数据会被保存到无名寄存器，之前保存的第一行的数据就被删除了，但是不会被保存到复制寄存器，第一行的数据仍然存储在赋值寄存器。接着立即执行<code>p</code> 它会从无名寄存器中中取出我们之前删除的第二行的数据。接着再执行<code>&quot;0p</code> 会从复制寄存器中取数据，这个时候取出的仍然是第一行的数据。</p>
+<h3 id="黑洞寄存器">黑洞寄存器</h3>
+<p>前面说到 dd会将被删除内容放入到无名寄存器中，如果这段内容我确实不想要了，也不想它占用寄存器，有没有什么办法彻底删除呢，答案是使用黑洞寄存器，顾名思义，放入该寄存器中的内容都被吸走丢失了，无法使用了。黑洞寄存器使用 _作为标识符，执行删除指令的时候可以使用 &ldquo;_dd这样就再也访问不到之前删除的内容了。
+<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://img-blog.csdnimg.cn/f4571dd57a2943838028cb4477730e05.gif#pic_center"
+        data-srcset="https://img-blog.csdnimg.cn/f4571dd57a2943838028cb4477730e05.gif#pic_center, https://img-blog.csdnimg.cn/f4571dd57a2943838028cb4477730e05.gif#pic_center 1.5x, https://img-blog.csdnimg.cn/f4571dd57a2943838028cb4477730e05.gif#pic_center 2x"
+        data-sizes="auto"
+        alt="https://img-blog.csdnimg.cn/f4571dd57a2943838028cb4477730e05.gif#pic_center"
+        title="黑洞寄存器" />
+在上面的例子中，我们先执行普通的<code>dd</code> 命令，它会将删除内容放入到无名寄存器中，第二次执行的是 <code>&quot;_dd</code> ，它会将内容放到黑洞寄存器中直接丢弃，后面执行<code>p</code> 的时候只会粘贴第一次删除的内容。有小伙伴可能会说，这个跟我使用其他有名寄存器效果是一样的。看不出什么区别，那么我们可以试试使用 <code>:reg</code> 命令来查看有名寄存器和黑洞寄存器的值，我们发现黑洞寄存器的值永远为空，而有名寄存器此时多了一条记录。</p>
+<h3 id="系统剪切板">系统剪切板</h3>
+<p>之前我们在vim中复制粘贴的内容，只能在vim中使用。同样的系统中复制粘贴的内容只能在系统其它程序中使用，无法直接粘贴到vim中。我们可以在vim中使用系统剪切板。vim可以使用<code>+</code>来访问系统剪切板。例如使用 <code>&quot;+yy</code>将内容复制到系统剪切板中，供其他程序使用。</p>
+<p>但是在有好的shell工具的加持下，我更喜欢用<code>&lt;Ctrl+v&gt;</code>这样的方式直接粘贴一大段文字到vim中。或者配合vim的可视模式，直接使用shell中的快捷键从vim中粘贴选中的内容到系统剪切板</p>
+<h3 id="表达式寄存器">表达式寄存器</h3>
+<p>前面介绍的几种寄存器都是被动的存储静态的内容，只有存储功能。表达式寄存器则可以接受一段vim脚本并执行它并输出结果。表达式寄存器使用 <code>=</code>来表示。
+例如在插入模式中可以使用 <code>&lt;Ctrl+r&gt;=6*6</code> 来进行数学计算并输出。
+<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://img-blog.csdnimg.cn/9921176fe6f64fe692fecd557ce817ab.gif#pic_center"
+        data-srcset="https://img-blog.csdnimg.cn/9921176fe6f64fe692fecd557ce817ab.gif#pic_center, https://img-blog.csdnimg.cn/9921176fe6f64fe692fecd557ce817ab.gif#pic_center 1.5x, https://img-blog.csdnimg.cn/9921176fe6f64fe692fecd557ce817ab.gif#pic_center 2x"
+        data-sizes="auto"
+        alt="https://img-blog.csdnimg.cn/9921176fe6f64fe692fecd557ce817ab.gif#pic_center"
+        title="表达式寄存器" />
+到此已经介绍完了vim中几种主要的寄存器，是不是觉得挺抽象的，而且用起来也不是那么方便。下面我们还是以例子来展示相关用法。</p>
+<h2 id="示例">示例</h2>
+<h3 id="示例1复制粘贴的使用">示例1：复制粘贴的使用</h3>
+<p>假设我们要将如下代码</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="nb">print</span><span class="p">(</span><span class="s2">&#34;hello world&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="nb">print</span><span class="p">(</span><span class="s2">&#34;hello vim&#34;</span><span class="p">)</span>
+</span></span></code></pre></div><p>修改为</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="nb">print</span><span class="p">(</span><span class="s2">&#34;hello world&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="nb">print</span><span class="p">(</span><span class="s2">&#34;hello world&#34;</span><span class="p">)</span>
+</span></span></code></pre></div><p>可以在第一行使用 <code>yi&quot;</code>来复制引号内的内容，但是如果在第二行先使用 <code>ci&quot;</code>再使用 <code>p</code>进行粘贴的话会发现粘贴的仍然是<code>hello vim</code>这是因为后面使用<code>c</code>操作的时候，已经将原来的给覆盖掉了。现在我们来解决这个问题。</p>
+<p>第一种解法：<code>y</code>指令可以额外产生一个动作，它会将内容放入到复制寄存器中，那么在执行了ci&quot;之后使用 &ldquo;0p来使用复制寄存器中的内容
+<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://img-blog.csdnimg.cn/b97a5804f79249d0a6e1bc5252ebe215.gif#pic_center"
+        data-srcset="https://img-blog.csdnimg.cn/b97a5804f79249d0a6e1bc5252ebe215.gif#pic_center, https://img-blog.csdnimg.cn/b97a5804f79249d0a6e1bc5252ebe215.gif#pic_center 1.5x, https://img-blog.csdnimg.cn/b97a5804f79249d0a6e1bc5252ebe215.gif#pic_center 2x"
+        data-sizes="auto"
+        alt="https://img-blog.csdnimg.cn/b97a5804f79249d0a6e1bc5252ebe215.gif#pic_center"
+        title="使用复制寄存器解决覆盖问题" />
+第二种解法：可以手动指定ci&quot;删除的内容放入到黑洞寄存器中，即执行&rdquo;_ci&quot;这样就不会产生覆盖问题。
+<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://img-blog.csdnimg.cn/d4efd1bb348b476e8b7fd1c083c70cfb.gif#pic_center"
+        data-srcset="https://img-blog.csdnimg.cn/d4efd1bb348b476e8b7fd1c083c70cfb.gif#pic_center, https://img-blog.csdnimg.cn/d4efd1bb348b476e8b7fd1c083c70cfb.gif#pic_center 1.5x, https://img-blog.csdnimg.cn/d4efd1bb348b476e8b7fd1c083c70cfb.gif#pic_center 2x"
+        data-sizes="auto"
+        alt="https://img-blog.csdnimg.cn/d4efd1bb348b476e8b7fd1c083c70cfb.gif#pic_center"
+        title="使用黑洞寄存器来解决覆盖问题" />
+前两种方法虽然解决问题了，但是都引入了新的寄存器，按键比较繁琐，如果不想引入新寄存器，就得使用接下来介绍的第三种方法了，它也是我最喜欢的方法了。</p>
+<p>解法三：由于我们需要先删除之前的内容再复制，为了快速删除，所以会发生覆盖问题，我们只要不执行删除操作就不会覆盖了，为了一次性完成粘贴替换的操作，可以使用选择模式，之前介绍选择模式的时候说过，在选择模式下<code>operator</code> 会将选中部分作为操作区域。可以使用 <code>vi&quot;</code> 来选中引号内容，然后直接使用 <code>p</code> 完成复制
+<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://img-blog.csdnimg.cn/1cdb2436622e4e5ba81d7604037d9946.gif#pic_center"
+        data-srcset="https://img-blog.csdnimg.cn/1cdb2436622e4e5ba81d7604037d9946.gif#pic_center, https://img-blog.csdnimg.cn/1cdb2436622e4e5ba81d7604037d9946.gif#pic_center 1.5x, https://img-blog.csdnimg.cn/1cdb2436622e4e5ba81d7604037d9946.gif#pic_center 2x"
+        data-sizes="auto"
+        alt="https://img-blog.csdnimg.cn/1cdb2436622e4e5ba81d7604037d9946.gif#pic_center"
+        title="使用可视模式解决问题" /></p>
+<h3 id="示例2插入模式中使用寄存器">示例2：插入模式中使用寄存器</h3>
+<p>之前已经在介绍表达式寄存器的时候已经介绍了如何在插入模式中使用寄存器，可以使用 <code>&lt;Ctrl + r&gt; + register</code> 例如上面的例子可以使用 <code>&lt;Ctrl + r&gt;0</code>来将复制寄存器中的内容写入到光标所在位置。
+<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://img-blog.csdnimg.cn/104c5afc7e8348b2a63e8a91f4a0d833.gif#pic_center"
+        data-srcset="https://img-blog.csdnimg.cn/104c5afc7e8348b2a63e8a91f4a0d833.gif#pic_center, https://img-blog.csdnimg.cn/104c5afc7e8348b2a63e8a91f4a0d833.gif#pic_center 1.5x, https://img-blog.csdnimg.cn/104c5afc7e8348b2a63e8a91f4a0d833.gif#pic_center 2x"
+        data-sizes="auto"
+        alt="https://img-blog.csdnimg.cn/104c5afc7e8348b2a63e8a91f4a0d833.gif#pic_center"
+        title="插入模式中使用寄存器来解决问题" />
+相比上面介绍的前两种解法，它省去了切换回普通模式的步骤，相对来说更高效一点。但是我觉得它还是比不上第三种解法。</p>
+<h3 id="示例三-处理粘贴混乱的问题">示例三： 处理粘贴混乱的问题</h3>
+<p>有的时候在粘贴代码的时候发现代码的格式可能会乱，这个时候可以设置 <code>:set paste</code>选项，设置之后复制粘贴将不再出现这个问题，但是它会使我们在其他模式下设置的快捷键失效，在粘贴完了之后可以使用 <code>:set nopaste</code>取消该设置。由于我使用的<code>neovim</code>中没有发现这个问题，就不演示了，各位使用<code>vim</code>的小伙伴可以自行测试。</p>
+<p>当然处理该问题的另一种方式是使用之前介绍的在<code>vim</code>中使用剪切板的方法，也就是使用 &ldquo;+p这样的形式。</p></div><div class="post-footer" id="post-footer">
+    <div class="post-info">
+        <div class="post-info-line">
+            <div class="post-info-mod">
+                <span>Updated on 2022-06-02</span>
+            </div></div>
+        <div class="post-info-line">
+            <div class="post-info-md"></div>
+            <div class="post-info-share">
+                <span><a href="javascript:void(0);" title="Share on Twitter" data-sharer="twitter" data-url="http://HaiLateBoy.github.io/posts/vim-tutorial-16/" data-title="vim 从嫌弃到依赖(15)——寄存器" data-hashtags="vim,编辑工具,文本处理"><i class="fab fa-twitter fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Facebook" data-sharer="facebook" data-url="http://HaiLateBoy.github.io/posts/vim-tutorial-16/" data-hashtag="vim"><i class="fab fa-facebook-square fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Hacker News" data-sharer="hackernews" data-url="http://HaiLateBoy.github.io/posts/vim-tutorial-16/" data-title="vim 从嫌弃到依赖(15)——寄存器"><i class="fab fa-hacker-news fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Line" data-sharer="line" data-url="http://HaiLateBoy.github.io/posts/vim-tutorial-16/" data-title="vim 从嫌弃到依赖(15)——寄存器"><i data-svg-src="https://cdn.jsdelivr.net/npm/simple-icons@7.3.0/icons/line.svg" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on 微博" data-sharer="weibo" data-url="http://HaiLateBoy.github.io/posts/vim-tutorial-16/" data-title="vim 从嫌弃到依赖(15)——寄存器"><i class="fab fa-weibo fa-fw" aria-hidden="true"></i></a></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="post-info-more">
+        <section class="post-tags"><i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/vim/">vim</a>,&nbsp;<a href="/tags/%E7%BC%96%E8%BE%91%E5%B7%A5%E5%85%B7/">编辑工具</a>,&nbsp;<a href="/tags/%E6%96%87%E6%9C%AC%E5%A4%84%E7%90%86/">文本处理</a></section>
+        <section>
+            <span><a href="javascript:void(0);" onclick="window.history.back();">Back</a></span>&nbsp;|&nbsp;<span><a href="/">Home</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav"><a href="/posts/vim-tutorial-15/" class="prev" rel="prev" title="vim 从嫌弃到依赖(14)——快速跳转"><i class="fas fa-angle-left fa-fw" aria-hidden="true"></i>vim 从嫌弃到依赖(14)——快速跳转</a>
+            <a href="/posts/vim-tutorial-17/" class="next" rel="next" title="vim 从嫌弃到依赖(16)——宏">vim 从嫌弃到依赖(16)——宏<i class="fas fa-angle-right fa-fw" aria-hidden="true"></i></a></div>
+</div>
+</article></div>
+            </main><footer class="footer">
+        <div class="footer-container"><div class="footer-line">Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener noreffer" title="Hugo 0.121.2">Hugo</a> | Theme - <a href="https://github.com/dillonzq/LoveIt" target="_blank" rel="noopener noreffer" title="LoveIt 0.2.11"><i class="far fa-kiss-wink-heart fa-fw" aria-hidden="true"></i> LoveIt</a>
+                </div><div class="footer-line" itemscope itemtype="http://schema.org/CreativeWork"><i class="far fa-copyright fa-fw" aria-hidden="true"></i><span itemprop="copyrightYear">2022 - 2024</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="https://www.masimaro.xyz" target="_blank">Masimaro</a></span></div>
+        </div>
+    </footer></div>
+
+        <div id="fixed-buttons"><a href="#" id="back-to-top" class="fixed-button" title="Back to Top">
+                <i class="fas fa-arrow-up fa-fw" aria-hidden="true"></i>
+            </a><a href="#" id="view-comments" class="fixed-button" title="View Comments">
+                <i class="fas fa-comment fa-fw" aria-hidden="true"></i>
+            </a>
+        </div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.css"><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/autocomplete.js@0.38.1/dist/autocomplete.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lunr@2.3.9/lunr.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lazysizes@5.3.2/lazysizes.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/clipboard@2.0.11/dist/clipboard.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/sharer.js@0.5.1/sharer.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/auto-render.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/copy-tex.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/mhchem.min.js"></script><script type="text/javascript">window.config={"code":{"copyTitle":"Copy to clipboard","maxShownLines":50},"comment":{},"math":{"delimiters":[{"display":true,"left":"$$","right":"$$"},{"display":true,"left":"\\[","right":"\\]"},{"display":true,"left":"\\begin{equation}","right":"\\end{equation}"},{"display":true,"left":"\\begin{equation*}","right":"\\end{equation*}"},{"display":true,"left":"\\begin{align}","right":"\\end{align}"},{"display":true,"left":"\\begin{align*}","right":"\\end{align*}"},{"display":true,"left":"\\begin{alignat}","right":"\\end{alignat}"},{"display":true,"left":"\\begin{alignat*}","right":"\\end{alignat*}"},{"display":true,"left":"\\begin{gather}","right":"\\end{gather}"},{"display":true,"left":"\\begin{CD}","right":"\\end{CD}"},{"display":false,"left":"$","right":"$"},{"display":false,"left":"\\(","right":"\\)"}],"strict":false},"search":{"highlightTag":"em","maxResultLength":10,"noResultsFound":"No results found","snippetLength":50}};</script><script type="text/javascript" src="/js/theme.min.js"></script></body>
+</html>

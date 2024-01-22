@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="robots" content="noodp" />
+        <title>OLEDB 调用存储过程 - Masimaro&#39;s blog</title><meta name="Description" content="这是我用于记录日常和学习的小站"><meta property="og:title" content="OLEDB 调用存储过程" />
+<meta property="og:description" content="除了常规调用sql语句和进行简单的插入删除操作外，OLEDB还提供了调用存储过程的功能，存储过程就好像是用SQL语句写成的一个函数，可以有参" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://HaiLateBoy.github.io/posts/oledb-and-ado-8/" /><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2018-03-31T14:09:35+00:00" />
+<meta property="article:modified_time" content="2018-03-31T14:09:35+00:00" /><meta property="og:site_name" content="Masimaro&#39;s blog" />
+
+<meta name="twitter:card" content="summary"/><meta name="twitter:title" content="OLEDB 调用存储过程"/>
+<meta name="twitter:description" content="除了常规调用sql语句和进行简单的插入删除操作外，OLEDB还提供了调用存储过程的功能，存储过程就好像是用SQL语句写成的一个函数，可以有参"/>
+<meta name="application-name" content="My cool site">
+<meta name="apple-mobile-web-app-title" content="My cool site"><meta name="theme-color" content="#ffffff"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="manifest" href="/site.webmanifest"><link rel="canonical" href="http://HaiLateBoy.github.io/posts/oledb-and-ado-8/" /><link rel="prev" href="http://HaiLateBoy.github.io/posts/oledb-and-ado-7/" /><link rel="next" href="http://HaiLateBoy.github.io/posts/oledb-and-ado-9/" /><link rel="stylesheet" href="/css/style.min.css"><link rel="preload" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css"></noscript><link rel="preload" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css"></noscript><script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "BlogPosting",
+        "headline": "OLEDB 调用存储过程",
+        "inLanguage": "zh-CN",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "http:\/\/HaiLateBoy.github.io\/posts\/oledb-and-ado-8\/"
+        },"genre": "posts","keywords": "OLEDB, 数据库编程, VC\u002b\u002b, 数据库","wordcount":  1554 ,
+        "url": "http:\/\/HaiLateBoy.github.io\/posts\/oledb-and-ado-8\/","datePublished": "2018-03-31T14:09:35+00:00","dateModified": "2018-03-31T14:09:35+00:00","publisher": {
+            "@type": "Organization",
+            "name": ""},"author": {
+                "@type": "Person",
+                "name": "Masimaro"
+            },"description": ""
+    }
+    </script></head>
+    <body data-header-desktop="fixed" data-header-mobile="auto"><script type="text/javascript">(window.localStorage && localStorage.getItem('theme') ? localStorage.getItem('theme') === 'dark' : ('auto' === 'auto' ? window.matchMedia('(prefers-color-scheme: dark)').matches : 'auto' === 'dark')) && document.body.setAttribute('theme', 'dark');</script>
+
+        <div id="mask"></div><div class="wrapper"><header class="desktop" id="header-desktop">
+    <div class="header-wrapper">
+        <div class="header-title">
+            <a href="/" title="Masimaro&#39;s blog">My cool site</a>
+        </div>
+        <div class="menu">
+            <div class="menu-inner"><a class="menu-item" href="/posts/" title="文章列表"> 文章 </a><a class="menu-item" href="/tags/" title="标签"> 标签 </a><a class="menu-item" href="/categories/" title="分类"> 分类 </a><a class="menu-item" href="/about" title="关于本站"> 关于 </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-desktop">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-desktop" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-desktop" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-desktop">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </span><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                    <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+                </a></div>
+        </div>
+    </div>
+</header><header class="mobile" id="header-mobile">
+    <div class="header-container">
+        <div class="header-wrapper">
+            <div class="header-title">
+                <a href="/" title="Masimaro&#39;s blog">My cool site</a>
+            </div>
+            <div class="menu-toggle" id="menu-toggle-mobile">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+        <div class="menu" id="menu-mobile"><div class="search-wrapper">
+                    <div class="search mobile" id="search-mobile">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-mobile">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-mobile" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-mobile" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-mobile">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </div>
+                    <a href="javascript:void(0);" class="search-cancel" id="search-cancel-mobile">
+                        Cancel
+                    </a>
+                </div><a class="menu-item" href="/posts/" title="文章列表">文章</a><a class="menu-item" href="/tags/" title="标签">标签</a><a class="menu-item" href="/categories/" title="分类">分类</a><a class="menu-item" href="/about" title="关于本站">关于</a><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+            </a></div>
+    </div>
+</header><div class="search-dropdown desktop">
+        <div id="search-dropdown-desktop"></div>
+    </div>
+    <div class="search-dropdown mobile">
+        <div id="search-dropdown-mobile"></div>
+    </div><main class="main">
+                <div class="container"><div class="toc" id="toc-auto">
+            <h2 class="toc-title">Contents</h2>
+            <div class="toc-content" id="toc-content-auto"></div>
+        </div><article class="page single"><h1 class="single-title animate__animated animate__flipInX">OLEDB 调用存储过程</h1><div class="post-meta">
+            <div class="post-meta-line"><span class="post-author"><a href="https://www.masimaro.xyz" title="Author" target="_blank" rel="noopener noreffer author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Masimaro</a></span>&nbsp;<span class="post-category">included in <a href="/categories/windows-%E6%95%B0%E6%8D%AE%E5%BA%93%E7%BC%96%E7%A8%8B/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>windows 数据库编程</a></span></div>
+            <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw" aria-hidden="true"></i>&nbsp;<time datetime="2018-03-31">2018-03-31</time>&nbsp;<i class="fas fa-pencil-alt fa-fw" aria-hidden="true"></i>&nbsp;1554 words&nbsp;
+                <i class="far fa-clock fa-fw" aria-hidden="true"></i>&nbsp;4 minutes&nbsp;</div>
+        </div><div class="details toc" id="toc-static"  data-kept="true">
+                <div class="details-summary toc-title">
+                    <span>Contents</span>
+                    <span><i class="details-icon fas fa-angle-right" aria-hidden="true"></i></span>
+                </div>
+                <div class="details-content toc-content" id="toc-content-static"><nav id="TableOfContents"></nav></div>
+            </div><div class="content" id="content"><p>除了常规调用sql语句和进行简单的插入删除操作外，OLEDB还提供了调用存储过程的功能，存储过程就好像是用SQL语句写成的一个函数，可以有参数，有返回值。</p>
+<!-- raw HTML omitted -->
+<p>存储过程除了像普通函数那样返回一般的值以外，还可以返回结果集，对于返回的内容可以使用输出参数的方式获取，但是如果返回的是结果集，一般不推荐使用输出参数来获取，一般采用的是使用多结果集来接收。另外对于输入参数一般采用参数化查询的方式进行，因此它的使用与参数化查询类似，但是相比于参数化查询来说要复杂一些。</p>
+<h1 id="存储过程的使用">存储过程的使用</h1>
+<p>对于输出参数，在绑定DBBINDING 结构的时候，将结构的eParamIO指定为DBPARAMIO_OUTPUT，调用存储过程可以使用类似下面的格式</p>
+<pre tabindex="0"><code>{? = call myProc(?, ?)}
+</code></pre><p>这个样式中两个大括号是必须的，其中？代表的输入输出参数，call表示调用存储过程，也是必须的。
+一般来说，存储过程的参数位置只接受输入，不作为输出参数，而存储过程的返回值位置只作为输出，不作为输入。另外最需要注意的一点是:<em><strong>当存储过程返回结果集的时候，返回的结果集指针如果没有被释放的话，输出参数的缓冲是不会被刷新的，也就是接收不到输出参数</strong></em>。这是由于数据提供者在返回这些数据的时候是按照流的方式。而结果集的流在输出参数和返回值的流之前，所以在结果集未被释放之前，应用程序是接收不到输出参数的。
+针对他的这个特性，我们一般是先使用存储过程返回的结果集，然后释放结果集的相关指针，接着从输出参数的缓冲中取出数据，最后释放这些缓冲。</p>
+<h1 id="存储过程使用的例子">存储过程使用的例子</h1>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="n">BOOL</span> <span class="nf">ExecUsp</span><span class="p">(</span><span class="n">IOpenRowset</span> <span class="o">*</span><span class="n">pIOpenRowset</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">	<span class="n">IAccessor</span> <span class="o">*</span><span class="n">pParamAccessor</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="n">LPOLESTR</span> <span class="n">pSQL</span> <span class="o">=</span> <span class="n">OLESTR</span><span class="p">(</span><span class="s">&#34;{? = call Usp_InputOutput(?,?)}&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="n">DB_UPARAMS</span> <span class="n">cParams</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">DBPARAMINFO</span><span class="o">*</span> <span class="n">rgParamInfo</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">DBBINDING</span><span class="o">*</span> <span class="n">rgParamBind</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">LPOLESTR</span> <span class="n">pParamNames</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">DWORD</span> <span class="n">dwOffset</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">HACCESSOR</span> <span class="n">hAccessor</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">TCHAR</span> <span class="n">szInputBuffer</span><span class="p">[</span><span class="mi">11</span><span class="p">]</span> <span class="o">=</span> <span class="n">_T</span><span class="p">(</span><span class="s">&#34;&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="n">DBPARAMS</span> <span class="n">dbParams</span> <span class="o">=</span> <span class="p">{</span><span class="mi">0</span><span class="p">};</span>
+</span></span><span class="line"><span class="cl">	<span class="n">BOOL</span> <span class="n">bRet</span> <span class="o">=</span> <span class="n">FALSE</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="n">HRESULT</span> <span class="n">hRes</span> <span class="o">=</span> <span class="n">pIOpenRowset</span><span class="o">-&gt;</span><span class="n">QueryInterface</span><span class="p">(</span><span class="n">IID_IDBCreateCommand</span><span class="p">,</span> <span class="p">(</span><span class="kt">void</span><span class="o">**</span><span class="p">)</span><span class="o">&amp;</span><span class="n">pIDBCreateCommand</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="n">hRes</span> <span class="o">=</span> <span class="n">pIDBCreateCommand</span><span class="o">-&gt;</span><span class="n">CreateCommand</span><span class="p">(</span><span class="nb">NULL</span><span class="p">,</span> <span class="n">IID_ICommandText</span><span class="p">,</span> <span class="p">(</span><span class="n">IUnknown</span><span class="o">**</span><span class="p">)</span><span class="o">&amp;</span><span class="n">pICommandText</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="n">hRes</span> <span class="o">=</span> <span class="n">pICommandText</span><span class="o">-&gt;</span><span class="n">SetCommandText</span><span class="p">(</span><span class="n">DBGUID_DEFAULT</span><span class="p">,</span> <span class="n">pSQL</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="n">hRes</span> <span class="o">=</span> <span class="n">pICommandText</span><span class="o">-&gt;</span><span class="n">QueryInterface</span><span class="p">(</span><span class="n">IID_ICommandPrepare</span><span class="p">,</span> <span class="p">(</span><span class="kt">void</span><span class="o">**</span><span class="p">)</span><span class="o">&amp;</span><span class="n">pICommandPrepare</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="n">hRes</span> <span class="o">=</span> <span class="n">pICommandPrepare</span><span class="o">-&gt;</span><span class="n">Prepare</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="n">hRes</span> <span class="o">=</span> <span class="n">pICommandText</span><span class="o">-&gt;</span><span class="n">QueryInterface</span><span class="p">(</span><span class="n">IID_ICommandWithParameters</span><span class="p">,</span> <span class="p">(</span><span class="kt">void</span><span class="o">**</span><span class="p">)</span><span class="o">&amp;</span><span class="n">pICommandWithParameters</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="n">hRes</span> <span class="o">=</span> <span class="n">pICommandWithParameters</span><span class="o">-&gt;</span><span class="n">GetParameterInfo</span><span class="p">(</span><span class="o">&amp;</span><span class="n">cParams</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">rgParamInfo</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">pParamNames</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="c1">//参数绑定
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="n">rgParamBind</span> <span class="o">=</span> <span class="p">(</span><span class="n">DBBINDING</span><span class="o">*</span><span class="p">)</span><span class="n">MALLOC</span><span class="p">(</span><span class="k">sizeof</span><span class="p">(</span><span class="n">DBBINDING</span><span class="p">)</span> <span class="o">*</span> <span class="n">cParams</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">cParams</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">	<span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="n">rgParamBind</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">bPrecision</span> <span class="o">=</span> <span class="mi">11</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">		<span class="n">rgParamBind</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">bScale</span> <span class="o">=</span> <span class="n">rgParamInfo</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">bScale</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">		<span class="n">rgParamBind</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">cbMaxLen</span> <span class="o">=</span> <span class="n">rgParamInfo</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">ulParamSize</span><span class="p">;</span> <span class="c1">//由于都是int型，所以这里就不需要指定多余的缓冲
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>		<span class="n">rgParamBind</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">iOrdinal</span> <span class="o">=</span> <span class="n">rgParamInfo</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">iOrdinal</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">		<span class="n">rgParamBind</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">dwPart</span> <span class="o">=</span> <span class="n">DBPART_VALUE</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">//当发现参数是输入参数的时候，在eParamIO中加一个输入参数的性质，
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>		<span class="k">if</span> <span class="p">(</span><span class="n">rgParamInfo</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">dwFlags</span> <span class="o">&amp;</span> <span class="n">DBPARAMFLAGS_ISINPUT</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">		<span class="p">{</span>
+</span></span><span class="line"><span class="cl">			<span class="n">rgParamBind</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">eParamIO</span> <span class="o">|=</span> <span class="n">DBPARAMIO_INPUT</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">		<span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="c1">//同上
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>		<span class="k">if</span> <span class="p">(</span><span class="n">rgParamInfo</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">dwFlags</span> <span class="o">&amp;</span> <span class="n">DBPARAMFLAGS_ISOUTPUT</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">		<span class="p">{</span>
+</span></span><span class="line"><span class="cl">			<span class="n">rgParamBind</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">eParamIO</span> <span class="o">|=</span> <span class="n">DBPARAMIO_OUTPUT</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">		<span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">		<span class="n">rgParamBind</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">dwMemOwner</span> <span class="o">=</span> <span class="n">DBMEMOWNER_CLIENTOWNED</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">		<span class="n">rgParamBind</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">obLength</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">		<span class="n">rgParamBind</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">obStatus</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">		<span class="n">rgParamBind</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">obValue</span> <span class="o">=</span> <span class="n">dwOffset</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">		<span class="n">dwOffset</span> <span class="o">=</span> <span class="n">rgParamBind</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">obValue</span> <span class="o">+</span> <span class="n">rgParamBind</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">cbMaxLen</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">		<span class="n">rgParamBind</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">wType</span> <span class="o">=</span> <span class="n">rgParamInfo</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">wType</span><span class="p">;</span> <span class="c1">//其实他们都是int型
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="c1">//创建参数的访问器
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="n">hRes</span> <span class="o">=</span> <span class="n">pICommandText</span><span class="o">-&gt;</span><span class="n">QueryInterface</span><span class="p">(</span><span class="n">IID_IAccessor</span><span class="p">,</span> <span class="p">(</span><span class="kt">void</span><span class="o">**</span><span class="p">)</span><span class="o">&amp;</span><span class="n">pParamAccessor</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="n">COM_SUCCESS</span><span class="p">(</span><span class="n">hRes</span><span class="p">,</span> <span class="n">_T</span><span class="p">(</span><span class="s">&#34;查询接口pParamAccessor失败，错误码为:%08x</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">),</span> <span class="n">hRes</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="n">hRes</span> <span class="o">=</span> <span class="n">pParamAccessor</span><span class="o">-&gt;</span><span class="n">CreateAccessor</span><span class="p">(</span><span class="n">DBACCESSOR_PARAMETERDATA</span><span class="p">,</span> <span class="n">cParams</span><span class="p">,</span> <span class="n">rgParamBind</span><span class="p">,</span> <span class="n">dwOffset</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">hAccessor</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="n">COM_SUCCESS</span><span class="p">(</span><span class="n">hRes</span><span class="p">,</span> <span class="n">_T</span><span class="p">(</span><span class="s">&#34;创建访问器失败，错误码为:%08x</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">),</span> <span class="n">hRes</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="c1">//设置参数值
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="n">dbParams</span><span class="p">.</span><span class="n">pData</span> <span class="o">=</span> <span class="n">MALLOC</span><span class="p">(</span><span class="n">dwOffset</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="n">ZeroMemory</span><span class="p">(</span><span class="n">dbParams</span><span class="p">.</span><span class="n">pData</span> <span class="p">,</span> <span class="n">dwOffset</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="n">dbParams</span><span class="p">.</span><span class="n">cParamSets</span> <span class="o">=</span> <span class="n">cParams</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">dbParams</span><span class="p">.</span><span class="n">hAccessor</span> <span class="o">=</span> <span class="n">hAccessor</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">cParams</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">	<span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="k">if</span> <span class="p">(</span><span class="n">rgParamBind</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">eParamIO</span> <span class="o">&amp;</span> <span class="n">DBPARAMIO_INPUT</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">		<span class="p">{</span>
+</span></span><span class="line"><span class="cl">			<span class="n">COM_PRINT</span><span class="p">(</span><span class="n">_T</span><span class="p">(</span><span class="s">&#34;请输入第%d个参数的值[%s]:&#34;</span><span class="p">),</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">rgParamInfo</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">pwszName</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">			<span class="k">while</span> <span class="p">(</span><span class="n">S_OK</span> <span class="o">!=</span> <span class="n">StringCchGets</span><span class="p">(</span><span class="n">szInputBuffer</span><span class="p">,</span> <span class="mi">11</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">			<span class="o">*</span><span class="p">(</span><span class="kt">int</span><span class="o">*</span><span class="p">)((</span><span class="n">BYTE</span><span class="o">*</span><span class="p">)</span><span class="n">dbParams</span><span class="p">.</span><span class="n">pData</span> <span class="o">+</span> <span class="n">rgParamBind</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">obValue</span><span class="p">)</span> <span class="o">=</span> <span class="n">_ttoi</span><span class="p">(</span><span class="n">szInputBuffer</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">			<span class="n">ZeroMemory</span><span class="p">(</span><span class="n">szInputBuffer</span><span class="p">,</span> <span class="mi">11</span> <span class="o">*</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">TCHAR</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">		<span class="p">}</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="n">hRes</span> <span class="o">=</span> <span class="n">pICommandText</span><span class="o">-&gt;</span><span class="n">Execute</span><span class="p">(</span><span class="nb">NULL</span><span class="p">,</span> <span class="n">IID_IMultipleResults</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">dbParams</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">,</span> <span class="p">(</span><span class="n">IUnknown</span><span class="o">**</span><span class="p">)</span><span class="o">&amp;</span><span class="n">pIMultipleResults</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="c1">//读取结果集
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="n">ReadRowset</span><span class="p">(</span><span class="n">pIMultipleResults</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="n">COM_PRINT</span><span class="p">(</span><span class="n">_T</span><span class="p">(</span><span class="s">&#34;返回值为:%d</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">),</span> <span class="o">*</span><span class="p">(</span><span class="kt">int</span><span class="o">*</span><span class="p">)</span><span class="n">dbParams</span><span class="p">.</span><span class="n">pData</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">	<span class="n">bRet</span> <span class="o">=</span> <span class="n">TRUE</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="nl">__CLEAR_UP</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">	<span class="n">CoTaskMemFree</span><span class="p">(</span><span class="n">rgParamInfo</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="n">FREE</span><span class="p">(</span><span class="n">rgParamBind</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="n">CoTaskMemFree</span><span class="p">(</span><span class="n">pParamNames</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="n">FREE</span><span class="p">(</span><span class="n">dbParams</span><span class="p">.</span><span class="n">pData</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="n">SAFE_RELEASE</span><span class="p">(</span><span class="n">pIDBCreateCommand</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="n">SAFE_RELEASE</span><span class="p">(</span><span class="n">pICommandText</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="n">SAFE_RELEASE</span><span class="p">(</span><span class="n">pICommandPrepare</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="n">SAFE_RELEASE</span><span class="p">(</span><span class="n">pICommandWithParameters</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="n">SAFE_RELEASE</span><span class="p">(</span><span class="n">pParamAccessor</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="n">SAFE_RELEASE</span><span class="p">(</span><span class="n">pIMultipleResults</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="k">return</span> <span class="n">bRet</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p>上述代码中调用的存储过程如下:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="cl"><span class="k">ALTER</span><span class="w"> </span><span class="k">PROCEDURE</span><span class="w"> </span><span class="p">[</span><span class="n">dbo</span><span class="p">].[</span><span class="n">Usp_InputOutput</span><span class="p">]</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">	</span><span class="o">@</span><span class="k">input</span><span class="w"> </span><span class="nb">int</span><span class="p">,</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">	</span><span class="o">@</span><span class="k">output</span><span class="w"> </span><span class="nb">int</span><span class="w"> </span><span class="k">Output</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="k">AS</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="k">BEGIN</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">	</span><span class="k">select</span><span class="w"> </span><span class="o">@</span><span class="k">input</span><span class="p">,</span><span class="w"> </span><span class="o">@</span><span class="k">output</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">	</span><span class="k">set</span><span class="w"> </span><span class="o">@</span><span class="k">output</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">2</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">	</span><span class="k">return</span><span class="w"> </span><span class="mi">7</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="k">END</span><span class="w">
+</span></span></span></code></pre></div><p>该存储过程输入两个参数，并通过select返回有这两个参数组成的结果集。存储过程的输出参数为7.
+在上述代码中，先定义了一个调用存储过程的sql语句，接着在ICommandText对象中设置该存储过程，然后获取参数的相关信息，然后绑定参数，提供输出、输出参数的缓冲，然后执行存储过程获取结果集。接着读取结果集。最后读取返回值。
+上面我们说过如果不释放返回的结果集的指针的话，是接收不到返回值的，但是在这段代码中好像在读取返回值之前没有释放返回的IMultipleResults指针的操作，但是还是可以取到结果集的，这是为什么呢？其实之前说的是返回的结果集，但是并没有说是多行结果集，这里释放的主要是结果集。针对多行结果集，我们只要释放它里面包含的所有结果集对象就可以了。释放结果集的代码在函数ReadRowset中，这里并没有列举出来。</p>
+<p>最后：完整的代码：<a href="https://gitee.com/masimaro/codes/vypocjnkabdu6wz8gfh0m36#OutputInput" target="_blank" rel="noopener noreffer ">请点击这里查看</a></p>
+<!-- raw HTML omitted -->
+</div><div class="post-footer" id="post-footer">
+    <div class="post-info">
+        <div class="post-info-line">
+            <div class="post-info-mod">
+                <span>Updated on 2018-03-31</span>
+            </div></div>
+        <div class="post-info-line">
+            <div class="post-info-md"></div>
+            <div class="post-info-share">
+                <span><a href="javascript:void(0);" title="Share on Twitter" data-sharer="twitter" data-url="http://HaiLateBoy.github.io/posts/oledb-and-ado-8/" data-title="OLEDB 调用存储过程" data-hashtags="OLEDB,数据库编程,VC&#43;&#43;,数据库"><i class="fab fa-twitter fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Facebook" data-sharer="facebook" data-url="http://HaiLateBoy.github.io/posts/oledb-and-ado-8/" data-hashtag="OLEDB"><i class="fab fa-facebook-square fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Hacker News" data-sharer="hackernews" data-url="http://HaiLateBoy.github.io/posts/oledb-and-ado-8/" data-title="OLEDB 调用存储过程"><i class="fab fa-hacker-news fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Line" data-sharer="line" data-url="http://HaiLateBoy.github.io/posts/oledb-and-ado-8/" data-title="OLEDB 调用存储过程"><i data-svg-src="https://cdn.jsdelivr.net/npm/simple-icons@7.3.0/icons/line.svg" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on 微博" data-sharer="weibo" data-url="http://HaiLateBoy.github.io/posts/oledb-and-ado-8/" data-title="OLEDB 调用存储过程"><i class="fab fa-weibo fa-fw" aria-hidden="true"></i></a></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="post-info-more">
+        <section class="post-tags"><i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/oledb/">OLEDB</a>,&nbsp;<a href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93%E7%BC%96%E7%A8%8B/">数据库编程</a>,&nbsp;<a href="/tags/vc&#43;&#43;/">VC&#43;&#43;</a>,&nbsp;<a href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93/">数据库</a></section>
+        <section>
+            <span><a href="javascript:void(0);" onclick="window.history.back();">Back</a></span>&nbsp;|&nbsp;<span><a href="/">Home</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav"><a href="/posts/oledb-and-ado-7/" class="prev" rel="prev" title="OLEDB 参数化查询"><i class="fas fa-angle-left fa-fw" aria-hidden="true"></i>OLEDB 参数化查询</a>
+            <a href="/posts/oledb-and-ado-9/" class="next" rel="next" title="OLEDB 枚举数据源">OLEDB 枚举数据源<i class="fas fa-angle-right fa-fw" aria-hidden="true"></i></a></div>
+</div>
+</article></div>
+            </main><footer class="footer">
+        <div class="footer-container"><div class="footer-line">Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener noreffer" title="Hugo 0.121.2">Hugo</a> | Theme - <a href="https://github.com/dillonzq/LoveIt" target="_blank" rel="noopener noreffer" title="LoveIt 0.2.11"><i class="far fa-kiss-wink-heart fa-fw" aria-hidden="true"></i> LoveIt</a>
+                </div><div class="footer-line" itemscope itemtype="http://schema.org/CreativeWork"><i class="far fa-copyright fa-fw" aria-hidden="true"></i><span itemprop="copyrightYear">2022 - 2024</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="https://www.masimaro.xyz" target="_blank">Masimaro</a></span></div>
+        </div>
+    </footer></div>
+
+        <div id="fixed-buttons"><a href="#" id="back-to-top" class="fixed-button" title="Back to Top">
+                <i class="fas fa-arrow-up fa-fw" aria-hidden="true"></i>
+            </a><a href="#" id="view-comments" class="fixed-button" title="View Comments">
+                <i class="fas fa-comment fa-fw" aria-hidden="true"></i>
+            </a>
+        </div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.css"><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/autocomplete.js@0.38.1/dist/autocomplete.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lunr@2.3.9/lunr.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lazysizes@5.3.2/lazysizes.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/clipboard@2.0.11/dist/clipboard.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/sharer.js@0.5.1/sharer.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/auto-render.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/copy-tex.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/mhchem.min.js"></script><script type="text/javascript">window.config={"code":{"copyTitle":"Copy to clipboard","maxShownLines":50},"comment":{},"math":{"delimiters":[{"display":true,"left":"$$","right":"$$"},{"display":true,"left":"\\[","right":"\\]"},{"display":true,"left":"\\begin{equation}","right":"\\end{equation}"},{"display":true,"left":"\\begin{equation*}","right":"\\end{equation*}"},{"display":true,"left":"\\begin{align}","right":"\\end{align}"},{"display":true,"left":"\\begin{align*}","right":"\\end{align*}"},{"display":true,"left":"\\begin{alignat}","right":"\\end{alignat}"},{"display":true,"left":"\\begin{alignat*}","right":"\\end{alignat*}"},{"display":true,"left":"\\begin{gather}","right":"\\end{gather}"},{"display":true,"left":"\\begin{CD}","right":"\\end{CD}"},{"display":false,"left":"$","right":"$"},{"display":false,"left":"\\(","right":"\\)"}],"strict":false},"search":{"highlightTag":"em","maxResultLength":10,"noResultsFound":"No results found","snippetLength":50}};</script><script type="text/javascript" src="/js/theme.min.js"></script></body>
+</html>

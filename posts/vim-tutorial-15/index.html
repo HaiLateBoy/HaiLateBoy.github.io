@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="robots" content="noodp" />
+        <title>vim 从嫌弃到依赖(14)——快速跳转 - Masimaro&#39;s blog</title><meta name="Description" content="这是我用于记录日常和学习的小站"><meta property="og:title" content="vim 从嫌弃到依赖(14)——快速跳转" />
+<meta property="og:description" content="之前介绍过众多的motion，根据移动范围来排序的话有 l、e、w、j等等，但是面对那么长的代码文件，仅仅使用这几个简单的motion不知道要移动多少次才能找到我想要的代码，这个速度有时候还不如我用鼠标移动光标。vim作为编辑器之神当然提供了快速移动光标的方式了，这篇文章我们就来了解一下如何使用vim在代码间进行快速跳转。" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://HaiLateBoy.github.io/posts/vim-tutorial-15/" /><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2022-05-31T10:56:20+08:00" />
+<meta property="article:modified_time" content="2022-05-31T10:56:20+08:00" /><meta property="og:site_name" content="Masimaro&#39;s blog" />
+
+<meta name="twitter:card" content="summary"/><meta name="twitter:title" content="vim 从嫌弃到依赖(14)——快速跳转"/>
+<meta name="twitter:description" content="之前介绍过众多的motion，根据移动范围来排序的话有 l、e、w、j等等，但是面对那么长的代码文件，仅仅使用这几个简单的motion不知道要移动多少次才能找到我想要的代码，这个速度有时候还不如我用鼠标移动光标。vim作为编辑器之神当然提供了快速移动光标的方式了，这篇文章我们就来了解一下如何使用vim在代码间进行快速跳转。"/>
+<meta name="application-name" content="My cool site">
+<meta name="apple-mobile-web-app-title" content="My cool site"><meta name="theme-color" content="#ffffff"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="manifest" href="/site.webmanifest"><link rel="canonical" href="http://HaiLateBoy.github.io/posts/vim-tutorial-15/" /><link rel="prev" href="http://HaiLateBoy.github.io/posts/vim-tutorial-14/" /><link rel="next" href="http://HaiLateBoy.github.io/posts/vim-tutorial-16/" /><link rel="stylesheet" href="/css/style.min.css"><link rel="preload" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css"></noscript><link rel="preload" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css"></noscript><script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "BlogPosting",
+        "headline": "vim 从嫌弃到依赖(14)——快速跳转",
+        "inLanguage": "zh-CN",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "http:\/\/HaiLateBoy.github.io\/posts\/vim-tutorial-15\/"
+        },"genre": "posts","keywords": "vim, 编辑工具, 文本处理","wordcount":  2888 ,
+        "url": "http:\/\/HaiLateBoy.github.io\/posts\/vim-tutorial-15\/","datePublished": "2022-05-31T10:56:20+08:00","dateModified": "2022-05-31T10:56:20+08:00","publisher": {
+            "@type": "Organization",
+            "name": ""},"author": {
+                "@type": "Person",
+                "name": "Masimaro"
+            },"description": ""
+    }
+    </script></head>
+    <body data-header-desktop="fixed" data-header-mobile="auto"><script type="text/javascript">(window.localStorage && localStorage.getItem('theme') ? localStorage.getItem('theme') === 'dark' : ('auto' === 'auto' ? window.matchMedia('(prefers-color-scheme: dark)').matches : 'auto' === 'dark')) && document.body.setAttribute('theme', 'dark');</script>
+
+        <div id="mask"></div><div class="wrapper"><header class="desktop" id="header-desktop">
+    <div class="header-wrapper">
+        <div class="header-title">
+            <a href="/" title="Masimaro&#39;s blog">My cool site</a>
+        </div>
+        <div class="menu">
+            <div class="menu-inner"><a class="menu-item" href="/posts/" title="文章列表"> 文章 </a><a class="menu-item" href="/tags/" title="标签"> 标签 </a><a class="menu-item" href="/categories/" title="分类"> 分类 </a><a class="menu-item" href="/about" title="关于本站"> 关于 </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-desktop">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-desktop" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-desktop" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-desktop">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </span><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                    <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+                </a></div>
+        </div>
+    </div>
+</header><header class="mobile" id="header-mobile">
+    <div class="header-container">
+        <div class="header-wrapper">
+            <div class="header-title">
+                <a href="/" title="Masimaro&#39;s blog">My cool site</a>
+            </div>
+            <div class="menu-toggle" id="menu-toggle-mobile">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+        <div class="menu" id="menu-mobile"><div class="search-wrapper">
+                    <div class="search mobile" id="search-mobile">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-mobile">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-mobile" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-mobile" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-mobile">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </div>
+                    <a href="javascript:void(0);" class="search-cancel" id="search-cancel-mobile">
+                        Cancel
+                    </a>
+                </div><a class="menu-item" href="/posts/" title="文章列表">文章</a><a class="menu-item" href="/tags/" title="标签">标签</a><a class="menu-item" href="/categories/" title="分类">分类</a><a class="menu-item" href="/about" title="关于本站">关于</a><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+            </a></div>
+    </div>
+</header><div class="search-dropdown desktop">
+        <div id="search-dropdown-desktop"></div>
+    </div>
+    <div class="search-dropdown mobile">
+        <div id="search-dropdown-mobile"></div>
+    </div><main class="main">
+                <div class="container"><div class="toc" id="toc-auto">
+            <h2 class="toc-title">Contents</h2>
+            <div class="toc-content" id="toc-content-auto"></div>
+        </div><article class="page single"><h1 class="single-title animate__animated animate__flipInX">vim 从嫌弃到依赖(14)——快速跳转</h1><div class="post-meta">
+            <div class="post-meta-line"><span class="post-author"><a href="https://www.masimaro.xyz" title="Author" target="_blank" rel="noopener noreffer author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Masimaro</a></span>&nbsp;<span class="post-category">included in <a href="/categories/vim/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>vim</a></span></div>
+            <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw" aria-hidden="true"></i>&nbsp;<time datetime="2022-05-31">2022-05-31</time>&nbsp;<i class="fas fa-pencil-alt fa-fw" aria-hidden="true"></i>&nbsp;2888 words&nbsp;
+                <i class="far fa-clock fa-fw" aria-hidden="true"></i>&nbsp;6 minutes&nbsp;</div>
+        </div><div class="details toc" id="toc-static"  data-kept="true">
+                <div class="details-summary toc-title">
+                    <span>Contents</span>
+                    <span><i class="details-icon fas fa-angle-right" aria-hidden="true"></i></span>
+                </div>
+                <div class="details-content toc-content" id="toc-content-static"><nav id="TableOfContents">
+  <ul>
+    <li><a href="#利用标签快速跳转">利用标签，快速跳转</a></li>
+    <li><a href="#在匹配的括号间进行跳转">在匹配的括号间进行跳转</a></li>
+    <li><a href="#跳转列表">跳转列表</a></li>
+    <li><a href="#改变列表">改变列表</a></li>
+    <li><a href="#跳转到光标下的文件">跳转到光标下的文件</a></li>
+    <li><a href="#使用全局书签在文件间跳转">使用全局书签在文件间跳转</a></li>
+  </ul>
+</nav></div>
+            </div><div class="content" id="content"><p>之前介绍过众多的motion，根据移动范围来排序的话有 <code>l</code>、<code>e</code>、<code>w</code>、<code>j</code>等等，但是面对那么长的代码文件，仅仅使用这几个简单的motion不知道要移动多少次才能找到我想要的代码，这个速度有时候还不如我用鼠标移动光标。vim作为编辑器之神当然提供了快速移动光标的方式了，这篇文章我们就来了解一下如何使用vim在代码间进行快速跳转。</p>
+<h2 id="利用标签快速跳转">利用标签，快速跳转</h2>
+<p>vim中提供了标签的方式进行跳转，事先可以在对应位置设置标签，后面通过标签访问该标签所在位置</p>
+<p>可以使用<code>m{a-z}</code> 来在任意位置设置标记，而后使用`{a-z}来回到对应标记位置。该命令可以回到之前设置标签时光标所在行和列。</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://img-blog.csdnimg.cn/2adaa86c3fcf4d9b82b635946195a056.gif#pic_center"
+        data-srcset="https://img-blog.csdnimg.cn/2adaa86c3fcf4d9b82b635946195a056.gif#pic_center, https://img-blog.csdnimg.cn/2adaa86c3fcf4d9b82b635946195a056.gif#pic_center 1.5x, https://img-blog.csdnimg.cn/2adaa86c3fcf4d9b82b635946195a056.gif#pic_center 2x"
+        data-sizes="auto"
+        alt="https://img-blog.csdnimg.cn/2adaa86c3fcf4d9b82b635946195a056.gif#pic_center"
+        title="标签使用" />
+vim可以支持从a到z的26个位置标记，一般来说我们用不到这么多，即使你能全部用到，可能早就忘了前面标记的在哪个位置了。这种方式有一个最大的问题就是在标记之后从显示上无法知道我们的标记位于何处。</p>
+<p>除了由用户主动使用<code>m</code> 来设置位置标记以外，vim还会自动为我们设置标记，例如上次修改、上次跳转、上次高亮等等。</p>
+<p>下表列举出了，如何回到这些vim自动标记所在位置</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">位置标记</th>
+<th style="text-align:left">含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">``</td>
+<td style="text-align:left">当前文件中上次跳转动作之前所处的位置</td>
+</tr>
+<tr>
+<td style="text-align:left">`.</td>
+<td style="text-align:left">上次修改的地方</td>
+</tr>
+<tr>
+<td style="text-align:left">`^</td>
+<td style="text-align:left">上次进入插入模式的位置</td>
+</tr>
+<tr>
+<td style="text-align:left">`[</td>
+<td style="text-align:left">上次修改或者复制的起始位置</td>
+</tr>
+<tr>
+<td style="text-align:left">`]</td>
+<td style="text-align:left">上次修改或者复制的结尾位置</td>
+</tr>
+<tr>
+<td style="text-align:left">`&lt;</td>
+<td style="text-align:left">上次高亮选区的起始位置</td>
+</tr>
+<tr>
+<td style="text-align:left">`&gt;</td>
+<td style="text-align:left">上次高亮选区的结尾位置</td>
+</tr>
+</tbody>
+</table>
+<h2 id="在匹配的括号间进行跳转">在匹配的括号间进行跳转</h2>
+<p>可以使用 <code>%</code> 在一组括号中使用，可以跳转到下一个匹配的<code>()</code>、<code>[]</code>、<code>{}</code>。例如下列操作</p>
+<p>我们可以配合<code>operator</code> 来使用，删除括号中的内容。例如下面的代码</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="line"><span class="cl"><span class="kd">var</span> <span class="nx">foo</span> <span class="o">=</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="s2">&#34;obj&#34;</span><span class="o">:</span><span class="p">{</span>
+</span></span><span class="line"><span class="cl">       <span class="s2">&#34;test&#34;</span><span class="o">:</span> <span class="s2">&#34;1&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">       <span class="s2">&#34;arr&#34;</span><span class="o">:</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://img-blog.csdnimg.cn/0198b07ba2524cf08fb24ee1c51ec1f3.gif#pic_center"
+        data-srcset="https://img-blog.csdnimg.cn/0198b07ba2524cf08fb24ee1c51ec1f3.gif#pic_center, https://img-blog.csdnimg.cn/0198b07ba2524cf08fb24ee1c51ec1f3.gif#pic_center 1.5x, https://img-blog.csdnimg.cn/0198b07ba2524cf08fb24ee1c51ec1f3.gif#pic_center 2x"
+        data-sizes="auto"
+        alt="https://img-blog.csdnimg.cn/0198b07ba2524cf08fb24ee1c51ec1f3.gif#pic_center"
+        title="% 跳转到匹配括号处" />
+可以使用将光标移动到对应的位置，然后使用<code>d%</code> 就可以删除对应的内容了。当然也可以使用文本对象来进行</p>
+<h2 id="跳转列表">跳转列表</h2>
+<p>浏览器中会记录浏览历史，并且提供了去到上一页和下一页的功能。vim中也提供了类似的功能，vim会记录我们每一次的跳转，可以通过相关命令来跳转到上一次跳转和下一次跳转的位置。</p>
+<p>我们先介绍什么是跳转。跳转似乎很容易理解，似乎光标每次的移动都算是一次跳转。但是vim中的跳转并不是这样的。我们可以先这样理解，<code>motion</code> 允许我们在一个文件中进行移动。而跳转则是不同文件间的移动。就像在浏览器中从一个页面打开另一个页面。为了类比浏览器的操作，你也可以把每次跳转记录理解成历史访问文件的记录。</p>
+<p>可以使用<code>:jumps</code> 来查看跳转记录。
+<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://img-blog.csdnimg.cn/dabfc60ec7bc480a921fc5eead5484fb.gif#pic_center"
+        data-srcset="https://img-blog.csdnimg.cn/dabfc60ec7bc480a921fc5eead5484fb.gif#pic_center, https://img-blog.csdnimg.cn/dabfc60ec7bc480a921fc5eead5484fb.gif#pic_center 1.5x, https://img-blog.csdnimg.cn/dabfc60ec7bc480a921fc5eead5484fb.gif#pic_center 2x"
+        data-sizes="auto"
+        alt="https://img-blog.csdnimg.cn/dabfc60ec7bc480a921fc5eead5484fb.gif#pic_center"
+        title="跳转列表" />
+从上图中可以看到这样几个现象：</p>
+<ol>
+<li>跳转列表中记录了所在文件以及上次光标所在的行和列。最后几行由于我们处在当前文件中，所以没有列出文件名称来，而是直接给出光标所在行的文本内容，由于我这里打开文件之后立即查看了跳转列表，光标处于第0行这个虚拟行，所以会显示空白内容。</li>
+<li>它记录了光标所在的行列，所以后面我们在恢复的时候可以直接定位到具体位置。</li>
+<li>与浏览器类似，之前打开vim的时候访问文件的记录也在里面，它并没有随着vim的关闭而被清除。</li>
+<li>任何能改变当前窗口中活动文件的命令都可以作为跳转命令，像<code>find</code>、<code>edit</code> 之类的。</li>
+</ol>
+<p>了解了跳转列表之后，我们现在来访问一下这个跳转列表。可以使用 <code>&lt;Ctrl + i&gt;</code> 来访问前一个跳转，<code>&lt;Ctrl + o&gt;</code> 来访问后一个跳转。
+在<code>nvim-config</code> 中随意打开一个文件，然后使用<code>edit</code> 打开另一个，接着就可以使用<code>&lt;Ctrl + i&gt;</code> 和 <code>&lt;Ctrl + o&gt;</code> 在两个文件中切换了</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://img-blog.csdnimg.cn/270445e790bf412a8f526ec5000f8ad5.gif#pic_center"
+        data-srcset="https://img-blog.csdnimg.cn/270445e790bf412a8f526ec5000f8ad5.gif#pic_center, https://img-blog.csdnimg.cn/270445e790bf412a8f526ec5000f8ad5.gif#pic_center 1.5x, https://img-blog.csdnimg.cn/270445e790bf412a8f526ec5000f8ad5.gif#pic_center 2x"
+        data-sizes="auto"
+        alt="https://img-blog.csdnimg.cn/270445e790bf412a8f526ec5000f8ad5.gif#pic_center"
+        title="跳转" />
+我们再来联想一下浏览器中的历史记录，我们发现有时候访问同一个页面的不同位置可能会产生多条历史记录。例如访问同一页面的不同锚点。那么我们之前说的将跳转理解为历史文件访问记录可能就不对了，同一个文件也可以产生多个跳转记录。 例如<code>gg(G)</code>、<code>%</code>、<code>\{a-z}</code>等等。而<code>h j k l w f</code>之类的就不作为一次跳转。用一句话来总结就是大范围的光标移动才会被作为一次跳转。什么会被作为大范围的移动呢？我个人的理解是一次移动有能力移动至少半屏，而像<code>50j</code> 之类的虽然也可以移动50行，也达到半屏以上，但是前面加数字表示的是重复，它是重复了多次，并不算一次移动。</p>
+<p>我们使用 split 或者 vsplit 再打开一个新的窗口，然后在两个窗口中分别使用:jumps 发现二者并不相同。vim可以维护多套跳转列表，每个窗口都有自己的一套独立的跳转列表。这个与浏览器中的也类似，新窗口并不能进行前进和后退操作，而且只两个操作也只能跳转到由这个窗口打开的网页上。</p>
+<h2 id="改变列表">改变列表</h2>
+<p>回忆一下，我们不管在文件的哪个位置，使用<code>u</code>撤销修改的时候光标总能跳转到对应修改的位置，或者使用<code>\.</code> 能回到上次修改的位置。如果以前没有注意这个细节的，也可以现在试试。</p>
+<p>vim在会话期间会维护一张表，表里记录了每个缓冲区的每一次修改。这个就是所谓的改变列表。可以使用<code>:changes</code> 来查看这个列表
+<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://img-blog.csdnimg.cn/8af8cdd6aa204810aa3575bb56885179.gif#pic_center"
+        data-srcset="https://img-blog.csdnimg.cn/8af8cdd6aa204810aa3575bb56885179.gif#pic_center, https://img-blog.csdnimg.cn/8af8cdd6aa204810aa3575bb56885179.gif#pic_center 1.5x, https://img-blog.csdnimg.cn/8af8cdd6aa204810aa3575bb56885179.gif#pic_center 2x"
+        data-sizes="auto"
+        alt="https://img-blog.csdnimg.cn/8af8cdd6aa204810aa3575bb56885179.gif#pic_center"
+        title="修改列表" />
+这个列表与跳转列表类似，都标记了行号与列号。我们可以通过<code>g;</code> 和 <code>g</code>, 来访问下一个和上一个记录。你可以拿<code>;</code>和<code>,</code> 来类比记忆。这两个操作符是配合<code>f</code>来使用的。<code>;</code> 移动到下一个匹配位置，<code>,</code> 移动到下一个匹配位置。</p>
+<p>我们可以使用<code>\.</code>来跳转到上一次修改的位置，而<code> `^</code>则更具体一点。它代表的是上一次退出插入模式光标所在位置。如果我们在做出修改并且退出插入模式之后，移动光标查看了下其他类似代码的实现，然后想快速回到之前编辑的位置继续编辑，可以使用<code> `^</code>将光标移动到对应位置，然后使用i进入插入模式，当然也可以使用<code>gi</code> 一步到位，直接从上次编辑位置进入插入模式。</p>
+<p>需要注意的是，vim会为每一个打开的窗口维护一个跳转列表，但是更新列表只有一个，而且跳转列表并不会随着vim的退出而消失，但是改变列表则会随着vim的退出而被清空。</p>
+<h2 id="跳转到光标下的文件">跳转到光标下的文件</h2>
+<p>在我们将当前项目所在的所有路径加入到path中之后(即在项目根目录中执行:set path+=./**)可:set 以将光标移动到对应表示相对路径的代码上，执行gf 即可跳转到对应文件。
+<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://img-blog.csdnimg.cn/df73ff65823b4f45be8e8bd584585ffe.gif#pic_center"
+        data-srcset="https://img-blog.csdnimg.cn/df73ff65823b4f45be8e8bd584585ffe.gif#pic_center, https://img-blog.csdnimg.cn/df73ff65823b4f45be8e8bd584585ffe.gif#pic_center 1.5x, https://img-blog.csdnimg.cn/df73ff65823b4f45be8e8bd584585ffe.gif#pic_center 2x"
+        data-sizes="auto"
+        alt="https://img-blog.csdnimg.cn/df73ff65823b4f45be8e8bd584585ffe.gif#pic_center"
+        title="跳转文件" /></p>
+<p>在上面的例子中，我们只写了<code>settings</code> 这样的文件，它是如何知道要打开 <code>settings.lua</code> 文件的呢，或者说如果有类似的<code>settings.h</code> 或者 <code>settings.js</code> 在同一个位置的话，它该打开哪一个呢？</p>
+<p>比如说我们新建一个<code>settings.h</code> 在同样的目录中，再次执行之前的操作，发现它还是能够正确的打开<code>settings.lua</code></p>
+<p>vim 中有一个<code>suffixesadd</code> 变量，它保存的当前缓冲区中执行<code>gf</code>操作时，可以使用的扩展。我们可以像设置<code>path</code> 一样，例如<code>:set suffixesadd+=.java</code> 来允许打开java文件。</p>
+<p>使用<code>gf</code> 也是一个跳转，也会被记录到跳转列表中，后续我们可以使用之前介绍的<code>&lt;Ctrl + o&gt;</code> 和 <code>&lt;Ctrl + i&gt;</code> 来回的在两个文件中切换。</p>
+<h2 id="使用全局书签在文件间跳转">使用全局书签在文件间跳转</h2>
+<p>之前介绍过在文件中可以使用标记，在文件不同位置进行跳转。那个时候说到使用小写字母设置标记，小伙伴们可能会产生疑惑，那大些字母去哪了呢，为什么只能使用小写字母，而大写字母被空着呢？文章写到这里了，我可以告诉大家，大写字母被用到了全局书签里面。</p>
+<p>全局书签与之前介绍的标记使用方式一模一样，只是一个使用大写字母，一个使用小写字母。例如在上面一个例子中，我们在跳转到<code>settings.lua</code> 之前先使用<code>mI</code> 在<code>init.lua</code>中一个标签，在跳转之后使用<code> `I</code> 快速跳转回来。
+<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://img-blog.csdnimg.cn/efbb395d60a2419e9813d5797c1c861d.gif#pic_center"
+        data-srcset="https://img-blog.csdnimg.cn/efbb395d60a2419e9813d5797c1c861d.gif#pic_center, https://img-blog.csdnimg.cn/efbb395d60a2419e9813d5797c1c861d.gif#pic_center 1.5x, https://img-blog.csdnimg.cn/efbb395d60a2419e9813d5797c1c861d.gif#pic_center 2x"
+        data-sizes="auto"
+        alt="https://img-blog.csdnimg.cn/efbb395d60a2419e9813d5797c1c861d.gif#pic_center"
+        title="全局标签" />
+好了，本篇内容就到这里了。下一次将介绍寄存器相关内容。再次感谢大家的阅读</p></div><div class="post-footer" id="post-footer">
+    <div class="post-info">
+        <div class="post-info-line">
+            <div class="post-info-mod">
+                <span>Updated on 2022-05-31</span>
+            </div></div>
+        <div class="post-info-line">
+            <div class="post-info-md"></div>
+            <div class="post-info-share">
+                <span><a href="javascript:void(0);" title="Share on Twitter" data-sharer="twitter" data-url="http://HaiLateBoy.github.io/posts/vim-tutorial-15/" data-title="vim 从嫌弃到依赖(14)——快速跳转" data-hashtags="vim,编辑工具,文本处理"><i class="fab fa-twitter fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Facebook" data-sharer="facebook" data-url="http://HaiLateBoy.github.io/posts/vim-tutorial-15/" data-hashtag="vim"><i class="fab fa-facebook-square fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Hacker News" data-sharer="hackernews" data-url="http://HaiLateBoy.github.io/posts/vim-tutorial-15/" data-title="vim 从嫌弃到依赖(14)——快速跳转"><i class="fab fa-hacker-news fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Line" data-sharer="line" data-url="http://HaiLateBoy.github.io/posts/vim-tutorial-15/" data-title="vim 从嫌弃到依赖(14)——快速跳转"><i data-svg-src="https://cdn.jsdelivr.net/npm/simple-icons@7.3.0/icons/line.svg" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on 微博" data-sharer="weibo" data-url="http://HaiLateBoy.github.io/posts/vim-tutorial-15/" data-title="vim 从嫌弃到依赖(14)——快速跳转"><i class="fab fa-weibo fa-fw" aria-hidden="true"></i></a></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="post-info-more">
+        <section class="post-tags"><i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/vim/">vim</a>,&nbsp;<a href="/tags/%E7%BC%96%E8%BE%91%E5%B7%A5%E5%85%B7/">编辑工具</a>,&nbsp;<a href="/tags/%E6%96%87%E6%9C%AC%E5%A4%84%E7%90%86/">文本处理</a></section>
+        <section>
+            <span><a href="javascript:void(0);" onclick="window.history.back();">Back</a></span>&nbsp;|&nbsp;<span><a href="/">Home</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav"><a href="/posts/vim-tutorial-14/" class="prev" rel="prev" title="vim 从嫌弃到依赖(13)——motion 进阶"><i class="fas fa-angle-left fa-fw" aria-hidden="true"></i>vim 从嫌弃到依赖(13)——motion 进阶</a>
+            <a href="/posts/vim-tutorial-16/" class="next" rel="next" title="vim 从嫌弃到依赖(15)——寄存器">vim 从嫌弃到依赖(15)——寄存器<i class="fas fa-angle-right fa-fw" aria-hidden="true"></i></a></div>
+</div>
+</article></div>
+            </main><footer class="footer">
+        <div class="footer-container"><div class="footer-line">Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener noreffer" title="Hugo 0.121.2">Hugo</a> | Theme - <a href="https://github.com/dillonzq/LoveIt" target="_blank" rel="noopener noreffer" title="LoveIt 0.2.11"><i class="far fa-kiss-wink-heart fa-fw" aria-hidden="true"></i> LoveIt</a>
+                </div><div class="footer-line" itemscope itemtype="http://schema.org/CreativeWork"><i class="far fa-copyright fa-fw" aria-hidden="true"></i><span itemprop="copyrightYear">2022 - 2024</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="https://www.masimaro.xyz" target="_blank">Masimaro</a></span></div>
+        </div>
+    </footer></div>
+
+        <div id="fixed-buttons"><a href="#" id="back-to-top" class="fixed-button" title="Back to Top">
+                <i class="fas fa-arrow-up fa-fw" aria-hidden="true"></i>
+            </a><a href="#" id="view-comments" class="fixed-button" title="View Comments">
+                <i class="fas fa-comment fa-fw" aria-hidden="true"></i>
+            </a>
+        </div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.css"><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/autocomplete.js@0.38.1/dist/autocomplete.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lunr@2.3.9/lunr.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lazysizes@5.3.2/lazysizes.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/clipboard@2.0.11/dist/clipboard.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/sharer.js@0.5.1/sharer.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/auto-render.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/copy-tex.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/mhchem.min.js"></script><script type="text/javascript">window.config={"code":{"copyTitle":"Copy to clipboard","maxShownLines":50},"comment":{},"math":{"delimiters":[{"display":true,"left":"$$","right":"$$"},{"display":true,"left":"\\[","right":"\\]"},{"display":true,"left":"\\begin{equation}","right":"\\end{equation}"},{"display":true,"left":"\\begin{equation*}","right":"\\end{equation*}"},{"display":true,"left":"\\begin{align}","right":"\\end{align}"},{"display":true,"left":"\\begin{align*}","right":"\\end{align*}"},{"display":true,"left":"\\begin{alignat}","right":"\\end{alignat}"},{"display":true,"left":"\\begin{alignat*}","right":"\\end{alignat*}"},{"display":true,"left":"\\begin{gather}","right":"\\end{gather}"},{"display":true,"left":"\\begin{CD}","right":"\\end{CD}"},{"display":false,"left":"$","right":"$"},{"display":false,"left":"\\(","right":"\\)"}],"strict":false},"search":{"highlightTag":"em","maxResultLength":10,"noResultsFound":"No results found","snippetLength":50}};</script><script type="text/javascript" src="/js/theme.min.js"></script></body>
+</html>

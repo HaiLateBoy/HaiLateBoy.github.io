@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="robots" content="noodp" />
+        <title>vim 从嫌弃到依赖(19)——替换 - Masimaro&#39;s blog</title><meta name="Description" content="这是我用于记录日常和学习的小站"><meta property="og:title" content="vim 从嫌弃到依赖(19)——替换" />
+<meta property="og:description" content="之前讨论了关于在vim中使用正则表达式的相关知识能方便的进行搜索，现在在之前的基础之上继续来讨论如何进行替换操作。 substitute 简介 substitute 允许我们先查找一段" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://HaiLateBoy.github.io/posts/vim-tutorial-20/" /><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2022-06-22T15:49:07+08:00" />
+<meta property="article:modified_time" content="2022-06-22T15:49:07+08:00" /><meta property="og:site_name" content="Masimaro&#39;s blog" />
+
+<meta name="twitter:card" content="summary"/><meta name="twitter:title" content="vim 从嫌弃到依赖(19)——替换"/>
+<meta name="twitter:description" content="之前讨论了关于在vim中使用正则表达式的相关知识能方便的进行搜索，现在在之前的基础之上继续来讨论如何进行替换操作。 substitute 简介 substitute 允许我们先查找一段"/>
+<meta name="application-name" content="My cool site">
+<meta name="apple-mobile-web-app-title" content="My cool site"><meta name="theme-color" content="#ffffff"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="manifest" href="/site.webmanifest"><link rel="canonical" href="http://HaiLateBoy.github.io/posts/vim-tutorial-20/" /><link rel="prev" href="http://HaiLateBoy.github.io/posts/vim-tutorial-19/" /><link rel="next" href="http://HaiLateBoy.github.io/posts/vim-tutorial-21/" /><link rel="stylesheet" href="/css/style.min.css"><link rel="preload" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css"></noscript><link rel="preload" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css"></noscript><script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "BlogPosting",
+        "headline": "vim 从嫌弃到依赖(19)——替换",
+        "inLanguage": "zh-CN",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "http:\/\/HaiLateBoy.github.io\/posts\/vim-tutorial-20\/"
+        },"genre": "posts","keywords": "vim, 编辑工具, 文本处理","wordcount":  3903 ,
+        "url": "http:\/\/HaiLateBoy.github.io\/posts\/vim-tutorial-20\/","datePublished": "2022-06-22T15:49:07+08:00","dateModified": "2022-06-22T15:49:07+08:00","publisher": {
+            "@type": "Organization",
+            "name": ""},"author": {
+                "@type": "Person",
+                "name": "Masimaro"
+            },"description": ""
+    }
+    </script></head>
+    <body data-header-desktop="fixed" data-header-mobile="auto"><script type="text/javascript">(window.localStorage && localStorage.getItem('theme') ? localStorage.getItem('theme') === 'dark' : ('auto' === 'auto' ? window.matchMedia('(prefers-color-scheme: dark)').matches : 'auto' === 'dark')) && document.body.setAttribute('theme', 'dark');</script>
+
+        <div id="mask"></div><div class="wrapper"><header class="desktop" id="header-desktop">
+    <div class="header-wrapper">
+        <div class="header-title">
+            <a href="/" title="Masimaro&#39;s blog">My cool site</a>
+        </div>
+        <div class="menu">
+            <div class="menu-inner"><a class="menu-item" href="/posts/" title="文章列表"> 文章 </a><a class="menu-item" href="/tags/" title="标签"> 标签 </a><a class="menu-item" href="/categories/" title="分类"> 分类 </a><a class="menu-item" href="/about" title="关于本站"> 关于 </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-desktop">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-desktop" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-desktop" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-desktop">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </span><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                    <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+                </a></div>
+        </div>
+    </div>
+</header><header class="mobile" id="header-mobile">
+    <div class="header-container">
+        <div class="header-wrapper">
+            <div class="header-title">
+                <a href="/" title="Masimaro&#39;s blog">My cool site</a>
+            </div>
+            <div class="menu-toggle" id="menu-toggle-mobile">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+        <div class="menu" id="menu-mobile"><div class="search-wrapper">
+                    <div class="search mobile" id="search-mobile">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-mobile">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-mobile" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-mobile" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-mobile">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </div>
+                    <a href="javascript:void(0);" class="search-cancel" id="search-cancel-mobile">
+                        Cancel
+                    </a>
+                </div><a class="menu-item" href="/posts/" title="文章列表">文章</a><a class="menu-item" href="/tags/" title="标签">标签</a><a class="menu-item" href="/categories/" title="分类">分类</a><a class="menu-item" href="/about" title="关于本站">关于</a><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+            </a></div>
+    </div>
+</header><div class="search-dropdown desktop">
+        <div id="search-dropdown-desktop"></div>
+    </div>
+    <div class="search-dropdown mobile">
+        <div id="search-dropdown-mobile"></div>
+    </div><main class="main">
+                <div class="container"><div class="toc" id="toc-auto">
+            <h2 class="toc-title">Contents</h2>
+            <div class="toc-content" id="toc-content-auto"></div>
+        </div><article class="page single"><h1 class="single-title animate__animated animate__flipInX">vim 从嫌弃到依赖(19)——替换</h1><div class="post-meta">
+            <div class="post-meta-line"><span class="post-author"><a href="https://www.masimaro.xyz" title="Author" target="_blank" rel="noopener noreffer author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Masimaro</a></span>&nbsp;<span class="post-category">included in <a href="/categories/vim/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>vim</a></span></div>
+            <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw" aria-hidden="true"></i>&nbsp;<time datetime="2022-06-22">2022-06-22</time>&nbsp;<i class="fas fa-pencil-alt fa-fw" aria-hidden="true"></i>&nbsp;3903 words&nbsp;
+                <i class="far fa-clock fa-fw" aria-hidden="true"></i>&nbsp;8 minutes&nbsp;</div>
+        </div><div class="details toc" id="toc-static"  data-kept="true">
+                <div class="details-summary toc-title">
+                    <span>Contents</span>
+                    <span><i class="details-icon fas fa-angle-right" aria-hidden="true"></i></span>
+                </div>
+                <div class="details-content toc-content" id="toc-content-static"><nav id="TableOfContents">
+  <ul>
+    <li><a href="#substitute-简介">substitute 简介</a></li>
+    <li><a href="#标志位">标志位</a></li>
+    <li><a href="#示例">示例</a>
+      <ul>
+        <li><a href="#使用-g-替换所有内容">使用 <code>g</code> 替换所有内容</a></li>
+        <li><a href="#手动选择是否需要替换">手动选择是否需要替换</a></li>
+        <li><a href="#重用上次匹配模式">重用上次匹配模式</a></li>
+      </ul>
+    </li>
+    <li><a href="#使用寄存器的内容进行替换">使用寄存器的内容进行替换</a></li>
+    <li><a href="#使用上一次的-substitute-命令">使用上一次的 <code>substitute</code> 命令</a></li>
+    <li><a href="#使用子匹配进行替换">使用子匹配进行替换</a></li>
+    <li><a href="#使用-vimscript-脚本">使用 vimscript 脚本</a></li>
+    <li><a href="#最后的总结">最后的总结</a></li>
+  </ul>
+</nav></div>
+            </div><div class="content" id="content"><p>之前讨论了关于在vim中使用正则表达式的相关知识能方便的进行搜索，现在在之前的基础之上继续来讨论如何进行替换操作。</p>
+<h2 id="substitute-简介">substitute 简介</h2>
+<p>substitute 允许我们先查找一段文本并用新的文本将匹配上的文本进行替换。它的使用比较复杂，需要提供一个匹配模式和一个替换的字符串。命令格式如下：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="cl">:[range]s[ubstitute]/{pattern}/{string}/{flag}
+</span></span></code></pre></div><ul>
+<li>range 表示范围，与之前介绍的其他 ex 命令中范围的作用一样。</li>
+<li>pattern 表示一个匹配模式，回忆一下之前说过的，这里的模式跟之前介绍的普通模式、插入模式的含义不同，它代表的是一串用来进行匹配并高亮显示的字符串。</li>
+<li>string是一串用来进行替换的字符串，将匹配项都替换成某项。</li>
+<li>flag是一些替换的标志，我们将在后面的内容中进行介绍。</li>
+</ul>
+<p>例如 <code>:%s/python/Python/g</code> 表示在整个文件中将 python都替换为 <code>Python</code>（这么长时间没怎么提到 ex 命令了，不知道各位小伙伴是否还记得 <code>%</code>代表当前打开的文件）。<code>g</code> 是一个标志位，表示修改整行中的所有匹配项，而不仅仅是修改第一个匹配项。</p>
+<h2 id="标志位">标志位</h2>
+<p>上面的例子中我们使用了一个 <code>g</code> 作为标志位，其实还有其他的标志位。我们可以通过标志位灵活的定义 <code>substitute</code> 的行为。下面是一些常用的标志位：</p>
+<ul>
+<li><code>\r</code>：插入一个换行符</li>
+<li><code>\t</code>：插入一个制表符</li>
+<li><code>\\</code>：插入一个反斜杠</li>
+<li><code>\1</code>：插入第一个子匹配项</li>
+<li><code>\2</code>：插入第二个子匹配项</li>
+<li><code>\0</code>：插入匹配模式的所有内容</li>
+<li><code>&amp;</code>：与 \0用法相同</li>
+<li><code>~</code>：使用上一次调用 substitute时提供的 string内容</li>
+<li><code>\={vim script}</code>：执行 vim script并将返回内容作为 string</li>
+</ul>
+<p>有这么多标志位，该怎么记，平时怎么用到呢？别急，下面将通过相应的示例来演示如何使用它们，我们完全可以在日常使用中学会它们。</p>
+<h2 id="示例">示例</h2>
+<h3 id="使用-g-替换所有内容">使用 <code>g</code> 替换所有内容</h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="cl">how can I learn python very good, just use it more and more.
+</span></span><span class="line"><span class="cl">python is very powerful, you can just learn python within your work.
+</span></span></code></pre></div><p>我们将上面文本中的所有 <code>python</code> 都改为 <code>vim</code> 。我们先来看看不使用标志是什么样子的。即这里输入 <code>:%s/python/vim</code>
+<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://img-blog.csdnimg.cn/6a2bbe846ff44babade868d32d40662e.gif#pic_center"
+        data-srcset="https://img-blog.csdnimg.cn/6a2bbe846ff44babade868d32d40662e.gif#pic_center, https://img-blog.csdnimg.cn/6a2bbe846ff44babade868d32d40662e.gif#pic_center 1.5x, https://img-blog.csdnimg.cn/6a2bbe846ff44babade868d32d40662e.gif#pic_center 2x"
+        data-sizes="auto"
+        alt="https://img-blog.csdnimg.cn/6a2bbe846ff44babade868d32d40662e.gif#pic_center"
+        title="在这里插入图片描述" />
+我们发现它只替换了每一行的第一个出现 <code>python</code> 的地方，同一行后面的 <code>python</code> 不受影响。这里我们使用 <code>/g</code> 替换每一处出现 <code>python</code> 的地方。</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://img-blog.csdnimg.cn/2e6e71726d7c42fa8df863854dbe0d84.gif#pic_center"
+        data-srcset="https://img-blog.csdnimg.cn/2e6e71726d7c42fa8df863854dbe0d84.gif#pic_center, https://img-blog.csdnimg.cn/2e6e71726d7c42fa8df863854dbe0d84.gif#pic_center 1.5x, https://img-blog.csdnimg.cn/2e6e71726d7c42fa8df863854dbe0d84.gif#pic_center 2x"
+        data-sizes="auto"
+        alt="https://img-blog.csdnimg.cn/2e6e71726d7c42fa8df863854dbe0d84.gif#pic_center"
+        title="在这里插入图片描述" />
+<code>g</code> 这个标志很容易联想到 <code>global</code> 这个单词，应该表示的是整个选中的文本范围，而我们前面已经选定了当前文件中的所有文本，似乎看起来很合理。但是 <code>g</code> 作用范围应该是整行，而我们选中的是文本中的所有行。看起来效果是一样，但是理解起来确实有差距。为什么它会作用于行，我想应该是 <code>vim</code> 发源于 <code>ed</code> 这个编辑器，vim的 <code>ex</code> 命令起源于 <code>ed</code> 编辑器，而后者是一个行编辑器，所以大部分的命令都作用于行。这样应该就能说得通了。</p>
+<h3 id="手动选择是否需要替换">手动选择是否需要替换</h3>
+<p>有的时候我们并不希望盲目的对所有内容进行替换，而只替换其中的部分内容。例如上述的文本中，我们只想替换第二行的最后一个 <code>python</code> 为<code>vim</code>。那么可以使用 <code>c</code> 标志。你可以理解为 <code>copy ?</code>。vim会询问我们是否需要进行替换。即我们在这里输入 <code>:%s/python/vim/gc</code>。后面可以按下 <code>y</code> 来确定替换，<code>n</code> 表示不进行替换并切换到下一处匹配。因此这里我们可以输入 <code>nny</code>
+<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://img-blog.csdnimg.cn/0310a535338c41dbaa05b9bc419489d8.gif#pic_center"
+        data-srcset="https://img-blog.csdnimg.cn/0310a535338c41dbaa05b9bc419489d8.gif#pic_center, https://img-blog.csdnimg.cn/0310a535338c41dbaa05b9bc419489d8.gif#pic_center 1.5x, https://img-blog.csdnimg.cn/0310a535338c41dbaa05b9bc419489d8.gif#pic_center 2x"
+        data-sizes="auto"
+        alt="https://img-blog.csdnimg.cn/0310a535338c41dbaa05b9bc419489d8.gif#pic_center"
+        title="在这里插入图片描述" />
+其实不光yn这两个选项，从vim的提示看总共有 ynaql和 <code>&lt;Ctrl +e&gt;</code>以及 <code>&lt;Ctrl + y&gt;</code>。它们的含义如下：</p>
+<ul>
+<li>y：替换本处匹配</li>
+<li>n：不替换本处匹配</li>
+<li>a：替换此处之后的所有匹配项，随后退出本次替换</li>
+<li>q：退出本次匹配</li>
+<li>l：替换此处之后退出本次替换</li>
+<li><code>&lt;Ctrl + e&gt;</code>：向上翻滚屏幕</li>
+<li><code>&lt;Ctrl + y&gt;</code>：向下翻滚屏幕</li>
+</ul>
+<h3 id="重用上次匹配模式">重用上次匹配模式</h3>
+<p>如果我们将 <code>{pattern}</code> 部分留空，那么 vim会重用上次的 <code>{pattern}</code> 。下面我们使用一个例子来看如何使用这一特性。</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-c++" data-lang="c++"><span class="line"><span class="cl"><span class="cp">#define VERSION &#34;v1.01&#34;
+</span></span></span><span class="line"><span class="cl"><span class="cp">#define TITLE &#34;vim&#34;
+</span></span></span><span class="line"><span class="cl"><span class="cp">#define PATH &#34;~/.config/nvim&#34;
+</span></span></span></code></pre></div><p>我们想将里面的字符串改为宽字符，也就是在双引号前加L我们首先要匹配所有的引号内容。很多时候正则表达式比较复杂，无法一次就写对的，所以这里我们分步骤来，首先正确写出正则表达式匹配出所有带双引号的字符串。 \v&quot;(.*)&quot;可以获取所有的字符串。
+<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://img-blog.csdnimg.cn/b8c052a1c223430aa0c46e8540d18bf0.png#pic_center"
+        data-srcset="https://img-blog.csdnimg.cn/b8c052a1c223430aa0c46e8540d18bf0.png#pic_center, https://img-blog.csdnimg.cn/b8c052a1c223430aa0c46e8540d18bf0.png#pic_center 1.5x, https://img-blog.csdnimg.cn/b8c052a1c223430aa0c46e8540d18bf0.png#pic_center 2x"
+        data-sizes="auto"
+        alt="https://img-blog.csdnimg.cn/b8c052a1c223430aa0c46e8540d18bf0.png#pic_center"
+        title="在这里插入图片描述" />
+接着我们使用上面的这个模式来进行替换，即输入 :%s//L\0/gc。当然这里只有这么三行一眼就知道我们要替换所有，但是代码一长了，就需要我们来确认是否需要替换。
+<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://img-blog.csdnimg.cn/9d7a0bbcca5945cd9bb477b791b59513.gif#pic_center"
+        data-srcset="https://img-blog.csdnimg.cn/9d7a0bbcca5945cd9bb477b791b59513.gif#pic_center, https://img-blog.csdnimg.cn/9d7a0bbcca5945cd9bb477b791b59513.gif#pic_center 1.5x, https://img-blog.csdnimg.cn/9d7a0bbcca5945cd9bb477b791b59513.gif#pic_center 2x"
+        data-sizes="auto"
+        alt="https://img-blog.csdnimg.cn/9d7a0bbcca5945cd9bb477b791b59513.gif#pic_center"
+        title="在这里插入图片描述" />
+复杂的正则表达式我们无法一次就输对，如果进行替换操作的时候因为正则表达式输入不对导致每次都得重新输入一堆内容就显得比较麻烦了。而且如果使用 <code>substitute</code> 命令之后才发现错了，又得撤销重新输入那么大一串。与 <code>substitute</code> 相比，查找模式不会修改文本，我们可以在查找模式中使用 <code>&lt;Up&gt;</code> 慢慢修改直到满意为止。当模式对了，下面就可以利用 <code>{pattern}</code> 留空这种方式来重用上次模式。</p>
+<p>需要注意的是将模式留空，将会在历史命令中留下一个不完整的记录，模式与命令是独立存储的。在上面的例子中，如果我又执行了新的匹配，例如我想查找所有 <code>define</code>，后面使用 <!-- raw HTML omitted -->重新执行命令的时候，发现匹配的内容变了。有一个办法就是将上次的模式存储到寄存器中，在匹配的时候从寄存器中取数据填充 <code>{pattern}</code> 部分。</p>
+<p>上次匹配成功之后如何将对应的模式放到寄存器呢，这里我们介绍一个新的内容——命令窗口。命令窗口是一个显示历史命令的缓冲区，它跟普通的缓冲区区别仅仅在于它显示的是历史命令而已。使用 <code>q:</code> 可以调出，这里我们可以使用 <code>q/</code> 调出模式的命令窗口。在对应模式行使用 <code>&quot;iy$</code> 来粘贴一行，然后在最后替换时使用 <code>&lt;C-r&gt;i</code> 来填充 <code>{pattern}</code>。
+<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://img-blog.csdnimg.cn/de27522e23834765b9ef9617a1166021.gif#pic_center"
+        data-srcset="https://img-blog.csdnimg.cn/de27522e23834765b9ef9617a1166021.gif#pic_center, https://img-blog.csdnimg.cn/de27522e23834765b9ef9617a1166021.gif#pic_center 1.5x, https://img-blog.csdnimg.cn/de27522e23834765b9ef9617a1166021.gif#pic_center 2x"
+        data-sizes="auto"
+        alt="https://img-blog.csdnimg.cn/de27522e23834765b9ef9617a1166021.gif#pic_center"
+        title="在这里插入图片描述" />
+<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://img-blog.csdnimg.cn/6f216b866a0940099bbefe5532c463ed.gif#pic_center"
+        data-srcset="https://img-blog.csdnimg.cn/6f216b866a0940099bbefe5532c463ed.gif#pic_center, https://img-blog.csdnimg.cn/6f216b866a0940099bbefe5532c463ed.gif#pic_center 1.5x, https://img-blog.csdnimg.cn/6f216b866a0940099bbefe5532c463ed.gif#pic_center 2x"
+        data-sizes="auto"
+        alt="https://img-blog.csdnimg.cn/6f216b866a0940099bbefe5532c463ed.gif#pic_center"
+        title="在这里插入图片描述" /></p>
+<p>使用留空这一招有时候很方便有时候又很麻烦，上述两种方式具体如何使用请各位结合具体情况自行判断吧。</p>
+<h2 id="使用寄存器的内容进行替换">使用寄存器的内容进行替换</h2>
+<p><code>{pattern}</code> 域留空了，vim会自动以上一次的模式来进行匹配，那么如果我把替换域留空，是不是会以上次替换的字符串作为这次的进行替换呢？试验过后发现 <code>vim</code> 并不会这样做，它会使用空字符串进行替换（单纯的使用上次的替换字符串使用的是 <code>~</code> 这个符号）。如果想要快速填充替换域，可以先进行复制，然后在 <code>substitute</code> 中使用<code>0</code> 寄存器。即，我们可以输入 <code>:%s/{pattern}/&lt;C-r&gt;0/gc</code> 来完成替换。就想上面的例子那样。</p>
+<p>但是这种方式有一种缺陷，那就是如果复制的内容中有 <code>/ &amp;</code> 之类的特殊符号的话，它会出现错误。这个时候我们可以手动编辑寄存器中的内容，对特殊符号进行转义。这个时候我们会想有没有什么办法能让vim知道我只想将寄存器中的特殊符号作为普通字符串呢？当然是有办法的，我们可以借助<code>vim script</code>来实现这一需求。我们可以输入 <code>:%s/{pattern}/\=@0/gc</code>，其中 <code>\=</code>是我们之前列举的使用 <code>vim script</code>，而后面的 <code>@0</code> 则是 <code>vim script</code> 的内容，表示取 <code>0</code> 寄存器的内容。</p>
+<p>这里出现了 vim script的内容，不过不用担心，这里涉及到的都是最简单的vim script内容，而且更新完了 vim 的基础内容之后会开一个新专栏介绍vim script和vim的配置，那个时候再回过来看这个方法也可以。这段脚本也很容易理解是不是？</p>
+<h2 id="使用上一次的-substitute-命令">使用上一次的 <code>substitute</code> 命令</h2>
+<p>假设我们在执行 substitute命令的时候忘记了在前面添加 %，我们当然可以使用 <code>&lt;Up&gt;</code> 键来在上一次的基础之上进行修改。</p>
+<p>这里介绍一个更简单的方式，可以在普通模式中输入 <code>g&amp;</code> 它会在整个文件中重新执行上一条 substitute命令。它等效于 <code>:%s//~/&amp;</code>。当你其他部分都正确，唯独忘了添加 %可以考虑使用这条命令。
+<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://img-blog.csdnimg.cn/500280db047a453f9efa43b5bf8e6435.gif#pic_center"
+        data-srcset="https://img-blog.csdnimg.cn/500280db047a453f9efa43b5bf8e6435.gif#pic_center, https://img-blog.csdnimg.cn/500280db047a453f9efa43b5bf8e6435.gif#pic_center 1.5x, https://img-blog.csdnimg.cn/500280db047a453f9efa43b5bf8e6435.gif#pic_center 2x"
+        data-sizes="auto"
+        alt="https://img-blog.csdnimg.cn/500280db047a453f9efa43b5bf8e6435.gif#pic_center"
+        title="在这里插入图片描述" />
+我们再来看另外一种情形：
+假设我有这么一段代码</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="line"><span class="cl"><span class="nx">mini</span> <span class="o">=</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">applyName</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">config</span><span class="p">){</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="nx">obj</span><span class="p">.</span><span class="nx">factory</span><span class="p">(</span><span class="nx">config</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">getName</span><span class="p">());</span>
+</span></span><span class="line"><span class="cl">  <span class="p">},</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p>我要在此基础之上增加一个新函数，使其变为这样</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="line"><span class="cl"><span class="nx">mini</span> <span class="o">=</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">applyName</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">config</span><span class="p">){</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="nx">obj</span><span class="p">.</span><span class="nx">factory</span><span class="p">(</span><span class="nx">config</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">getName</span><span class="p">());</span>
+</span></span><span class="line"><span class="cl">  <span class="p">},</span>
+</span></span><span class="line"><span class="cl">  
+</span></span><span class="line"><span class="cl">  <span class="nx">applyNumber</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">config</span><span class="p">){</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="nx">obj</span><span class="p">.</span><span class="nx">factory</span><span class="p">(</span><span class="nx">config</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">getNumber</span><span class="p">());</span>
+</span></span><span class="line"><span class="cl">  <span class="p">},</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p>我们发现，只需要简单的将上一个函数进行复制，然后将 <code>Name</code> 改为 <code>Number</code> 就可以了。我们可以使用 <code>:%s/Name/Number/g</code> 来执行替换，但是有一个问题就是它将所有的内容都进行了一个替换。好在可以使用一次 u来撤销所有修改。
+<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://img-blog.csdnimg.cn/a79bef71be834c3580f3b6bb51d3d784.gif#pic_center"
+        data-srcset="https://img-blog.csdnimg.cn/a79bef71be834c3580f3b6bb51d3d784.gif#pic_center, https://img-blog.csdnimg.cn/a79bef71be834c3580f3b6bb51d3d784.gif#pic_center 1.5x, https://img-blog.csdnimg.cn/a79bef71be834c3580f3b6bb51d3d784.gif#pic_center 2x"
+        data-sizes="auto"
+        alt="https://img-blog.csdnimg.cn/a79bef71be834c3580f3b6bb51d3d784.gif#pic_center"
+        title="在这里插入图片描述" />
+在介绍命令模式的时候介绍过，大部分的 <code>ex</code> 命令都可以使用选择模式中选中部分作为命令执行的范围，<code>substitute</code> 同样可以。我们先选中后面要更改的部分，然后使用 <code>:&amp;&amp;</code>来在选中部分重复执行上一次的 <code>substitute</code> 命令。这两个 <code>&amp;</code>具有不同的含义，第一个 <code>&amp;</code> 表示重复上次执行的 <code>substitute</code> 命令，但是它不包含上次指定的标志位，在后面再加一个 <code>&amp;</code> 表示重复上一次的标志位。后面的 <code>&amp;</code>与上面介绍的 <code>g&amp;</code>中的 <code>&amp;</code>含义相同。
+<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://img-blog.csdnimg.cn/39ab4f592c4d4526b6d44b09bdc80a71.gif#pic_center"
+        data-srcset="https://img-blog.csdnimg.cn/39ab4f592c4d4526b6d44b09bdc80a71.gif#pic_center, https://img-blog.csdnimg.cn/39ab4f592c4d4526b6d44b09bdc80a71.gif#pic_center 1.5x, https://img-blog.csdnimg.cn/39ab4f592c4d4526b6d44b09bdc80a71.gif#pic_center 2x"
+        data-sizes="auto"
+        alt="https://img-blog.csdnimg.cn/39ab4f592c4d4526b6d44b09bdc80a71.gif#pic_center"
+        title="在这里插入图片描述" /></p>
+<h2 id="使用子匹配进行替换">使用子匹配进行替换</h2>
+<p>假设我有这么一份联系人记录</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="cl">Jack Ma, 12398988011
+</span></span><span class="line"><span class="cl">Pony Ma, 16528649018
+</span></span><span class="line"><span class="cl">Donald Trump, 15092838173
+</span></span><span class="line"><span class="cl">Joe Biden, 18571820986
+</span></span></code></pre></div><p>现在我想改变一下顺序，让电话号码在前，人名在后。
+首先构造一个可以准确匹配到人名和电话号码的正则表达式： <code>(.*),\s+(\d{11})</code> 。第一个括号匹配的是人名，第二个括号匹配的是电话号码的11位整数。
+<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://img-blog.csdnimg.cn/350ecd13c02c4bb0b7f89003f0834cfc.png#pic_center"
+        data-srcset="https://img-blog.csdnimg.cn/350ecd13c02c4bb0b7f89003f0834cfc.png#pic_center, https://img-blog.csdnimg.cn/350ecd13c02c4bb0b7f89003f0834cfc.png#pic_center 1.5x, https://img-blog.csdnimg.cn/350ecd13c02c4bb0b7f89003f0834cfc.png#pic_center 2x"
+        data-sizes="auto"
+        alt="https://img-blog.csdnimg.cn/350ecd13c02c4bb0b7f89003f0834cfc.png#pic_center"
+        title="在这里插入图片描述" />
+然后我们可以利用之前介绍的 <code>{pattern}</code> 留空的方式，重新组织新的排列格式 :<code>%s//\2, \1</code>
+<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://img-blog.csdnimg.cn/977d1cf0118d4a068680557276c17605.gif#pic_center"
+        data-srcset="https://img-blog.csdnimg.cn/977d1cf0118d4a068680557276c17605.gif#pic_center, https://img-blog.csdnimg.cn/977d1cf0118d4a068680557276c17605.gif#pic_center 1.5x, https://img-blog.csdnimg.cn/977d1cf0118d4a068680557276c17605.gif#pic_center 2x"
+        data-sizes="auto"
+        alt="https://img-blog.csdnimg.cn/977d1cf0118d4a068680557276c17605.gif#pic_center"
+        title="在这里插入图片描述" /></p>
+<h2 id="使用-vimscript-脚本">使用 vimscript 脚本</h2>
+<p>在上面介绍从寄存器中读取内容进行替换的时候初步介绍了，使用 <code>vimscript</code> 的例子。这里我们再举出一个使用 <code>vimscript</code> 的例子，不过不用慌，使用的脚本都极为简单，不存在理解障碍。</p>
+<p>假设有这么一段HTML代码</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-html" data-lang="html"><span class="line"><span class="cl"><span class="p">&lt;</span><span class="nt">h2</span><span class="p">&gt;</span> this is a h2 tag<span class="p">&lt;/</span><span class="nt">h2</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl"><span class="p">&lt;</span><span class="nt">h3</span><span class="p">&gt;</span> this is a h3 tag<span class="p">&lt;/</span><span class="nt">h3</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl"><span class="p">&lt;</span><span class="nt">h4</span><span class="p">&gt;</span> this is a h4 tag<span class="p">&lt;/</span><span class="nt">h4</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl"><span class="p">&lt;</span><span class="nt">h5</span><span class="p">&gt;</span> this is a h5 tag<span class="p">&lt;/</span><span class="nt">h5</span><span class="p">&gt;</span>
+</span></span></code></pre></div><p>我们希望对标题标签进行升级，换句话说就是将 <code>&lt;h2&gt;</code>，提升为 <code>&lt;h1&gt;</code>，<code>&lt;h3&gt;</code> 提升为 <code>&lt;h2&gt;</code>。</p>
+<p>首先我们构造模式来匹配对应的数字，可以用 <code>\d</code> 来匹配数字，但是它会匹配到所有数字，因此我们加一个限定，只匹配以 <code>&lt;h</code> 或者 <code>&lt;/h</code>开头的数字，这个时候正则表达式可以改为 <code>\&lt;\/?h\d</code>，我们只想要后面的数字，因此可以对这个匹配进行裁剪，<code>\&lt;\/?h\zs\d</code>。这样就匹配到了所有标签后的数字，但是内容里面的数字没有被匹配。
+<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://img-blog.csdnimg.cn/2360f34ea7f9428c968871d18e6b8263.png#pic_center"
+        data-srcset="https://img-blog.csdnimg.cn/2360f34ea7f9428c968871d18e6b8263.png#pic_center, https://img-blog.csdnimg.cn/2360f34ea7f9428c968871d18e6b8263.png#pic_center 1.5x, https://img-blog.csdnimg.cn/2360f34ea7f9428c968871d18e6b8263.png#pic_center 2x"
+        data-sizes="auto"
+        alt="https://img-blog.csdnimg.cn/2360f34ea7f9428c968871d18e6b8263.png#pic_center"
+        title="在这里插入图片描述" />
+接着我们介绍一个新的 <code>vimscript</code> 命令——<code>submatch</code>，它接收一个表示第几个匹配的参数，返回对应的匹配项。我们可以使用这个函数将获取的每个匹配项都 <code>-1</code>，即输入 <code>:%s//\=submatch(0)-1/g</code> 就可以完成这个操作了。
+<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://img-blog.csdnimg.cn/e9e76ad6bd314681895bc3feff40ff73.gif#pic_center"
+        data-srcset="https://img-blog.csdnimg.cn/e9e76ad6bd314681895bc3feff40ff73.gif#pic_center, https://img-blog.csdnimg.cn/e9e76ad6bd314681895bc3feff40ff73.gif#pic_center 1.5x, https://img-blog.csdnimg.cn/e9e76ad6bd314681895bc3feff40ff73.gif#pic_center 2x"
+        data-sizes="auto"
+        alt="https://img-blog.csdnimg.cn/e9e76ad6bd314681895bc3feff40ff73.gif#pic_center"
+        title="在这里插入图片描述" /></p>
+<h2 id="最后的总结">最后的总结</h2>
+<p>在这篇文章我着重讨论了 <code>substitute</code> 这个命令的使用，介绍了该命令对应的标志位，并通过一些例子演示了如何使用这些标志位。相信各位对替换命令有了一定的认识。</p>
+<p>各位小伙伴可能还会有疑惑，目前介绍的查找替换似乎只针对的是某个文件，如果我想在项目中进行全局替换该怎么办呢？请各位想想之前我们是如何在多个文件中执行宏的。这部分就不做介绍，算是留的一个练习吧。至于多个文件进行查找，我们将在后面的部分继续介绍</p>
+</div><div class="post-footer" id="post-footer">
+    <div class="post-info">
+        <div class="post-info-line">
+            <div class="post-info-mod">
+                <span>Updated on 2022-06-22</span>
+            </div></div>
+        <div class="post-info-line">
+            <div class="post-info-md"></div>
+            <div class="post-info-share">
+                <span><a href="javascript:void(0);" title="Share on Twitter" data-sharer="twitter" data-url="http://HaiLateBoy.github.io/posts/vim-tutorial-20/" data-title="vim 从嫌弃到依赖(19)——替换" data-hashtags="vim,编辑工具,文本处理"><i class="fab fa-twitter fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Facebook" data-sharer="facebook" data-url="http://HaiLateBoy.github.io/posts/vim-tutorial-20/" data-hashtag="vim"><i class="fab fa-facebook-square fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Hacker News" data-sharer="hackernews" data-url="http://HaiLateBoy.github.io/posts/vim-tutorial-20/" data-title="vim 从嫌弃到依赖(19)——替换"><i class="fab fa-hacker-news fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Line" data-sharer="line" data-url="http://HaiLateBoy.github.io/posts/vim-tutorial-20/" data-title="vim 从嫌弃到依赖(19)——替换"><i data-svg-src="https://cdn.jsdelivr.net/npm/simple-icons@7.3.0/icons/line.svg" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on 微博" data-sharer="weibo" data-url="http://HaiLateBoy.github.io/posts/vim-tutorial-20/" data-title="vim 从嫌弃到依赖(19)——替换"><i class="fab fa-weibo fa-fw" aria-hidden="true"></i></a></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="post-info-more">
+        <section class="post-tags"><i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/vim/">vim</a>,&nbsp;<a href="/tags/%E7%BC%96%E8%BE%91%E5%B7%A5%E5%85%B7/">编辑工具</a>,&nbsp;<a href="/tags/%E6%96%87%E6%9C%AC%E5%A4%84%E7%90%86/">文本处理</a></section>
+        <section>
+            <span><a href="javascript:void(0);" onclick="window.history.back();">Back</a></span>&nbsp;|&nbsp;<span><a href="/">Home</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav"><a href="/posts/vim-tutorial-19/" class="prev" rel="prev" title="vim 从嫌弃到依赖(18)——查找模式进阶"><i class="fas fa-angle-left fa-fw" aria-hidden="true"></i>vim 从嫌弃到依赖(18)——查找模式进阶</a>
+            <a href="/posts/vim-tutorial-21/" class="next" rel="next" title="vim 从嫌弃到依赖(20)——global 命令">vim 从嫌弃到依赖(20)——global 命令<i class="fas fa-angle-right fa-fw" aria-hidden="true"></i></a></div>
+</div>
+</article></div>
+            </main><footer class="footer">
+        <div class="footer-container"><div class="footer-line">Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener noreffer" title="Hugo 0.121.2">Hugo</a> | Theme - <a href="https://github.com/dillonzq/LoveIt" target="_blank" rel="noopener noreffer" title="LoveIt 0.2.11"><i class="far fa-kiss-wink-heart fa-fw" aria-hidden="true"></i> LoveIt</a>
+                </div><div class="footer-line" itemscope itemtype="http://schema.org/CreativeWork"><i class="far fa-copyright fa-fw" aria-hidden="true"></i><span itemprop="copyrightYear">2022 - 2024</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="https://www.masimaro.xyz" target="_blank">Masimaro</a></span></div>
+        </div>
+    </footer></div>
+
+        <div id="fixed-buttons"><a href="#" id="back-to-top" class="fixed-button" title="Back to Top">
+                <i class="fas fa-arrow-up fa-fw" aria-hidden="true"></i>
+            </a><a href="#" id="view-comments" class="fixed-button" title="View Comments">
+                <i class="fas fa-comment fa-fw" aria-hidden="true"></i>
+            </a>
+        </div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.css"><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/autocomplete.js@0.38.1/dist/autocomplete.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lunr@2.3.9/lunr.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lazysizes@5.3.2/lazysizes.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/clipboard@2.0.11/dist/clipboard.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/sharer.js@0.5.1/sharer.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/auto-render.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/copy-tex.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/mhchem.min.js"></script><script type="text/javascript">window.config={"code":{"copyTitle":"Copy to clipboard","maxShownLines":50},"comment":{},"math":{"delimiters":[{"display":true,"left":"$$","right":"$$"},{"display":true,"left":"\\[","right":"\\]"},{"display":true,"left":"\\begin{equation}","right":"\\end{equation}"},{"display":true,"left":"\\begin{equation*}","right":"\\end{equation*}"},{"display":true,"left":"\\begin{align}","right":"\\end{align}"},{"display":true,"left":"\\begin{align*}","right":"\\end{align*}"},{"display":true,"left":"\\begin{alignat}","right":"\\end{alignat}"},{"display":true,"left":"\\begin{alignat*}","right":"\\end{alignat*}"},{"display":true,"left":"\\begin{gather}","right":"\\end{gather}"},{"display":true,"left":"\\begin{CD}","right":"\\end{CD}"},{"display":false,"left":"$","right":"$"},{"display":false,"left":"\\(","right":"\\)"}],"strict":false},"search":{"highlightTag":"em","maxResultLength":10,"noResultsFound":"No results found","snippetLength":50}};</script><script type="text/javascript" src="/js/theme.min.js"></script></body>
+</html>

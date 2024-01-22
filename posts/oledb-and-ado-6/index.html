@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="robots" content="noodp" />
+        <title>多结果集IMultipleResult接口 - Masimaro&#39;s blog</title><meta name="Description" content="这是我用于记录日常和学习的小站"><meta property="og:title" content="多结果集IMultipleResult接口" />
+<meta property="og:description" content="在某些任务中，需要执行多条sql语句，这样一次会返回多个结果集，在应用程序就需要处理多个结果集，在OLEDB中支持多结果集的接口是IMult" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://HaiLateBoy.github.io/posts/oledb-and-ado-6/" /><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2018-03-16T21:04:31+00:00" />
+<meta property="article:modified_time" content="2018-03-16T21:04:31+00:00" /><meta property="og:site_name" content="Masimaro&#39;s blog" />
+
+<meta name="twitter:card" content="summary"/><meta name="twitter:title" content="多结果集IMultipleResult接口"/>
+<meta name="twitter:description" content="在某些任务中，需要执行多条sql语句，这样一次会返回多个结果集，在应用程序就需要处理多个结果集，在OLEDB中支持多结果集的接口是IMult"/>
+<meta name="application-name" content="My cool site">
+<meta name="apple-mobile-web-app-title" content="My cool site"><meta name="theme-color" content="#ffffff"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="manifest" href="/site.webmanifest"><link rel="canonical" href="http://HaiLateBoy.github.io/posts/oledb-and-ado-6/" /><link rel="prev" href="http://HaiLateBoy.github.io/posts/phy-use/" /><link rel="next" href="http://HaiLateBoy.github.io/posts/oledb-and-ado-7/" /><link rel="stylesheet" href="/css/style.min.css"><link rel="preload" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css"></noscript><link rel="preload" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css"></noscript><script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "BlogPosting",
+        "headline": "多结果集IMultipleResult接口",
+        "inLanguage": "zh-CN",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "http:\/\/HaiLateBoy.github.io\/posts\/oledb-and-ado-6\/"
+        },"genre": "posts","keywords": "OLEDB, 数据库编程, VC\u002b\u002b, 数据库","wordcount":  1906 ,
+        "url": "http:\/\/HaiLateBoy.github.io\/posts\/oledb-and-ado-6\/","datePublished": "2018-03-16T21:04:31+00:00","dateModified": "2018-03-16T21:04:31+00:00","publisher": {
+            "@type": "Organization",
+            "name": ""},"author": {
+                "@type": "Person",
+                "name": "Masimaro"
+            },"description": ""
+    }
+    </script></head>
+    <body data-header-desktop="fixed" data-header-mobile="auto"><script type="text/javascript">(window.localStorage && localStorage.getItem('theme') ? localStorage.getItem('theme') === 'dark' : ('auto' === 'auto' ? window.matchMedia('(prefers-color-scheme: dark)').matches : 'auto' === 'dark')) && document.body.setAttribute('theme', 'dark');</script>
+
+        <div id="mask"></div><div class="wrapper"><header class="desktop" id="header-desktop">
+    <div class="header-wrapper">
+        <div class="header-title">
+            <a href="/" title="Masimaro&#39;s blog">My cool site</a>
+        </div>
+        <div class="menu">
+            <div class="menu-inner"><a class="menu-item" href="/posts/" title="文章列表"> 文章 </a><a class="menu-item" href="/tags/" title="标签"> 标签 </a><a class="menu-item" href="/categories/" title="分类"> 分类 </a><a class="menu-item" href="/about" title="关于本站"> 关于 </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-desktop">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-desktop" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-desktop" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-desktop">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </span><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                    <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+                </a></div>
+        </div>
+    </div>
+</header><header class="mobile" id="header-mobile">
+    <div class="header-container">
+        <div class="header-wrapper">
+            <div class="header-title">
+                <a href="/" title="Masimaro&#39;s blog">My cool site</a>
+            </div>
+            <div class="menu-toggle" id="menu-toggle-mobile">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+        <div class="menu" id="menu-mobile"><div class="search-wrapper">
+                    <div class="search mobile" id="search-mobile">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-mobile">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-mobile" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-mobile" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-mobile">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </div>
+                    <a href="javascript:void(0);" class="search-cancel" id="search-cancel-mobile">
+                        Cancel
+                    </a>
+                </div><a class="menu-item" href="/posts/" title="文章列表">文章</a><a class="menu-item" href="/tags/" title="标签">标签</a><a class="menu-item" href="/categories/" title="分类">分类</a><a class="menu-item" href="/about" title="关于本站">关于</a><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+            </a></div>
+    </div>
+</header><div class="search-dropdown desktop">
+        <div id="search-dropdown-desktop"></div>
+    </div>
+    <div class="search-dropdown mobile">
+        <div id="search-dropdown-mobile"></div>
+    </div><main class="main">
+                <div class="container"><div class="toc" id="toc-auto">
+            <h2 class="toc-title">Contents</h2>
+            <div class="toc-content" id="toc-content-auto"></div>
+        </div><article class="page single"><h1 class="single-title animate__animated animate__flipInX">多结果集IMultipleResult接口</h1><div class="post-meta">
+            <div class="post-meta-line"><span class="post-author"><a href="https://www.masimaro.xyz" title="Author" target="_blank" rel="noopener noreffer author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Masimaro</a></span>&nbsp;<span class="post-category">included in <a href="/categories/windows-%E6%95%B0%E6%8D%AE%E5%BA%93%E7%BC%96%E7%A8%8B/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>windows 数据库编程</a></span></div>
+            <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw" aria-hidden="true"></i>&nbsp;<time datetime="2018-03-16">2018-03-16</time>&nbsp;<i class="fas fa-pencil-alt fa-fw" aria-hidden="true"></i>&nbsp;1906 words&nbsp;
+                <i class="far fa-clock fa-fw" aria-hidden="true"></i>&nbsp;4 minutes&nbsp;</div>
+        </div><div class="details toc" id="toc-static"  data-kept="true">
+                <div class="details-summary toc-title">
+                    <span>Contents</span>
+                    <span><i class="details-icon fas fa-angle-right" aria-hidden="true"></i></span>
+                </div>
+                <div class="details-content toc-content" id="toc-content-static"><nav id="TableOfContents"></nav></div>
+            </div><div class="content" id="content"><p>在某些任务中，需要执行多条sql语句，这样一次会返回多个结果集，在应用程序就需要处理多个结果集，在OLEDB中支持多结果集的接口是IMultipleResult。</p>
+<!-- raw HTML omitted -->
+<h1 id="查询数据源是否支持多结果集">查询数据源是否支持多结果集</h1>
+<p>并不是所有数据源都支持多结果集，可以通过查询数据源对象的DBPROPSET_DATASOURCEINFO属性集中的DBPROP_MULTIPLERESULTS属性来确定，该值是一个按位设置的4字节的联合值。它可取的值有下面几个：</p>
+<ul>
+<li>DBPROPVAL_MR_SUPPORITED：支持多结果集</li>
+<li>DBPROPVAL_MR_SONCURRENT:支持多结果集，并支持同时打开多个返回的结果集（如果它不支持同时打开多个结果集的话，在打开下一个结果集之前需要关闭已经打开的结果集）</li>
+<li>DBPROPVAL_MR_NOTSUPPORTED: 不支持多结果集
+这个属性可以通过接口IDBProperties接口的GetProperties方法来获取,该函数的原型如下：</li>
+</ul>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="n">HRESULT</span> <span class="nf">GetProperties</span> <span class="p">(</span>
+</span></span><span class="line"><span class="cl">   <span class="n">ULONG</span>               <span class="n">cPropertyIDSets</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">   <span class="k">const</span> <span class="n">DBPROPIDSET</span>   <span class="n">rgPropertyIDSets</span><span class="p">[],</span>
+</span></span><span class="line"><span class="cl">   <span class="n">ULONG</span>              <span class="o">*</span><span class="n">pcPropertySets</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">   <span class="n">DBPROPSET</span>         <span class="o">**</span><span class="n">prgPropertySets</span><span class="p">);</span>
+</span></span></code></pre></div><p>它的用法与之前的SetProperties十分类似
+第一个参数是我们传入DBPROPIDSET数组元素的个数，第二个参数是一个DBPROPIDSET结构的参数，该结构的原型如下：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="k">typedef</span> <span class="k">struct</span> <span class="nc">tagDBPROPIDSET</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">   <span class="n">DBPROPID</span> <span class="o">*</span>   <span class="n">rgPropertyIDs</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">   <span class="n">ULONG</span>        <span class="n">cPropertyIDs</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">   <span class="n">GUID</span>         <span class="n">guidPropertySet</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span> <span class="n">DBPROPIDSET</span><span class="p">;</span>
+</span></span></code></pre></div><p>该结构与之前遇到的DBPROPSET类似，第一个参数是一个DBPROPID结构的数组的首地址，该值是一个属性值，表示我们希望查询哪个属性的情况，第二个参数表示我们总共查询多少个属性的值，第3个参数表示这些属性都属于哪个属性集。
+接口方法的第三个参数返回当前我们总共查询到几个属性集的内容。
+第四个参数返回具体查到的属性值。</p>
+<h1 id="多结果集接口的使用">多结果集接口的使用</h1>
+<p>多结果集对象的定义如下：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="n">CoType</span> <span class="n">TMultipleResults</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">   <span class="p">[</span><span class="n">mandatory</span><span class="p">]</span>   <span class="n">interface</span> <span class="n">IMultipleResults</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">   <span class="p">[</span><span class="n">optional</span><span class="p">]</span>    <span class="n">interface</span> <span class="n">ISupportErrorInfo</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p>一般在程序中，使用多结果集有如下步骤</p>
+<ol>
+<li>查询数据源是否支持多结果集，如果不支持则要考虑其他的实现方案</li>
+<li>如果它支持多结果集，在调用ICommandText接口的Execute方法执行SQL语句时，让其返回一个IMultipleRowset接口。</li>
+<li>循环调用接口的GetResult方法获取结果集对象。</li>
+<li>使用结果集对象</li>
+</ol>
+<p>最后是一个完整的例子:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="c1">//判断是否支持多结果集
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="n">BOOL</span> <span class="nf">SupportMultipleRowsets</span><span class="p">(</span><span class="n">IOpenRowset</span> <span class="o">*</span><span class="n">pIOpenRowset</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">COM_DECLARE_BUFFER</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">    <span class="n">COM_DECLARE_INTERFACE</span><span class="p">(</span><span class="n">IDBInitialize</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">COM_DECLARE_INTERFACE</span><span class="p">(</span><span class="n">IDBProperties</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">COM_DECLARE_INTERFACE</span><span class="p">(</span><span class="n">IGetDataSource</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="n">BOOL</span> <span class="n">bRet</span> <span class="o">=</span> <span class="n">FALSE</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="c1">//定义相关结构用于获取关于多结果集的信息
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="n">DBPROPID</span> <span class="n">dbPropId</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="mi">0</span><span class="p">};</span>
+</span></span><span class="line"><span class="cl">    <span class="n">DBPROPIDSET</span> <span class="n">dbPropIDSet</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="mi">0</span><span class="p">};</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="n">dbPropId</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">DBPROP_MULTIPLERESULTS</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">dbPropIDSet</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">cPropertyIDs</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">dbPropIDSet</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">guidPropertySet</span> <span class="o">=</span> <span class="n">DBPROPSET_DATASOURCEINFO</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">dbPropIDSet</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">rgPropertyIDs</span> <span class="o">=</span> <span class="n">dbPropId</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="c1">//定义相关结构用于接受返回的属性信息
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="n">ULONG</span> <span class="n">uPropsets</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">DBPROPSET</span> <span class="o">*</span><span class="n">pDBPropset</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">//获取数据源对象
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="n">HRESULT</span> <span class="n">hRes</span> <span class="o">=</span> <span class="n">pIOpenRowset</span><span class="o">-&gt;</span><span class="n">QueryInterface</span><span class="p">(</span><span class="n">IID_IGetDataSource</span><span class="p">,</span> <span class="p">(</span><span class="kt">void</span><span class="o">**</span><span class="p">)</span><span class="o">&amp;</span><span class="n">pIGetDataSource</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">COM_SUCCESS</span><span class="p">(</span><span class="n">hRes</span><span class="p">,</span> <span class="n">_T</span><span class="p">(</span><span class="s">&#34;查询接口IGetDataSource失败，错误码为:%08x</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">),</span> <span class="n">hRes</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">hRes</span> <span class="o">=</span> <span class="n">pIGetDataSource</span><span class="o">-&gt;</span><span class="n">GetDataSource</span><span class="p">(</span><span class="n">IID_IDBInitialize</span><span class="p">,</span> <span class="p">(</span><span class="n">IUnknown</span> <span class="o">**</span><span class="p">)</span><span class="o">&amp;</span><span class="n">pIDBInitialize</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">COM_SUCCESS</span><span class="p">(</span><span class="n">hRes</span><span class="p">,</span> <span class="n">_T</span><span class="p">(</span><span class="s">&#34;获取数据源对象失败，错误码为:%08x</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">),</span> <span class="n">hRes</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="c1">//获取对应属性
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="n">hRes</span> <span class="o">=</span> <span class="n">pIDBInitialize</span><span class="o">-&gt;</span><span class="n">QueryInterface</span><span class="p">(</span><span class="n">IID_IDBProperties</span><span class="p">,</span> <span class="p">(</span><span class="kt">void</span><span class="o">**</span><span class="p">)</span><span class="o">&amp;</span><span class="n">pIDBProperties</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">COM_SUCCESS</span><span class="p">(</span><span class="n">hRes</span><span class="p">,</span> <span class="n">_T</span><span class="p">(</span><span class="s">&#34;查询IDBProperties接口失败，错误码为:%08x</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">),</span> <span class="n">hRes</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">hRes</span> <span class="o">=</span> <span class="n">pIDBProperties</span><span class="o">-&gt;</span><span class="n">GetProperties</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">dbPropIDSet</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">uPropsets</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">pDBPropset</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">COM_SUCCESS</span><span class="p">(</span><span class="n">hRes</span><span class="p">,</span> <span class="n">_T</span><span class="p">(</span><span class="s">&#34;获取属性信息失败,错误码：%08x</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">),</span> <span class="n">hRes</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="c1">//判断是否支持多结果集
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="k">if</span> <span class="p">(</span><span class="n">pDBPropset</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">rgProperties</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">vValue</span><span class="p">.</span><span class="n">vt</span> <span class="o">==</span> <span class="n">VT_I4</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="k">if</span> <span class="p">(</span><span class="n">pDBPropset</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">rgProperties</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">vValue</span><span class="p">.</span><span class="n">intVal</span> <span class="o">&amp;</span> <span class="n">DBPROPVAL_MR_CONCURRENT</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="p">{</span>
+</span></span><span class="line"><span class="cl">            <span class="n">COM_PRINT</span><span class="p">(</span><span class="n">_T</span><span class="p">(</span><span class="s">&#34;支持多结果集</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">        <span class="p">}</span><span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="n">pDBPropset</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">rgProperties</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">vValue</span><span class="p">.</span><span class="n">intVal</span> <span class="o">&amp;</span> <span class="n">DBPROPVAL_MR_SUPPORTED</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="p">{</span>
+</span></span><span class="line"><span class="cl">            <span class="n">COM_PRINT</span><span class="p">(</span><span class="n">_T</span><span class="p">(</span><span class="s">&#34;支持多结果集</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">        <span class="p">}</span><span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="n">pDBPropset</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">rgProperties</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">vValue</span><span class="p">.</span><span class="n">intVal</span> <span class="o">&amp;</span> <span class="n">DBPROPVAL_MR_NOTSUPPORTED</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="p">{</span>
+</span></span><span class="line"><span class="cl">            <span class="n">COM_PRINT</span><span class="p">(</span><span class="n">_T</span><span class="p">(</span><span class="s">&#34;不支持多结果集</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">            <span class="k">goto</span> <span class="n">__CLEAR_UP</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="p">}</span>
+</span></span><span class="line"><span class="cl">        <span class="k">else</span>
+</span></span><span class="line"><span class="cl">        <span class="p">{</span>
+</span></span><span class="line"><span class="cl">            <span class="n">COM_PRINT</span><span class="p">(</span><span class="n">_T</span><span class="p">(</span><span class="s">&#34;未知</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">            <span class="k">goto</span> <span class="n">__CLEAR_UP</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="n">bRet</span> <span class="o">=</span> <span class="n">TRUE</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="nl">__CLEAR_UP</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">    <span class="n">SAFE_RELSEASE</span><span class="p">(</span><span class="n">pIDBInitialize</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">SAFE_RELSEASE</span><span class="p">(</span><span class="n">pIDBProperties</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">SAFE_RELSEASE</span><span class="p">(</span><span class="n">pIGetDataSource</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="n">CoTaskMemFree</span><span class="p">(</span><span class="n">pDBPropset</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">rgProperties</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">CoTaskMemFree</span><span class="p">(</span><span class="n">pDBPropset</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="n">bRet</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// 执行sql语句并返回多结果集对象
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="n">BOOL</span> <span class="nf">ExecSQL</span><span class="p">(</span><span class="n">LPOLESTR</span> <span class="n">lpSQL</span><span class="p">,</span> <span class="n">IOpenRowset</span> <span class="o">*</span><span class="n">pIOpenRowset</span><span class="p">,</span> <span class="n">IMultipleResults</span><span class="o">*</span> <span class="o">&amp;</span><span class="n">pIMultipleResults</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">COM_DECLARE_BUFFER</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">    <span class="n">COM_DECLARE_INTERFACE</span><span class="p">(</span><span class="n">IDBCreateCommand</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">COM_DECLARE_INTERFACE</span><span class="p">(</span><span class="n">ICommandText</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">COM_DECLARE_INTERFACE</span><span class="p">(</span><span class="n">ICommandProperties</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="n">BOOL</span> <span class="n">bRet</span> <span class="o">=</span> <span class="n">FALSE</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">DBPROP</span> <span class="n">dbProp</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="mi">0</span><span class="p">};</span>
+</span></span><span class="line"><span class="cl">    <span class="n">DBPROPSET</span> <span class="n">dbPropset</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="mi">0</span><span class="p">};</span>
+</span></span><span class="line"><span class="cl">    <span class="n">dbProp</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">colid</span> <span class="o">=</span> <span class="n">DB_NULLID</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">dbProp</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">dwOptions</span> <span class="o">=</span> <span class="n">DBPROPOPTIONS_REQUIRED</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">dbProp</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">dwPropertyID</span> <span class="o">=</span> <span class="n">DBPROP_UPDATABILITY</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">dbProp</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">vValue</span><span class="p">.</span><span class="n">vt</span> <span class="o">=</span> <span class="n">VT_I4</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">dbProp</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">vValue</span><span class="p">.</span><span class="n">intVal</span> <span class="o">=</span> <span class="n">DBPROPVAL_UP_CHANGE</span> <span class="o">|</span> <span class="n">DBPROPVAL_UP_DELETE</span> <span class="o">|</span> <span class="n">DBPROPVAL_UP_INSERT</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="c1">//设置SQL语句
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="n">HRESULT</span> <span class="n">hRes</span> <span class="o">=</span> <span class="n">pIOpenRowset</span><span class="o">-&gt;</span><span class="n">QueryInterface</span><span class="p">(</span><span class="n">IID_IDBCreateCommand</span><span class="p">,</span> <span class="p">(</span><span class="kt">void</span><span class="o">**</span><span class="p">)</span><span class="o">&amp;</span><span class="n">pIDBCreateCommand</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">COM_SUCCESS</span><span class="p">(</span><span class="n">hRes</span><span class="p">,</span> <span class="n">_T</span><span class="p">(</span><span class="s">&#34;查询接口IDBCreateCommand失败，错误码:%08x</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">),</span> <span class="n">hRes</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">hRes</span> <span class="o">=</span> <span class="n">pIDBCreateCommand</span><span class="o">-&gt;</span><span class="n">CreateCommand</span><span class="p">(</span><span class="nb">NULL</span> <span class="p">,</span> <span class="n">IID_ICommandText</span><span class="p">,</span> <span class="p">(</span><span class="n">IUnknown</span><span class="o">**</span><span class="p">)</span><span class="o">&amp;</span><span class="n">pICommandText</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">COM_SUCCESS</span><span class="p">(</span><span class="n">hRes</span><span class="p">,</span> <span class="n">_T</span><span class="p">(</span><span class="s">&#34;创建接口ICommandText失败,错误码:%08x&#34;</span><span class="p">),</span> <span class="n">hRes</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">hRes</span> <span class="o">=</span> <span class="n">pICommandText</span><span class="o">-&gt;</span><span class="n">SetCommandText</span><span class="p">(</span><span class="n">DBGUID_DEFAULT</span><span class="p">,</span> <span class="n">lpSQL</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">COM_SUCCESS</span><span class="p">(</span><span class="n">hRes</span><span class="p">,</span> <span class="n">_T</span><span class="p">(</span><span class="s">&#34;设置SQL语句失败,错误码为:%08x</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">),</span> <span class="n">hRes</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="c1">//设置属性
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="n">hRes</span> <span class="o">=</span> <span class="n">pICommandText</span><span class="o">-&gt;</span><span class="n">QueryInterface</span><span class="p">(</span><span class="n">IID_ICommandProperties</span><span class="p">,</span> <span class="p">(</span><span class="kt">void</span><span class="o">**</span><span class="p">)</span><span class="o">&amp;</span><span class="n">pICommandProperties</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">COM_SUCCESS</span><span class="p">(</span><span class="n">hRes</span><span class="p">,</span> <span class="n">_T</span><span class="p">(</span><span class="s">&#34;查询接口ICommandProperties接口失败,错误码:%08x</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">),</span> <span class="n">hRes</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="c1">//执行SQL语句
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="n">hRes</span> <span class="o">=</span> <span class="n">pICommandText</span><span class="o">-&gt;</span><span class="n">Execute</span><span class="p">(</span><span class="nb">NULL</span><span class="p">,</span> <span class="n">IID_IMultipleResults</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">,</span> <span class="p">(</span><span class="n">IUnknown</span><span class="o">**</span><span class="p">)</span><span class="o">&amp;</span><span class="n">pIMultipleResults</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">COM_SUCCESS</span><span class="p">(</span><span class="n">hRes</span><span class="p">,</span> <span class="n">_T</span><span class="p">(</span><span class="s">&#34;执行SQL语句失败,错误码:%08x</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">),</span> <span class="n">hRes</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="n">bRet</span> <span class="o">=</span> <span class="n">TRUE</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="nl">__CLEAR_UP</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">    <span class="n">SAFE_RELSEASE</span><span class="p">(</span><span class="n">pIDBCreateCommand</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">SAFE_RELSEASE</span><span class="p">(</span><span class="n">pICommandText</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">SAFE_RELSEASE</span><span class="p">(</span><span class="n">pICommandProperties</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="n">bRet</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kt">int</span> <span class="nf">_tmain</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="n">TCHAR</span> <span class="o">*</span><span class="n">argv</span><span class="p">[])</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">CoInitialize</span><span class="p">(</span><span class="nb">NULL</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">COM_DECLARE_BUFFER</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">    <span class="n">COM_DECLARE_INTERFACE</span><span class="p">(</span><span class="n">IOpenRowset</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">COM_DECLARE_INTERFACE</span><span class="p">(</span><span class="n">IMultipleResults</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">COM_DECLARE_INTERFACE</span><span class="p">(</span><span class="n">IRowset</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="n">LPOLESTR</span> <span class="n">pSQL</span> <span class="o">=</span> <span class="n">OLESTR</span><span class="p">(</span><span class="s">&#34;Select * From aa26 Where Left(aac031,2) = &#39;11&#39;;\
+</span></span></span><span class="line"><span class="cl"><span class="s">                           Select * From aa26 Where Left(aac031,2) = &#39;32&#39;;\
+</span></span></span><span class="line"><span class="cl"><span class="s">                           Select * From aa26 Where Left(aac031,2) = &#39;21&#39;;&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">CreateSession</span><span class="p">(</span><span class="n">pIOpenRowset</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="k">goto</span> <span class="n">__EXIT</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">SupportMultipleRowsets</span><span class="p">(</span><span class="n">pIOpenRowset</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="k">goto</span> <span class="n">__EXIT</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">ExecSQL</span><span class="p">(</span><span class="n">pSQL</span><span class="p">,</span> <span class="n">pIOpenRowset</span><span class="p">,</span> <span class="n">pIMultipleResults</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="k">goto</span> <span class="n">__EXIT</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="c1">//循环取结果集
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="k">while</span> <span class="p">(</span><span class="n">TRUE</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">HRESULT</span> <span class="n">hr</span> <span class="o">=</span> <span class="n">pIMultipleResults</span><span class="o">-&gt;</span><span class="n">GetResult</span><span class="p">(</span><span class="nb">NULL</span><span class="p">,</span> <span class="n">DBRESULTFLAG_DEFAULT</span><span class="p">,</span> <span class="n">IID_IRowset</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">,</span> <span class="p">(</span><span class="n">IUnknown</span><span class="o">**</span><span class="p">)</span><span class="o">&amp;</span><span class="n">pIRowset</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="k">if</span> <span class="p">(</span><span class="n">hr</span> <span class="o">!=</span> <span class="n">S_OK</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="p">{</span>
+</span></span><span class="line"><span class="cl">            <span class="k">break</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="p">}</span>
+</span></span><span class="line"><span class="cl">        <span class="c1">//后面的代码就是针对每个结果集来进行列的绑定与数据输出，在这就不列举出来了
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="nl">__CLEAR_UP</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">        <span class="n">CoTaskMemFree</span><span class="p">(</span><span class="n">pdbColumn</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="n">CoTaskMemFree</span><span class="p">(</span><span class="n">pColumsName</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="n">FREE</span><span class="p">(</span><span class="n">pDBBinding</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="n">FREE</span><span class="p">(</span><span class="n">pData</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="n">pIAccessor</span><span class="o">-&gt;</span><span class="n">ReleaseAccessor</span><span class="p">(</span><span class="n">hAccessor</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="n">SAFE_RELSEASE</span><span class="p">(</span><span class="n">pIColumnsInfo</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="n">SAFE_RELSEASE</span><span class="p">(</span><span class="n">pIAccessor</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="n">SAFE_RELSEASE</span><span class="p">(</span><span class="n">pIRowset</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">        <span class="n">_tsystem</span><span class="p">(</span><span class="n">_T</span><span class="p">(</span><span class="s">&#34;PAUSE&#34;</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="nl">__EXIT</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">    <span class="n">SAFE_RELSEASE</span><span class="p">(</span><span class="n">pIOpenRowset</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">SAFE_RELSEASE</span><span class="p">(</span><span class="n">pIMultipleResults</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="n">CoUninitialize</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p>最后贴出例子完整代码的链接:
+[源代码查看](<a href="https://gitee.com/masimaro/codes/vypocjnkabdu6wz8gfh0m36#" target="_blank" rel="noopener noreffer ">https://gitee.com/masimaro/codes/vypocjnkabdu6wz8gfh0m36#</a> MultipleResults)</p>
+<!-- raw HTML omitted -->
+</div><div class="post-footer" id="post-footer">
+    <div class="post-info">
+        <div class="post-info-line">
+            <div class="post-info-mod">
+                <span>Updated on 2018-03-16</span>
+            </div></div>
+        <div class="post-info-line">
+            <div class="post-info-md"></div>
+            <div class="post-info-share">
+                <span><a href="javascript:void(0);" title="Share on Twitter" data-sharer="twitter" data-url="http://HaiLateBoy.github.io/posts/oledb-and-ado-6/" data-title="多结果集IMultipleResult接口" data-hashtags="OLEDB,数据库编程,VC&#43;&#43;,数据库"><i class="fab fa-twitter fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Facebook" data-sharer="facebook" data-url="http://HaiLateBoy.github.io/posts/oledb-and-ado-6/" data-hashtag="OLEDB"><i class="fab fa-facebook-square fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Hacker News" data-sharer="hackernews" data-url="http://HaiLateBoy.github.io/posts/oledb-and-ado-6/" data-title="多结果集IMultipleResult接口"><i class="fab fa-hacker-news fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Line" data-sharer="line" data-url="http://HaiLateBoy.github.io/posts/oledb-and-ado-6/" data-title="多结果集IMultipleResult接口"><i data-svg-src="https://cdn.jsdelivr.net/npm/simple-icons@7.3.0/icons/line.svg" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on 微博" data-sharer="weibo" data-url="http://HaiLateBoy.github.io/posts/oledb-and-ado-6/" data-title="多结果集IMultipleResult接口"><i class="fab fa-weibo fa-fw" aria-hidden="true"></i></a></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="post-info-more">
+        <section class="post-tags"><i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/oledb/">OLEDB</a>,&nbsp;<a href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93%E7%BC%96%E7%A8%8B/">数据库编程</a>,&nbsp;<a href="/tags/vc&#43;&#43;/">VC&#43;&#43;</a>,&nbsp;<a href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93/">数据库</a></section>
+        <section>
+            <span><a href="javascript:void(0);" onclick="window.history.back();">Back</a></span>&nbsp;|&nbsp;<span><a href="/">Home</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav"><a href="/posts/phy-use/" class="prev" rel="prev" title="使用pyh生成HTML文档"><i class="fas fa-angle-left fa-fw" aria-hidden="true"></i>使用pyh生成HTML文档</a>
+            <a href="/posts/oledb-and-ado-7/" class="next" rel="next" title="OLEDB 参数化查询">OLEDB 参数化查询<i class="fas fa-angle-right fa-fw" aria-hidden="true"></i></a></div>
+</div>
+</article></div>
+            </main><footer class="footer">
+        <div class="footer-container"><div class="footer-line">Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener noreffer" title="Hugo 0.121.2">Hugo</a> | Theme - <a href="https://github.com/dillonzq/LoveIt" target="_blank" rel="noopener noreffer" title="LoveIt 0.2.11"><i class="far fa-kiss-wink-heart fa-fw" aria-hidden="true"></i> LoveIt</a>
+                </div><div class="footer-line" itemscope itemtype="http://schema.org/CreativeWork"><i class="far fa-copyright fa-fw" aria-hidden="true"></i><span itemprop="copyrightYear">2022 - 2024</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="https://www.masimaro.xyz" target="_blank">Masimaro</a></span></div>
+        </div>
+    </footer></div>
+
+        <div id="fixed-buttons"><a href="#" id="back-to-top" class="fixed-button" title="Back to Top">
+                <i class="fas fa-arrow-up fa-fw" aria-hidden="true"></i>
+            </a><a href="#" id="view-comments" class="fixed-button" title="View Comments">
+                <i class="fas fa-comment fa-fw" aria-hidden="true"></i>
+            </a>
+        </div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.css"><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/autocomplete.js@0.38.1/dist/autocomplete.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lunr@2.3.9/lunr.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lazysizes@5.3.2/lazysizes.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/clipboard@2.0.11/dist/clipboard.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/sharer.js@0.5.1/sharer.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/auto-render.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/copy-tex.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/mhchem.min.js"></script><script type="text/javascript">window.config={"code":{"copyTitle":"Copy to clipboard","maxShownLines":50},"comment":{},"math":{"delimiters":[{"display":true,"left":"$$","right":"$$"},{"display":true,"left":"\\[","right":"\\]"},{"display":true,"left":"\\begin{equation}","right":"\\end{equation}"},{"display":true,"left":"\\begin{equation*}","right":"\\end{equation*}"},{"display":true,"left":"\\begin{align}","right":"\\end{align}"},{"display":true,"left":"\\begin{align*}","right":"\\end{align*}"},{"display":true,"left":"\\begin{alignat}","right":"\\end{alignat}"},{"display":true,"left":"\\begin{alignat*}","right":"\\end{alignat*}"},{"display":true,"left":"\\begin{gather}","right":"\\end{gather}"},{"display":true,"left":"\\begin{CD}","right":"\\end{CD}"},{"display":false,"left":"$","right":"$"},{"display":false,"left":"\\(","right":"\\)"}],"strict":false},"search":{"highlightTag":"em","maxResultLength":10,"noResultsFound":"No results found","snippetLength":50}};</script><script type="text/javascript" src="/js/theme.min.js"></script></body>
+</html>

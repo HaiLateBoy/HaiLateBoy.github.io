@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="robots" content="noodp" />
+        <title>从零开始配置vim(29)——DAP 配置 - Masimaro&#39;s blog</title><meta name="Description" content="这是我用于记录日常和学习的小站"><meta property="og:title" content="从零开始配置vim(29)——DAP 配置" />
+<meta property="og:description" content="首先给大家说一声抱歉，前段时间一直在忙换工作的事，包括但不限于交接、背面试题准备面试。好在最终找到了工作，也顺利入职了。期间也有朋友在催更，" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://HaiLateBoy.github.io/posts/vim-config29/" /><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2022-11-18T11:43:22+08:00" />
+<meta property="article:modified_time" content="2022-11-18T11:43:22+08:00" /><meta property="og:site_name" content="Masimaro&#39;s blog" />
+
+<meta name="twitter:card" content="summary"/><meta name="twitter:title" content="从零开始配置vim(29)——DAP 配置"/>
+<meta name="twitter:description" content="首先给大家说一声抱歉，前段时间一直在忙换工作的事，包括但不限于交接、背面试题准备面试。好在最终找到了工作，也顺利入职了。期间也有朋友在催更，"/>
+<meta name="application-name" content="My cool site">
+<meta name="apple-mobile-web-app-title" content="My cool site"><meta name="theme-color" content="#ffffff"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="manifest" href="/site.webmanifest"><link rel="canonical" href="http://HaiLateBoy.github.io/posts/vim-config29/" /><link rel="prev" href="http://HaiLateBoy.github.io/posts/vim-config28/" /><link rel="next" href="http://HaiLateBoy.github.io/posts/work/" /><link rel="stylesheet" href="/css/style.min.css"><link rel="preload" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css"></noscript><link rel="preload" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css"></noscript><script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "BlogPosting",
+        "headline": "从零开始配置vim(29)——DAP 配置",
+        "inLanguage": "zh-CN",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "http:\/\/HaiLateBoy.github.io\/posts\/vim-config29\/"
+        },"genre": "posts","keywords": "vim, 编辑工具, 文本处理, lua, 编辑器","wordcount":  1905 ,
+        "url": "http:\/\/HaiLateBoy.github.io\/posts\/vim-config29\/","datePublished": "2022-11-18T11:43:22+08:00","dateModified": "2022-11-18T11:43:22+08:00","publisher": {
+            "@type": "Organization",
+            "name": ""},"author": {
+                "@type": "Person",
+                "name": "Masimaro"
+            },"description": ""
+    }
+    </script></head>
+    <body data-header-desktop="fixed" data-header-mobile="auto"><script type="text/javascript">(window.localStorage && localStorage.getItem('theme') ? localStorage.getItem('theme') === 'dark' : ('auto' === 'auto' ? window.matchMedia('(prefers-color-scheme: dark)').matches : 'auto' === 'dark')) && document.body.setAttribute('theme', 'dark');</script>
+
+        <div id="mask"></div><div class="wrapper"><header class="desktop" id="header-desktop">
+    <div class="header-wrapper">
+        <div class="header-title">
+            <a href="/" title="Masimaro&#39;s blog">My cool site</a>
+        </div>
+        <div class="menu">
+            <div class="menu-inner"><a class="menu-item" href="/posts/" title="文章列表"> 文章 </a><a class="menu-item" href="/tags/" title="标签"> 标签 </a><a class="menu-item" href="/categories/" title="分类"> 分类 </a><a class="menu-item" href="/about" title="关于本站"> 关于 </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-desktop">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-desktop" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-desktop" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-desktop">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </span><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                    <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+                </a></div>
+        </div>
+    </div>
+</header><header class="mobile" id="header-mobile">
+    <div class="header-container">
+        <div class="header-wrapper">
+            <div class="header-title">
+                <a href="/" title="Masimaro&#39;s blog">My cool site</a>
+            </div>
+            <div class="menu-toggle" id="menu-toggle-mobile">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+        <div class="menu" id="menu-mobile"><div class="search-wrapper">
+                    <div class="search mobile" id="search-mobile">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-mobile">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-mobile" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-mobile" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-mobile">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </div>
+                    <a href="javascript:void(0);" class="search-cancel" id="search-cancel-mobile">
+                        Cancel
+                    </a>
+                </div><a class="menu-item" href="/posts/" title="文章列表">文章</a><a class="menu-item" href="/tags/" title="标签">标签</a><a class="menu-item" href="/categories/" title="分类">分类</a><a class="menu-item" href="/about" title="关于本站">关于</a><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+            </a></div>
+    </div>
+</header><div class="search-dropdown desktop">
+        <div id="search-dropdown-desktop"></div>
+    </div>
+    <div class="search-dropdown mobile">
+        <div id="search-dropdown-mobile"></div>
+    </div><main class="main">
+                <div class="container"><div class="toc" id="toc-auto">
+            <h2 class="toc-title">Contents</h2>
+            <div class="toc-content" id="toc-content-auto"></div>
+        </div><article class="page single"><h1 class="single-title animate__animated animate__flipInX">从零开始配置vim(29)——DAP 配置</h1><div class="post-meta">
+            <div class="post-meta-line"><span class="post-author"><a href="https://www.masimaro.xyz" title="Author" target="_blank" rel="noopener noreffer author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Masimaro</a></span>&nbsp;<span class="post-category">included in <a href="/categories/vim-%E9%85%8D%E7%BD%AE/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>vim 配置</a></span></div>
+            <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw" aria-hidden="true"></i>&nbsp;<time datetime="2022-11-18">2022-11-18</time>&nbsp;<i class="fas fa-pencil-alt fa-fw" aria-hidden="true"></i>&nbsp;1905 words&nbsp;
+                <i class="far fa-clock fa-fw" aria-hidden="true"></i>&nbsp;4 minutes&nbsp;</div>
+        </div><div class="details toc" id="toc-static"  data-kept="true">
+                <div class="details-summary toc-title">
+                    <span>Contents</span>
+                    <span><i class="details-icon fas fa-angle-right" aria-hidden="true"></i></span>
+                </div>
+                <div class="details-content toc-content" id="toc-content-static"><nav id="TableOfContents">
+  <ul>
+    <li><a href="#优化界面">优化界面</a></li>
+    <li><a href="#配置c基础调试环境">配置c++基础调试环境</a></li>
+  </ul>
+</nav></div>
+            </div><div class="content" id="content"><p>首先给大家说一声抱歉，前段时间一直在忙换工作的事，包括但不限于交接、背面试题准备面试。好在最终找到了工作，也顺利入职了。期间也有朋友在催更，在这里我对关注本系列的朋友表示感谢。多的就不说了，我们正式进入<code>vim</code> 的配置吧</p>
+<p>上一节通过配置 <code>python</code> 的调试环境，我们大概了解了配置 <code>dap</code> 的基本步骤。首先需要一个 <code>dap</code> 的客户端负责在编辑器上显示各种调试信息，并且与用户进行交互。然后需要一个服务端，与客户端通信并完成调试的实际步骤。然后需要配置两个东西， <code>dap.adapters</code> 用来配置如何启动调试器，<code>dap.configurations</code>用来配置如何将当前项目加载到调试器上。</p>
+<p>本篇我们进一步配置 <code>dap</code>。让它变得更好用，并且介绍编译型语言(<code>C/C++</code>)调试的配置。</p>
+<h2 id="优化界面">优化界面</h2>
+<p>回顾一下上一篇中在演示图片里面看到的效果。默认界面在断点位置以 <code>B</code> 来标识，当前运行的代码以 <code>-&gt;</code> 来标识。看起来不那么的直观，我们先对它进行优化，我们采用 <code>Visual Code</code> 的调试图标来进行标识</p>
+<p>我们采用以下代码进行配置</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-lua" data-lang="lua"><span class="line"><span class="cl"><span class="kd">local</span> <span class="n">dap_breakpoint_color</span> <span class="o">=</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">breakpoint</span> <span class="o">=</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">ctermbg</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">        <span class="n">fg</span><span class="o">=</span><span class="s1">&#39;#993939&#39;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">        <span class="n">bg</span><span class="o">=</span><span class="s1">&#39;#31353f&#39;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="p">},</span>
+</span></span><span class="line"><span class="cl">    <span class="n">logpoing</span> <span class="o">=</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">ctermbg</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">        <span class="n">fg</span><span class="o">=</span><span class="s1">&#39;#61afef&#39;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">        <span class="n">bg</span><span class="o">=</span><span class="s1">&#39;#31353f&#39;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="p">},</span>
+</span></span><span class="line"><span class="cl">    <span class="n">stopped</span> <span class="o">=</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">ctermbg</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">        <span class="n">fg</span><span class="o">=</span><span class="s1">&#39;#98c379&#39;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">        <span class="n">bg</span><span class="o">=</span><span class="s1">&#39;#31353f&#39;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">},</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">vim.api</span><span class="p">.</span><span class="n">nvim_set_hl</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;DapBreakpoint&#39;</span><span class="p">,</span> <span class="n">dap_breakpoint_color.breakpoint</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">vim.api</span><span class="p">.</span><span class="n">nvim_set_hl</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;DapLogPoint&#39;</span><span class="p">,</span> <span class="n">dap_breakpoint_color.logpoing</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">vim.api</span><span class="p">.</span><span class="n">nvim_set_hl</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;DapStopped&#39;</span><span class="p">,</span> <span class="n">dap_breakpoint_color.stopped</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kd">local</span> <span class="n">dap_breakpoint</span> <span class="o">=</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">error</span> <span class="o">=</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">text</span> <span class="o">=</span> <span class="s2">&#34;&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">        <span class="n">texthl</span> <span class="o">=</span> <span class="s2">&#34;DapBreakpoint&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">        <span class="n">linehl</span> <span class="o">=</span> <span class="s2">&#34;DapBreakpoint&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">        <span class="n">numhl</span> <span class="o">=</span> <span class="s2">&#34;DapBreakpoint&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="p">},</span>
+</span></span><span class="line"><span class="cl">    <span class="n">condition</span> <span class="o">=</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">text</span> <span class="o">=</span> <span class="s1">&#39;ﳁ&#39;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">        <span class="n">texthl</span> <span class="o">=</span> <span class="s1">&#39;DapBreakpoint&#39;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">        <span class="n">linehl</span> <span class="o">=</span> <span class="s1">&#39;DapBreakpoint&#39;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">        <span class="n">numhl</span> <span class="o">=</span> <span class="s1">&#39;DapBreakpoint&#39;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="p">},</span>
+</span></span><span class="line"><span class="cl">    <span class="n">rejected</span> <span class="o">=</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">text</span> <span class="o">=</span> <span class="s2">&#34;&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">        <span class="n">texthl</span> <span class="o">=</span> <span class="s2">&#34;DapBreakpint&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">        <span class="n">linehl</span> <span class="o">=</span> <span class="s2">&#34;DapBreakpoint&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">        <span class="n">numhl</span> <span class="o">=</span> <span class="s2">&#34;DapBreakpoint&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="p">},</span>
+</span></span><span class="line"><span class="cl">    <span class="n">logpoint</span> <span class="o">=</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">text</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">        <span class="n">texthl</span> <span class="o">=</span> <span class="s1">&#39;DapLogPoint&#39;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">        <span class="n">linehl</span> <span class="o">=</span> <span class="s1">&#39;DapLogPoint&#39;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">        <span class="n">numhl</span> <span class="o">=</span> <span class="s1">&#39;DapLogPoint&#39;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="p">},</span>
+</span></span><span class="line"><span class="cl">    <span class="n">stopped</span> <span class="o">=</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">text</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">        <span class="n">texthl</span> <span class="o">=</span> <span class="s1">&#39;DapStopped&#39;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">        <span class="n">linehl</span> <span class="o">=</span> <span class="s1">&#39;DapStopped&#39;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">        <span class="n">numhl</span> <span class="o">=</span> <span class="s1">&#39;DapStopped&#39;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="p">},</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">vim.fn</span><span class="p">.</span><span class="n">sign_define</span><span class="p">(</span><span class="s1">&#39;DapBreakpoint&#39;</span><span class="p">,</span> <span class="n">dap_breakpoint.error</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">vim.fn</span><span class="p">.</span><span class="n">sign_define</span><span class="p">(</span><span class="s1">&#39;DapBreakpointCondition&#39;</span><span class="p">,</span> <span class="n">dap_breakpoint.condition</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">vim.fn</span><span class="p">.</span><span class="n">sign_define</span><span class="p">(</span><span class="s1">&#39;DapBreakpointRejected&#39;</span><span class="p">,</span> <span class="n">dap_breakpoint.rejected</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">vim.fn</span><span class="p">.</span><span class="n">sign_define</span><span class="p">(</span><span class="s1">&#39;DapLogPoint&#39;</span><span class="p">,</span> <span class="n">dap_breakpoint.logpoint</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">vim.fn</span><span class="p">.</span><span class="n">sign_define</span><span class="p">(</span><span class="s1">&#39;DapStopped&#39;</span><span class="p">,</span> <span class="n">dap_breakpoint.stopped</span><span class="p">)</span>
+</span></span></code></pre></div><p>上面的代码主要配置了显示的颜色和图标。最终调试的效果如下图所示
+<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://img-blog.csdnimg.cn/4685a01a2a184e3e84e4cce3b065907c.png#pic_center"
+        data-srcset="https://img-blog.csdnimg.cn/4685a01a2a184e3e84e4cce3b065907c.png#pic_center, https://img-blog.csdnimg.cn/4685a01a2a184e3e84e4cce3b065907c.png#pic_center 1.5x, https://img-blog.csdnimg.cn/4685a01a2a184e3e84e4cce3b065907c.png#pic_center 2x"
+        data-sizes="auto"
+        alt="https://img-blog.csdnimg.cn/4685a01a2a184e3e84e4cce3b065907c.png#pic_center"
+        title="在这里插入图片描述" />
+然后我们需要提供一个可用的界面用来显示调试过程中的各种信息，包括变量值和调用栈。完成这个工作的是插件 <code>nvim-dap-ui</code> 。我们使用如下的代码进行安装</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-lua" data-lang="lua"><span class="line"><span class="cl"><span class="n">use</span> <span class="p">{</span> <span class="s2">&#34;rcarriga/nvim-dap-ui&#34;</span><span class="p">,</span> <span class="n">requires</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&#34;mfussenegger/nvim-dap&#34;</span><span class="p">}</span> <span class="p">}</span>
+</span></span></code></pre></div><p>这个插件里面包装了很多调试相关的窗口，例如变量监控、调用栈等等。我们可以对他进行配置，让这些窗口元素出现在我们希望它出现的位置。为了加载这个插件我们还是按照之前的惯例，为它准备一个单独的配置文件，并且加载它。</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-lua" data-lang="lua"><span class="line"><span class="cl"><span class="kd">local</span> <span class="n">dapui</span> <span class="o">=</span> <span class="n">require</span><span class="p">(</span><span class="s2">&#34;dapui&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">dapui.setup</span><span class="p">({})</span>
+</span></span></code></pre></div><p>我们可以使用该插件中的函数 <code>toggle()</code> 开打开或者关闭这些调试窗口。最终的效果就像这样
+<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://img-blog.csdnimg.cn/4c2a2dea6d524a4b9fc81bfd277e4ae9.gif#pic_center"
+        data-srcset="https://img-blog.csdnimg.cn/4c2a2dea6d524a4b9fc81bfd277e4ae9.gif#pic_center, https://img-blog.csdnimg.cn/4c2a2dea6d524a4b9fc81bfd277e4ae9.gif#pic_center 1.5x, https://img-blog.csdnimg.cn/4c2a2dea6d524a4b9fc81bfd277e4ae9.gif#pic_center 2x"
+        data-sizes="auto"
+        alt="https://img-blog.csdnimg.cn/4c2a2dea6d524a4b9fc81bfd277e4ae9.gif#pic_center"
+        title="在这里插入图片描述" />
+每次都输入这个函数来打开和关闭调试窗口比较麻烦，因此我们这里可以使用以下代码来实现自动加载和关闭</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-lua" data-lang="lua"><span class="line"><span class="cl"><span class="kd">local</span> <span class="n">dapui</span> <span class="o">=</span> <span class="n">require</span><span class="p">(</span><span class="s2">&#34;dapui&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">dapui.setup</span><span class="p">({})</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kd">local</span> <span class="n">dap</span> <span class="o">=</span> <span class="n">require</span><span class="p">(</span><span class="s2">&#34;dap&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">dap.listeners</span><span class="p">.</span><span class="n">after.event_initialized</span><span class="p">[</span><span class="s2">&#34;dapui_config&#34;</span><span class="p">]</span> <span class="o">=</span> <span class="kr">function</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">    <span class="n">dapui.open</span><span class="p">({})</span>
+</span></span><span class="line"><span class="cl"><span class="kr">end</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">dap.listeners</span><span class="p">.</span><span class="n">before.event_terminated</span><span class="p">[</span><span class="s2">&#34;dapui_config&#34;</span><span class="p">]</span> <span class="o">=</span> <span class="kr">function</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">    <span class="n">dapui.close</span><span class="p">({})</span>
+</span></span><span class="line"><span class="cl"><span class="kr">end</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">dap.listeners</span><span class="p">.</span><span class="n">before.event_exited</span><span class="p">[</span><span class="s2">&#34;dapui_config&#34;</span><span class="p">]</span> <span class="o">=</span> <span class="kr">function</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">    <span class="n">dapui.close</span><span class="p">({})</span>
+</span></span><span class="line"><span class="cl"><span class="kr">end</span>
+</span></span></code></pre></div><p>这段代码在 <code>dap</code> 的事件中注册了几个回调函数，当对应的事件发生时会调用对应的函数，我们在 <code>dap</code> 的调试启动时打开调试窗口，在结束时关闭调试窗口
+<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://img-blog.csdnimg.cn/1ce04e8869ca490ab72c19bca861f256.gif#pic_center"
+        data-srcset="https://img-blog.csdnimg.cn/1ce04e8869ca490ab72c19bca861f256.gif#pic_center, https://img-blog.csdnimg.cn/1ce04e8869ca490ab72c19bca861f256.gif#pic_center 1.5x, https://img-blog.csdnimg.cn/1ce04e8869ca490ab72c19bca861f256.gif#pic_center 2x"
+        data-sizes="auto"
+        alt="https://img-blog.csdnimg.cn/1ce04e8869ca490ab72c19bca861f256.gif#pic_center"
+        title="在这里插入图片描述" />
+最后关于界面方面的优化再来推荐一个插件——<code>nvim-dap-virtual-text</code> 它的作用是在调试过程中，在变量附近事实显示变量的值。我们可以在 <code>dap-ui</code> 的配置文件中对他进行配置</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-lua" data-lang="lua"><span class="line"><span class="cl"><span class="n">require</span><span class="p">(</span><span class="s2">&#34;nvim-dap-virtual-text&#34;</span><span class="p">).</span><span class="n">setup</span><span class="p">({</span>
+</span></span><span class="line"><span class="cl">    <span class="n">enabled</span> <span class="o">=</span> <span class="kc">true</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">enable_commands</span> <span class="o">=</span> <span class="kc">true</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">highlight_changed_variables</span> <span class="o">=</span> <span class="kc">true</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">highlight_new_as_changed</span> <span class="o">=</span> <span class="kc">false</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">show_stop_reason</span> <span class="o">=</span> <span class="kc">true</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">commented</span> <span class="o">=</span> <span class="kc">false</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">only_first_definition</span> <span class="o">=</span> <span class="kc">true</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">all_references</span> <span class="o">=</span> <span class="kc">false</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">filter_references_pattern</span> <span class="o">=</span> <span class="s1">&#39;&lt;module&#39;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">virt_text_pos</span> <span class="o">=</span> <span class="s1">&#39;eol&#39;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">all_frames</span> <span class="o">=</span> <span class="kc">false</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">virt_lines</span> <span class="o">=</span> <span class="kc">false</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">virt_text_win_col</span> <span class="o">=</span> <span class="kc">nil</span>
+</span></span><span class="line"><span class="cl"><span class="p">})</span>
+</span></span></code></pre></div><p>上述的配置是官方给出的，我原封不动的复制过来了。它的效果如下图所示：
+<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://img-blog.csdnimg.cn/c62eceef8c6447208a15dbd4fefbf3b1.gif#pic_center"
+        data-srcset="https://img-blog.csdnimg.cn/c62eceef8c6447208a15dbd4fefbf3b1.gif#pic_center, https://img-blog.csdnimg.cn/c62eceef8c6447208a15dbd4fefbf3b1.gif#pic_center 1.5x, https://img-blog.csdnimg.cn/c62eceef8c6447208a15dbd4fefbf3b1.gif#pic_center 2x"
+        data-sizes="auto"
+        alt="https://img-blog.csdnimg.cn/c62eceef8c6447208a15dbd4fefbf3b1.gif#pic_center"
+        title="在这里插入图片描述" /></p>
+<h2 id="配置c基础调试环境">配置c++基础调试环境</h2>
+<p>终于到了本文最重要的环节了，就是配置 <code>c/c++</code> 的调试环境，上一篇我们讲解了 <code>Python</code> 的配置，它代表了脚本类解释型语言的调试配置，<code>C/C++</code> 代表了编译型语言的调试配置。</p>
+<p>针对 <code>C/C++</code> 的调试我们选用 <code>cpptools</code> 作为 <code>dap</code> 的服务端。首先通过 <code>MasonInstall cpptools</code> 来下载安装它，也可以通过 <code>:Mason</code> 命令在图形化的界面上进行安装。</p>
+<p>然后我们还是按照之前的顺序来对他进行配置，首先配置它的加载方式</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-lua" data-lang="lua"><span class="line"><span class="cl"><span class="kd">local</span> <span class="n">dap</span> <span class="o">=</span> <span class="n">require</span><span class="p">(</span><span class="s2">&#34;dap&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">dap.adapters</span><span class="p">.</span><span class="n">cppdbg</span> <span class="o">=</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">id</span> <span class="o">=</span> <span class="s2">&#34;cppdbg&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">type</span> <span class="o">=</span> <span class="s1">&#39;executable&#39;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">command</span> <span class="o">=</span> <span class="s2">&#34;~/.local/share/nvim/mason/bin/OpenDebugAD7&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p>这里我们设置它以 <code>executable</code> 的方式启动(在客户端调试时启动)。然后指定可执行程序的路径，如果这里报找不到 <code>OpenDebugAD7</code> 这种错误，可以将 <code>~</code> 改为 <code>/home/user</code> 这样的具体目录。</p>
+<p>然后我们配置一下客户端与服务器通信相关的内容</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-lua" data-lang="lua"><span class="line"><span class="cl"><span class="n">dap.configurations</span><span class="p">.</span><span class="n">cpp</span> <span class="o">=</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">name</span> <span class="o">=</span> <span class="s2">&#34;Launch file&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">        <span class="n">type</span> <span class="o">=</span> <span class="s2">&#34;cppdbg&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">        <span class="n">request</span> <span class="o">=</span> <span class="s2">&#34;launch&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">        <span class="n">program</span> <span class="o">=</span> <span class="kr">function</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">            <span class="kr">return</span> <span class="n">vim.fn</span><span class="p">.</span><span class="n">input</span><span class="p">(</span><span class="s2">&#34;Path to executable: &#34;</span><span class="p">,</span> <span class="n">vim.fn</span><span class="p">.</span><span class="n">getcwd</span><span class="p">()</span> <span class="o">..</span> <span class="s2">&#34;/&#34;</span><span class="p">,</span> <span class="s2">&#34;file&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="kr">end</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">        <span class="n">cwd</span> <span class="o">=</span> <span class="s2">&#34;${workspaceFolder}&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">        <span class="n">stopAtEntry</span> <span class="o">=</span> <span class="kc">true</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="p">},</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="n">dap.configurations</span><span class="p">.</span><span class="n">c</span> <span class="o">=</span> <span class="n">dap.configurations</span><span class="p">.</span><span class="n">cpp</span>
+</span></span></code></pre></div><p>最后我们通过一个 <code>dap.configurations.c= dap.configurations.cpp</code> 让<code>c++</code>和 <code>c</code>使用同一个配置。因为 <code>C/C++</code> 是编译运行的，在调试的时候其实调试的是它生成的可执行程序，所以这里每次在调试的时候需要手工指定要调试的可执行程序。最后别忘了在 <code>ftplugin/cpp.lua</code> 中加载它</p>
+<p>另外需要注意，因为可执行程序运行时是不依赖源代码的，但是调试的时候想让调试器能够准确的知道当前在源码的位置并且能够显示当前变量的值，这个时候需要在可执行程序中打包符号表，对于<code>linux</code> 的 <code>C/C++</code> 程序来说，只需要在编译的时候给<code>gcc/g++</code> 传递 <code>-s</code> 参数即可。</p>
+<p>我们写一个简单的 C程序来进行实验</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;stdio.h&gt;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp"></span>
+</span></span><span class="line"><span class="cl"><span class="kt">int</span> <span class="nf">main</span> <span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span> <span class="o">*</span><span class="n">argv</span><span class="p">[])</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">printf</span><span class="p">(</span><span class="s">&#34;hello world</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="k">for</span> <span class="p">(</span><span class="n">size_t</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="mi">10</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">printf</span><span class="p">(</span><span class="s">&#34;i = %ld</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">,</span> <span class="n">i</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://img-blog.csdnimg.cn/3940174ecdd8436a9052132d120cf135.gif#pic_center"
+        data-srcset="https://img-blog.csdnimg.cn/3940174ecdd8436a9052132d120cf135.gif#pic_center, https://img-blog.csdnimg.cn/3940174ecdd8436a9052132d120cf135.gif#pic_center 1.5x, https://img-blog.csdnimg.cn/3940174ecdd8436a9052132d120cf135.gif#pic_center 2x"
+        data-sizes="auto"
+        alt="https://img-blog.csdnimg.cn/3940174ecdd8436a9052132d120cf135.gif#pic_center"
+        title="在这里插入图片描述" />
+<strong>注意: 这里我们使用的调试器仍然是gdb, cpptools 只是在上层进行了一层封装。因此这里能调试的前提是安装了gdb 调试器</strong></p>
+<p>到此我们将关于 <code>dap</code> 调试的部分都基本介绍完了。其实 <code>dap</code> 也并没有想象中那么难，目前从安装到配置使用，都有大量的插件来方便我们使用，而且官网上基本都有配置的介绍，没有特殊需求只需要将标准配置原样拷贝粘贴即可。下一篇我们将补充一些关于 <code>dap</code> 的其他内容，并介绍 <code>neovim + gdb</code> 的组合，敬请期待!</p>
+</div><div class="post-footer" id="post-footer">
+    <div class="post-info">
+        <div class="post-info-line">
+            <div class="post-info-mod">
+                <span>Updated on 2022-11-18</span>
+            </div></div>
+        <div class="post-info-line">
+            <div class="post-info-md"></div>
+            <div class="post-info-share">
+                <span><a href="javascript:void(0);" title="Share on Twitter" data-sharer="twitter" data-url="http://HaiLateBoy.github.io/posts/vim-config29/" data-title="从零开始配置vim(29)——DAP 配置" data-hashtags="vim,编辑工具,文本处理,lua,编辑器"><i class="fab fa-twitter fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Facebook" data-sharer="facebook" data-url="http://HaiLateBoy.github.io/posts/vim-config29/" data-hashtag="vim"><i class="fab fa-facebook-square fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Hacker News" data-sharer="hackernews" data-url="http://HaiLateBoy.github.io/posts/vim-config29/" data-title="从零开始配置vim(29)——DAP 配置"><i class="fab fa-hacker-news fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Line" data-sharer="line" data-url="http://HaiLateBoy.github.io/posts/vim-config29/" data-title="从零开始配置vim(29)——DAP 配置"><i data-svg-src="https://cdn.jsdelivr.net/npm/simple-icons@7.3.0/icons/line.svg" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on 微博" data-sharer="weibo" data-url="http://HaiLateBoy.github.io/posts/vim-config29/" data-title="从零开始配置vim(29)——DAP 配置"><i class="fab fa-weibo fa-fw" aria-hidden="true"></i></a></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="post-info-more">
+        <section class="post-tags"><i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/vim/">vim</a>,&nbsp;<a href="/tags/%E7%BC%96%E8%BE%91%E5%B7%A5%E5%85%B7/">编辑工具</a>,&nbsp;<a href="/tags/%E6%96%87%E6%9C%AC%E5%A4%84%E7%90%86/">文本处理</a>,&nbsp;<a href="/tags/lua/">lua</a>,&nbsp;<a href="/tags/%E7%BC%96%E8%BE%91%E5%99%A8/">编辑器</a></section>
+        <section>
+            <span><a href="javascript:void(0);" onclick="window.history.back();">Back</a></span>&nbsp;|&nbsp;<span><a href="/">Home</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav"><a href="/posts/vim-config28/" class="prev" rel="prev" title="从零开始配置vim(28)——代码的编译、运行与调试"><i class="fas fa-angle-left fa-fw" aria-hidden="true"></i>从零开始配置vim(28)——代码的编译、运行与调试</a>
+            <a href="/posts/work/" class="next" rel="next" title="换工作有感">换工作有感<i class="fas fa-angle-right fa-fw" aria-hidden="true"></i></a></div>
+</div>
+</article></div>
+            </main><footer class="footer">
+        <div class="footer-container"><div class="footer-line">Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener noreffer" title="Hugo 0.121.2">Hugo</a> | Theme - <a href="https://github.com/dillonzq/LoveIt" target="_blank" rel="noopener noreffer" title="LoveIt 0.2.11"><i class="far fa-kiss-wink-heart fa-fw" aria-hidden="true"></i> LoveIt</a>
+                </div><div class="footer-line" itemscope itemtype="http://schema.org/CreativeWork"><i class="far fa-copyright fa-fw" aria-hidden="true"></i><span itemprop="copyrightYear">2022 - 2024</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="https://www.masimaro.xyz" target="_blank">Masimaro</a></span></div>
+        </div>
+    </footer></div>
+
+        <div id="fixed-buttons"><a href="#" id="back-to-top" class="fixed-button" title="Back to Top">
+                <i class="fas fa-arrow-up fa-fw" aria-hidden="true"></i>
+            </a><a href="#" id="view-comments" class="fixed-button" title="View Comments">
+                <i class="fas fa-comment fa-fw" aria-hidden="true"></i>
+            </a>
+        </div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.css"><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/autocomplete.js@0.38.1/dist/autocomplete.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lunr@2.3.9/lunr.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lazysizes@5.3.2/lazysizes.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/clipboard@2.0.11/dist/clipboard.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/sharer.js@0.5.1/sharer.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/auto-render.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/copy-tex.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/mhchem.min.js"></script><script type="text/javascript">window.config={"code":{"copyTitle":"Copy to clipboard","maxShownLines":50},"comment":{},"math":{"delimiters":[{"display":true,"left":"$$","right":"$$"},{"display":true,"left":"\\[","right":"\\]"},{"display":true,"left":"\\begin{equation}","right":"\\end{equation}"},{"display":true,"left":"\\begin{equation*}","right":"\\end{equation*}"},{"display":true,"left":"\\begin{align}","right":"\\end{align}"},{"display":true,"left":"\\begin{align*}","right":"\\end{align*}"},{"display":true,"left":"\\begin{alignat}","right":"\\end{alignat}"},{"display":true,"left":"\\begin{alignat*}","right":"\\end{alignat*}"},{"display":true,"left":"\\begin{gather}","right":"\\end{gather}"},{"display":true,"left":"\\begin{CD}","right":"\\end{CD}"},{"display":false,"left":"$","right":"$"},{"display":false,"left":"\\(","right":"\\)"}],"strict":false},"search":{"highlightTag":"em","maxResultLength":10,"noResultsFound":"No results found","snippetLength":50}};</script><script type="text/javascript" src="/js/theme.min.js"></script></body>
+</html>

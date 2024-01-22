@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="robots" content="noodp" />
+        <title>从0开始自制解释器——实现简单的加法计算器 - Masimaro&#39;s blog</title><meta name="Description" content="这是我用于记录日常和学习的小站"><meta property="og:title" content="从0开始自制解释器——实现简单的加法计算器" />
+<meta property="og:description" content="为什么要学习编译器和解释器呢？文中的作者给出的答案有下面几个： 为了深入理解计算机是如何工作的：一个显而易见的道理就是，如果你不懂编译器和解释" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://HaiLateBoy.github.io/posts/make-parser02/" /><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2023-03-07T09:34:42+08:00" />
+<meta property="article:modified_time" content="2023-03-07T09:34:42+08:00" /><meta property="og:site_name" content="Masimaro&#39;s blog" />
+
+<meta name="twitter:card" content="summary"/><meta name="twitter:title" content="从0开始自制解释器——实现简单的加法计算器"/>
+<meta name="twitter:description" content="为什么要学习编译器和解释器呢？文中的作者给出的答案有下面几个： 为了深入理解计算机是如何工作的：一个显而易见的道理就是，如果你不懂编译器和解释"/>
+<meta name="application-name" content="My cool site">
+<meta name="apple-mobile-web-app-title" content="My cool site"><meta name="theme-color" content="#ffffff"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="manifest" href="/site.webmanifest"><link rel="canonical" href="http://HaiLateBoy.github.io/posts/make-parser02/" /><link rel="prev" href="http://HaiLateBoy.github.io/posts/make-parser01/" /><link rel="next" href="http://HaiLateBoy.github.io/posts/make-parser03/" /><link rel="stylesheet" href="/css/style.min.css"><link rel="preload" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css"></noscript><link rel="preload" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css"></noscript><script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "BlogPosting",
+        "headline": "从0开始自制解释器——实现简单的加法计算器",
+        "inLanguage": "zh-CN",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "http:\/\/HaiLateBoy.github.io\/posts\/make-parser02\/"
+        },"genre": "posts","keywords": "编译原理, 编译器, c语言","wordcount":  1515 ,
+        "url": "http:\/\/HaiLateBoy.github.io\/posts\/make-parser02\/","datePublished": "2023-03-07T09:34:42+08:00","dateModified": "2023-03-07T09:34:42+08:00","publisher": {
+            "@type": "Organization",
+            "name": ""},"author": {
+                "@type": "Person",
+                "name": "Masimaro"
+            },"description": ""
+    }
+    </script></head>
+    <body data-header-desktop="fixed" data-header-mobile="auto"><script type="text/javascript">(window.localStorage && localStorage.getItem('theme') ? localStorage.getItem('theme') === 'dark' : ('auto' === 'auto' ? window.matchMedia('(prefers-color-scheme: dark)').matches : 'auto' === 'dark')) && document.body.setAttribute('theme', 'dark');</script>
+
+        <div id="mask"></div><div class="wrapper"><header class="desktop" id="header-desktop">
+    <div class="header-wrapper">
+        <div class="header-title">
+            <a href="/" title="Masimaro&#39;s blog">My cool site</a>
+        </div>
+        <div class="menu">
+            <div class="menu-inner"><a class="menu-item" href="/posts/" title="文章列表"> 文章 </a><a class="menu-item" href="/tags/" title="标签"> 标签 </a><a class="menu-item" href="/categories/" title="分类"> 分类 </a><a class="menu-item" href="/about" title="关于本站"> 关于 </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-desktop">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-desktop" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-desktop" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-desktop">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </span><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                    <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+                </a></div>
+        </div>
+    </div>
+</header><header class="mobile" id="header-mobile">
+    <div class="header-container">
+        <div class="header-wrapper">
+            <div class="header-title">
+                <a href="/" title="Masimaro&#39;s blog">My cool site</a>
+            </div>
+            <div class="menu-toggle" id="menu-toggle-mobile">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+        <div class="menu" id="menu-mobile"><div class="search-wrapper">
+                    <div class="search mobile" id="search-mobile">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-mobile">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-mobile" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-mobile" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-mobile">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </div>
+                    <a href="javascript:void(0);" class="search-cancel" id="search-cancel-mobile">
+                        Cancel
+                    </a>
+                </div><a class="menu-item" href="/posts/" title="文章列表">文章</a><a class="menu-item" href="/tags/" title="标签">标签</a><a class="menu-item" href="/categories/" title="分类">分类</a><a class="menu-item" href="/about" title="关于本站">关于</a><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+            </a></div>
+    </div>
+</header><div class="search-dropdown desktop">
+        <div id="search-dropdown-desktop"></div>
+    </div>
+    <div class="search-dropdown mobile">
+        <div id="search-dropdown-mobile"></div>
+    </div><main class="main">
+                <div class="container"><div class="toc" id="toc-auto">
+            <h2 class="toc-title">Contents</h2>
+            <div class="toc-content" id="toc-content-auto"></div>
+        </div><article class="page single"><h1 class="single-title animate__animated animate__flipInX">从0开始自制解释器——实现简单的加法计算器</h1><div class="post-meta">
+            <div class="post-meta-line"><span class="post-author"><a href="https://www.masimaro.xyz" title="Author" target="_blank" rel="noopener noreffer author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Masimaro</a></span>&nbsp;<span class="post-category">included in <a href="/categories/%E8%87%AA%E5%88%B6%E8%A7%A3%E9%87%8A%E5%99%A8/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>自制解释器</a></span></div>
+            <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw" aria-hidden="true"></i>&nbsp;<time datetime="2023-03-07">2023-03-07</time>&nbsp;<i class="fas fa-pencil-alt fa-fw" aria-hidden="true"></i>&nbsp;1515 words&nbsp;
+                <i class="far fa-clock fa-fw" aria-hidden="true"></i>&nbsp;4 minutes&nbsp;</div>
+        </div><div class="details toc" id="toc-static"  data-kept="true">
+                <div class="details-summary toc-title">
+                    <span>Contents</span>
+                    <span><i class="details-icon fas fa-angle-right" aria-hidden="true"></i></span>
+                </div>
+                <div class="details-content toc-content" id="toc-content-static"><nav id="TableOfContents">
+  <ul>
+    <li><a href="#实现的算法">实现的算法</a></li>
+    <li><a href="#具体的代码">具体的代码</a></li>
+    <li><a href="#最后的总结">最后的总结</a></li>
+  </ul>
+</nav></div>
+            </div><div class="content" id="content"><p>为什么要学习编译器和解释器呢？文中的作者给出的答案有下面几个：</p>
+<ol>
+<li>为了深入理解计算机是如何工作的：一个显而易见的道理就是，如果你不懂编译器和解释器是如何工作的那么你就不明白计算机是如何工作的</li>
+<li>编译器和解释器用到的一些原理和编程技巧以及算法在其他地方也可以用到。学习编译器和解释器能够学到并强化这些技巧的运用</li>
+<li>为了方便日后能编写自己的编程语言或者专用领域的特殊语言</li>
+</ol>
+<p>接下来我们就从0开始一步一步的构建自己的解释器。跟着教程先制作一个简单的加法计算器，为了保证简单，这个加法计算器能够解析的表达式需要满足下面几点：</p>
+<ol>
+<li>目前只支持加法运算</li>
+<li>目前只支持两个10以内的整数的计算</li>
+<li>表达式之间不能有空格</li>
+<li>只能计算一次加法</li>
+</ol>
+<p>举一个例子来说，它可以计算诸如&quot;1+2&quot;、&ldquo;5+6&rdquo; 这样的表达式，但是不能计算像 &ldquo;11+20&rdquo;(必须是10以内)、&ldquo;1.1+2&rdquo;(需要两个数都是整数)、&ldquo;1 + 2&rdquo;(中间不能有空格)、&ldquo;1+2+3&rdquo;(只能计算一次加法)</p>
+<p>有了这些限制，我们很容易就能实现出来。</p>
+<h2 id="实现的算法">实现的算法</h2>
+<p>假设我们要计算表达式 <code>5+6</code>。这里主要的步骤是通过字符串保存表达式，然后通过索引依次访问每个字符，分别找到两个整数和加法运算符，最后实现两个整数相加的操作。</p>
+<p>第一步，我们的索引在表达式字符串的开始位置，解析得到当前位置的字符是一个整数，我们给它打上标记，类型为整形，值为5。
+<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://img-blog.csdnimg.cn/fb56b8af172f4b3990cfd0ac3fd73cfd.png#pic_center"
+        data-srcset="https://img-blog.csdnimg.cn/fb56b8af172f4b3990cfd0ac3fd73cfd.png#pic_center, https://img-blog.csdnimg.cn/fb56b8af172f4b3990cfd0ac3fd73cfd.png#pic_center 1.5x, https://img-blog.csdnimg.cn/fb56b8af172f4b3990cfd0ac3fd73cfd.png#pic_center 2x"
+        data-sizes="auto"
+        alt="https://img-blog.csdnimg.cn/fb56b8af172f4b3990cfd0ac3fd73cfd.png#pic_center"
+        title="在这里插入图片描述" />
+第二步，索引向前推进，解析当前位置的字符是一个<code>+</code>。还是给它打上标记，类型为<code>plus</code>，值为<code>+</code>。
+<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://img-blog.csdnimg.cn/6b4c7f10d1214db7aef8cab0916993c3.png#pic_center"
+        data-srcset="https://img-blog.csdnimg.cn/6b4c7f10d1214db7aef8cab0916993c3.png#pic_center, https://img-blog.csdnimg.cn/6b4c7f10d1214db7aef8cab0916993c3.png#pic_center 1.5x, https://img-blog.csdnimg.cn/6b4c7f10d1214db7aef8cab0916993c3.png#pic_center 2x"
+        data-sizes="auto"
+        alt="https://img-blog.csdnimg.cn/6b4c7f10d1214db7aef8cab0916993c3.png#pic_center"
+        title="在这里插入图片描述" />
+第三步，索引继续前进，解析到当前位置的字符是一个整数，我们给它打上标记，类型为整形，值为6
+<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://img-blog.csdnimg.cn/6b4c7f10d1214db7aef8cab0916993c3.png#pic_center"
+        data-srcset="https://img-blog.csdnimg.cn/6b4c7f10d1214db7aef8cab0916993c3.png#pic_center, https://img-blog.csdnimg.cn/6b4c7f10d1214db7aef8cab0916993c3.png#pic_center 1.5x, https://img-blog.csdnimg.cn/6b4c7f10d1214db7aef8cab0916993c3.png#pic_center 2x"
+        data-sizes="auto"
+        alt="https://img-blog.csdnimg.cn/6b4c7f10d1214db7aef8cab0916993c3.png#pic_center"
+        title="在这里插入图片描述" />
+最后一步，根据得到的两个整数以及要执行的算术运算，我们将两个数直接进行相加得到最终结果</p>
+<h2 id="具体的代码">具体的代码</h2>
+<p>首先我们定义这个标记的类型，目前支持整数以及加法的标记</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="k">typedef</span> <span class="k">enum</span> <span class="n">e_TokenType</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">CINT</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="c1">//整型
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="n">PLUS</span> <span class="c1">//加法运算符
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">}</span><span class="n">ETokenType</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// 这里因为只支持10以内的整数，所以表示计算数字的字符只有一个，加上字符串最后的结束标记，字符数组只需要两个即可
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="k">typedef</span> <span class="k">struct</span> <span class="n">Token</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">ETokenType</span> <span class="n">type</span><span class="p">;</span> <span class="c1">//类型
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="kt">char</span> <span class="n">value</span><span class="p">[</span><span class="mi">2</span><span class="p">];</span> <span class="c1">//值
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">}</span><span class="n">Token</span><span class="p">,</span> <span class="o">*</span><span class="n">LPTOKEN</span><span class="p">;</span>
+</span></span></code></pre></div><p>接着定义一些全局变量来保存算术运算的表达式和当前指针的索引</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="kt">char</span><span class="o">*</span> <span class="n">g_pszUserBuf</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="kt">char</span><span class="o">*</span> <span class="n">g_pPosition</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+</span></span></code></pre></div><p>接着我们定义一个函数来模拟上述说到的不断解析每一个字符的过程</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="kt">bool</span> <span class="nf">get_next_token</span><span class="p">(</span><span class="n">LPTOKEN</span> <span class="n">pToken</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">char</span><span class="o">*</span> <span class="n">sz</span> <span class="o">=</span> <span class="n">g_pPosition</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">g_pPosition</span><span class="o">++</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">pToken</span><span class="o">-&gt;</span><span class="n">value</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="sc">&#39;\0&#39;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="p">(</span><span class="o">*</span><span class="n">sz</span> <span class="o">&gt;=</span> <span class="sc">&#39;0&#39;</span> <span class="o">&amp;&amp;</span> <span class="o">*</span><span class="n">sz</span> <span class="o">&lt;=</span> <span class="sc">&#39;9&#39;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">pToken</span><span class="o">-&gt;</span><span class="n">type</span> <span class="o">=</span> <span class="n">CINT</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="n">pToken</span><span class="o">-&gt;</span><span class="n">value</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="o">*</span><span class="n">sz</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="nb">true</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="o">*</span><span class="n">sz</span> <span class="o">==</span> <span class="sc">&#39;+&#39;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">pToken</span><span class="o">-&gt;</span><span class="n">type</span> <span class="o">=</span> <span class="n">PLUS</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="n">pToken</span><span class="o">-&gt;</span><span class="n">value</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="o">*</span><span class="n">sz</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="nb">true</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="k">else</span>
+</span></span><span class="line"><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">pToken</span><span class="o">-&gt;</span><span class="n">value</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="sc">&#39;\0&#39;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="nb">false</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p>最后我们定义一个函数来执行获取每个标记并最终计算结果的操作</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="kt">int</span> <span class="nf">expr</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">int</span> <span class="n">val1</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">val2</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">Token</span> <span class="n">token</span> <span class="o">=</span> <span class="p">{</span> <span class="mi">0</span> <span class="p">};</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="p">(</span><span class="nf">get_next_token</span><span class="p">(</span><span class="o">&amp;</span><span class="n">token</span><span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="n">token</span><span class="p">.</span><span class="n">type</span> <span class="o">==</span> <span class="n">CINT</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">val1</span> <span class="o">=</span> <span class="nf">atoi</span><span class="p">(</span><span class="n">token</span><span class="p">.</span><span class="n">value</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="k">else</span>
+</span></span><span class="line"><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="nf">printf</span><span class="p">(</span><span class="s">&#34;首个字符必须是整数&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="p">(</span><span class="nf">get_next_token</span><span class="p">(</span><span class="o">&amp;</span><span class="n">token</span><span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="n">token</span><span class="p">.</span><span class="n">type</span> <span class="o">==</span> <span class="n">PLUS</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="k">else</span>
+</span></span><span class="line"><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="nf">printf</span><span class="p">(</span><span class="s">&#34;第二个字符必须是操作符，并且当前只支持 + 运算&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="p">(</span><span class="nf">get_next_token</span><span class="p">(</span><span class="o">&amp;</span><span class="n">token</span><span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="n">token</span><span class="p">.</span><span class="n">type</span> <span class="o">==</span> <span class="n">CINT</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">val2</span> <span class="o">=</span> <span class="nf">atoi</span><span class="p">(</span><span class="n">token</span><span class="p">.</span><span class="n">value</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="nf">printf</span><span class="p">(</span><span class="s">&#34;%d+%d=%d</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">,</span> <span class="n">val1</span><span class="p">,</span> <span class="n">val2</span><span class="p">,</span> <span class="n">val1</span> <span class="o">+</span> <span class="n">val2</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p>在<code>main</code>函数里面我们只需要建立一个缓冲来保存字符，并且在循环中不断等待用户输入，完成解析并输出结果即可</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="c1">// 重制当前解析环境
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kt">void</span> <span class="nf">reset</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">memset</span><span class="p">(</span><span class="n">g_pszUserBuf</span><span class="p">,</span> <span class="mh">0x00</span><span class="p">,</span> <span class="mi">16</span> <span class="o">*</span> <span class="k">sizeof</span><span class="p">(</span><span class="kt">char</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">scanf_s</span><span class="p">(</span><span class="s">&#34;%s&#34;</span><span class="p">,</span> <span class="n">g_pszUserBuf</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">g_pPosition</span> <span class="o">=</span> <span class="n">g_pszUserBuf</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kt">int</span> <span class="nf">main</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">g_pszUserBuf</span> <span class="o">=</span> <span class="p">(</span><span class="kt">char</span><span class="o">*</span><span class="p">)</span><span class="nf">malloc</span><span class="p">(</span><span class="mi">16</span> <span class="o">*</span> <span class="k">sizeof</span><span class="p">(</span><span class="kt">char</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">    <span class="k">while</span> <span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="nf">printf</span><span class="p">(</span><span class="s">&#34;&gt;&gt;&gt;&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="nf">reset</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">        <span class="k">if</span> <span class="p">(</span><span class="nf">strcmp</span><span class="p">(</span><span class="n">g_pszUserBuf</span><span class="p">,</span> <span class="s">&#34;exit&#34;</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="p">{</span>
+</span></span><span class="line"><span class="cl">            <span class="k">break</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="p">}</span>
+</span></span><span class="line"><span class="cl">        <span class="nf">expr</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p>最终执行的结果如下
+<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://img-blog.csdnimg.cn/a6bd6f90a23e4970a82f190b199b76d0.png#pic_center"
+        data-srcset="https://img-blog.csdnimg.cn/a6bd6f90a23e4970a82f190b199b76d0.png#pic_center, https://img-blog.csdnimg.cn/a6bd6f90a23e4970a82f190b199b76d0.png#pic_center 1.5x, https://img-blog.csdnimg.cn/a6bd6f90a23e4970a82f190b199b76d0.png#pic_center 2x"
+        data-sizes="auto"
+        alt="https://img-blog.csdnimg.cn/a6bd6f90a23e4970a82f190b199b76d0.png#pic_center"
+        title="在这里插入图片描述" /></p>
+<h2 id="最后的总结">最后的总结</h2>
+<p>程序我们已经写完了，你可能觉得这个程序太简单了，只能做这点事情。别着急，后面将会逐步的去完善这个程序。以便它能实现更加复杂的运算。</p>
+<p>最后我们来引入一些概念性的东西：</p>
+<ol>
+<li>我们将输入内容按照一定规则打上的标记被称之为Token</li>
+<li>上述get_next_token函数体现的将一段字符串分割并打上有意义的标签的过程被称为词法分析。</li>
+<li>解释器工作的第一步就是将输入的字符串按照一定的规则转换为一系列有意义的标记。完成这个工作的组件被称之为词法分析器，也可以被称为扫描器或者分词器</li>
+</ol>
+</div><div class="post-footer" id="post-footer">
+    <div class="post-info">
+        <div class="post-info-line">
+            <div class="post-info-mod">
+                <span>Updated on 2023-03-07</span>
+            </div></div>
+        <div class="post-info-line">
+            <div class="post-info-md"></div>
+            <div class="post-info-share">
+                <span><a href="javascript:void(0);" title="Share on Twitter" data-sharer="twitter" data-url="http://HaiLateBoy.github.io/posts/make-parser02/" data-title="从0开始自制解释器——实现简单的加法计算器" data-hashtags="编译原理,编译器,c语言"><i class="fab fa-twitter fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Facebook" data-sharer="facebook" data-url="http://HaiLateBoy.github.io/posts/make-parser02/" data-hashtag="编译原理"><i class="fab fa-facebook-square fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Hacker News" data-sharer="hackernews" data-url="http://HaiLateBoy.github.io/posts/make-parser02/" data-title="从0开始自制解释器——实现简单的加法计算器"><i class="fab fa-hacker-news fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Line" data-sharer="line" data-url="http://HaiLateBoy.github.io/posts/make-parser02/" data-title="从0开始自制解释器——实现简单的加法计算器"><i data-svg-src="https://cdn.jsdelivr.net/npm/simple-icons@7.3.0/icons/line.svg" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on 微博" data-sharer="weibo" data-url="http://HaiLateBoy.github.io/posts/make-parser02/" data-title="从0开始自制解释器——实现简单的加法计算器"><i class="fab fa-weibo fa-fw" aria-hidden="true"></i></a></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="post-info-more">
+        <section class="post-tags"><i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/%E7%BC%96%E8%AF%91%E5%8E%9F%E7%90%86/">编译原理</a>,&nbsp;<a href="/tags/%E7%BC%96%E8%AF%91%E5%99%A8/">编译器</a>,&nbsp;<a href="/tags/c%E8%AF%AD%E8%A8%80/">C语言</a></section>
+        <section>
+            <span><a href="javascript:void(0);" onclick="window.history.back();">Back</a></span>&nbsp;|&nbsp;<span><a href="/">Home</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav"><a href="/posts/make-parser01/" class="prev" rel="prev" title="从0开始自制解释器——概述"><i class="fas fa-angle-left fa-fw" aria-hidden="true"></i>从0开始自制解释器——概述</a>
+            <a href="/posts/make-parser03/" class="next" rel="next" title="从0开始自制解释器——实现多位整数的加减法计算器">从0开始自制解释器——实现多位整数的加减法计算器<i class="fas fa-angle-right fa-fw" aria-hidden="true"></i></a></div>
+</div>
+</article></div>
+            </main><footer class="footer">
+        <div class="footer-container"><div class="footer-line">Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener noreffer" title="Hugo 0.121.2">Hugo</a> | Theme - <a href="https://github.com/dillonzq/LoveIt" target="_blank" rel="noopener noreffer" title="LoveIt 0.2.11"><i class="far fa-kiss-wink-heart fa-fw" aria-hidden="true"></i> LoveIt</a>
+                </div><div class="footer-line" itemscope itemtype="http://schema.org/CreativeWork"><i class="far fa-copyright fa-fw" aria-hidden="true"></i><span itemprop="copyrightYear">2022 - 2024</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="https://www.masimaro.xyz" target="_blank">Masimaro</a></span></div>
+        </div>
+    </footer></div>
+
+        <div id="fixed-buttons"><a href="#" id="back-to-top" class="fixed-button" title="Back to Top">
+                <i class="fas fa-arrow-up fa-fw" aria-hidden="true"></i>
+            </a><a href="#" id="view-comments" class="fixed-button" title="View Comments">
+                <i class="fas fa-comment fa-fw" aria-hidden="true"></i>
+            </a>
+        </div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.css"><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/autocomplete.js@0.38.1/dist/autocomplete.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lunr@2.3.9/lunr.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lazysizes@5.3.2/lazysizes.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/clipboard@2.0.11/dist/clipboard.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/sharer.js@0.5.1/sharer.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/auto-render.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/copy-tex.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/mhchem.min.js"></script><script type="text/javascript">window.config={"code":{"copyTitle":"Copy to clipboard","maxShownLines":50},"comment":{},"math":{"delimiters":[{"display":true,"left":"$$","right":"$$"},{"display":true,"left":"\\[","right":"\\]"},{"display":true,"left":"\\begin{equation}","right":"\\end{equation}"},{"display":true,"left":"\\begin{equation*}","right":"\\end{equation*}"},{"display":true,"left":"\\begin{align}","right":"\\end{align}"},{"display":true,"left":"\\begin{align*}","right":"\\end{align*}"},{"display":true,"left":"\\begin{alignat}","right":"\\end{alignat}"},{"display":true,"left":"\\begin{alignat*}","right":"\\end{alignat*}"},{"display":true,"left":"\\begin{gather}","right":"\\end{gather}"},{"display":true,"left":"\\begin{CD}","right":"\\end{CD}"},{"display":false,"left":"$","right":"$"},{"display":false,"left":"\\(","right":"\\)"}],"strict":false},"search":{"highlightTag":"em","maxResultLength":10,"noResultsFound":"No results found","snippetLength":50}};</script><script type="text/javascript" src="/js/theme.min.js"></script></body>
+</html>

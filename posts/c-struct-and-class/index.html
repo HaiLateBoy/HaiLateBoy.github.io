@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="robots" content="noodp" />
+        <title>结构体和类 - Masimaro&#39;s blog</title><meta name="Description" content="这是我用于记录日常和学习的小站"><meta property="og:title" content="结构体和类" />
+<meta property="og:description" content="在C&#43;&#43;中类与结构体并没有太大的区别，只是默认的成员访问权限不同，类默认权限为私有，而结构体为公有，所以在这将它们统一处理，在例子中采用类的" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://HaiLateBoy.github.io/posts/c-struct-and-class/" /><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2018-01-28T14:31:44+00:00" />
+<meta property="article:modified_time" content="2018-01-28T14:31:44+00:00" /><meta property="og:site_name" content="Masimaro&#39;s blog" />
+
+<meta name="twitter:card" content="summary"/><meta name="twitter:title" content="结构体和类"/>
+<meta name="twitter:description" content="在C&#43;&#43;中类与结构体并没有太大的区别，只是默认的成员访问权限不同，类默认权限为私有，而结构体为公有，所以在这将它们统一处理，在例子中采用类的"/>
+<meta name="application-name" content="My cool site">
+<meta name="apple-mobile-web-app-title" content="My cool site"><meta name="theme-color" content="#ffffff"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="manifest" href="/site.webmanifest"><link rel="canonical" href="http://HaiLateBoy.github.io/posts/c-struct-and-class/" /><link rel="prev" href="http://HaiLateBoy.github.io/posts/oledb-and-ado4/" /><link rel="next" href="http://HaiLateBoy.github.io/posts/c-plus-structure-and-destruct/" /><link rel="stylesheet" href="/css/style.min.css"><link rel="preload" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css"></noscript><link rel="preload" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css"></noscript><script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "BlogPosting",
+        "headline": "结构体和类",
+        "inLanguage": "zh-CN",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "http:\/\/HaiLateBoy.github.io\/posts\/c-struct-and-class\/"
+        },"genre": "posts","keywords": "VC\u002b\u002b, 反汇编, C\u002b\u002b实现原理","wordcount":  3293 ,
+        "url": "http:\/\/HaiLateBoy.github.io\/posts\/c-struct-and-class\/","datePublished": "2018-01-28T14:31:44+00:00","dateModified": "2018-01-28T14:31:44+00:00","publisher": {
+            "@type": "Organization",
+            "name": ""},"author": {
+                "@type": "Person",
+                "name": "Masimaro"
+            },"description": ""
+    }
+    </script></head>
+    <body data-header-desktop="fixed" data-header-mobile="auto"><script type="text/javascript">(window.localStorage && localStorage.getItem('theme') ? localStorage.getItem('theme') === 'dark' : ('auto' === 'auto' ? window.matchMedia('(prefers-color-scheme: dark)').matches : 'auto' === 'dark')) && document.body.setAttribute('theme', 'dark');</script>
+
+        <div id="mask"></div><div class="wrapper"><header class="desktop" id="header-desktop">
+    <div class="header-wrapper">
+        <div class="header-title">
+            <a href="/" title="Masimaro&#39;s blog">My cool site</a>
+        </div>
+        <div class="menu">
+            <div class="menu-inner"><a class="menu-item" href="/posts/" title="文章列表"> 文章 </a><a class="menu-item" href="/tags/" title="标签"> 标签 </a><a class="menu-item" href="/categories/" title="分类"> 分类 </a><a class="menu-item" href="/about" title="关于本站"> 关于 </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-desktop">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-desktop" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-desktop" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-desktop">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </span><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                    <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+                </a></div>
+        </div>
+    </div>
+</header><header class="mobile" id="header-mobile">
+    <div class="header-container">
+        <div class="header-wrapper">
+            <div class="header-title">
+                <a href="/" title="Masimaro&#39;s blog">My cool site</a>
+            </div>
+            <div class="menu-toggle" id="menu-toggle-mobile">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+        <div class="menu" id="menu-mobile"><div class="search-wrapper">
+                    <div class="search mobile" id="search-mobile">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-mobile">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-mobile" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-mobile" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-mobile">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </div>
+                    <a href="javascript:void(0);" class="search-cancel" id="search-cancel-mobile">
+                        Cancel
+                    </a>
+                </div><a class="menu-item" href="/posts/" title="文章列表">文章</a><a class="menu-item" href="/tags/" title="标签">标签</a><a class="menu-item" href="/categories/" title="分类">分类</a><a class="menu-item" href="/about" title="关于本站">关于</a><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+            </a></div>
+    </div>
+</header><div class="search-dropdown desktop">
+        <div id="search-dropdown-desktop"></div>
+    </div>
+    <div class="search-dropdown mobile">
+        <div id="search-dropdown-mobile"></div>
+    </div><main class="main">
+                <div class="container"><div class="toc" id="toc-auto">
+            <h2 class="toc-title">Contents</h2>
+            <div class="toc-content" id="toc-content-auto"></div>
+        </div><article class="page single"><h1 class="single-title animate__animated animate__flipInX">结构体和类</h1><div class="post-meta">
+            <div class="post-meta-line"><span class="post-author"><a href="https://www.masimaro.xyz" title="Author" target="_blank" rel="noopener noreffer author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Masimaro</a></span>&nbsp;<span class="post-category">included in <a href="/categories/vc++%E5%8F%8D%E6%B1%87%E7%BC%96%E5%88%86%E6%9E%90/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>VC++反汇编分析</a></span></div>
+            <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw" aria-hidden="true"></i>&nbsp;<time datetime="2018-01-28">2018-01-28</time>&nbsp;<i class="fas fa-pencil-alt fa-fw" aria-hidden="true"></i>&nbsp;3293 words&nbsp;
+                <i class="far fa-clock fa-fw" aria-hidden="true"></i>&nbsp;7 minutes&nbsp;</div>
+        </div><div class="details toc" id="toc-static"  data-kept="true">
+                <div class="details-summary toc-title">
+                    <span>Contents</span>
+                    <span><i class="details-icon fas fa-angle-right" aria-hidden="true"></i></span>
+                </div>
+                <div class="details-content toc-content" id="toc-content-static"><nav id="TableOfContents">
+  <ul>
+    <li>
+      <ul>
+        <li><a href="#空类">空类</a></li>
+        <li><a href="#内存对齐">内存对齐</a></li>
+      </ul>
+    </li>
+  </ul>
+
+  <ul>
+    <li><a href="#静态数据成员">静态数据成员</a></li>
+    <li><a href="#静态函数成员">静态函数成员</a></li>
+  </ul>
+</nav></div>
+            </div><div class="content" id="content"><p>在C++中类与结构体并没有太大的区别，只是默认的成员访问权限不同，类默认权限为私有，而结构体为公有，所以在这将它们统一处理，在例子中采用类的方式。</p>
+<!-- raw HTML omitted -->
+<h1 id="类对象在内存中的分布">类对象在内存中的分布</h1>
+<p>在类中只有数据成员占内存空间，而类的函数成员主要分布在代码段中，不占内存空间，一般对象所占的内存空间大小为sizeof(成员1) + sizeof(成员2) + &hellip; + sizeof(成员n)但是有几种情况不符合这个公式，比如虚函数和继承，空类，内存对齐，静态数据成员。只要出现虚函数就会多出4个字节的空间，作为虚函数表，继承时需要考虑基类的大小，另外出现静态成员时静态成员由于存在于数据段中，并不在类对象的空间中，所以静态成员不计算在类对象的大小中这些不在此处讨论，主要说明其余的三种情况：</p>
+<h3 id="空类">空类</h3>
+<p>按照上述公式，空类应该不占内存，但是实际情况却不是这样，下面来看一个具体的例子：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">Test</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl"><span class="k">public</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">int</span> <span class="n">Print</span><span class="p">(){</span><span class="n">printf</span><span class="p">(</span><span class="s">&#34;Hello world!</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">);}</span>
+</span></span><span class="line"><span class="cl"><span class="p">};</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kt">int</span> <span class="nf">main</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">Test</span> <span class="n">test</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">printf</span><span class="p">(</span><span class="s">&#34;%d</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">test</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p>运行程序发现，输出结果为1，这个结果与我们预想的可能有点不一样，按理来说，空类中没有数据成员，应该不占内存空间才对，但是我们知道每个类都有一个this指针指向具体的内存，以便成员函数的调用，即使定义一个类什么都不写，编译器也会提供默认的构造函数用来初始化类，但是如果类的实例不占内存空间，那么该如何初始化？所以编译器为它分配一个1字节的空间以便初始化this指针。所以空类占一个字节。</p>
+<h3 id="内存对齐">内存对齐</h3>
+<p>下面看这样一个类</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">Test</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl"><span class="k">public</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">short</span> <span class="n">s</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">int</span> <span class="n">n</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">};</span>
+</span></span></code></pre></div><p>当在程序中定义这样一个类，通过sizeof来输出大小得到的是8，上面的公式又不满足了，我们知道为了程序的运行效率，编译器并不会依次申请内存用于存储变量，而会采用内存对齐的方式，以牺牲一定内存空间的代价来换取程序的效率，这个类的大小为8，也是内存对齐的结果，查看类工各个成员的地址我们发现 n的地址为0x0012ff44，而s的地址为0x0012ff40，s本来是占2个字节，但是n并没有出现在其后的42的位置，我所用的VC++6.0默认采用的是8个字节的对齐方式，假设编译器采用的是n个字节的对齐方式，而类中某成员实际所占内存空间的大小为m，那么该成员所在的内存地址必须为p的整数倍，而p = min(m, n)，所以对于s来说，采用的是2个字节的对齐方式，分配到的首地址为40是2的倍数，而其后的整型成员n占4个字节，采用上述公式，得到它的内存地址应该是4的倍数，所以取其后的44作为它的地址，中间有两个字节没有使用，所以这个类占8个字节。
+下面再来看一个例子:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">Test</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl"><span class="k">public</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">short</span> <span class="n">s</span><span class="p">;</span> <span class="c1">//8
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="kt">double</span> <span class="n">d</span><span class="p">;</span> <span class="c1">//8
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="kt">char</span> <span class="n">c</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">};</span>
+</span></span></code></pre></div><p>通过程序得出当前结果体的大小为24，根据上面的分析，首先在为s分配空间的时候采用的是2个字节的对齐方式，假设分配到的地址为0x0012ff40，那么d采用的是8个字节的对齐方式，它的地址应该为0x0012ff48，最后为c分配内存的时候，应该是用1个字节的对齐方式，总共应该占的空间为8 + 8 + 1 = 17但是结果却并不是这样。在内存对齐时编译器实际采用对齐方式是：假设结构体成员的最大成员占n个字节，编译器默认采用m个字节的对齐方式，那么实际对齐大小应该为min(m, n)的整数倍，所以实际采用的是8个字节的对齐方式，而结构体的大小应该是实际对齐方式的整数倍，所以占24个字节。在编写程序时可以使用#pragma pack(n)的方式来改变编译器的默认对齐方式。另外对于嵌套定义的结构体，对齐情况也有少许不同。</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">One</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl"><span class="k">public</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">short</span> <span class="n">s</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">double</span> <span class="n">d</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">char</span> <span class="n">c</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">};</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">Two</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">One</span> <span class="n">one</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">int</span> <span class="n">n</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">};</span>
+</span></span></code></pre></div><p>输出class two的大小为32个字节，嵌套定义的结构体仍然能够满足上述两个法则，首先其中的成员结构体one大小为24，然后另外一个成员n占4个字节，得到总共占28个字节，然后根据第二个对齐的规则在24和8之间取最小值8，可以得到结构体的大小应该为8的整数倍32个字节。</p>
+<h1 id="类的成员函数">类的成员函数</h1>
+<p>类的成员函数在调用时直接利用对象打点调用，在函数中直接使用类中的成员，函数操作的是不同对象的数据成员，能够达到这个目的实际上类的对象在调用类的成员函数时默认传入的第一个参数是一个指向这个对象地址的指针叫做this指针，具体this指针的原理看下面一段代码：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="n">class</span> <span class="n">test</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl"><span class="nl">private</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">int</span> <span class="n">i</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="nl">public</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">test</span><span class="p">(){</span><span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;}</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">int</span> <span class="nf">GetNum</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">i</span> <span class="o">=</span> <span class="mi">10</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="n">i</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">};</span>
+</span></span><span class="line"><span class="cl"><span class="p">};</span>
+</span></span><span class="line"><span class="cl"><span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span><span class="o">*</span> <span class="n">argv</span><span class="p">[])</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">test</span> <span class="n">t</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">t</span><span class="p">.</span><span class="nf">GetNum</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p>下面对应的反汇编代码：</p>
+<pre tabindex="0"><code>;主函数
+24:       test t;
+00401278   lea         ecx,[ebp-4]
+0040127B   call        @ILT+20(test::test) (00401019)
+25:       t.GetNum();
+00401280   lea         ecx,[ebp-4]
+00401283   call        @ILT+0(test::GetNum) (00401005)
+26:       return 0;
+00401288   xor         eax,eax
+
+;GetNum()函数
+18:           i = 10;
+0040130D   mov         eax,dword ptr [ebp-4]
+00401310   mov         dword ptr [eax],0Ah
+19:           return i;
+00401316   mov         ecx,dword ptr [ebp-4]
+00401319   mov         eax,dword ptr [ecx]
+</code></pre><p>在主函数中定义类的对象时首先会调用其构造函数，在调用函数之前首先通过lea指令获取到对象的首地址并将它保存到了ecx寄存器中，在函数GetNum中，首先是在函数栈中定义了一个局部变量，将这个局部变量的值赋值为10，然后将这个局部变量的值赋值到ecx所在地址的内存中，最后再将这块内存中的值放到eax中作为参数返回。通过这部分代码可以看到，this指针并不是通过参数栈的方式传递给成员函数的，而是通过一个寄存器来传递，但是成员函数中若有参数，则仍然通过参数栈的方式传递参数。通过寄存器传递给成员方法作为this指针，然后根据数据成员定义的顺序和类型进行指针偏移找到对应的内存地址，对其进行操作。</p>
+<h1 id="类的静态成员">类的静态成员</h1>
+<h2 id="静态数据成员">静态数据成员</h2>
+<p>类的静态成员与之前所说的函数中的局部静态变量相似，它们都存储在数据段中，它们的生命周期与它们所在的位置无关，都是全局的生命周期，它们的可见性被封装到了它们所在的位置，对于函数中的局部静态变量来说，只在函数中可见，对于在文件中的全局静态变量来说，它们只在当前文件中可见，类中的局部静态变量可见性只在类中可见。
+类的静态数据成员的生命周期与类对象的无关，这样我们可以通过类名::变量名的方式来直接访问这块内存，而不需要通过对象访问，由于静态数据成员所在的内存不在具体的类对象中，所以在C++中所有类的对象中的局部静态变量都是使用同一块内存区域，随便一个修改了静态变量的值，其他的对象中，这个静态变量的值都会发生变化。</p>
+<h2 id="静态函数成员">静态函数成员</h2>
+<p>类中的函数成员也可以是静态的，下面看一个静态函数成员的例子。</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">test</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl"><span class="k">public</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">    <span class="k">static</span> <span class="kt">void</span> <span class="n">print</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">cout</span><span class="o">&lt;&lt;</span><span class="s">&#34;hello world&#34;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>   
+</span></span><span class="line"><span class="cl"><span class="p">};</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span><span class="o">*</span> <span class="n">argv</span><span class="p">[])</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">test</span> <span class="n">t</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">t</span><span class="p">.</span><span class="n">print</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p>下面是对应的汇编代码：</p>
+<pre tabindex="0"><code>21:       test t;
+22:       t.print();
+00401388   call        @ILT+80(test::print) (00401055)
+</code></pre><p>我们可以看到，在调用类的静态函数时并没有取对象的地址到ecx的操作，也就说，静态成员函数并不会传递this指针，由于静态成员的生命周期与对象无关，可以通过类名直接访问，那么如果静态成员函数也需要传递this指针的话，那么对于这种通过类名访问的时候，它要怎么传递this指针呢。
+另外由于静态成员函数不传递this指针，这样会造成另外一个问题，如果需要在这个静态函数中操作类的数据成员，那么通过对象调用时，它怎么能找到这个数据成员所在的地址，另外在还没有对象，通过类直接调用时，这个数据成员还没有分配内存地址，所以说在C++中为了避免这些问题直接规定静态函数不能调用类的非静态成员，但是静态数据成员虽然说由所有类共享，但是能够找到对应的内存地址，所以非静态成员函数是可以访问静态数据成员的。</p>
+<h1 id="类作为函数参数">类作为函数参数</h1>
+<p>前面在写函数原理的那篇博文时说过结构体是如何参数传递的，其实类也是一样的，当类作为参数时，会调用拷贝构造，拷贝到函数的参数栈中，下面通过一个简单的例子来说明</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">test</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl"><span class="k">private</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">char</span> <span class="n">szBuf</span><span class="p">[</span><span class="mi">255</span><span class="p">];</span>
+</span></span><span class="line"><span class="cl"><span class="k">public</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">    <span class="k">static</span> <span class="kt">void</span> <span class="n">print</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">cout</span><span class="o">&lt;&lt;</span><span class="s">&#34;hello world&#34;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>   
+</span></span><span class="line"><span class="cl"><span class="p">};</span>
+</span></span><span class="line"><span class="cl"><span class="kt">void</span> <span class="nf">printhello</span><span class="p">(</span><span class="n">test</span> <span class="n">t</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">t</span><span class="p">.</span><span class="n">print</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span><span class="o">*</span> <span class="n">argv</span><span class="p">[])</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">test</span> <span class="n">t</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">printhello</span><span class="p">(</span><span class="n">t</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><pre tabindex="0"><code>26:       test t;
+27:       printhello(t);
+0040141E   sub         esp,100h
+00401424   mov         ecx,3Fh
+00401429   lea         esi,[ebp-100h]
+0040142F   mov         edi,esp
+00401431   rep movs    dword ptr [edi],dword ptr [esi]
+00401433   movs        word ptr [edi],word ptr [esi]
+00401435   movs        byte ptr [edi],byte ptr [esi]
+00401436   call        @ILT+130(printhello) (00401087)
+0040143B   add         esp,100h
+</code></pre><p>从上面的汇编代码上可以看出，在进行参数传递时通过rep mov这个指令来将对象所在内存中的内容拷贝到函数栈中。在函数参数需要对象时，直接传递对象会进行一次拷贝，这样不仅浪费内存空间，而且在效率上不高，可以通过传递指针或者引用的方式来实现，这样只消耗4个字节的空间，而且不用拷贝，如果希望函数中不修改对象的内容，可以加上const限定。</p>
+<h1 id="类作为函数返回值">类作为函数返回值</h1>
+<p>类作为函数的返回值时也与之前所说的结构体作为函数的返回值类似，都是需要先将类拷贝到对应函数栈外部的内存中，然后在随着函数栈由系统统一回收，在这就不做特别的说明了。但是与作为参数不同，为了安全起见一般不要返回局部变量的指针或者引用，在某些需要返回类对象的场合一般只能返回类对象。</p>
+<!-- raw HTML omitted -->
+</div><div class="post-footer" id="post-footer">
+    <div class="post-info">
+        <div class="post-info-line">
+            <div class="post-info-mod">
+                <span>Updated on 2018-01-28</span>
+            </div></div>
+        <div class="post-info-line">
+            <div class="post-info-md"></div>
+            <div class="post-info-share">
+                <span><a href="javascript:void(0);" title="Share on Twitter" data-sharer="twitter" data-url="http://HaiLateBoy.github.io/posts/c-struct-and-class/" data-title="结构体和类" data-hashtags="VC&#43;&#43;,反汇编,C&#43;&#43;实现原理"><i class="fab fa-twitter fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Facebook" data-sharer="facebook" data-url="http://HaiLateBoy.github.io/posts/c-struct-and-class/" data-hashtag="VC&#43;&#43;"><i class="fab fa-facebook-square fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Hacker News" data-sharer="hackernews" data-url="http://HaiLateBoy.github.io/posts/c-struct-and-class/" data-title="结构体和类"><i class="fab fa-hacker-news fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Line" data-sharer="line" data-url="http://HaiLateBoy.github.io/posts/c-struct-and-class/" data-title="结构体和类"><i data-svg-src="https://cdn.jsdelivr.net/npm/simple-icons@7.3.0/icons/line.svg" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on 微博" data-sharer="weibo" data-url="http://HaiLateBoy.github.io/posts/c-struct-and-class/" data-title="结构体和类"><i class="fab fa-weibo fa-fw" aria-hidden="true"></i></a></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="post-info-more">
+        <section class="post-tags"><i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/vc&#43;&#43;/">VC&#43;&#43;</a>,&nbsp;<a href="/tags/%E5%8F%8D%E6%B1%87%E7%BC%96/">反汇编</a>,&nbsp;<a href="/tags/c&#43;&#43;%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86/">C&#43;&#43;实现原理</a></section>
+        <section>
+            <span><a href="javascript:void(0);" onclick="window.history.back();">Back</a></span>&nbsp;|&nbsp;<span><a href="/">Home</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav"><a href="/posts/oledb-and-ado4/" class="prev" rel="prev" title="SQL语句执行与结果集的获取"><i class="fas fa-angle-left fa-fw" aria-hidden="true"></i>SQL语句执行与结果集的获取</a>
+            <a href="/posts/c-plus-structure-and-destruct/" class="next" rel="next" title="C&#43;&#43;类的构造函数与析构函数">C++类的构造函数与析构函数<i class="fas fa-angle-right fa-fw" aria-hidden="true"></i></a></div>
+</div>
+</article></div>
+            </main><footer class="footer">
+        <div class="footer-container"><div class="footer-line">Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener noreffer" title="Hugo 0.121.2">Hugo</a> | Theme - <a href="https://github.com/dillonzq/LoveIt" target="_blank" rel="noopener noreffer" title="LoveIt 0.2.11"><i class="far fa-kiss-wink-heart fa-fw" aria-hidden="true"></i> LoveIt</a>
+                </div><div class="footer-line" itemscope itemtype="http://schema.org/CreativeWork"><i class="far fa-copyright fa-fw" aria-hidden="true"></i><span itemprop="copyrightYear">2022 - 2024</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="https://www.masimaro.xyz" target="_blank">Masimaro</a></span></div>
+        </div>
+    </footer></div>
+
+        <div id="fixed-buttons"><a href="#" id="back-to-top" class="fixed-button" title="Back to Top">
+                <i class="fas fa-arrow-up fa-fw" aria-hidden="true"></i>
+            </a><a href="#" id="view-comments" class="fixed-button" title="View Comments">
+                <i class="fas fa-comment fa-fw" aria-hidden="true"></i>
+            </a>
+        </div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.css"><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/autocomplete.js@0.38.1/dist/autocomplete.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lunr@2.3.9/lunr.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lazysizes@5.3.2/lazysizes.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/clipboard@2.0.11/dist/clipboard.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/sharer.js@0.5.1/sharer.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/auto-render.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/copy-tex.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/mhchem.min.js"></script><script type="text/javascript">window.config={"code":{"copyTitle":"Copy to clipboard","maxShownLines":50},"comment":{},"math":{"delimiters":[{"display":true,"left":"$$","right":"$$"},{"display":true,"left":"\\[","right":"\\]"},{"display":true,"left":"\\begin{equation}","right":"\\end{equation}"},{"display":true,"left":"\\begin{equation*}","right":"\\end{equation*}"},{"display":true,"left":"\\begin{align}","right":"\\end{align}"},{"display":true,"left":"\\begin{align*}","right":"\\end{align*}"},{"display":true,"left":"\\begin{alignat}","right":"\\end{alignat}"},{"display":true,"left":"\\begin{alignat*}","right":"\\end{alignat*}"},{"display":true,"left":"\\begin{gather}","right":"\\end{gather}"},{"display":true,"left":"\\begin{CD}","right":"\\end{CD}"},{"display":false,"left":"$","right":"$"},{"display":false,"left":"\\(","right":"\\)"}],"strict":false},"search":{"highlightTag":"em","maxResultLength":10,"noResultsFound":"No results found","snippetLength":50}};</script><script type="text/javascript" src="/js/theme.min.js"></script></body>
+</html>

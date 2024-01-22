@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="robots" content="noodp" />
+        <title>OLEDB不使用SQL语句直接打开数据表 - Masimaro&#39;s blog</title><meta name="Description" content="这是我用于记录日常和学习的小站"><meta property="og:title" content="OLEDB不使用SQL语句直接打开数据表" />
+<meta property="og:description" content="一般来说获取数据库表的方法是采用类似 select * from table_name 这样的sql语句。SQL语句必然伴随着数据库的解释执行，一般来说效率比较低下，而且使用SQL语句" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://HaiLateBoy.github.io/posts/oledb-and-ado-10/" /><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2018-04-14T10:30:28+00:00" />
+<meta property="article:modified_time" content="2018-04-14T10:30:28+00:00" /><meta property="og:site_name" content="Masimaro&#39;s blog" />
+
+<meta name="twitter:card" content="summary"/><meta name="twitter:title" content="OLEDB不使用SQL语句直接打开数据表"/>
+<meta name="twitter:description" content="一般来说获取数据库表的方法是采用类似 select * from table_name 这样的sql语句。SQL语句必然伴随着数据库的解释执行，一般来说效率比较低下，而且使用SQL语句"/>
+<meta name="application-name" content="My cool site">
+<meta name="apple-mobile-web-app-title" content="My cool site"><meta name="theme-color" content="#ffffff"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="manifest" href="/site.webmanifest"><link rel="canonical" href="http://HaiLateBoy.github.io/posts/oledb-and-ado-10/" /><link rel="prev" href="http://HaiLateBoy.github.io/posts/cpp-inherit/" /><link rel="next" href="http://HaiLateBoy.github.io/posts/oledb-and-ado-11/" /><link rel="stylesheet" href="/css/style.min.css"><link rel="preload" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css"></noscript><link rel="preload" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css"></noscript><script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "BlogPosting",
+        "headline": "OLEDB不使用SQL语句直接打开数据表",
+        "inLanguage": "zh-CN",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "http:\/\/HaiLateBoy.github.io\/posts\/oledb-and-ado-10\/"
+        },"genre": "posts","keywords": "OLEDB, 数据库编程, VC\u002b\u002b, 数据库","wordcount":  759 ,
+        "url": "http:\/\/HaiLateBoy.github.io\/posts\/oledb-and-ado-10\/","datePublished": "2018-04-14T10:30:28+00:00","dateModified": "2018-04-14T10:30:28+00:00","publisher": {
+            "@type": "Organization",
+            "name": ""},"author": {
+                "@type": "Person",
+                "name": "Masimaro"
+            },"description": ""
+    }
+    </script></head>
+    <body data-header-desktop="fixed" data-header-mobile="auto"><script type="text/javascript">(window.localStorage && localStorage.getItem('theme') ? localStorage.getItem('theme') === 'dark' : ('auto' === 'auto' ? window.matchMedia('(prefers-color-scheme: dark)').matches : 'auto' === 'dark')) && document.body.setAttribute('theme', 'dark');</script>
+
+        <div id="mask"></div><div class="wrapper"><header class="desktop" id="header-desktop">
+    <div class="header-wrapper">
+        <div class="header-title">
+            <a href="/" title="Masimaro&#39;s blog">My cool site</a>
+        </div>
+        <div class="menu">
+            <div class="menu-inner"><a class="menu-item" href="/posts/" title="文章列表"> 文章 </a><a class="menu-item" href="/tags/" title="标签"> 标签 </a><a class="menu-item" href="/categories/" title="分类"> 分类 </a><a class="menu-item" href="/about" title="关于本站"> 关于 </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-desktop">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-desktop" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-desktop" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-desktop">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </span><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                    <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+                </a></div>
+        </div>
+    </div>
+</header><header class="mobile" id="header-mobile">
+    <div class="header-container">
+        <div class="header-wrapper">
+            <div class="header-title">
+                <a href="/" title="Masimaro&#39;s blog">My cool site</a>
+            </div>
+            <div class="menu-toggle" id="menu-toggle-mobile">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+        <div class="menu" id="menu-mobile"><div class="search-wrapper">
+                    <div class="search mobile" id="search-mobile">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-mobile">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-mobile" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-mobile" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-mobile">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </div>
+                    <a href="javascript:void(0);" class="search-cancel" id="search-cancel-mobile">
+                        Cancel
+                    </a>
+                </div><a class="menu-item" href="/posts/" title="文章列表">文章</a><a class="menu-item" href="/tags/" title="标签">标签</a><a class="menu-item" href="/categories/" title="分类">分类</a><a class="menu-item" href="/about" title="关于本站">关于</a><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+            </a></div>
+    </div>
+</header><div class="search-dropdown desktop">
+        <div id="search-dropdown-desktop"></div>
+    </div>
+    <div class="search-dropdown mobile">
+        <div id="search-dropdown-mobile"></div>
+    </div><main class="main">
+                <div class="container"><div class="toc" id="toc-auto">
+            <h2 class="toc-title">Contents</h2>
+            <div class="toc-content" id="toc-content-auto"></div>
+        </div><article class="page single"><h1 class="single-title animate__animated animate__flipInX">OLEDB不使用SQL语句直接打开数据表</h1><div class="post-meta">
+            <div class="post-meta-line"><span class="post-author"><a href="https://www.masimaro.xyz" title="Author" target="_blank" rel="noopener noreffer author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Masimaro</a></span>&nbsp;<span class="post-category">included in <a href="/categories/windows-%E6%95%B0%E6%8D%AE%E5%BA%93%E7%BC%96%E7%A8%8B/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>windows 数据库编程</a></span></div>
+            <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw" aria-hidden="true"></i>&nbsp;<time datetime="2018-04-14">2018-04-14</time>&nbsp;<i class="fas fa-pencil-alt fa-fw" aria-hidden="true"></i>&nbsp;759 words&nbsp;
+                <i class="far fa-clock fa-fw" aria-hidden="true"></i>&nbsp;2 minutes&nbsp;</div>
+        </div><div class="details toc" id="toc-static"  data-kept="true">
+                <div class="details-summary toc-title">
+                    <span>Contents</span>
+                    <span><i class="details-icon fas fa-angle-right" aria-hidden="true"></i></span>
+                </div>
+                <div class="details-content toc-content" id="toc-content-static"><nav id="TableOfContents"></nav></div>
+            </div><div class="content" id="content"><p>一般来说获取数据库表的方法是采用类似</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="cl"><span class="k">select</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">from</span><span class="w"> </span><span class="k">table_name</span><span class="w">
+</span></span></span></code></pre></div><p>这样的sql语句。SQL语句必然伴随着数据库的解释执行，一般来说效率比较低下，而且使用SQL语句时需要数据库支持ICommandText对象，但是在OLEDB中它是一个可选接口，也就是有的数据库可能不支持，这个时候OLEDB给我们提供了一种方法让我们能够在不使用SQL的情况下操作数据库表对象。</p>
+<!-- raw HTML omitted -->
+<p>直接打开表对象需要使用IOpenRowset接口。该接口属于Session对象。</p>
+<h1 id="打开数据库表的一般步骤">打开数据库表的一般步骤</h1>
+<ol>
+<li>声明一个DBID结构对象</li>
+<li>为结构对象的ekind（对象种类）字段赋值DBKIND_NAME值</li>
+<li>为结构对象的uName.pwszName字段赋值为表名</li>
+<li>调用IOpenRowset接口的OpenRowset方法，将DBID结构的指针传入，并让函数返回结果集对象</li>
+</ol>
+<p>IOpenRowset接口属于Session，可以在使用CreateSession时让其直接打开这个接口，而且该接口是必须实现的接口，因此不用担心获取不到的情况，得到这个接口后就可以直接使用接口的OpenRowset方法。
+OpenRowset函数原型如下：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="n">HRESULT</span> <span class="nf">OpenRowset</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">   <span class="n">IUnknown</span>    <span class="o">*</span><span class="n">pUnkOuter</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">   <span class="n">DBID</span>        <span class="o">*</span><span class="n">pTableID</span><span class="p">,</span> <span class="c1">//打开表时使用该结构
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>   <span class="n">DBID</span>        <span class="o">*</span><span class="n">pIndexID</span><span class="p">,</span> <span class="c1">//打开索引时使用这个参数
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>   <span class="n">REFIID</span>       <span class="n">riid</span><span class="p">,</span> <span class="c1">//返回对象的GUID
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>   <span class="n">ULONG</span>        <span class="n">cPropertySets</span><span class="p">,</span> <span class="c1">//给对应返回对象设置的属性集的个数
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>   <span class="n">DBPROPSET</span>    <span class="n">rgPropertySets</span><span class="p">[],</span> <span class="c1">//给对应对象设置的属性集
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>   <span class="n">IUnknown</span>   <span class="o">**</span><span class="n">ppRowset</span><span class="p">);</span> <span class="c1">// 返回的接口
+</span></span></span></code></pre></div><p>从函数定义上来，这种方式还可以用来打开索引</p>
+<h1 id="使用实例">使用实例</h1>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="n">BOOL</span> <span class="nf">OpenTable</span><span class="p">(</span><span class="n">IOpenRowset</span> <span class="o">*</span><span class="n">pIOpenRowset</span><span class="p">,</span> <span class="n">IRowset</span><span class="o">*</span> <span class="o">&amp;</span><span class="n">pIRowset</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">	<span class="n">DBID</span> <span class="n">dbId</span> <span class="o">=</span> <span class="p">{</span><span class="mi">0</span><span class="p">};</span>
+</span></span><span class="line"><span class="cl">	<span class="n">dbId</span><span class="p">.</span><span class="n">eKind</span> <span class="o">=</span> <span class="n">DBKIND_NAME</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">dbId</span><span class="p">.</span><span class="n">uName</span><span class="p">.</span><span class="n">pwszName</span> <span class="o">=</span> <span class="n">OLESTR</span><span class="p">(</span><span class="s">&#34;aa26&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="n">DBPROP</span> <span class="n">dbRowsetProp</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="mi">0</span><span class="p">};</span>
+</span></span><span class="line"><span class="cl">	<span class="n">DBPROPSET</span> <span class="n">dbRowsetPropset</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="mi">0</span><span class="p">};</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="c1">//运行直接使用对应接口函数对数据库进行增删改操作
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="n">dbRowsetProp</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">colid</span> <span class="o">=</span> <span class="n">DB_NULLID</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">dbRowsetProp</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">dwOptions</span> <span class="o">=</span> <span class="n">DBPROPOPTIONS_REQUIRED</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">dbRowsetProp</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">dwPropertyID</span> <span class="o">=</span> <span class="n">DBPROP_UPDATABILITY</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">dbRowsetProp</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">vValue</span><span class="p">.</span><span class="n">vt</span> <span class="o">=</span> <span class="n">VT_I4</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">dbRowsetProp</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">vValue</span><span class="p">.</span><span class="n">intVal</span> <span class="o">=</span> <span class="n">DBPROPVAL_UP_CHANGE</span> <span class="o">|</span> <span class="n">DBPROPVAL_UP_DELETE</span> <span class="o">|</span> <span class="n">DBPROPVAL_UP_DELETE</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="c1">//运行在删改的同时插入数据
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="n">dbRowsetProp</span><span class="p">[</span><span class="mi">1</span><span class="p">].</span><span class="n">colid</span> <span class="o">=</span> <span class="n">DB_NULLID</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">dbRowsetProp</span><span class="p">[</span><span class="mi">1</span><span class="p">].</span><span class="n">dwOptions</span> <span class="o">=</span> <span class="n">DBPROPOPTIONS_REQUIRED</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">dbRowsetProp</span><span class="p">[</span><span class="mi">1</span><span class="p">].</span><span class="n">dwPropertyID</span> <span class="o">=</span> <span class="n">DBPROP_CANHOLDROWS</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">dbRowsetProp</span><span class="p">[</span><span class="mi">1</span><span class="p">].</span><span class="n">vValue</span><span class="p">.</span><span class="n">vt</span> <span class="o">=</span> <span class="n">VT_BOOL</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">dbRowsetProp</span><span class="p">[</span><span class="mi">1</span><span class="p">].</span><span class="n">vValue</span><span class="p">.</span><span class="n">boolVal</span> <span class="o">=</span> <span class="n">VARIANT_TRUE</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="c1">//打开IRowsetUpdate接口，实现延迟更新
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="n">dbRowsetProp</span><span class="p">[</span><span class="mi">2</span><span class="p">].</span><span class="n">colid</span> <span class="o">=</span> <span class="n">DB_NULLID</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">dbRowsetProp</span><span class="p">[</span><span class="mi">2</span><span class="p">].</span><span class="n">dwOptions</span> <span class="o">=</span> <span class="n">DBPROPOPTIONS_REQUIRED</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">dbRowsetProp</span><span class="p">[</span><span class="mi">2</span><span class="p">].</span><span class="n">dwPropertyID</span> <span class="o">=</span> <span class="n">DBPROP_IRowsetUpdate</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">dbRowsetProp</span><span class="p">[</span><span class="mi">2</span><span class="p">].</span><span class="n">vValue</span><span class="p">.</span><span class="n">vt</span> <span class="o">=</span> <span class="n">VT_BOOL</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">dbRowsetProp</span><span class="p">[</span><span class="mi">2</span><span class="p">].</span><span class="n">vValue</span><span class="p">.</span><span class="n">boolVal</span> <span class="o">=</span> <span class="n">VARIANT_TRUE</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="n">dbRowsetPropset</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">cProperties</span> <span class="o">=</span> <span class="mi">3</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">dbRowsetPropset</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">guidPropertySet</span> <span class="o">=</span> <span class="n">DBPROPSET_ROWSET</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">dbRowsetPropset</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">rgProperties</span> <span class="o">=</span> <span class="n">dbRowsetProp</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="n">HRESULT</span> <span class="n">hRes</span> <span class="o">=</span> <span class="n">pIOpenRowset</span><span class="o">-&gt;</span><span class="n">OpenRowset</span><span class="p">(</span><span class="nb">NULL</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">dbId</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">,</span> <span class="n">IID_IRowset</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">dbRowsetPropset</span><span class="p">,</span> <span class="p">(</span><span class="n">IUnknown</span><span class="o">**</span><span class="p">)</span><span class="o">&amp;</span><span class="n">pIRowset</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="k">return</span> <span class="n">SUCCEEDED</span><span class="p">(</span><span class="n">hRes</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p>详细的代码请参考: <a href="https://gitee.com/masimaro/codes/tcesnrul0g2yi76bam5dj19" target="_blank" rel="noopener noreffer ">完整代码</a></p>
+<!-- raw HTML omitted -->
+</div><div class="post-footer" id="post-footer">
+    <div class="post-info">
+        <div class="post-info-line">
+            <div class="post-info-mod">
+                <span>Updated on 2018-04-14</span>
+            </div></div>
+        <div class="post-info-line">
+            <div class="post-info-md"></div>
+            <div class="post-info-share">
+                <span><a href="javascript:void(0);" title="Share on Twitter" data-sharer="twitter" data-url="http://HaiLateBoy.github.io/posts/oledb-and-ado-10/" data-title="OLEDB不使用SQL语句直接打开数据表" data-hashtags="OLEDB,数据库编程,VC&#43;&#43;,数据库"><i class="fab fa-twitter fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Facebook" data-sharer="facebook" data-url="http://HaiLateBoy.github.io/posts/oledb-and-ado-10/" data-hashtag="OLEDB"><i class="fab fa-facebook-square fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Hacker News" data-sharer="hackernews" data-url="http://HaiLateBoy.github.io/posts/oledb-and-ado-10/" data-title="OLEDB不使用SQL语句直接打开数据表"><i class="fab fa-hacker-news fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Line" data-sharer="line" data-url="http://HaiLateBoy.github.io/posts/oledb-and-ado-10/" data-title="OLEDB不使用SQL语句直接打开数据表"><i data-svg-src="https://cdn.jsdelivr.net/npm/simple-icons@7.3.0/icons/line.svg" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on 微博" data-sharer="weibo" data-url="http://HaiLateBoy.github.io/posts/oledb-and-ado-10/" data-title="OLEDB不使用SQL语句直接打开数据表"><i class="fab fa-weibo fa-fw" aria-hidden="true"></i></a></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="post-info-more">
+        <section class="post-tags"><i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/oledb/">OLEDB</a>,&nbsp;<a href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93%E7%BC%96%E7%A8%8B/">数据库编程</a>,&nbsp;<a href="/tags/vc&#43;&#43;/">VC&#43;&#43;</a>,&nbsp;<a href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93/">数据库</a></section>
+        <section>
+            <span><a href="javascript:void(0);" onclick="window.history.back();">Back</a></span>&nbsp;|&nbsp;<span><a href="/">Home</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav"><a href="/posts/cpp-inherit/" class="prev" rel="prev" title="C&#43;&#43; 继承分析"><i class="fas fa-angle-left fa-fw" aria-hidden="true"></i>C++ 继承分析</a>
+            <a href="/posts/oledb-and-ado-11/" class="next" rel="next" title="OLEDB存取BLOB型数据">OLEDB存取BLOB型数据<i class="fas fa-angle-right fa-fw" aria-hidden="true"></i></a></div>
+</div>
+</article></div>
+            </main><footer class="footer">
+        <div class="footer-container"><div class="footer-line">Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener noreffer" title="Hugo 0.121.2">Hugo</a> | Theme - <a href="https://github.com/dillonzq/LoveIt" target="_blank" rel="noopener noreffer" title="LoveIt 0.2.11"><i class="far fa-kiss-wink-heart fa-fw" aria-hidden="true"></i> LoveIt</a>
+                </div><div class="footer-line" itemscope itemtype="http://schema.org/CreativeWork"><i class="far fa-copyright fa-fw" aria-hidden="true"></i><span itemprop="copyrightYear">2022 - 2024</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="https://www.masimaro.xyz" target="_blank">Masimaro</a></span></div>
+        </div>
+    </footer></div>
+
+        <div id="fixed-buttons"><a href="#" id="back-to-top" class="fixed-button" title="Back to Top">
+                <i class="fas fa-arrow-up fa-fw" aria-hidden="true"></i>
+            </a><a href="#" id="view-comments" class="fixed-button" title="View Comments">
+                <i class="fas fa-comment fa-fw" aria-hidden="true"></i>
+            </a>
+        </div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.css"><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/autocomplete.js@0.38.1/dist/autocomplete.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lunr@2.3.9/lunr.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lazysizes@5.3.2/lazysizes.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/clipboard@2.0.11/dist/clipboard.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/sharer.js@0.5.1/sharer.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/auto-render.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/copy-tex.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/mhchem.min.js"></script><script type="text/javascript">window.config={"code":{"copyTitle":"Copy to clipboard","maxShownLines":50},"comment":{},"math":{"delimiters":[{"display":true,"left":"$$","right":"$$"},{"display":true,"left":"\\[","right":"\\]"},{"display":true,"left":"\\begin{equation}","right":"\\end{equation}"},{"display":true,"left":"\\begin{equation*}","right":"\\end{equation*}"},{"display":true,"left":"\\begin{align}","right":"\\end{align}"},{"display":true,"left":"\\begin{align*}","right":"\\end{align*}"},{"display":true,"left":"\\begin{alignat}","right":"\\end{alignat}"},{"display":true,"left":"\\begin{alignat*}","right":"\\end{alignat*}"},{"display":true,"left":"\\begin{gather}","right":"\\end{gather}"},{"display":true,"left":"\\begin{CD}","right":"\\end{CD}"},{"display":false,"left":"$","right":"$"},{"display":false,"left":"\\(","right":"\\)"}],"strict":false},"search":{"highlightTag":"em","maxResultLength":10,"noResultsFound":"No results found","snippetLength":50}};</script><script type="text/javascript" src="/js/theme.min.js"></script></body>
+</html>

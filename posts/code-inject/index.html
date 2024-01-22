@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="robots" content="noodp" />
+        <title>Windows下的代码注入 - Masimaro&#39;s blog</title><meta name="Description" content="这是我用于记录日常和学习的小站"><meta property="og:title" content="Windows下的代码注入" />
+<meta property="og:description" content="木马和病毒的好坏很大程度上取决于它的隐蔽性，木马和病毒本质上也是在执行程序代码，如果采用独立进程的方式需要考虑隐藏进程否则很容易被发现，在编" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://HaiLateBoy.github.io/posts/code-inject/" /><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2018-09-09T17:39:13+00:00" />
+<meta property="article:modified_time" content="2018-09-09T17:39:13+00:00" /><meta property="og:site_name" content="Masimaro&#39;s blog" />
+
+<meta name="twitter:card" content="summary"/><meta name="twitter:title" content="Windows下的代码注入"/>
+<meta name="twitter:description" content="木马和病毒的好坏很大程度上取决于它的隐蔽性，木马和病毒本质上也是在执行程序代码，如果采用独立进程的方式需要考虑隐藏进程否则很容易被发现，在编"/>
+<meta name="application-name" content="My cool site">
+<meta name="apple-mobile-web-app-title" content="My cool site"><meta name="theme-color" content="#ffffff"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="manifest" href="/site.webmanifest"><link rel="canonical" href="http://HaiLateBoy.github.io/posts/code-inject/" /><link rel="prev" href="http://HaiLateBoy.github.io/posts/heap-manage/" /><link rel="next" href="http://HaiLateBoy.github.io/posts/post-before-call-main/" /><link rel="stylesheet" href="/css/style.min.css"><link rel="preload" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css"></noscript><link rel="preload" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css"></noscript><script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "BlogPosting",
+        "headline": "Windows下的代码注入",
+        "inLanguage": "zh-CN",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "http:\/\/HaiLateBoy.github.io\/posts\/code-inject\/"
+        },"genre": "posts","keywords": "Dll 远程注入, Dll远程卸载, 无Dll的代码注入","wordcount":  3286 ,
+        "url": "http:\/\/HaiLateBoy.github.io\/posts\/code-inject\/","datePublished": "2018-09-09T17:39:13+00:00","dateModified": "2018-09-09T17:39:13+00:00","publisher": {
+            "@type": "Organization",
+            "name": ""},"author": {
+                "@type": "Person",
+                "name": "Masimaro"
+            },"description": ""
+    }
+    </script></head>
+    <body data-header-desktop="fixed" data-header-mobile="auto"><script type="text/javascript">(window.localStorage && localStorage.getItem('theme') ? localStorage.getItem('theme') === 'dark' : ('auto' === 'auto' ? window.matchMedia('(prefers-color-scheme: dark)').matches : 'auto' === 'dark')) && document.body.setAttribute('theme', 'dark');</script>
+
+        <div id="mask"></div><div class="wrapper"><header class="desktop" id="header-desktop">
+    <div class="header-wrapper">
+        <div class="header-title">
+            <a href="/" title="Masimaro&#39;s blog">My cool site</a>
+        </div>
+        <div class="menu">
+            <div class="menu-inner"><a class="menu-item" href="/posts/" title="文章列表"> 文章 </a><a class="menu-item" href="/tags/" title="标签"> 标签 </a><a class="menu-item" href="/categories/" title="分类"> 分类 </a><a class="menu-item" href="/about" title="关于本站"> 关于 </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-desktop">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-desktop" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-desktop" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-desktop">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </span><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                    <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+                </a></div>
+        </div>
+    </div>
+</header><header class="mobile" id="header-mobile">
+    <div class="header-container">
+        <div class="header-wrapper">
+            <div class="header-title">
+                <a href="/" title="Masimaro&#39;s blog">My cool site</a>
+            </div>
+            <div class="menu-toggle" id="menu-toggle-mobile">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+        <div class="menu" id="menu-mobile"><div class="search-wrapper">
+                    <div class="search mobile" id="search-mobile">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-mobile">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-mobile" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-mobile" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-mobile">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </div>
+                    <a href="javascript:void(0);" class="search-cancel" id="search-cancel-mobile">
+                        Cancel
+                    </a>
+                </div><a class="menu-item" href="/posts/" title="文章列表">文章</a><a class="menu-item" href="/tags/" title="标签">标签</a><a class="menu-item" href="/categories/" title="分类">分类</a><a class="menu-item" href="/about" title="关于本站">关于</a><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+            </a></div>
+    </div>
+</header><div class="search-dropdown desktop">
+        <div id="search-dropdown-desktop"></div>
+    </div>
+    <div class="search-dropdown mobile">
+        <div id="search-dropdown-mobile"></div>
+    </div><main class="main">
+                <div class="container"><div class="toc" id="toc-auto">
+            <h2 class="toc-title">Contents</h2>
+            <div class="toc-content" id="toc-content-auto"></div>
+        </div><article class="page single"><h1 class="single-title animate__animated animate__flipInX">Windows下的代码注入</h1><div class="post-meta">
+            <div class="post-meta-line"><span class="post-author"><a href="https://www.masimaro.xyz" title="Author" target="_blank" rel="noopener noreffer author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Masimaro</a></span>&nbsp;<span class="post-category">included in <a href="/categories/windows-%E9%AB%98%E7%BA%A7%E7%BC%96%E7%A8%8B/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>Windows 高级编程</a></span></div>
+            <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw" aria-hidden="true"></i>&nbsp;<time datetime="2018-09-09">2018-09-09</time>&nbsp;<i class="fas fa-pencil-alt fa-fw" aria-hidden="true"></i>&nbsp;3286 words&nbsp;
+                <i class="far fa-clock fa-fw" aria-hidden="true"></i>&nbsp;7 minutes&nbsp;</div>
+        </div><div class="details toc" id="toc-static"  data-kept="true">
+                <div class="details-summary toc-title">
+                    <span>Contents</span>
+                    <span><i class="details-icon fas fa-angle-right" aria-hidden="true"></i></span>
+                </div>
+                <div class="details-content toc-content" id="toc-content-static"><nav id="TableOfContents">
+  <ul>
+    <li><a href="#dll注入">DLL注入</a></li>
+    <li><a href="#卸载远程dll">卸载远程DLL</a></li>
+    <li><a href="#无dll的注入">无DLL的注入</a></li>
+  </ul>
+</nav></div>
+            </div><div class="content" id="content"><p>木马和病毒的好坏很大程度上取决于它的隐蔽性，木马和病毒本质上也是在执行程序代码，如果采用独立进程的方式需要考虑隐藏进程否则很容易被发现，在编写这类程序的时候可以考虑将代码注入到其他进程中，借用其他进程的环境和资源来执行代码。远程注入技术不仅被木马和病毒广泛使用，防病毒软件和软件调试中也有很大的用途，最近也简单的研究过这些东西，在这里将它发布出来。</p>
+<!-- raw HTML omitted -->
+<p>想要将代码注入到其他进程并能成功执行需要解决两个问题：</p>
+<ol>
+<li>第一个问题是如何让远程进程执行注入的代码。原始进程有它自己的执行逻辑，想要破坏原来的执行流程，使EIP寄存器跳转到注入的代码位置基本是不可能的</li>
+<li>第二个问题是每个进程中地址空间是独立的，比如在调用某个句柄时，即使是同一个内核对象，在不同进程中对应的句柄也是不同的，这就需要进行地址转化。</li>
+</ol>
+<p>要进行远程代码注入的要点和难点主要就是这两个问题，下面给出两种不同的注入方式来说明如何解决这两个问题</p>
+<h2 id="dll注入">DLL注入</h2>
+<p>DLL注入很好的解决了第二个问题，DLL被加载到目标进程之后，它里面的代码中的地址就会自动被转化为对应进程中的地址，这个特性是由于DLL加载的过程决定的，它会自己使用它所在进程中的资源和地址空间，所以只要DLL中不存在硬编码的地址，基本不用担心里面会出现函数或者句柄需要进行地址转化的问题。
+那么第一个问题改怎么解决呢？</p>
+<p>要执行用户代码，在Windows中最常见的就是使用回调的方式，Windows采用的是事件驱动的方式，只要发生了某些事件就会调用回调，在众多使用回调的场景中，线程的回调是最简单的，它不会干扰到目标进程的正常执行，也就不用考虑最后还原EIP的问题，因此DLL注入采用的最常见的就是创建一个远程线程，让线程加载DLL代码。</p>
+<p>DLL注入中一般的思路是：使用CreateRemoteThread来在目标进程中创建一个远程的线程，这个线程主要是加载DLL到目标进程中，由于DLL在入口函数(DLLMain)中会处理进程加载Dll的事件，所以将注入代码写到这个事件中，这样就能执行注入的代码了。那么如何在远程进程中执行DLL的加载操作呢？我们知道加载DLL主要使用的是函数LoadLibrary,仔细分析线程的回调函数和LoadLibrary函数的原型，会发现，它们同样都是传入一个参数，而CreateRemoteThread函数正好需要一个函数的地址作为回调，并且传入一个参数作为回调函数的参数。这样就有思路了，我们让LoadLibrary作为线程的回调函数，将对应dll的文件名和路径作为参数传入，这样就可以在对应进程中加载dll了，进一步也就可以执行dllmain中的对应代码了。</p>
+<p>还有一个很重要的问题，我们知道不同进程中，地址空间是隔离的，那么我在注入的进程中传入LoadLibrary函数的地址，这算是一个硬编码的地址，它在目标进程中是否是一样的呢？答案是，二者的地址是一样的，这是由于kernel32.dll在32位程序中加载的基地址是一样的，而LoadLibrary在kernel32.dll中的偏移是一定的（只要不同的进程加载的是同一份kernel32.dll）那么不同进程中的LoadLibrary函数的地址是一样的。其实不光是LoadLibrary函数，只要是kernel32.dll中导出的函数，在不同进程中的地址都是一样的。注意这里只是32位，如果想要使用32位程序往64位目标程序中注入，可能需要考虑地址转换的问题，只要知道kernel32.dll在64位中的偏移，就可以计算出对应函数的地址了。</p>
+<p>LoabLibrary函数传入的代表路径的字符串的首地址在不同进程中同样是不同的，而且也没办法利用偏移来计算，这个时候解决的办法就是在远程进程中申请一块虚拟地址空间，并将目标字符串写入对应的地址中，然后将对应的首地址作为参数传入即可。</p>
+<p>最后总结一下DLL注入的步骤：</p>
+<ol>
+<li>获取LoadLibrary函数的地址</li>
+<li>调用VirtualAllocEx 函数在远程进程中申请一段虚拟内存</li>
+<li>调用WriteProcessMemory 函数将参数写入对应的虚拟内存</li>
+<li>调用CreateRemoteThread 函数创建远程线程，线程的回调函数为LoadLibrary，参数为对应的字符串的地址</li>
+</ol>
+<p>按照这个思路可以编写如下的代码:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="k">typedef</span> <span class="nf">HMODULE</span><span class="p">(</span><span class="n">WINAPI</span> <span class="o">*</span><span class="n">pfnLoadLibrary</span><span class="p">)(</span><span class="n">LPCWSTR</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">DebugPrivilege</span><span class="p">())</span> <span class="c1">//提权代码，在Windows Vista 及以上的版本需要将进程的权限提升，否则打开进程会失败
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="k">return</span> <span class="n">FALSE</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">//打开目标进程
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="n">HANDLE</span> <span class="n">hRemoteProcess</span> <span class="o">=</span> <span class="n">OpenProcess</span><span class="p">(</span><span class="n">PROCESS_ALL_ACCESS</span><span class="p">,</span> <span class="n">FALSE</span><span class="p">,</span> <span class="n">dwPid</span><span class="p">);</span> <span class="c1">//dwPid是对应的进程ID
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="k">if</span> <span class="p">(</span><span class="nb">NULL</span> <span class="o">==</span> <span class="n">hRemoteProcess</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="n">AfxMessageBox</span><span class="p">(</span><span class="n">_T</span><span class="p">(</span><span class="s">&#34;OpenProcess Error&#34;</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">//查找LoadLibrary函数地址
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="n">pfnLoadLibrary</span> <span class="n">lpLoadLibrary</span> <span class="o">=</span> <span class="p">(</span><span class="n">pfnLoadLibrary</span><span class="p">)</span><span class="n">GetProcAddress</span><span class="p">(</span><span class="n">GetModuleHandle</span><span class="p">(</span><span class="n">_T</span><span class="p">(</span><span class="s">&#34;kernel32.dll&#34;</span><span class="p">)),</span> <span class="s">&#34;LoadLibraryW&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="c1">//在远程进程中申请一块内存用于保存对应线程的参数
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="n">PVOID</span> <span class="n">pBuffer</span> <span class="o">=</span> <span class="n">VirtualAllocEx</span><span class="p">(</span><span class="n">hRemoteProcess</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">,</span> <span class="n">MAX_PATH</span><span class="p">,</span> <span class="n">MEM_COMMIT</span><span class="p">,</span> <span class="n">PAGE_READWRITE</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="c1">//在对应内存位置处写入参数值
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="n">DWORD</span> <span class="n">dwWritten</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="n">WriteProcessMemory</span><span class="p">(</span><span class="n">hRemoteProcess</span><span class="p">,</span> <span class="n">pBuffer</span><span class="p">,</span> <span class="n">m_csDLLName</span><span class="p">.</span><span class="n">GetString</span><span class="p">(),</span> <span class="p">(</span><span class="n">m_csDLLName</span><span class="p">.</span><span class="n">GetLength</span><span class="p">()</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">TCHAR</span><span class="p">),</span> <span class="o">&amp;</span><span class="n">dwWritten</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">//创建远程线程并传入对应参数
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="n">HANDLE</span> <span class="n">hRemoteThread</span> <span class="o">=</span> <span class="n">CreateRemoteThread</span><span class="p">(</span><span class="n">hRemoteProcess</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="p">(</span><span class="n">LPTHREAD_START_ROUTINE</span><span class="p">)</span><span class="n">lpLoadLibrary</span><span class="p">,</span> <span class="n">pBuffer</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="n">WaitForSingleObject</span><span class="p">(</span><span class="n">hRemoteThread</span><span class="p">,</span> <span class="n">INFINITE</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="n">VirtualFreeEx</span><span class="p">(</span><span class="n">hRemoteProcess</span><span class="p">,</span> <span class="n">pBuffer</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">MEM_RELEASE</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="n">CloseHandle</span><span class="p">(</span><span class="n">hRemoteThread</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="n">CloseHandle</span><span class="p">(</span><span class="n">hRemoteProcess</span><span class="p">);</span>
+</span></span></code></pre></div><h2 id="卸载远程dll">卸载远程DLL</h2>
+<p>上面进行了代码的注入，作为一个文明的程序，自然得考虑卸载dll，毕竟现在提倡环保，谁使用，谁治理。这里既然注入了，自然得考虑卸载。
+卸载的思路与注入的类似，只是函数变为了FreeLibrary，传入的参数变成了对应的dll的句柄了。</p>
+<p>如何获取这个模块的句柄呢？我们可以枚举进程中的模块，根据模块的名称来找到对应的模块并获取它的句柄。枚举的方式一般是使用toolhelp32中对应的函数，下面是卸载的例子代码</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="n">HANDLE</span> <span class="n">hSnapshot</span> <span class="o">=</span> <span class="n">CreateToolhelp32Snapshot</span><span class="p">(</span><span class="n">TH32CS_SNAPMODULE</span><span class="p">,</span> <span class="n">m_dwPid</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="k">if</span> <span class="p">(</span><span class="n">INVALID_HANDLE_VALUE</span> <span class="o">==</span> <span class="n">hSnapshot</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="n">AfxMessageBox</span><span class="p">(</span><span class="n">_T</span><span class="p">(</span><span class="s">&#34;CreateToolhelp32Snapshot Error&#34;</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">  <span class="k">return</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">MODULEENTRY32</span>  <span class="n">me</span> <span class="o">=</span> <span class="p">{</span><span class="mi">0</span><span class="p">};</span>
+</span></span><span class="line"><span class="cl"><span class="n">me</span><span class="p">.</span><span class="n">dwSize</span> <span class="o">=</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">MODULEENTRY32</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="n">BOOL</span> <span class="n">bRet</span> <span class="o">=</span> <span class="n">Module32First</span><span class="p">(</span><span class="n">hSnapshot</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">me</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="k">while</span> <span class="p">(</span><span class="n">bRet</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="n">CString</span> <span class="n">csModuleFile</span> <span class="o">=</span> <span class="n">_tcsupr</span><span class="p">(</span><span class="n">me</span><span class="p">.</span><span class="n">szExePath</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="k">if</span> <span class="p">(</span><span class="n">csModuleFile</span> <span class="o">==</span> <span class="n">_tcsupr</span><span class="p">((</span><span class="n">LPTSTR</span><span class="p">)</span><span class="n">m_csDLLName</span><span class="p">.</span><span class="n">GetString</span><span class="p">())</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">  <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">break</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="n">ZeroMemory</span><span class="p">(</span><span class="o">&amp;</span><span class="n">me</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">me</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">  <span class="n">me</span><span class="p">.</span><span class="n">dwSize</span> <span class="o">=</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">PROCESSENTRY32</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="n">bRet</span> <span class="o">=</span> <span class="n">Module32Next</span><span class="p">(</span><span class="n">hSnapshot</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">me</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">CloseHandle</span><span class="p">(</span><span class="n">hSnapshot</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">typedef</span> <span class="nf">BOOL</span> <span class="p">(</span><span class="o">*</span><span class="n">pfnFreeLibrary</span><span class="p">)(</span><span class="n">HMODULE</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="n">pfnFreeLibrary</span> <span class="n">FreeLibrary</span> <span class="o">=</span> <span class="p">(</span><span class="n">pfnFreeLibrary</span><span class="p">)</span><span class="n">GetProcAddress</span><span class="p">(</span><span class="n">GetModuleHandle</span><span class="p">(</span><span class="n">_T</span><span class="p">(</span><span class="s">&#34;kernel32.dll&#34;</span><span class="p">)),</span> <span class="s">&#34;FreeLibrary&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">HANDLE</span> <span class="n">hRemoteProcess</span> <span class="o">=</span> <span class="n">OpenProcess</span><span class="p">(</span><span class="n">PROCESS_ALL_ACCESS</span><span class="p">,</span> <span class="n">FALSE</span><span class="p">,</span> <span class="n">m_dwPid</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="k">if</span> <span class="p">(</span><span class="n">hRemoteProcess</span> <span class="o">==</span> <span class="nb">NULL</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">AfxMessageBox</span><span class="p">(</span><span class="n">_T</span><span class="p">(</span><span class="s">&#34;OpenProcess Error&#34;</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">HANDLE</span> <span class="n">hRemoteThread</span> <span class="o">=</span> <span class="n">CreateRemoteThread</span><span class="p">(</span><span class="n">hRemoteProcess</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="p">(</span><span class="n">LPTHREAD_START_ROUTINE</span><span class="p">)</span><span class="n">FreeLibrary</span><span class="p">,</span> <span class="n">me</span><span class="p">.</span><span class="n">modBaseAddr</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="n">WaitForSingleObject</span><span class="p">(</span><span class="n">hRemoteThread</span><span class="p">,</span> <span class="n">INFINITE</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="n">CloseHandle</span><span class="p">(</span><span class="n">hRemoteThread</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="n">CloseHandle</span><span class="p">(</span><span class="n">hRemoteProcess</span><span class="p">);</span>
+</span></span></code></pre></div><h2 id="无dll的注入">无DLL的注入</h2>
+<p>注入不一定需要使用DLL，虽然使用DLL比较简单一点，无DLL注入在解决上述两个问题的第一个思路是一样的，也是使用CreateRemoteThread来创建一个远程线程来执行目标代码。</p>
+<p>无dll的注入主要麻烦是在进行地址转化上，在调用API的时候，如果无法保证对应的dll的基地址不变的话，就得在目标进程中自行调用LoadLibrary来动态获取函数地址，并调用。</p>
+<p>在动态获取API函数的地址的时候，主要使用的函数是LoadLibrary、GetModuleHandle、GetProcAddress这三个函数，而线程的回调函数只能传入一个参数，所以我们需要将对应的需要传入的参数组成一个结构体，并将结构体对应的数据写入到目标进程的内存中，特别要注意的是，里面不要使用指针或者句柄这种与地址有关的东西。
+例如我们想在目标进程中注入一段代码，让它弹出一个对话框，以便测试是否注入成功。这种情况除了要传入上述三个函数的地址外，还需要MesageBox，而MessageBox是在user32.dll中，user32.dll在每个进程中的基地址并不相同，因此在注入的代码中需要动态加载，因此可以定义下面一个结构</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="k">typedef</span> <span class="k">struct</span> <span class="nc">REMOTE_DATA</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">DWORD</span> <span class="n">dwLoadLibrary</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">DWORD</span> <span class="n">dwGetProcAddress</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">DWORD</span> <span class="n">dwGetModuleHandle</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="n">DWORD</span> <span class="n">dwGetModuelFileName</span><span class="p">;</span> <span class="c1">//辅助函数
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="kt">char</span> <span class="n">szUser32dll</span><span class="p">[</span><span class="n">MAX_PATH</span><span class="p">];</span> <span class="c1">//存储user32dll的路径，以便调用LoadLibrary加载
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="kt">char</span> <span class="n">szMessageBox</span><span class="p">[</span><span class="mi">128</span><span class="p">];</span> <span class="c1">//存储字符串MessageBoxA 这个字符串，以便使用GetProcAddress加载MesageBox函数
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="kt">char</span> <span class="n">szMessage</span><span class="p">[</span><span class="mi">512</span><span class="p">];</span> <span class="c1">//弹出对话框上显示的字符
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">}</span>
+</span></span></code></pre></div><p>不使用DLL注入与使用DLL注入的另一个区别是，不使用DLL注入的时候需要自己加载目标代码到对应的进程中，这个操作可以借由WriteProcessMemory 将函数代码写到对应的虚拟内存中。
+最后注入的代码主要如下:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="n">DWORD</span> <span class="n">WINAPI</span> <span class="nf">RemoteThreadProc</span><span class="p">(</span><span class="n">LPVOID</span> <span class="n">lpParam</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">	<span class="n">LPREMOTE_DATA</span> <span class="n">lpData</span> <span class="o">=</span> <span class="p">(</span><span class="n">LPREMOTE_DATA</span><span class="p">)</span><span class="n">lpParam</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="k">typedef</span> <span class="n">HMODULE</span> <span class="p">(</span><span class="n">WINAPI</span> <span class="o">*</span><span class="n">pfnLoadLibrary</span><span class="p">)(</span><span class="n">LPCSTR</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="k">typedef</span> <span class="n">FARPROC</span> <span class="p">(</span><span class="n">WINAPI</span> <span class="o">*</span><span class="n">pfnGetProcAddress</span><span class="p">)(</span><span class="n">HMODULE</span><span class="p">,</span> <span class="n">LPCSTR</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="k">typedef</span> <span class="n">HMODULE</span> <span class="p">(</span><span class="o">*</span><span class="n">pfnGetModuleHandle</span><span class="p">)(</span><span class="n">LPCSTR</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="k">typedef</span> <span class="n">DWORD</span> <span class="p">(</span><span class="n">WINAPI</span> <span class="o">*</span><span class="n">pfnGetModuleFileName</span><span class="p">)(</span> <span class="n">HMODULE</span><span class="p">,</span><span class="n">LPSTR</span><span class="p">,</span> <span class="n">DWORD</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="n">pfnGetModuleHandle</span> <span class="n">MyGetModuleHandle</span> <span class="o">=</span> <span class="p">(</span><span class="n">pfnGetModuleHandle</span><span class="p">)</span><span class="n">lpData</span><span class="o">-&gt;</span><span class="n">dwGetModuleHandle</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">pfnGetModuleFileName</span> <span class="n">MyGetModuleFileName</span> <span class="o">=</span> <span class="p">(</span><span class="n">pfnGetModuleFileName</span><span class="p">)</span><span class="n">lpData</span><span class="o">-&gt;</span><span class="n">dwGetModuleFileName</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">pfnGetProcAddress</span> <span class="n">MyGetProcAddress</span> <span class="o">=</span> <span class="p">(</span><span class="n">pfnGetProcAddress</span><span class="p">)</span><span class="n">lpData</span><span class="o">-&gt;</span><span class="n">dwGetProcAddress</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">pfnLoadLibrary</span> <span class="n">MyLoadLibrary</span> <span class="o">=</span> <span class="p">(</span><span class="n">pfnLoadLibrary</span><span class="p">)</span><span class="n">lpData</span><span class="o">-&gt;</span><span class="n">dwGetProcAddress</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="k">typedef</span> <span class="kt">int</span> <span class="p">(</span><span class="n">WINAPI</span> <span class="o">*</span><span class="n">pfnMessageBox</span><span class="p">)(</span><span class="n">HWND</span><span class="p">,</span> <span class="n">LPCSTR</span><span class="p">,</span> <span class="n">LPCSTR</span><span class="p">,</span> <span class="n">UINT</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="c1">//加载User32.dll
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="n">HMODULE</span> <span class="n">hUser32Dll</span> <span class="o">=</span> <span class="n">MyLoadLibrary</span><span class="p">(</span><span class="n">lpData</span><span class="o">-&gt;</span><span class="n">szUerDll</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="c1">//加载MessageBox函数
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="n">pfnMessageBox</span> <span class="n">MyMessageBox</span> <span class="o">=</span> <span class="p">(</span><span class="n">pfnMessageBox</span><span class="p">)</span><span class="n">MyGetProcAddress</span><span class="p">(</span><span class="n">hUser32Dll</span><span class="p">,</span> <span class="n">lpData</span><span class="o">-&gt;</span><span class="n">szMessageBox</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="kt">char</span> <span class="n">szTitlte</span><span class="p">[</span><span class="n">MAX_PATH</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#34;&#34;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">MyGetModuleFileName</span><span class="p">(</span><span class="nb">NULL</span><span class="p">,</span> <span class="n">szTitlte</span><span class="p">,</span> <span class="n">MAX_PATH</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="n">MyMessageBox</span><span class="p">(</span><span class="nb">NULL</span><span class="p">,</span> <span class="n">lpData</span><span class="o">-&gt;</span><span class="n">szMessage</span><span class="p">,</span> <span class="n">szTitlte</span><span class="p">,</span> <span class="n">MB_OK</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">m_dwPid</span> <span class="o">=</span> <span class="n">GetPid</span><span class="p">();</span> <span class="c1">//获取目标进程ID
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="n">DebugPrivilege</span><span class="p">();</span> <span class="c1">//进程提权
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="n">HANDLE</span> <span class="n">hRemoteProcess</span> <span class="o">=</span> <span class="n">OpenProcess</span><span class="p">(</span><span class="n">PROCESS_ALL_ACCESS</span><span class="p">,</span> <span class="n">FALSE</span><span class="p">,</span>  <span class="n">m_dwPid</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="k">if</span> <span class="p">(</span><span class="nb">NULL</span> <span class="o">==</span> <span class="n">hRemoteProcess</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="n">AfxMessageBox</span><span class="p">(</span><span class="n">_T</span><span class="p">(</span><span class="s">&#34;OpenProcess Error&#34;</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">  <span class="k">return</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">LPREMOTE_DATA</span> <span class="n">lpData</span> <span class="o">=</span> <span class="k">new</span> <span class="n">REMOTE_DATA</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="n">ZeroMemory</span><span class="p">(</span><span class="n">lpData</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">REMOTE_DATA</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">//获取对应函数的地址
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="n">lpData</span><span class="o">-&gt;</span><span class="n">dwGetModuleFileName</span> <span class="o">=</span> <span class="p">(</span><span class="n">DWORD</span><span class="p">)</span><span class="n">GetProcAddress</span><span class="p">(</span><span class="n">GetModuleHandle</span><span class="p">(</span><span class="n">_T</span><span class="p">(</span><span class="s">&#34;kernel32.dll&#34;</span><span class="p">)),</span> <span class="s">&#34;GetModuleFileNameA&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="n">lpData</span><span class="o">-&gt;</span><span class="n">dwGetModuleHandle</span> <span class="o">=</span> <span class="p">(</span><span class="n">DWORD</span><span class="p">)</span><span class="n">GetProcAddress</span><span class="p">(</span><span class="n">GetModuleHandle</span><span class="p">(</span><span class="n">_T</span><span class="p">(</span><span class="s">&#34;kernel32.dll&#34;</span><span class="p">)),</span> <span class="s">&#34;GetModuleHandleA&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="n">lpData</span><span class="o">-&gt;</span><span class="n">dwGetProcAddress</span> <span class="o">=</span> <span class="p">(</span><span class="n">DWORD</span><span class="p">)</span><span class="n">GetProcAddress</span><span class="p">(</span><span class="n">GetModuleHandle</span><span class="p">(</span><span class="n">_T</span><span class="p">(</span><span class="s">&#34;kernel32.dll&#34;</span><span class="p">)),</span> <span class="s">&#34;GetProcAddress&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="n">lpData</span><span class="o">-&gt;</span><span class="n">dwLoadLibrary</span> <span class="o">=</span> <span class="p">(</span><span class="n">DWORD</span><span class="p">)</span><span class="n">GetProcAddress</span><span class="p">(</span><span class="n">GetModuleHandle</span><span class="p">(</span><span class="n">_T</span><span class="p">(</span><span class="s">&#34;kernel32.dll&#34;</span><span class="p">)),</span> <span class="s">&#34;LoadLibraryA&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// 拷贝对应的字符串
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="n">StringCchCopyA</span><span class="p">(</span><span class="n">lpData</span><span class="o">-&gt;</span><span class="n">szMessage</span><span class="p">,</span> <span class="n">MAX_STRING_LENGTH</span><span class="p">,</span> <span class="s">&#34;Inject Success!!!&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="n">StringCchCopyA</span><span class="p">(</span><span class="n">lpData</span><span class="o">-&gt;</span><span class="n">szUerDll</span><span class="p">,</span> <span class="n">MAX_PATH</span><span class="p">,</span> <span class="s">&#34;user32.dll&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="n">StringCchCopyA</span><span class="p">(</span><span class="n">lpData</span><span class="o">-&gt;</span><span class="n">szMessageBox</span><span class="p">,</span> <span class="n">MAX_PROC_NAME_LENGTH</span><span class="p">,</span> <span class="s">&#34;MessageBoxA&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">//在远程空间中申请对应的内存，写入参数和函数的代码
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="n">LPVOID</span> <span class="n">lpRemoteBuf</span> <span class="o">=</span> <span class="n">VirtualAllocEx</span><span class="p">(</span><span class="n">hRemoteProcess</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">REMOTE_DATA</span><span class="p">),</span> <span class="n">MEM_COMMIT</span><span class="p">,</span> <span class="n">PAGE_READWRITE</span><span class="p">);</span> <span class="c1">// 存储data结构的数据
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="n">LPVOID</span> <span class="n">lpRemoteProc</span> <span class="o">=</span> <span class="n">VirtualAllocEx</span><span class="p">(</span><span class="n">hRemoteProcess</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">,</span> <span class="mh">0x4000</span><span class="p">,</span> <span class="n">MEM_COMMIT</span><span class="p">,</span> <span class="n">PAGE_EXECUTE_READWRITE</span><span class="p">);</span> <span class="c1">// 存储函数的代码
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="n">DWORD</span> <span class="n">dwWrittenSize</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="n">WriteProcessMemory</span><span class="p">(</span><span class="n">hRemoteProcess</span><span class="p">,</span> <span class="n">lpRemoteProc</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">RemoteThreadProc</span><span class="p">,</span> <span class="mh">0x4000</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">dwWrittenSize</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="n">WriteProcessMemory</span><span class="p">(</span><span class="n">hRemoteProcess</span><span class="p">,</span> <span class="n">lpRemoteBuf</span><span class="p">,</span> <span class="n">lpData</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">REMOTE_DATA</span><span class="p">),</span> <span class="o">&amp;</span><span class="n">dwWrittenSize</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">HANDLE</span> <span class="n">hRemoteThread</span> <span class="o">=</span> <span class="n">CreateRemoteThread</span><span class="p">(</span><span class="n">hRemoteProcess</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="p">(</span><span class="n">LPTHREAD_START_ROUTINE</span><span class="p">)</span><span class="n">lpRemoteProc</span><span class="p">,</span> <span class="n">lpRemoteBuf</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="n">WaitForSingleObject</span><span class="p">(</span><span class="n">hRemoteThread</span><span class="p">,</span> <span class="n">INFINITE</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="n">VirtualFreeEx</span><span class="p">(</span><span class="n">hRemoteProcess</span><span class="p">,</span> <span class="n">lpRemoteBuf</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">MEM_RELEASE</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="n">VirtualFreeEx</span><span class="p">(</span><span class="n">hRemoteProcess</span><span class="p">,</span> <span class="n">lpRemoteProc</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">MEM_RELEASE</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="n">CloseHandle</span><span class="p">(</span><span class="n">hRemoteThread</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="n">CloseHandle</span><span class="p">(</span><span class="n">hRemoteProcess</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">delete</span><span class="p">[]</span> <span class="n">lpData</span><span class="p">;</span>
+</span></span></code></pre></div><!-- raw HTML omitted -->
+</div><div class="post-footer" id="post-footer">
+    <div class="post-info">
+        <div class="post-info-line">
+            <div class="post-info-mod">
+                <span>Updated on 2018-09-09</span>
+            </div></div>
+        <div class="post-info-line">
+            <div class="post-info-md"></div>
+            <div class="post-info-share">
+                <span><a href="javascript:void(0);" title="Share on Twitter" data-sharer="twitter" data-url="http://HaiLateBoy.github.io/posts/code-inject/" data-title="Windows下的代码注入" data-hashtags="Dll 远程注入,Dll远程卸载,无Dll的代码注入"><i class="fab fa-twitter fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Facebook" data-sharer="facebook" data-url="http://HaiLateBoy.github.io/posts/code-inject/" data-hashtag="Dll 远程注入"><i class="fab fa-facebook-square fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Hacker News" data-sharer="hackernews" data-url="http://HaiLateBoy.github.io/posts/code-inject/" data-title="Windows下的代码注入"><i class="fab fa-hacker-news fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Line" data-sharer="line" data-url="http://HaiLateBoy.github.io/posts/code-inject/" data-title="Windows下的代码注入"><i data-svg-src="https://cdn.jsdelivr.net/npm/simple-icons@7.3.0/icons/line.svg" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on 微博" data-sharer="weibo" data-url="http://HaiLateBoy.github.io/posts/code-inject/" data-title="Windows下的代码注入"><i class="fab fa-weibo fa-fw" aria-hidden="true"></i></a></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="post-info-more">
+        <section class="post-tags"><i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/dll-%E8%BF%9C%E7%A8%8B%E6%B3%A8%E5%85%A5/">Dll 远程注入</a>,&nbsp;<a href="/tags/dll%E8%BF%9C%E7%A8%8B%E5%8D%B8%E8%BD%BD/">Dll远程卸载</a>,&nbsp;<a href="/tags/%E6%97%A0dll%E7%9A%84%E4%BB%A3%E7%A0%81%E6%B3%A8%E5%85%A5/">无Dll的代码注入</a></section>
+        <section>
+            <span><a href="javascript:void(0);" onclick="window.history.back();">Back</a></span>&nbsp;|&nbsp;<span><a href="/">Home</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav"><a href="/posts/heap-manage/" class="prev" rel="prev" title="C 堆内存管理"><i class="fas fa-angle-left fa-fw" aria-hidden="true"></i>C 堆内存管理</a>
+            <a href="/posts/post-before-call-main/" class="next" rel="next" title="VC 在调用main函数之前的操作">VC 在调用main函数之前的操作<i class="fas fa-angle-right fa-fw" aria-hidden="true"></i></a></div>
+</div>
+</article></div>
+            </main><footer class="footer">
+        <div class="footer-container"><div class="footer-line">Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener noreffer" title="Hugo 0.121.2">Hugo</a> | Theme - <a href="https://github.com/dillonzq/LoveIt" target="_blank" rel="noopener noreffer" title="LoveIt 0.2.11"><i class="far fa-kiss-wink-heart fa-fw" aria-hidden="true"></i> LoveIt</a>
+                </div><div class="footer-line" itemscope itemtype="http://schema.org/CreativeWork"><i class="far fa-copyright fa-fw" aria-hidden="true"></i><span itemprop="copyrightYear">2022 - 2024</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="https://www.masimaro.xyz" target="_blank">Masimaro</a></span></div>
+        </div>
+    </footer></div>
+
+        <div id="fixed-buttons"><a href="#" id="back-to-top" class="fixed-button" title="Back to Top">
+                <i class="fas fa-arrow-up fa-fw" aria-hidden="true"></i>
+            </a><a href="#" id="view-comments" class="fixed-button" title="View Comments">
+                <i class="fas fa-comment fa-fw" aria-hidden="true"></i>
+            </a>
+        </div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.css"><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/autocomplete.js@0.38.1/dist/autocomplete.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lunr@2.3.9/lunr.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lazysizes@5.3.2/lazysizes.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/clipboard@2.0.11/dist/clipboard.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/sharer.js@0.5.1/sharer.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/auto-render.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/copy-tex.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/mhchem.min.js"></script><script type="text/javascript">window.config={"code":{"copyTitle":"Copy to clipboard","maxShownLines":50},"comment":{},"math":{"delimiters":[{"display":true,"left":"$$","right":"$$"},{"display":true,"left":"\\[","right":"\\]"},{"display":true,"left":"\\begin{equation}","right":"\\end{equation}"},{"display":true,"left":"\\begin{equation*}","right":"\\end{equation*}"},{"display":true,"left":"\\begin{align}","right":"\\end{align}"},{"display":true,"left":"\\begin{align*}","right":"\\end{align*}"},{"display":true,"left":"\\begin{alignat}","right":"\\end{alignat}"},{"display":true,"left":"\\begin{alignat*}","right":"\\end{alignat*}"},{"display":true,"left":"\\begin{gather}","right":"\\end{gather}"},{"display":true,"left":"\\begin{CD}","right":"\\end{CD}"},{"display":false,"left":"$","right":"$"},{"display":false,"left":"\\(","right":"\\)"}],"strict":false},"search":{"highlightTag":"em","maxResultLength":10,"noResultsFound":"No results found","snippetLength":50}};</script><script type="text/javascript" src="/js/theme.min.js"></script></body>
+</html>

@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="robots" content="noodp" />
+        <title>vim 从嫌弃到依赖(6)——插入模式 - Masimaro&#39;s blog</title><meta name="Description" content="这是我用于记录日常和学习的小站"><meta property="og:title" content="vim 从嫌弃到依赖(6)——插入模式" />
+<meta property="og:description" content="插入模式是vim中主要用来处理输入的一种模式，在这种模式中，用户的输入的字符会显示在窗口中。该模式中的行为与在普通编辑器中输入类似。由于在该模式中输入的字符会被当做有效输入，因此该模式下涉及的到命令也少，内容也不多，这一篇文章差不多就能讲完" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://HaiLateBoy.github.io/posts/vim-tutorial-7/" /><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2022-04-21T12:38:01+08:00" />
+<meta property="article:modified_time" content="2022-04-21T12:38:01+08:00" /><meta property="og:site_name" content="Masimaro&#39;s blog" />
+
+<meta name="twitter:card" content="summary"/><meta name="twitter:title" content="vim 从嫌弃到依赖(6)——插入模式"/>
+<meta name="twitter:description" content="插入模式是vim中主要用来处理输入的一种模式，在这种模式中，用户的输入的字符会显示在窗口中。该模式中的行为与在普通编辑器中输入类似。由于在该模式中输入的字符会被当做有效输入，因此该模式下涉及的到命令也少，内容也不多，这一篇文章差不多就能讲完"/>
+<meta name="application-name" content="My cool site">
+<meta name="apple-mobile-web-app-title" content="My cool site"><meta name="theme-color" content="#ffffff"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="manifest" href="/site.webmanifest"><link rel="canonical" href="http://HaiLateBoy.github.io/posts/vim-tutorial-7/" /><link rel="prev" href="http://HaiLateBoy.github.io/posts/vim-tutorial-6/" /><link rel="next" href="http://HaiLateBoy.github.io/posts/vim-tutorial-8/" /><link rel="stylesheet" href="/css/style.min.css"><link rel="preload" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css"></noscript><link rel="preload" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css"></noscript><script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "BlogPosting",
+        "headline": "vim 从嫌弃到依赖(6)——插入模式",
+        "inLanguage": "zh-CN",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "http:\/\/HaiLateBoy.github.io\/posts\/vim-tutorial-7\/"
+        },"genre": "posts","keywords": "vim, 编辑工具, 文本处理","wordcount":  2118 ,
+        "url": "http:\/\/HaiLateBoy.github.io\/posts\/vim-tutorial-7\/","datePublished": "2022-04-21T12:38:01+08:00","dateModified": "2022-04-21T12:38:01+08:00","publisher": {
+            "@type": "Organization",
+            "name": ""},"author": {
+                "@type": "Person",
+                "name": "Masimaro"
+            },"description": ""
+    }
+    </script></head>
+    <body data-header-desktop="fixed" data-header-mobile="auto"><script type="text/javascript">(window.localStorage && localStorage.getItem('theme') ? localStorage.getItem('theme') === 'dark' : ('auto' === 'auto' ? window.matchMedia('(prefers-color-scheme: dark)').matches : 'auto' === 'dark')) && document.body.setAttribute('theme', 'dark');</script>
+
+        <div id="mask"></div><div class="wrapper"><header class="desktop" id="header-desktop">
+    <div class="header-wrapper">
+        <div class="header-title">
+            <a href="/" title="Masimaro&#39;s blog">My cool site</a>
+        </div>
+        <div class="menu">
+            <div class="menu-inner"><a class="menu-item" href="/posts/" title="文章列表"> 文章 </a><a class="menu-item" href="/tags/" title="标签"> 标签 </a><a class="menu-item" href="/categories/" title="分类"> 分类 </a><a class="menu-item" href="/about" title="关于本站"> 关于 </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-desktop">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-desktop" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-desktop" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-desktop">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </span><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                    <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+                </a></div>
+        </div>
+    </div>
+</header><header class="mobile" id="header-mobile">
+    <div class="header-container">
+        <div class="header-wrapper">
+            <div class="header-title">
+                <a href="/" title="Masimaro&#39;s blog">My cool site</a>
+            </div>
+            <div class="menu-toggle" id="menu-toggle-mobile">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+        <div class="menu" id="menu-mobile"><div class="search-wrapper">
+                    <div class="search mobile" id="search-mobile">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-mobile">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-mobile" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-mobile" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-mobile">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </div>
+                    <a href="javascript:void(0);" class="search-cancel" id="search-cancel-mobile">
+                        Cancel
+                    </a>
+                </div><a class="menu-item" href="/posts/" title="文章列表">文章</a><a class="menu-item" href="/tags/" title="标签">标签</a><a class="menu-item" href="/categories/" title="分类">分类</a><a class="menu-item" href="/about" title="关于本站">关于</a><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+            </a></div>
+    </div>
+</header><div class="search-dropdown desktop">
+        <div id="search-dropdown-desktop"></div>
+    </div>
+    <div class="search-dropdown mobile">
+        <div id="search-dropdown-mobile"></div>
+    </div><main class="main">
+                <div class="container"><div class="toc" id="toc-auto">
+            <h2 class="toc-title">Contents</h2>
+            <div class="toc-content" id="toc-content-auto"></div>
+        </div><article class="page single"><h1 class="single-title animate__animated animate__flipInX">vim 从嫌弃到依赖(6)——插入模式</h1><div class="post-meta">
+            <div class="post-meta-line"><span class="post-author"><a href="https://www.masimaro.xyz" title="Author" target="_blank" rel="noopener noreffer author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Masimaro</a></span>&nbsp;<span class="post-category">included in <a href="/categories/vim/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>vim</a></span></div>
+            <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw" aria-hidden="true"></i>&nbsp;<time datetime="2022-04-21">2022-04-21</time>&nbsp;<i class="fas fa-pencil-alt fa-fw" aria-hidden="true"></i>&nbsp;2118 words&nbsp;
+                <i class="far fa-clock fa-fw" aria-hidden="true"></i>&nbsp;5 minutes&nbsp;</div>
+        </div><div class="details toc" id="toc-static"  data-kept="true">
+                <div class="details-summary toc-title">
+                    <span>Contents</span>
+                    <span><i class="details-icon fas fa-angle-right" aria-hidden="true"></i></span>
+                </div>
+                <div class="details-content toc-content" id="toc-content-static"><nav id="TableOfContents"></nav></div>
+            </div><div class="content" id="content"><p>插入模式是vim中主要用来处理输入的一种模式，在这种模式中，用户的输入的字符会显示在窗口中。该模式中的行为与在普通编辑器中输入类似。由于在该模式中输入的字符会被当做有效输入，因此该模式下涉及的到命令也少，内容也不多，这一篇文章差不多就能讲完</p>
+<h1 id="进入插入模式的一些命令">进入插入模式的一些命令</h1>
+<p>在前面几节我们在介绍一些例子的时候或多或少接触到了如何进入插入模式，特别是用的比较多的 <code>i</code>、<code>c</code> 等命令。而且还介绍了一些复合命令，有些复合命令同时也肩负着进入插入模式的职责。这里列出一些常用的进入插入模式的方法，也算是对之前的一些命令做一个总结。</p>
+<table>
+<thead>
+<tr>
+<th>命令</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>i</td>
+<td>在当前光标前进入插入模式</td>
+</tr>
+<tr>
+<td>I</td>
+<td>在行首进入插入模式</td>
+</tr>
+<tr>
+<td>a</td>
+<td>在当前光标后面进入插入模式</td>
+</tr>
+<tr>
+<td>A</td>
+<td>在行尾进入插入模式</td>
+</tr>
+<tr>
+<td>o</td>
+<td>在下一行进入插入模式</td>
+</tr>
+<tr>
+<td>O</td>
+<td>在上一行进入插入模式</td>
+</tr>
+<tr>
+<td>s</td>
+<td>删除当前光标所在字符并进入插入模式</td>
+</tr>
+<tr>
+<td>S</td>
+<td>删除光标所在行并进入模式</td>
+</tr>
+<tr>
+<td>c + motion</td>
+<td>删除指定范围的字符，并进入插入模式</td>
+</tr>
+<tr>
+<td>C</td>
+<td>删除光标所在位置至行尾的字符，并进入插入模式</td>
+</tr>
+</tbody>
+</table>
+<h1 id="在插入模式中删除字符">在插入模式中删除字符</h1>
+<p>在插入模式中输入出错，我们一般会退出到普通模式下使用<code>c</code>或者<code>d</code>之类的指令进行删除操作，然后重新进入插入模式，但是有时候这种方式显的有些啰嗦。</p>
+<p>其实在插入模式中是可以进行删除操作的，例如如果要删除的字符刚好在光标前面，我们可以使用退格键删除它。另外<code>vim</code>提供了其他几种方式在插入模式中向前删除单词、行</p>
+<ul>
+<li><code>&lt;Ctrl + h&gt;</code>: 删除光标前一个词(与退格键相同)</li>
+<li><code>&lt;Ctrl + w&gt;</code>: 删除光标前一个单词</li>
+<li><code>&lt;Ctrl + u&gt;</code>: 删除至行首</li>
+</ul>
+<h1 id="插入-普通模式">插入-普通模式</h1>
+<p>从插入模式返回到普通模式可以使用 <code>\&lt;Esc\&gt;</code> 键，或者使用 <code>&lt;C-[&gt;</code>， 但是在某些情况下我主要的经历还是集中在编写代码或者文档上面，之前也说过<code>vim</code> 作为编辑器应该要符合人的一般使用习惯，在文思如泉涌的时候退回到普通模式总有种割裂感，普通模式应该是我们在需要调整思路的时候回去最好。</p>
+<p>假设我在写文档或者写代码的时候光标已经到窗口的最后一行了，但是我想将光标定位到窗口中央，一般都会先退回到普通模式，然后使用前面介绍过的 <code>zz</code>来完成这一动作，最后再进入插入模式。</p>
+<p>针对这种情况<code>vim</code> 提供了一种新的模式 <code>插入—普通模式</code>，在插入模式中使用<code>Ctrl + o</code> 来进入该模式。该模式运行用户暂时回到普通模式，然后在执行一条普通模式的命令之后自动回到插入模式中。</p>
+<p>例如针对上面的例子，可以使用 <code>\&lt;Ctrl +o&gt;zz</code> 来刷新光标位置
+<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://img-blog.csdnimg.cn/eda403fd711c4c2a9eb8ec54f3a9c07d.gif#pic_center"
+        data-srcset="https://img-blog.csdnimg.cn/eda403fd711c4c2a9eb8ec54f3a9c07d.gif#pic_center, https://img-blog.csdnimg.cn/eda403fd711c4c2a9eb8ec54f3a9c07d.gif#pic_center 1.5x, https://img-blog.csdnimg.cn/eda403fd711c4c2a9eb8ec54f3a9c07d.gif#pic_center 2x"
+        data-sizes="auto"
+        alt="https://img-blog.csdnimg.cn/eda403fd711c4c2a9eb8ec54f3a9c07d.gif#pic_center"
+        title="插入—普通模式" /></p>
+<h1 id="插入非常用字符">插入非常用字符</h1>
+<p>在平时输入的时候，除了常用的英文单词或者汉字之类的字符还有一些非常用字符，例如unicode 图标或者ascii 字符，或者其他键盘无法直接打出的字符。<code>vim</code> 支持使用通过字符的二进制编码进行输入</p>
+<ul>
+<li><code>&lt;Ctrl + v&gt;</code> {code}：按照字符的十进制编码输入，这里code只能输入单字节的字符</li>
+<li><code>&lt;Ctrl +v&gt;</code> u{code}: 按照字符的16进制编码输入，这里可以支持两个字节的字符输入，例如unicode</li>
+</ul>
+<p>例如可以使用该方式输入字符A，A在ascii表的十进制值是65，因此在插入模式下使用 <code>&lt;Ctrl v&gt;65</code> 然后回车即可
+<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://img-blog.csdnimg.cn/4180525ccf874992819ce0a27052decd.gif#pic_center"
+        data-srcset="https://img-blog.csdnimg.cn/4180525ccf874992819ce0a27052decd.gif#pic_center, https://img-blog.csdnimg.cn/4180525ccf874992819ce0a27052decd.gif#pic_center 1.5x, https://img-blog.csdnimg.cn/4180525ccf874992819ce0a27052decd.gif#pic_center 2x"
+        data-sizes="auto"
+        alt="https://img-blog.csdnimg.cn/4180525ccf874992819ce0a27052decd.gif#pic_center"
+        title="插入ASCII字符" />
+这里再给出一个输入unicode字符的例子，例如我们输入一个安卓的小机器人，通过查询对应的unicode字码表，它的16进制值是 <code>e70e</code>，那么我们就可以输入<code>&lt;Ctrl v&gt;ue70e</code></p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://img-blog.csdnimg.cn/9c8712f11d5242ddb8ff99a24cbb72aa.gif#pic_center"
+        data-srcset="https://img-blog.csdnimg.cn/9c8712f11d5242ddb8ff99a24cbb72aa.gif#pic_center, https://img-blog.csdnimg.cn/9c8712f11d5242ddb8ff99a24cbb72aa.gif#pic_center 1.5x, https://img-blog.csdnimg.cn/9c8712f11d5242ddb8ff99a24cbb72aa.gif#pic_center 2x"
+        data-sizes="auto"
+        alt="https://img-blog.csdnimg.cn/9c8712f11d5242ddb8ff99a24cbb72aa.gif#pic_center"
+        title="插入unicode" />
+除了输入字符表中的例子，也可以输入二合字符。可以使用 <code>&lt;C-k&gt;{char1}{char2}</code> 来输入二合字符，例如要输入分数 1/2可以使用<code>&lt;C-v&gt;12</code> 来进行。</p>
+<p>这个技巧也是 《vim实用技巧》 书中介绍的，可以在vim中使用 <code>:h digraph-table</code> 来查看二合字母表。平时写代码基本用不到这个，所以这里就一笔带过吧。</p>
+<h1 id="替换模式">替换模式</h1>
+<p>vim 中的替换模式与改写模式类似。它会将光标所在字符替换为新输入的字符，按照 vim官方文档的说法，替换模式不会变更文本自身的长度，只会在现有长度上替换已有文本。只有在光标超出原有文本长度时才会表现出插入字符这一特性。而且在替换模式下没有删除的操作。</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://img-blog.csdnimg.cn/98a9d1294d374fb88fb1c6e8b30fab43.gif#pic_center"
+        data-srcset="https://img-blog.csdnimg.cn/98a9d1294d374fb88fb1c6e8b30fab43.gif#pic_center, https://img-blog.csdnimg.cn/98a9d1294d374fb88fb1c6e8b30fab43.gif#pic_center 1.5x, https://img-blog.csdnimg.cn/98a9d1294d374fb88fb1c6e8b30fab43.gif#pic_center 2x"
+        data-sizes="auto"
+        alt="https://img-blog.csdnimg.cn/98a9d1294d374fb88fb1c6e8b30fab43.gif#pic_center"
+        title="替换模式" />
+在某些情况下替换可能会导致代码格式错乱，如果代码中某些位置存在制表符，而制表符的宽度会根据<code>tabstop</code> 的值不同，而显示不同，例如<code>vim</code> 默认的制表符占8个空格，如果我们使用<code>R</code> 进入替换模式，替换tab键的话，原来的tab键所有空白字符都会被替换，这样会导致文本长度发生变化。如果不希望长度变化，vim提供了一种被称之为虚拟替换模式的方式，可以使用 <code>gR</code> 进入，这样再替换制表符的话，制表符被替换为一个字符+ 多余的空格，源文本长度不变。</p>
+<ul>
+<li>使用普通的替换模式
+<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://img-blog.csdnimg.cn/20c230a1edef47d4ba14f67037829c41.gif#pic_center"
+        data-srcset="https://img-blog.csdnimg.cn/20c230a1edef47d4ba14f67037829c41.gif#pic_center, https://img-blog.csdnimg.cn/20c230a1edef47d4ba14f67037829c41.gif#pic_center 1.5x, https://img-blog.csdnimg.cn/20c230a1edef47d4ba14f67037829c41.gif#pic_center 2x"
+        data-sizes="auto"
+        alt="https://img-blog.csdnimg.cn/20c230a1edef47d4ba14f67037829c41.gif#pic_center"
+        title="使用普通替换模式" /></li>
+<li>使用虚拟替换模式
+<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://img-blog.csdnimg.cn/2b66598c11d843e8961eed6de6884051.gif#pic_center"
+        data-srcset="https://img-blog.csdnimg.cn/2b66598c11d843e8961eed6de6884051.gif#pic_center, https://img-blog.csdnimg.cn/2b66598c11d843e8961eed6de6884051.gif#pic_center 1.5x, https://img-blog.csdnimg.cn/2b66598c11d843e8961eed6de6884051.gif#pic_center 2x"
+        data-sizes="auto"
+        alt="https://img-blog.csdnimg.cn/2b66598c11d843e8961eed6de6884051.gif#pic_center"
+        title="使用虚拟替换模式" />
+除了进入和退出替换模式，如果只是想替换一次，可以使用<code>r{char}</code> 和 <code>gr{char}</code> 暂时进入替换模式，替换一个字符后立即回到普通模式</li>
+</ul>
+<p>替换模式就我自己来说用的还是比较少的，除非我只需要替换个别字符导致的拼写错误。一般我更习惯删除整个单词，然后重新输入。至于虚拟替换模式解决<code>tab</code> 的问题，我更喜欢使用一些配置将<code>tab</code> 键改为空格，这里我们在配置文件中再添加几行</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-lua" data-lang="lua"><span class="line"><span class="cl"><span class="c1">-- nvim lua 配置</span>
+</span></span><span class="line"><span class="cl"><span class="n">vim.o</span><span class="p">.</span><span class="n">softtabstop</span> <span class="o">=</span> <span class="mi">4</span>
+</span></span><span class="line"><span class="cl"><span class="n">vim.o</span><span class="p">.</span><span class="n">shiftwidth</span> <span class="o">=</span> <span class="mi">4</span>
+</span></span><span class="line"><span class="cl"><span class="n">vim.o</span><span class="p">.</span><span class="n">expandtab</span> <span class="o">=</span> <span class="kc">true</span>
+</span></span></code></pre></div><pre tabindex="0"><code class="language-vimscript" data-lang="vimscript"># vimscript
+set softtabstop=4
+set shiftwidth = 4
+set expandtab = true
+</code></pre><p>这几行会将tab替换为4个空格，并且在一些代码中，如果加入了自动缩进的属性，在输入下一行的时候它会自动以4个空格进行缩进</p>
+<p>到这里，插入模式下的一些内容都介绍完了，插入模式主要用来做文本输入，与在其他编辑器中输入文本相比并没有太大的区别，所以内容比较少，只需要一篇就结束了。请各位多多支持，订阅专栏，关注作者。方便接收更新推送和日后系统性的回顾，谢谢大家</p></div><div class="post-footer" id="post-footer">
+    <div class="post-info">
+        <div class="post-info-line">
+            <div class="post-info-mod">
+                <span>Updated on 2022-04-21</span>
+            </div></div>
+        <div class="post-info-line">
+            <div class="post-info-md"></div>
+            <div class="post-info-share">
+                <span><a href="javascript:void(0);" title="Share on Twitter" data-sharer="twitter" data-url="http://HaiLateBoy.github.io/posts/vim-tutorial-7/" data-title="vim 从嫌弃到依赖(6)——插入模式" data-hashtags="vim,编辑工具,文本处理"><i class="fab fa-twitter fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Facebook" data-sharer="facebook" data-url="http://HaiLateBoy.github.io/posts/vim-tutorial-7/" data-hashtag="vim"><i class="fab fa-facebook-square fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Hacker News" data-sharer="hackernews" data-url="http://HaiLateBoy.github.io/posts/vim-tutorial-7/" data-title="vim 从嫌弃到依赖(6)——插入模式"><i class="fab fa-hacker-news fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Line" data-sharer="line" data-url="http://HaiLateBoy.github.io/posts/vim-tutorial-7/" data-title="vim 从嫌弃到依赖(6)——插入模式"><i data-svg-src="https://cdn.jsdelivr.net/npm/simple-icons@7.3.0/icons/line.svg" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on 微博" data-sharer="weibo" data-url="http://HaiLateBoy.github.io/posts/vim-tutorial-7/" data-title="vim 从嫌弃到依赖(6)——插入模式"><i class="fab fa-weibo fa-fw" aria-hidden="true"></i></a></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="post-info-more">
+        <section class="post-tags"><i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/vim/">vim</a>,&nbsp;<a href="/tags/%E7%BC%96%E8%BE%91%E5%B7%A5%E5%85%B7/">编辑工具</a>,&nbsp;<a href="/tags/%E6%96%87%E6%9C%AC%E5%A4%84%E7%90%86/">文本处理</a></section>
+        <section>
+            <span><a href="javascript:void(0);" onclick="window.history.back();">Back</a></span>&nbsp;|&nbsp;<span><a href="/">Home</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav"><a href="/posts/vim-tutorial-6/" class="prev" rel="prev" title="vim 从嫌弃到依赖(5)——普通模式的一些操作"><i class="fas fa-angle-left fa-fw" aria-hidden="true"></i>vim 从嫌弃到依赖(5)——普通模式的一些操作</a>
+            <a href="/posts/vim-tutorial-8/" class="next" rel="next" title="vim 从嫌弃到依赖(7)——可视模式">vim 从嫌弃到依赖(7)——可视模式<i class="fas fa-angle-right fa-fw" aria-hidden="true"></i></a></div>
+</div>
+</article></div>
+            </main><footer class="footer">
+        <div class="footer-container"><div class="footer-line">Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener noreffer" title="Hugo 0.121.2">Hugo</a> | Theme - <a href="https://github.com/dillonzq/LoveIt" target="_blank" rel="noopener noreffer" title="LoveIt 0.2.11"><i class="far fa-kiss-wink-heart fa-fw" aria-hidden="true"></i> LoveIt</a>
+                </div><div class="footer-line" itemscope itemtype="http://schema.org/CreativeWork"><i class="far fa-copyright fa-fw" aria-hidden="true"></i><span itemprop="copyrightYear">2022 - 2024</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="https://www.masimaro.xyz" target="_blank">Masimaro</a></span></div>
+        </div>
+    </footer></div>
+
+        <div id="fixed-buttons"><a href="#" id="back-to-top" class="fixed-button" title="Back to Top">
+                <i class="fas fa-arrow-up fa-fw" aria-hidden="true"></i>
+            </a><a href="#" id="view-comments" class="fixed-button" title="View Comments">
+                <i class="fas fa-comment fa-fw" aria-hidden="true"></i>
+            </a>
+        </div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.css"><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/autocomplete.js@0.38.1/dist/autocomplete.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lunr@2.3.9/lunr.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lazysizes@5.3.2/lazysizes.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/clipboard@2.0.11/dist/clipboard.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/sharer.js@0.5.1/sharer.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/auto-render.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/copy-tex.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/mhchem.min.js"></script><script type="text/javascript">window.config={"code":{"copyTitle":"Copy to clipboard","maxShownLines":50},"comment":{},"math":{"delimiters":[{"display":true,"left":"$$","right":"$$"},{"display":true,"left":"\\[","right":"\\]"},{"display":true,"left":"\\begin{equation}","right":"\\end{equation}"},{"display":true,"left":"\\begin{equation*}","right":"\\end{equation*}"},{"display":true,"left":"\\begin{align}","right":"\\end{align}"},{"display":true,"left":"\\begin{align*}","right":"\\end{align*}"},{"display":true,"left":"\\begin{alignat}","right":"\\end{alignat}"},{"display":true,"left":"\\begin{alignat*}","right":"\\end{alignat*}"},{"display":true,"left":"\\begin{gather}","right":"\\end{gather}"},{"display":true,"left":"\\begin{CD}","right":"\\end{CD}"},{"display":false,"left":"$","right":"$"},{"display":false,"left":"\\(","right":"\\)"}],"strict":false},"search":{"highlightTag":"em","maxResultLength":10,"noResultsFound":"No results found","snippetLength":50}};</script><script type="text/javascript" src="/js/theme.min.js"></script></body>
+</html>

@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="robots" content="noodp" />
+        <title>C语言if、switch原理 - Masimaro&#39;s blog</title><meta name="Description" content="这是我用于记录日常和学习的小站"><meta property="og:title" content="C语言if、switch原理" />
+<meta property="og:description" content="条件语句是计算机编程语言中的三大流程之一，而在C语言中，if和switch是条件分支的重要组成部分。因此有必要弄明白它的底层原理" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://HaiLateBoy.github.io/posts/c-switch-if/" /><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2018-01-06T10:07:00+00:00" />
+<meta property="article:modified_time" content="2018-01-06T10:07:00+00:00" /><meta property="og:site_name" content="Masimaro&#39;s blog" />
+
+<meta name="twitter:card" content="summary"/><meta name="twitter:title" content="C语言if、switch原理"/>
+<meta name="twitter:description" content="条件语句是计算机编程语言中的三大流程之一，而在C语言中，if和switch是条件分支的重要组成部分。因此有必要弄明白它的底层原理"/>
+<meta name="application-name" content="My cool site">
+<meta name="apple-mobile-web-app-title" content="My cool site"><meta name="theme-color" content="#ffffff"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="manifest" href="/site.webmanifest"><link rel="canonical" href="http://HaiLateBoy.github.io/posts/c-switch-if/" /><link rel="prev" href="http://HaiLateBoy.github.io/posts/2018-new-year-plan/" /><link rel="next" href="http://HaiLateBoy.github.io/posts/oledb-and-ado-1/" /><link rel="stylesheet" href="/css/style.min.css"><link rel="preload" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css"></noscript><link rel="preload" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css"></noscript><script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "BlogPosting",
+        "headline": "C语言if、switch原理",
+        "inLanguage": "zh-CN",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "http:\/\/HaiLateBoy.github.io\/posts\/c-switch-if\/"
+        },"genre": "posts","keywords": "VC\u002b\u002b, 反汇编, C\u002b\u002b实现原理","wordcount":  3381 ,
+        "url": "http:\/\/HaiLateBoy.github.io\/posts\/c-switch-if\/","datePublished": "2018-01-06T10:07:00+00:00","dateModified": "2018-01-06T10:07:00+00:00","publisher": {
+            "@type": "Organization",
+            "name": ""},"author": {
+                "@type": "Person",
+                "name": "Masimaro"
+            },"description": ""
+    }
+    </script></head>
+    <body data-header-desktop="fixed" data-header-mobile="auto"><script type="text/javascript">(window.localStorage && localStorage.getItem('theme') ? localStorage.getItem('theme') === 'dark' : ('auto' === 'auto' ? window.matchMedia('(prefers-color-scheme: dark)').matches : 'auto' === 'dark')) && document.body.setAttribute('theme', 'dark');</script>
+
+        <div id="mask"></div><div class="wrapper"><header class="desktop" id="header-desktop">
+    <div class="header-wrapper">
+        <div class="header-title">
+            <a href="/" title="Masimaro&#39;s blog">My cool site</a>
+        </div>
+        <div class="menu">
+            <div class="menu-inner"><a class="menu-item" href="/posts/" title="文章列表"> 文章 </a><a class="menu-item" href="/tags/" title="标签"> 标签 </a><a class="menu-item" href="/categories/" title="分类"> 分类 </a><a class="menu-item" href="/about" title="关于本站"> 关于 </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-desktop">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-desktop" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-desktop" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-desktop">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </span><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                    <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+                </a></div>
+        </div>
+    </div>
+</header><header class="mobile" id="header-mobile">
+    <div class="header-container">
+        <div class="header-wrapper">
+            <div class="header-title">
+                <a href="/" title="Masimaro&#39;s blog">My cool site</a>
+            </div>
+            <div class="menu-toggle" id="menu-toggle-mobile">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+        <div class="menu" id="menu-mobile"><div class="search-wrapper">
+                    <div class="search mobile" id="search-mobile">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-mobile">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-mobile" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-mobile" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-mobile">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </div>
+                    <a href="javascript:void(0);" class="search-cancel" id="search-cancel-mobile">
+                        Cancel
+                    </a>
+                </div><a class="menu-item" href="/posts/" title="文章列表">文章</a><a class="menu-item" href="/tags/" title="标签">标签</a><a class="menu-item" href="/categories/" title="分类">分类</a><a class="menu-item" href="/about" title="关于本站">关于</a><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+            </a></div>
+    </div>
+</header><div class="search-dropdown desktop">
+        <div id="search-dropdown-desktop"></div>
+    </div>
+    <div class="search-dropdown mobile">
+        <div id="search-dropdown-mobile"></div>
+    </div><main class="main">
+                <div class="container"><div class="toc" id="toc-auto">
+            <h2 class="toc-title">Contents</h2>
+            <div class="toc-content" id="toc-content-auto"></div>
+        </div><article class="page single"><h1 class="single-title animate__animated animate__flipInX">C语言if、switch原理</h1><div class="post-meta">
+            <div class="post-meta-line"><span class="post-author"><a href="https://www.masimaro.xyz" title="Author" target="_blank" rel="noopener noreffer author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Masimaro</a></span>&nbsp;<span class="post-category">included in <a href="/categories/vc++%E5%8F%8D%E6%B1%87%E7%BC%96%E5%88%86%E6%9E%90/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>VC++反汇编分析</a></span></div>
+            <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw" aria-hidden="true"></i>&nbsp;<time datetime="2018-01-06">2018-01-06</time>&nbsp;<i class="fas fa-pencil-alt fa-fw" aria-hidden="true"></i>&nbsp;3381 words&nbsp;
+                <i class="far fa-clock fa-fw" aria-hidden="true"></i>&nbsp;7 minutes&nbsp;</div>
+        </div><div class="details toc" id="toc-static"  data-kept="true">
+                <div class="details-summary toc-title">
+                    <span>Contents</span>
+                    <span><i class="details-icon fas fa-angle-right" aria-hidden="true"></i></span>
+                </div>
+                <div class="details-content toc-content" id="toc-content-static"><nav id="TableOfContents"></nav></div>
+            </div><div class="content" id="content"><p>条件语句是计算机编程语言中的三大流程之一，而在C语言中，if和switch是条件分支的重要组成部分。因此有必要弄明白它的底层原理</p>
+<h1 id="if原理">if原理</h1>
+<p>if的功能是计算判断条件的值，根据返回的值的不同来决定跳转到哪个部分。值为真则跳转到if语句块中，否则跳过if语句块。下面来分析一个简单的if实例：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="k">if</span><span class="p">(</span><span class="n">argc</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">printf</span><span class="p">(</span><span class="s">&#34;argc &gt; 0</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="k">if</span> <span class="p">(</span><span class="n">argc</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">printf</span><span class="p">(</span><span class="s">&#34;argc &lt;= 0</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="n">printf</span><span class="p">(</span><span class="s">&#34;argc = %d</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">,</span> <span class="n">argc</span><span class="p">);</span>
+</span></span></code></pre></div><p>它对应的汇编代码如下：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-asm" data-lang="asm"><span class="line"><span class="cl"><span class="err">9:</span>        <span class="nf">if</span><span class="p">(</span><span class="no">argc</span> <span class="err">&gt;</span> <span class="mi">0</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">cmp</span>         <span class="no">dword</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">ebp</span><span class="err">+</span><span class="mi">8</span><span class="p">],</span><span class="mi">0</span>
+</span></span><span class="line"><span class="cl"><span class="err">0040102</span><span class="nf">C</span>   <span class="no">jle</span>         <span class="no">main</span><span class="err">+</span><span class="mi">2</span><span class="no">Bh</span> <span class="p">(</span><span class="mi">0040103</span><span class="no">b</span><span class="p">)</span> <span class="c1">;argc &lt;= 0就跳转到下一个if处
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">10:</span>       <span class="err">{</span>
+</span></span><span class="line"><span class="cl"><span class="err">11:</span>           <span class="nf">printf</span><span class="p">(</span><span class="err">&#34;</span><span class="no">argc</span> <span class="err">&gt;</span> <span class="mi">0</span><span class="err">\</span><span class="no">n</span><span class="err">&#34;</span><span class="p">)</span><span class="c1">;
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">0040102</span><span class="nf">E</span>   <span class="no">push</span>        <span class="no">offset</span> <span class="no">string</span> <span class="err">&#34;</span><span class="no">argc</span> <span class="err">&gt;</span> <span class="mi">0</span><span class="err">\</span><span class="no">n</span><span class="err">&#34;</span> <span class="p">(</span><span class="mi">0042003</span><span class="no">c</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">call</span>        <span class="no">printf</span> <span class="p">(</span><span class="mi">00401090</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">add</span>         <span class="no">esp</span><span class="p">,</span><span class="mi">4</span>
+</span></span><span class="line"><span class="cl"><span class="err">12:</span>       <span class="err">}</span>
+</span></span><span class="line"><span class="cl"><span class="err">13:</span>       <span class="nf">if</span> <span class="p">(</span><span class="no">argc</span> <span class="err">&lt;=</span> <span class="mi">0</span><span class="p">)</span> <span class="c1">;argc &gt; 0跳转到后面的printf语句输出argc的值
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">0040103</span><span class="nf">B</span>   <span class="no">cmp</span>         <span class="no">dword</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">ebp</span><span class="err">+</span><span class="mi">8</span><span class="p">],</span><span class="mi">0</span>
+</span></span><span class="line"><span class="cl"><span class="err">0040103</span><span class="nf">F</span>   <span class="no">jg</span>          <span class="no">main</span><span class="err">+</span><span class="mi">3</span><span class="no">Eh</span> <span class="p">(</span><span class="mi">0040104</span><span class="no">e</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="err">14:</span>       <span class="err">{</span>
+</span></span><span class="line"><span class="cl"><span class="err">15:</span>           <span class="nf">printf</span><span class="p">(</span><span class="err">&#34;</span><span class="no">argc</span> <span class="err">&lt;=</span> <span class="mi">0</span><span class="err">\</span><span class="no">n</span><span class="err">&#34;</span><span class="p">)</span><span class="c1">;
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="nf">push</span>        <span class="no">offset</span> <span class="no">string</span> <span class="err">&#34;</span><span class="no">argc</span> <span class="err">&lt;=</span> <span class="mi">0</span><span class="err">\</span><span class="no">n</span><span class="err">&#34;</span> <span class="p">(</span><span class="mi">0042002</span><span class="no">c</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">call</span>        <span class="no">printf</span> <span class="p">(</span><span class="mi">00401090</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="err">0040104</span><span class="nf">B</span>   <span class="no">add</span>         <span class="no">esp</span><span class="p">,</span><span class="mi">4</span>
+</span></span><span class="line"><span class="cl"><span class="err">16:</span>       <span class="err">}</span>
+</span></span><span class="line"><span class="cl"><span class="err">17:</span>       <span class="nf">printf</span><span class="p">(</span><span class="err">&#34;</span><span class="no">argc</span> <span class="err">=</span> <span class="nv">%d</span><span class="err">\</span><span class="no">n</span><span class="err">&#34;</span><span class="p">,</span> <span class="no">argc</span><span class="p">)</span><span class="c1">;
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">0040104</span><span class="nf">E</span>   <span class="no">mov</span>         <span class="no">eax</span><span class="p">,</span><span class="no">dword</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">ebp</span><span class="err">+</span><span class="mi">8</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">push</span>        <span class="no">eax</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">push</span>        <span class="no">offset</span> <span class="no">string</span> <span class="err">&#34;</span><span class="no">argc</span> <span class="err">=</span> <span class="nv">%d</span><span class="err">\</span><span class="no">n</span><span class="err">&#34;</span> <span class="p">(</span><span class="mi">0042001</span><span class="no">c</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">call</span>        <span class="no">printf</span> <span class="p">(</span><span class="mi">00401090</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="err">0040105</span><span class="nf">C</span>   <span class="no">add</span>         <span class="no">esp</span><span class="p">,</span><span class="mi">8</span>
+</span></span></code></pre></div><p>根据汇编代码我们看到，首先执行第一个if中的比较，jle表示当cmp得到的结果≤0时会进行跳转，第二个if在汇编中的跳转条件是＞0，从这个上面可以看出在代码执行过程当中if转换的条件判断语句与if的判断结果时相反的，也就是说cmp比较后不成立则跳转，成立则向下执行。同时每一次跳转都是到当前if语句的下一条语句。</p>
+<p>下面来看看if&hellip;else&hellip;语句的跳转。</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="k">if</span><span class="p">(</span><span class="n">argc</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">printf</span><span class="p">(</span><span class="s">&#34;argc &gt; 0</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span><span class="k">else</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">printf</span><span class="p">(</span><span class="s">&#34;argc &lt;= 0</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="n">printf</span><span class="p">(</span><span class="s">&#34;argc = %d</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">,</span> <span class="n">argc</span><span class="p">);</span>
+</span></span></code></pre></div><p>它所对应的汇编代码如下：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-asm" data-lang="asm"><span class="line"><span class="cl"><span class="err">00401028</span>   <span class="nf">cmp</span>         <span class="no">dword</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">ebp</span><span class="err">+</span><span class="mi">8</span><span class="p">],</span><span class="mi">0</span>
+</span></span><span class="line"><span class="cl"><span class="err">0040102</span><span class="nf">C</span>   <span class="no">jle</span>         <span class="no">main</span><span class="err">+</span><span class="mi">2</span><span class="no">Dh</span> <span class="p">(</span><span class="mi">0040103</span><span class="no">d</span><span class="p">)</span> <span class="c1">;条件不满足则跳转到else语句块中
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">10:</span>       <span class="err">{</span>
+</span></span><span class="line"><span class="cl"><span class="err">11:</span>           <span class="nf">printf</span><span class="p">(</span><span class="err">&#34;</span><span class="no">argc</span> <span class="err">&gt;</span> <span class="mi">0</span><span class="err">\</span><span class="no">n</span><span class="err">&#34;</span><span class="p">)</span><span class="c1">;
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">0040102</span><span class="nf">E</span>   <span class="no">push</span>        <span class="no">offset</span> <span class="no">string</span> <span class="err">&#34;</span><span class="no">argc</span> <span class="err">&gt;</span> <span class="mi">0</span><span class="err">\</span><span class="no">n</span><span class="err">&#34;</span> <span class="p">(</span><span class="mi">0042003</span><span class="no">c</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="err">00401033</span>   <span class="nf">call</span>        <span class="no">printf</span> <span class="p">(</span><span class="mi">00401090</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="err">00401038</span>   <span class="nf">add</span>         <span class="no">esp</span><span class="p">,</span><span class="mi">4</span>
+</span></span><span class="line"><span class="cl"><span class="err">12:</span>       <span class="err">}</span><span class="nf">else</span>
+</span></span><span class="line"><span class="cl"><span class="err">0040103</span><span class="nf">B</span>   <span class="no">jmp</span>         <span class="no">main</span><span class="err">+</span><span class="mi">3</span><span class="no">Ah</span> <span class="p">(</span><span class="mi">0040104</span><span class="no">a</span><span class="p">)</span><span class="c1">;如果执行if语句块就会执行这条语句跳出else语句块
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">13:</span>       <span class="err">{</span>
+</span></span><span class="line"><span class="cl"><span class="err">14:</span>           <span class="nf">printf</span><span class="p">(</span><span class="err">&#34;</span><span class="no">argc</span> <span class="err">&lt;=</span> <span class="mi">0</span><span class="err">\</span><span class="no">n</span><span class="err">&#34;</span><span class="p">)</span><span class="c1">;
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">0040103</span><span class="nf">D</span>   <span class="no">push</span>        <span class="no">offset</span> <span class="no">string</span> <span class="err">&#34;</span><span class="no">argc</span> <span class="err">&lt;=</span> <span class="mi">0</span><span class="err">\</span><span class="no">n</span><span class="err">&#34;</span> <span class="p">(</span><span class="mi">0042002</span><span class="no">c</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="err">00401042</span>   <span class="nf">call</span>        <span class="no">printf</span> <span class="p">(</span><span class="mi">00401090</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="err">00401047</span>   <span class="nf">add</span>         <span class="no">esp</span><span class="p">,</span><span class="mi">4</span>
+</span></span><span class="line"><span class="cl"><span class="err">15:</span>       <span class="err">}</span>
+</span></span><span class="line"><span class="cl"><span class="err">16:</span>       <span class="nf">printf</span><span class="p">(</span><span class="err">&#34;</span><span class="no">argc</span> <span class="err">=</span> <span class="nv">%d</span><span class="err">\</span><span class="no">n</span><span class="err">&#34;</span><span class="p">,</span> <span class="no">argc</span><span class="p">)</span><span class="c1">; 
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">0040104</span><span class="nf">A</span>   <span class="no">mov</span>         <span class="no">eax</span><span class="p">,</span><span class="no">dword</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">ebp</span><span class="err">+</span><span class="mi">8</span><span class="p">]</span>
+</span></span></code></pre></div><p>上述的汇编代码指出，对于if&hellip;else..语句，首先进行条件判断，if表达式为真，则继续执行if快中的语句，然后利用jmp跳转到else语句块外，否则会利用jmp跳转到else语句块中，然后依次执行其后的每一句代码。
+最后再来展示if&hellip;else if&hellip;else这种分支结构：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="k">if</span><span class="p">(</span><span class="n">argc</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">printf</span><span class="p">(</span><span class="s">&#34;argc &gt; 0</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span><span class="k">else</span> <span class="nf">if</span><span class="p">(</span><span class="n">argc</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">printf</span><span class="p">(</span><span class="s">&#34;argc &lt; 0</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span><span class="k">else</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">printf</span><span class="p">(</span><span class="s">&#34;argc == 0</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="n">printf</span><span class="p">(</span><span class="s">&#34;argc = %d</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">,</span> <span class="n">argc</span><span class="p">);</span>
+</span></span></code></pre></div><p>汇编代码如下：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-asm" data-lang="asm"><span class="line"><span class="cl"><span class="err">9:</span>        <span class="nf">if</span><span class="p">(</span><span class="no">argc</span> <span class="err">&gt;</span> <span class="mi">0</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="err">00401028</span>   <span class="nf">cmp</span>         <span class="no">dword</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">ebp</span><span class="err">+</span><span class="mi">8</span><span class="p">],</span><span class="mi">0</span>
+</span></span><span class="line"><span class="cl"><span class="err">0040102</span><span class="nf">C</span>   <span class="no">jle</span>         <span class="no">main</span><span class="err">+</span><span class="mi">2</span><span class="no">Dh</span> <span class="p">(</span><span class="mi">0040103</span><span class="no">d</span><span class="p">)</span><span class="c1">;条件不满足则会跳转到下一句else if中
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">10:</span>       <span class="err">{</span>
+</span></span><span class="line"><span class="cl"><span class="err">11:</span>           <span class="nf">printf</span><span class="p">(</span><span class="err">&#34;</span><span class="no">argc</span> <span class="err">&gt;</span> <span class="mi">0</span><span class="err">\</span><span class="no">n</span><span class="err">&#34;</span><span class="p">)</span><span class="c1">;
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">0040102</span><span class="nf">E</span>   <span class="no">push</span>        <span class="no">offset</span> <span class="no">string</span> <span class="err">&#34;</span><span class="no">argc</span> <span class="err">&gt;</span> <span class="mi">0</span><span class="err">\</span><span class="no">n</span><span class="err">&#34;</span> <span class="p">(</span><span class="mi">00420</span><span class="no">f9c</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="err">00401033</span>   <span class="nf">call</span>        <span class="no">printf</span> <span class="p">(</span><span class="mi">00401090</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="err">00401038</span>   <span class="nf">add</span>         <span class="no">esp</span><span class="p">,</span><span class="mi">4</span>
+</span></span><span class="line"><span class="cl"><span class="err">12:</span>       <span class="err">}</span><span class="nf">else</span> <span class="no">if</span><span class="p">(</span><span class="no">argc</span> <span class="err">&lt;</span> <span class="mi">0</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="err">0040103</span><span class="nf">B</span>   <span class="no">jmp</span>         <span class="no">main</span><span class="err">+</span><span class="mi">4</span><span class="no">Fh</span> <span class="p">(</span><span class="mi">0040105</span><span class="no">f</span><span class="p">)</span>  <span class="c1">;当上述条件符合则执行这条语句跳出分支外，跳转的地址正是else语句外的printf语句
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">0040103</span><span class="nf">D</span>   <span class="no">cmp</span>         <span class="no">dword</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">ebp</span><span class="err">+</span><span class="mi">8</span><span class="p">],</span><span class="mi">0</span>
+</span></span><span class="line"><span class="cl"><span class="err">00401041</span>   <span class="nf">jge</span>         <span class="no">main</span><span class="err">+</span><span class="mi">42</span><span class="no">h</span> <span class="p">(</span><span class="mi">00401052</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="err">13:</span>       <span class="err">{</span>
+</span></span><span class="line"><span class="cl"><span class="err">14:</span>           <span class="nf">printf</span><span class="p">(</span><span class="err">&#34;</span><span class="no">argc</span> <span class="err">&lt;</span> <span class="mi">0</span><span class="err">\</span><span class="no">n</span><span class="err">&#34;</span><span class="p">)</span><span class="c1">;
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">00401043</span>   <span class="nf">push</span>        <span class="no">offset</span> <span class="no">string</span> <span class="err">&#34;</span><span class="no">argc</span> <span class="err">&lt;</span> <span class="mi">0</span><span class="err">\</span><span class="no">n</span><span class="err">&#34;</span> <span class="p">(</span><span class="mi">0042003</span><span class="no">c</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="err">00401048</span>   <span class="nf">call</span>        <span class="no">printf</span> <span class="p">(</span><span class="mi">00401090</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="err">0040104</span><span class="nf">D</span>   <span class="no">add</span>         <span class="no">esp</span><span class="p">,</span><span class="mi">4</span>
+</span></span><span class="line"><span class="cl"><span class="err">15:</span>       <span class="err">}</span><span class="nf">else</span>
+</span></span><span class="line"><span class="cl"><span class="err">00401050</span>   <span class="nf">jmp</span>         <span class="no">main</span><span class="err">+</span><span class="mi">4</span><span class="no">Fh</span> <span class="p">(</span><span class="mi">0040105</span><span class="no">f</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="err">16:</span>       <span class="err">{</span>
+</span></span><span class="line"><span class="cl"><span class="err">17:</span>           <span class="nf">printf</span><span class="p">(</span><span class="err">&#34;</span><span class="no">argc</span> <span class="err">==</span> <span class="mi">0</span><span class="err">\</span><span class="no">n</span><span class="err">&#34;</span><span class="p">)</span><span class="c1">;
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">00401052</span>   <span class="nf">push</span>        <span class="no">offset</span> <span class="no">string</span> <span class="err">&#34;</span><span class="no">argc</span> <span class="err">&lt;=</span> <span class="mi">0</span><span class="err">\</span><span class="no">n</span><span class="err">&#34;</span> <span class="p">(</span><span class="mi">0042002</span><span class="no">c</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="err">00401057</span>   <span class="nf">call</span>        <span class="no">printf</span> <span class="p">(</span><span class="mi">00401090</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="err">0040105</span><span class="nf">C</span>   <span class="no">add</span>         <span class="no">esp</span><span class="p">,</span><span class="mi">4</span>
+</span></span><span class="line"><span class="cl"><span class="err">18:</span>       <span class="err">}</span>
+</span></span><span class="line"><span class="cl"><span class="err">19:</span>       <span class="nf">printf</span><span class="p">(</span><span class="err">&#34;</span><span class="no">argc</span> <span class="err">=</span> <span class="nv">%d</span><span class="err">\</span><span class="no">n</span><span class="err">&#34;</span><span class="p">,</span> <span class="no">argc</span><span class="p">)</span><span class="c1">;
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">0040105</span><span class="nf">F</span>   <span class="no">mov</span>         <span class="no">eax</span><span class="p">,</span><span class="no">dword</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">ebp</span><span class="err">+</span><span class="mi">8</span><span class="p">]</span>
+</span></span></code></pre></div><p>通过汇编代码可以看到对于这种结构，会依次判断每个if语句中的条件，当有一个满足，执行完对应语句块中的代码后，会直接调转到分支结构外部，当前面的条件都不满足则会执行else语句块中的内容。这个逻辑结构在某些情况下可以利用if  return if return 这种结构来替代。当某一条件满足时执行完对应的语句后直接返回而不执行其后的代码。一条提升效率的做法是将最有可能满足的条件放在前面进行比较，这样可以减少比较次数，提升效率。</p>
+<h1 id="switch原理">switch原理</h1>
+<p>switch是另一种比较常用的多分支结构，在使用上比较简单，效率上也比if&hellip;else if&hellip;else高，下面将分析switch结构的实现</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="k">switch</span><span class="p">(</span><span class="n">argc</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">　　<span class="k">case</span> <span class="mi">1</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">　　　　<span class="n">printf</span><span class="p">(</span><span class="s">&#34;argc = 1</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">　　　　<span class="k">break</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">　　<span class="k">case</span> <span class="mi">2</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">　　　　<span class="n">printf</span><span class="p">(</span><span class="s">&#34;argc = 2</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">　　　　<span class="k">break</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">　　　<span class="k">case</span> <span class="mi">3</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">　　　　<span class="n">printf</span><span class="p">(</span><span class="s">&#34;argc = 3</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">　　　　<span class="k">break</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">　　　<span class="k">case</span> <span class="mi">4</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">　　　　<span class="n">printf</span><span class="p">(</span><span class="s">&#34;argc = 4</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">　　　　<span class="k">break</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">　　　<span class="k">case</span> <span class="mi">5</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">　　　　<span class="n">printf</span><span class="p">(</span><span class="s">&#34;argc = 5</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">　　　　<span class="k">break</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">　　　<span class="k">case</span> <span class="mi">6</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">　　　　<span class="n">printf</span><span class="p">(</span><span class="s">&#34;argc = 6</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">　　　　<span class="k">break</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">　　　<span class="k">default</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">　　　　<span class="n">printf</span><span class="p">(</span><span class="s">&#34;else</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">　　　　<span class="k">break</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p>对应的汇编代码如下:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-asm" data-lang="asm"><span class="line"><span class="cl"><span class="err">0040</span><span class="nf">B798</span>   <span class="no">mov</span>         <span class="no">eax</span><span class="p">,</span><span class="no">dword</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">ebp</span><span class="err">+</span><span class="mi">8</span><span class="p">]</span> <span class="c1">;eax = argc
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">0040</span><span class="nf">B79B</span>   <span class="no">mov</span>         <span class="no">dword</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">ebp-4</span><span class="p">],</span><span class="no">eax</span>
+</span></span><span class="line"><span class="cl"><span class="err">0040</span><span class="nf">B79E</span>   <span class="no">mov</span>         <span class="no">ecx</span><span class="p">,</span><span class="no">dword</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">ebp-4</span><span class="p">]</span>  <span class="c1">;ecx = eax
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">0040</span><span class="nf">B7A1</span>   <span class="no">sub</span>         <span class="no">ecx</span><span class="p">,</span><span class="mi">1</span>
+</span></span><span class="line"><span class="cl"><span class="err">0040</span><span class="nf">B7A4</span>   <span class="no">mov</span>         <span class="no">dword</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">ebp-4</span><span class="p">],</span><span class="no">ecx</span>
+</span></span><span class="line"><span class="cl"><span class="err">0040</span><span class="nf">B7A7</span>   <span class="no">cmp</span>         <span class="no">dword</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">ebp-4</span><span class="p">],</span><span class="mi">5</span>
+</span></span><span class="line"><span class="cl"><span class="err">0040</span><span class="nf">B7AB</span>   <span class="no">ja</span>          <span class="no">$L544</span><span class="err">+</span><span class="mi">0</span><span class="no">Fh</span> <span class="p">(</span><span class="mi">0040</span><span class="no">b811</span><span class="p">)</span> <span class="c1">;argc 》 5则跳转到default处，至于为什么是5而不是6，看后面的说明
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">0040</span><span class="nf">B7AD</span>   <span class="no">mov</span>         <span class="no">edx</span><span class="p">,</span><span class="no">dword</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">ebp-4</span><span class="p">]</span> <span class="c1">;edx = argc
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">0040</span><span class="nf">B7B0</span>   <span class="no">jmp</span>         <span class="no">dword</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">edx</span><span class="p">*</span><span class="mi">4</span><span class="err">+</span><span class="mi">40</span><span class="no">B831h</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="err">11:</span>       <span class="nf">case</span> <span class="mi">1</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl"><span class="err">12:</span>           <span class="nf">printf</span><span class="p">(</span><span class="err">&#34;</span><span class="no">argc</span> <span class="err">=</span> <span class="mi">1</span><span class="err">\</span><span class="no">n</span><span class="err">&#34;</span><span class="p">)</span><span class="c1">;
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">0040</span><span class="nf">B7B7</span>   <span class="no">push</span>        <span class="no">offset</span> <span class="no">string</span> <span class="err">&#34;</span><span class="no">argc</span> <span class="err">=</span> <span class="mi">1</span><span class="err">\</span><span class="no">n</span><span class="err">&#34;</span> <span class="p">(</span><span class="mi">00420</span><span class="no">fc0</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="err">0040</span><span class="nf">B7BC</span>   <span class="no">call</span>        <span class="no">printf</span> <span class="p">(</span><span class="mi">00401090</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="err">0040</span><span class="nf">B7C1</span>   <span class="no">add</span>         <span class="no">esp</span><span class="p">,</span><span class="mi">4</span>
+</span></span><span class="line"><span class="cl"><span class="err">13:</span>           <span class="nf">break</span><span class="c1">;
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">0040</span><span class="nf">B7C4</span>   <span class="no">jmp</span>         <span class="no">$L544</span><span class="err">+</span><span class="mi">1</span><span class="no">Ch</span> <span class="p">(</span><span class="mi">0040</span><span class="no">b81e</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="err">14:</span>       <span class="nf">case</span> <span class="mi">2</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl"><span class="err">15:</span>           <span class="nf">printf</span><span class="p">(</span><span class="err">&#34;</span><span class="no">argc</span> <span class="err">=</span> <span class="mi">2</span><span class="err">\</span><span class="no">n</span><span class="err">&#34;</span><span class="p">)</span><span class="c1">;
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">0040</span><span class="nf">B7C6</span>   <span class="no">push</span>        <span class="no">offset</span> <span class="no">string</span> <span class="err">&#34;</span><span class="no">argc</span> <span class="err">=</span> <span class="mi">2</span><span class="err">\</span><span class="no">n</span><span class="err">&#34;</span> <span class="p">(</span><span class="mi">00420</span><span class="no">fb4</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="err">0040</span><span class="nf">B7CB</span>   <span class="no">call</span>        <span class="no">printf</span> <span class="p">(</span><span class="mi">00401090</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="err">0040</span><span class="nf">B7D0</span>   <span class="no">add</span>         <span class="no">esp</span><span class="p">,</span><span class="mi">4</span>
+</span></span><span class="line"><span class="cl"><span class="err">16:</span>           <span class="nf">break</span><span class="c1">;
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">0040</span><span class="nf">B7D3</span>   <span class="no">jmp</span>         <span class="no">$L544</span><span class="err">+</span><span class="mi">1</span><span class="no">Ch</span> <span class="p">(</span><span class="mi">0040</span><span class="no">b81e</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="err">17:</span>       <span class="nf">case</span> <span class="mi">3</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl"><span class="err">18:</span>           <span class="nf">printf</span><span class="p">(</span><span class="err">&#34;</span><span class="no">argc</span> <span class="err">=</span> <span class="mi">3</span><span class="err">\</span><span class="no">n</span><span class="err">&#34;</span><span class="p">)</span><span class="c1">;
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">0040</span><span class="nf">B7D5</span>   <span class="no">push</span>        <span class="no">offset</span> <span class="no">string</span> <span class="err">&#34;</span><span class="no">argc</span> <span class="err">=</span> <span class="mi">3</span><span class="err">\</span><span class="no">n</span><span class="err">&#34;</span> <span class="p">(</span><span class="mi">00420</span><span class="no">fa8</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="err">0040</span><span class="nf">B7DA</span>   <span class="no">call</span>        <span class="no">printf</span> <span class="p">(</span><span class="mi">00401090</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="err">0040</span><span class="nf">B7DF</span>   <span class="no">add</span>         <span class="no">esp</span><span class="p">,</span><span class="mi">4</span>
+</span></span><span class="line"><span class="cl"><span class="err">19:</span>           <span class="nf">break</span><span class="c1">;
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">0040</span><span class="nf">B7E2</span>   <span class="no">jmp</span>         <span class="no">$L544</span><span class="err">+</span><span class="mi">1</span><span class="no">Ch</span> <span class="p">(</span><span class="mi">0040</span><span class="no">b81e</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="err">20:</span>       <span class="nf">case</span> <span class="mi">4</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl"><span class="err">21:</span>           <span class="nf">printf</span><span class="p">(</span><span class="err">&#34;</span><span class="no">argc</span> <span class="err">=</span> <span class="mi">4</span><span class="err">\</span><span class="no">n</span><span class="err">&#34;</span><span class="p">)</span><span class="c1">;
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">0040</span><span class="nf">B7E4</span>   <span class="no">push</span>        <span class="no">offset</span> <span class="no">string</span> <span class="err">&#34;</span><span class="no">argc</span> <span class="err">=</span> <span class="mi">4</span><span class="err">\</span><span class="no">n</span><span class="err">&#34;</span> <span class="p">(</span><span class="mi">00420</span><span class="no">f9c</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="err">0040</span><span class="nf">B7E9</span>   <span class="no">call</span>        <span class="no">printf</span> <span class="p">(</span><span class="mi">00401090</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="err">0040</span><span class="nf">B7EE</span>   <span class="no">add</span>         <span class="no">esp</span><span class="p">,</span><span class="mi">4</span>
+</span></span><span class="line"><span class="cl"><span class="err">22:</span>           <span class="nf">break</span><span class="c1">;
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">0040</span><span class="nf">B7F1</span>   <span class="no">jmp</span>         <span class="no">$L544</span><span class="err">+</span><span class="mi">1</span><span class="no">Ch</span> <span class="p">(</span><span class="mi">0040</span><span class="no">b81e</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="err">23:</span>       <span class="nf">case</span> <span class="mi">5</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl"><span class="err">24:</span>           <span class="nf">printf</span><span class="p">(</span><span class="err">&#34;</span><span class="no">argc</span> <span class="err">=</span> <span class="mi">5</span><span class="err">\</span><span class="no">n</span><span class="err">&#34;</span><span class="p">)</span><span class="c1">;
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">0040</span><span class="nf">B7F3</span>   <span class="no">push</span>        <span class="no">offset</span> <span class="no">string</span> <span class="err">&#34;</span><span class="no">argc</span> <span class="err">&lt;</span> <span class="mi">0</span><span class="err">\</span><span class="no">n</span><span class="err">&#34;</span> <span class="p">(</span><span class="mi">0042003</span><span class="no">c</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="err">0040</span><span class="nf">B7F8</span>   <span class="no">call</span>        <span class="no">printf</span> <span class="p">(</span><span class="mi">00401090</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="err">0040</span><span class="nf">B7FD</span>   <span class="no">add</span>         <span class="no">esp</span><span class="p">,</span><span class="mi">4</span>
+</span></span><span class="line"><span class="cl"><span class="err">25:</span>           <span class="nf">break</span><span class="c1">;
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">0040</span><span class="nf">B800</span>   <span class="no">jmp</span>         <span class="no">$L544</span><span class="err">+</span><span class="mi">1</span><span class="no">Ch</span> <span class="p">(</span><span class="mi">0040</span><span class="no">b81e</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="err">26:</span>       <span class="nf">case</span> <span class="mi">6</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl"><span class="err">27:</span>           <span class="nf">printf</span><span class="p">(</span><span class="err">&#34;</span><span class="no">argc</span> <span class="err">=</span> <span class="mi">6</span><span class="err">\</span><span class="no">n</span><span class="err">&#34;</span><span class="p">)</span><span class="c1">;
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">0040</span><span class="nf">B802</span>   <span class="no">push</span>        <span class="no">offset</span> <span class="no">string</span> <span class="err">&#34;</span><span class="no">argc</span> <span class="err">&lt;=</span> <span class="mi">0</span><span class="err">\</span><span class="no">n</span><span class="err">&#34;</span> <span class="p">(</span><span class="mi">0042002</span><span class="no">c</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="err">0040</span><span class="nf">B807</span>   <span class="no">call</span>        <span class="no">printf</span> <span class="p">(</span><span class="mi">00401090</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="err">0040</span><span class="nf">B80C</span>   <span class="no">add</span>         <span class="no">esp</span><span class="p">,</span><span class="mi">4</span>
+</span></span><span class="line"><span class="cl"><span class="err">28:</span>           <span class="nf">break</span><span class="c1">;
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">0040</span><span class="nf">B80F</span>   <span class="no">jmp</span>         <span class="no">$L544</span><span class="err">+</span><span class="mi">1</span><span class="no">Ch</span> <span class="p">(</span><span class="mi">0040</span><span class="no">b81e</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="err">29:</span>       <span class="nl">default:</span>
+</span></span><span class="line"><span class="cl"><span class="err">30:</span>           <span class="nf">printf</span><span class="p">(</span><span class="err">&#34;</span><span class="no">else</span><span class="err">\</span><span class="no">n</span><span class="err">&#34;</span><span class="p">)</span><span class="c1">;
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">0040</span><span class="nf">B811</span>   <span class="no">push</span>        <span class="no">offset</span> <span class="no">string</span> <span class="err">&#34;</span><span class="no">argc</span> <span class="err">=</span> <span class="nv">%d</span><span class="err">\</span><span class="no">n</span><span class="err">&#34;</span> <span class="p">(</span><span class="mi">0042001</span><span class="no">c</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="err">0040</span><span class="nf">B816</span>   <span class="no">call</span>        <span class="no">printf</span> <span class="p">(</span><span class="mi">00401090</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="err">0040</span><span class="nf">B81B</span>   <span class="no">add</span>         <span class="no">esp</span><span class="p">,</span><span class="mi">4</span>
+</span></span><span class="line"><span class="cl"><span class="err">31:</span>           <span class="nf">break</span><span class="c1">;
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">32:</span>       <span class="err">}</span>
+</span></span><span class="line"><span class="cl"><span class="err">33:</span>
+</span></span><span class="line"><span class="cl"><span class="err">34:</span>       <span class="nf">return</span> <span class="mi">0</span><span class="c1">;
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">0040</span><span class="nf">B81E</span>   <span class="no">xor</span>         <span class="no">eax</span><span class="p">,</span><span class="no">eax</span>
+</span></span></code></pre></div><p>上面的代码中并没有看到像if那样，对每一个条件都进行比较，其中有一句话 “jmp dword ptr [edx*4+40B831h]” 这句话从表面上看应该是取数组中的元素，再根据元素的值来进行跳转,而这个元素在数组中的位置与eax也就是与argc的值有关，下面我们跟踪到数组中查看数组的元素值：
+0040B831 　　B7 B7 40 00 　　　　　　　　
+0040B835 　　C6 B7 40 00
+0040B839 　　D5 B7 40 00
+0040B83D 　　E4 B7 40 00
+0040B841 　　F3 B7 40 00
+0040B845 　　02 B8 40 00
+通过对比可以发现0x0040b7b7是case 1处的地址，后面的分别是case 2、case 3、case 4、case 5、case 6处的地址，每个case中的break语句都翻译为了同一句话“jmp $L544+1Ch (0040b81e)”，所以从这可以看出，在switch中，编译器多增加了一个数组用于存储每个case对应的地址，根据switch中传入的整数在数组中查到到对应的地址，直接通过这个地址跳转到对应的位置，减少了比较操作，提升了效率。编译器在处理switch时会首先校验不满足所有case的情况，当这种情况发生时代码调转到default或者switch语句块之外。然后将传入的整数值减一（数组元素是从0开始计数）。最后根据参数值找到应该跳转的位置。
+上述的代码case是从0~6依次递增，这样做确实可行，但是当我们在case中的值并不是依次递增的话会怎样？此时根据不同的情况编译器会做不同的处理。
+1）一般仍然会建立这样的一个表，将case中出现的值填写对应的跳转地址，没有出现的则将这个地址值填入default对应的地址或者switch语句结束的地址，比如当我们上述的代码去掉case 5， 这个时候填入的地址值如下图所示：
+<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="/c-switch-if/1.png"
+        data-srcset="/c-switch-if/1.png, /c-switch-if/1.png 1.5x, /c-switch-if/1.png 2x"
+        data-sizes="auto"
+        alt="/c-switch-if/1.png"
+        title="1" />
+2）如果每两个case之间的差距大于6，或者case语句数小于4则不会采取这种做法，如果再采用这种方式，那么会造成较大的资源消耗。这个时候编译器会采用索引表的方式来进行地址的跳转。
+下面有这样一个例子：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="k">switch</span><span class="p">(</span><span class="n">argc</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">case</span> <span class="mi">1</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">        <span class="n">printf</span><span class="p">(</span><span class="s">&#34;argc = 1</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="k">break</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="k">case</span> <span class="mi">2</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">        <span class="n">printf</span><span class="p">(</span><span class="s">&#34;argc = 2</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="k">break</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="k">case</span> <span class="mi">5</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">        <span class="n">printf</span><span class="p">(</span><span class="s">&#34;argc = 5</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="k">break</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="k">case</span> <span class="mi">6</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">        <span class="n">printf</span><span class="p">(</span><span class="s">&#34;argc = 6</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="k">break</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="k">case</span> <span class="mi">255</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">        <span class="n">printf</span><span class="p">(</span><span class="s">&#34;argc = 255</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="k">default</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">        <span class="n">printf</span><span class="p">(</span><span class="s">&#34;else</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="k">break</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p>它对应的汇编代码如下：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="mo">0040</span><span class="n">B798</span>   <span class="n">mov</span>         <span class="n">eax</span><span class="p">,</span><span class="n">dword</span> <span class="n">ptr</span> <span class="p">[</span><span class="n">ebp</span><span class="o">+</span><span class="mi">8</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="mo">0040</span><span class="n">B79B</span>   <span class="n">mov</span>         <span class="n">dword</span> <span class="n">ptr</span> <span class="p">[</span><span class="n">ebp</span><span class="o">-</span><span class="mi">4</span><span class="p">],</span><span class="n">eax</span>
+</span></span><span class="line"><span class="cl"><span class="mo">0040</span><span class="n">B79E</span>   <span class="n">mov</span>         <span class="n">ecx</span><span class="p">,</span><span class="n">dword</span> <span class="n">ptr</span> <span class="p">[</span><span class="n">ebp</span><span class="o">-</span><span class="mi">4</span><span class="p">]</span> <span class="p">;</span><span class="err">到此</span><span class="n">eax</span> <span class="o">=</span> <span class="n">ecx</span> <span class="o">=</span> <span class="n">argc</span>
+</span></span><span class="line"><span class="cl"><span class="mo">0040</span><span class="n">B7A1</span>   <span class="n">sub</span>         <span class="n">ecx</span><span class="p">,</span><span class="mi">1</span> 
+</span></span><span class="line"><span class="cl"><span class="mo">0040</span><span class="n">B7A4</span>   <span class="n">mov</span>         <span class="n">dword</span> <span class="n">ptr</span> <span class="p">[</span><span class="n">ebp</span><span class="o">-</span><span class="mi">4</span><span class="p">],</span><span class="n">ecx</span>
+</span></span><span class="line"><span class="cl"><span class="mo">0040</span><span class="n">B7A7</span>   <span class="n">cmp</span>         <span class="n">dword</span> <span class="n">ptr</span> <span class="p">[</span><span class="n">ebp</span><span class="o">-</span><span class="mi">4</span><span class="p">],</span><span class="mf">0F</span><span class="n">Eh</span>
+</span></span><span class="line"><span class="cl"><span class="mo">0040</span><span class="n">B7AE</span>   <span class="n">ja</span>          <span class="err">$</span><span class="n">L542</span><span class="o">+</span><span class="mi">0</span><span class="n">Dh</span> <span class="p">(</span><span class="mo">0040</span><span class="n">b80b</span><span class="p">)</span> <span class="p">;</span><span class="err">当</span><span class="n">argc</span>  <span class="o">&gt;</span> <span class="mi">255</span><span class="err">则跳转到</span><span class="n">default处</span>
+</span></span><span class="line"><span class="cl"><span class="mo">0040</span><span class="n">B7B0</span>   <span class="n">mov</span>         <span class="n">eax</span><span class="p">,</span><span class="n">dword</span> <span class="n">ptr</span> <span class="p">[</span><span class="n">ebp</span><span class="o">-</span><span class="mi">4</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="mo">0040</span><span class="n">B7B3</span>   <span class="n">xor</span>         <span class="n">edx</span><span class="p">,</span><span class="n">edx</span>
+</span></span><span class="line"><span class="cl"><span class="mo">0040</span><span class="n">B7B5</span>   <span class="n">mov</span>         <span class="n">dl</span><span class="p">,</span><span class="n">byte</span> <span class="n">ptr</span>  <span class="p">(</span><span class="mo">0040</span><span class="n">b843</span><span class="p">)[</span><span class="n">eax</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="mo">0040</span><span class="n">B7BB</span>   <span class="n">jmp</span>         <span class="n">dword</span> <span class="n">ptr</span> <span class="p">[</span><span class="n">edx</span><span class="o">*</span><span class="mi">4</span><span class="o">+</span><span class="mi">40</span><span class="n">B82Bh</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="mi">11</span><span class="o">:</span>       <span class="k">case</span> <span class="mi">1</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl"><span class="mi">12</span><span class="o">:</span>           <span class="n">printf</span><span class="p">(</span><span class="s">&#34;argc = 1</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="mo">0040</span><span class="n">B7C2</span>   <span class="n">push</span>        <span class="n">offset</span> <span class="n">string</span> <span class="s">&#34;argc = 1</span><span class="se">\n</span><span class="s">&#34;</span> <span class="p">(</span><span class="mf">00420f</span><span class="n">b4</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="mo">0040</span><span class="n">B7C7</span>   <span class="n">call</span>        <span class="n">printf</span> <span class="p">(</span><span class="mo">004010</span><span class="mi">90</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="mo">0040</span><span class="n">B7CC</span>   <span class="n">add</span>         <span class="n">esp</span><span class="p">,</span><span class="mi">4</span>
+</span></span><span class="line"><span class="cl"><span class="mi">13</span><span class="o">:</span>           <span class="k">break</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="mo">0040</span><span class="n">B7CF</span>   <span class="n">jmp</span>         <span class="err">$</span><span class="n">L542</span><span class="o">+</span><span class="mi">1</span><span class="n">Ah</span> <span class="p">(</span><span class="mo">0040</span><span class="n">b818</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="mi">14</span><span class="o">:</span>       <span class="k">case</span> <span class="mi">2</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl"><span class="mi">15</span><span class="o">:</span>           <span class="n">printf</span><span class="p">(</span><span class="s">&#34;argc = 2</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="mo">0040</span><span class="n">B7D1</span>   <span class="n">push</span>        <span class="n">offset</span> <span class="n">string</span> <span class="s">&#34;argc = 3</span><span class="se">\n</span><span class="s">&#34;</span> <span class="p">(</span><span class="mf">00420f</span><span class="n">a8</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="mo">0040</span><span class="n">B7D6</span>   <span class="n">call</span>        <span class="n">printf</span> <span class="p">(</span><span class="mo">004010</span><span class="mi">90</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="mo">0040</span><span class="n">B7DB</span>   <span class="n">add</span>         <span class="n">esp</span><span class="p">,</span><span class="mi">4</span>
+</span></span><span class="line"><span class="cl"><span class="mi">16</span><span class="o">:</span>           <span class="k">break</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="mo">0040</span><span class="n">B7DE</span>   <span class="n">jmp</span>         <span class="err">$</span><span class="n">L542</span><span class="o">+</span><span class="mi">1</span><span class="n">Ah</span> <span class="p">(</span><span class="mo">0040</span><span class="n">b818</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="mi">17</span><span class="o">:</span>       <span class="k">case</span> <span class="mi">5</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl"><span class="mi">18</span><span class="o">:</span>           <span class="n">printf</span><span class="p">(</span><span class="s">&#34;argc = 5</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="mo">0040</span><span class="n">B7E0</span>   <span class="n">push</span>        <span class="n">offset</span> <span class="n">string</span> <span class="s">&#34;argc = 5</span><span class="se">\n</span><span class="s">&#34;</span> <span class="p">(</span><span class="mf">00420f</span><span class="mi">9</span><span class="n">c</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="mo">0040</span><span class="n">B7E5</span>   <span class="n">call</span>        <span class="n">printf</span> <span class="p">(</span><span class="mo">004010</span><span class="mi">90</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="mo">0040</span><span class="n">B7EA</span>   <span class="n">add</span>         <span class="n">esp</span><span class="p">,</span><span class="mi">4</span>
+</span></span><span class="line"><span class="cl"><span class="mi">19</span><span class="o">:</span>           <span class="k">break</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="mo">0040</span><span class="n">B7ED</span>   <span class="n">jmp</span>         <span class="err">$</span><span class="n">L542</span><span class="o">+</span><span class="mi">1</span><span class="n">Ah</span> <span class="p">(</span><span class="mo">0040</span><span class="n">b818</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="mi">20</span><span class="o">:</span>       <span class="k">case</span> <span class="mi">6</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl"><span class="mi">21</span><span class="o">:</span>           <span class="n">printf</span><span class="p">(</span><span class="s">&#34;argc = 6</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="mo">0040</span><span class="n">B7EF</span>   <span class="n">push</span>        <span class="n">offset</span> <span class="n">string</span> <span class="s">&#34;argc &lt; 0</span><span class="se">\n</span><span class="s">&#34;</span> <span class="p">(</span><span class="mo">0042003</span><span class="n">c</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="mo">0040</span><span class="n">B7F4</span>   <span class="n">call</span>        <span class="n">printf</span> <span class="p">(</span><span class="mo">004010</span><span class="mi">90</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="mo">0040</span><span class="n">B7F9</span>   <span class="n">add</span>         <span class="n">esp</span><span class="p">,</span><span class="mi">4</span>
+</span></span><span class="line"><span class="cl"><span class="mi">22</span><span class="o">:</span>           <span class="k">break</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="mo">0040</span><span class="n">B7FC</span>   <span class="n">jmp</span>         <span class="err">$</span><span class="n">L542</span><span class="o">+</span><span class="mi">1</span><span class="n">Ah</span> <span class="p">(</span><span class="mo">0040</span><span class="n">b818</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="mi">23</span><span class="o">:</span>       <span class="k">case</span> <span class="mi">255</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl"><span class="mi">24</span><span class="o">:</span>           <span class="n">printf</span><span class="p">(</span><span class="s">&#34;argc = 255</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="mo">0040</span><span class="n">B7FE</span>   <span class="n">push</span>        <span class="n">offset</span> <span class="n">string</span> <span class="s">&#34;argc &lt;= 0</span><span class="se">\n</span><span class="s">&#34;</span> <span class="p">(</span><span class="mo">0042002</span><span class="n">c</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="mo">0040</span><span class="n">B803</span>   <span class="n">call</span>        <span class="n">printf</span> <span class="p">(</span><span class="mo">004010</span><span class="mi">90</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="mo">0040</span><span class="n">B808</span>   <span class="n">add</span>         <span class="n">esp</span><span class="p">,</span><span class="mi">4</span>
+</span></span><span class="line"><span class="cl"><span class="mi">25</span><span class="o">:</span>       <span class="k">default</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl"><span class="mi">26</span><span class="o">:</span>           <span class="n">printf</span><span class="p">(</span><span class="s">&#34;else</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="mo">0040</span><span class="n">B80B</span>   <span class="n">push</span>        <span class="n">offset</span> <span class="n">string</span> <span class="s">&#34;argc = %d</span><span class="se">\n</span><span class="s">&#34;</span> <span class="p">(</span><span class="mo">0042001</span><span class="n">c</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="mo">0040</span><span class="n">B810</span>   <span class="n">call</span>        <span class="n">printf</span> <span class="p">(</span><span class="mo">004010</span><span class="mi">90</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="mo">0040</span><span class="n">B815</span>   <span class="n">add</span>         <span class="n">esp</span><span class="p">,</span><span class="mi">4</span>
+</span></span><span class="line"><span class="cl"><span class="mi">27</span><span class="o">:</span>           <span class="k">break</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="mi">28</span><span class="o">:</span>       <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="mi">29</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl"><span class="mi">30</span><span class="o">:</span>       <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="mo">0040</span><span class="n">B818</span>   <span class="n">xor</span>         <span class="n">eax</span><span class="p">,</span><span class="n">eax</span>
+</span></span></code></pre></div><p>这段代码与上述的线性表相比较区别并不大，只是多了一句 “mov dl,byte ptr (0040b843)[eax]”  这似乎又是一个数组，通过查看内存可以知道这个数组的值分别为：00 01 05 05 02 03 05 05 &hellip; 04，下一句根据这些值在另外一个数组中查找数据，我们列出另外一个数组的值：
+C2 B7 40 00 　　D1 B7 40 00　　E0 B7 40 00　　EF B7 40 00　　FE B7 40 00　　0B B8 40 00
+通过对比我们发现，这些值分别是每个case与default入口处的地址，编译器先查找到每个值在数组中对应的元素位置，然后根据这个位置值再在地址表中从、找到地址进行跳转，这个过程可以用下面的图来表示：
+<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="/c-switch-if/2.png"
+        data-srcset="/c-switch-if/2.png, /c-switch-if/2.png 1.5x, /c-switch-if/2.png 2x"
+        data-sizes="auto"
+        alt="/c-switch-if/2.png"
+        title="2" />
+这样通过一个每个元素占一个字节的表，来表示对应的case在地址表中所对应的位置，从而跳转到对应的地址，这样通过对每个case增加一个字节的内存消耗来达到，减少地址表对应的内存消耗。
+在上述的汇编代码中，是利用dl寄存器来存储对应case在地址表中项，这样就会产生一个问题，当case 值大于 255，也就是超出了一个字节的，超出了dl寄存器的表示范围时，又该如何来进行跳转这个时候编译器会采用判定树的方式来进行判定，在根节点保存的是所有case值的中位数， 左子树都是大于这个大于这个值的数，右字数是小于这个值的数，通过每次的比较来得到正确的地址。比如下面的这个判定树：
+<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="/c-switch-if/3.png"
+        data-srcset="/c-switch-if/3.png, /c-switch-if/3.png 1.5x, /c-switch-if/3.png 2x"
+        data-sizes="auto"
+        alt="/c-switch-if/3.png"
+        title="3" />
+首先与10进行比较，根据与10 的大小关系进入左子树或者右子树，再看看左右子树的分支是否不大于3，若不大于3则直接转化为对应的if&hellip;else if&hellip; else结构，大于3则检测分支是否满足上述的优化条件，满足则进行对应的地址表或者索引表的优化，否则会再次对子树进行优化，以便减少比较次数。</p></div><div class="post-footer" id="post-footer">
+    <div class="post-info">
+        <div class="post-info-line">
+            <div class="post-info-mod">
+                <span>Updated on 2018-01-06</span>
+            </div></div>
+        <div class="post-info-line">
+            <div class="post-info-md"></div>
+            <div class="post-info-share">
+                <span><a href="javascript:void(0);" title="Share on Twitter" data-sharer="twitter" data-url="http://HaiLateBoy.github.io/posts/c-switch-if/" data-title="C语言if、switch原理" data-hashtags="VC&#43;&#43;,反汇编,C&#43;&#43;实现原理"><i class="fab fa-twitter fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Facebook" data-sharer="facebook" data-url="http://HaiLateBoy.github.io/posts/c-switch-if/" data-hashtag="VC&#43;&#43;"><i class="fab fa-facebook-square fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Hacker News" data-sharer="hackernews" data-url="http://HaiLateBoy.github.io/posts/c-switch-if/" data-title="C语言if、switch原理"><i class="fab fa-hacker-news fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Line" data-sharer="line" data-url="http://HaiLateBoy.github.io/posts/c-switch-if/" data-title="C语言if、switch原理"><i data-svg-src="https://cdn.jsdelivr.net/npm/simple-icons@7.3.0/icons/line.svg" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on 微博" data-sharer="weibo" data-url="http://HaiLateBoy.github.io/posts/c-switch-if/" data-title="C语言if、switch原理"><i class="fab fa-weibo fa-fw" aria-hidden="true"></i></a></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="post-info-more">
+        <section class="post-tags"><i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/vc&#43;&#43;/">VC&#43;&#43;</a>,&nbsp;<a href="/tags/%E5%8F%8D%E6%B1%87%E7%BC%96/">反汇编</a>,&nbsp;<a href="/tags/c&#43;&#43;%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86/">C&#43;&#43;实现原理</a></section>
+        <section>
+            <span><a href="javascript:void(0);" onclick="window.history.back();">Back</a></span>&nbsp;|&nbsp;<span><a href="/">Home</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav"><a href="/posts/2018-new-year-plan/" class="prev" rel="prev" title="2017总结与2018规划"><i class="fas fa-angle-left fa-fw" aria-hidden="true"></i>2017总结与2018规划</a>
+            <a href="/posts/oledb-and-ado-1/" class="next" rel="next" title="Windows数据库编程接口简介">Windows数据库编程接口简介<i class="fas fa-angle-right fa-fw" aria-hidden="true"></i></a></div>
+</div>
+</article></div>
+            </main><footer class="footer">
+        <div class="footer-container"><div class="footer-line">Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener noreffer" title="Hugo 0.121.2">Hugo</a> | Theme - <a href="https://github.com/dillonzq/LoveIt" target="_blank" rel="noopener noreffer" title="LoveIt 0.2.11"><i class="far fa-kiss-wink-heart fa-fw" aria-hidden="true"></i> LoveIt</a>
+                </div><div class="footer-line" itemscope itemtype="http://schema.org/CreativeWork"><i class="far fa-copyright fa-fw" aria-hidden="true"></i><span itemprop="copyrightYear">2022 - 2024</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="https://www.masimaro.xyz" target="_blank">Masimaro</a></span></div>
+        </div>
+    </footer></div>
+
+        <div id="fixed-buttons"><a href="#" id="back-to-top" class="fixed-button" title="Back to Top">
+                <i class="fas fa-arrow-up fa-fw" aria-hidden="true"></i>
+            </a><a href="#" id="view-comments" class="fixed-button" title="View Comments">
+                <i class="fas fa-comment fa-fw" aria-hidden="true"></i>
+            </a>
+        </div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.css"><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/autocomplete.js@0.38.1/dist/autocomplete.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lunr@2.3.9/lunr.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lazysizes@5.3.2/lazysizes.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/clipboard@2.0.11/dist/clipboard.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/sharer.js@0.5.1/sharer.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/auto-render.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/copy-tex.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/mhchem.min.js"></script><script type="text/javascript">window.config={"code":{"copyTitle":"Copy to clipboard","maxShownLines":50},"comment":{},"math":{"delimiters":[{"display":true,"left":"$$","right":"$$"},{"display":true,"left":"\\[","right":"\\]"},{"display":true,"left":"\\begin{equation}","right":"\\end{equation}"},{"display":true,"left":"\\begin{equation*}","right":"\\end{equation*}"},{"display":true,"left":"\\begin{align}","right":"\\end{align}"},{"display":true,"left":"\\begin{align*}","right":"\\end{align*}"},{"display":true,"left":"\\begin{alignat}","right":"\\end{alignat}"},{"display":true,"left":"\\begin{alignat*}","right":"\\end{alignat*}"},{"display":true,"left":"\\begin{gather}","right":"\\end{gather}"},{"display":true,"left":"\\begin{CD}","right":"\\end{CD}"},{"display":false,"left":"$","right":"$"},{"display":false,"left":"\\(","right":"\\)"}],"strict":false},"search":{"highlightTag":"em","maxResultLength":10,"noResultsFound":"No results found","snippetLength":50}};</script><script type="text/javascript" src="/js/theme.min.js"></script></body>
+</html>

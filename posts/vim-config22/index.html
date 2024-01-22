@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="robots" content="noodp" />
+        <title>从零开始配置vim(22)——lsp简介与treesitter 配置 - Masimaro&#39;s blog</title><meta name="Description" content="这是我用于记录日常和学习的小站"><meta property="og:title" content="从零开始配置vim(22)——lsp简介与treesitter 配置" />
+<meta property="og:description" content="截止到上一篇文章，我们配置了neovim的很多内容了。具备了一些编辑器的常用功能了，而且可以胜任日常的文档编辑工作了。但是想作为一个可靠的代" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://HaiLateBoy.github.io/posts/vim-config22/" /><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2022-09-07T09:13:28+08:00" />
+<meta property="article:modified_time" content="2022-09-07T09:13:28+08:00" /><meta property="og:site_name" content="Masimaro&#39;s blog" />
+
+<meta name="twitter:card" content="summary"/><meta name="twitter:title" content="从零开始配置vim(22)——lsp简介与treesitter 配置"/>
+<meta name="twitter:description" content="截止到上一篇文章，我们配置了neovim的很多内容了。具备了一些编辑器的常用功能了，而且可以胜任日常的文档编辑工作了。但是想作为一个可靠的代"/>
+<meta name="application-name" content="My cool site">
+<meta name="apple-mobile-web-app-title" content="My cool site"><meta name="theme-color" content="#ffffff"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="manifest" href="/site.webmanifest"><link rel="canonical" href="http://HaiLateBoy.github.io/posts/vim-config22/" /><link rel="prev" href="http://HaiLateBoy.github.io/posts/vim-config21/" /><link rel="next" href="http://HaiLateBoy.github.io/posts/vim-config23/" /><link rel="stylesheet" href="/css/style.min.css"><link rel="preload" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css"></noscript><link rel="preload" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css"></noscript><script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "BlogPosting",
+        "headline": "从零开始配置vim(22)——lsp简介与treesitter 配置",
+        "inLanguage": "zh-CN",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "http:\/\/HaiLateBoy.github.io\/posts\/vim-config22\/"
+        },"genre": "posts","keywords": "vim, 编辑工具, 文本处理, lua, 编辑器","wordcount":  1863 ,
+        "url": "http:\/\/HaiLateBoy.github.io\/posts\/vim-config22\/","datePublished": "2022-09-07T09:13:28+08:00","dateModified": "2022-09-07T09:13:28+08:00","publisher": {
+            "@type": "Organization",
+            "name": ""},"author": {
+                "@type": "Person",
+                "name": "Masimaro"
+            },"description": ""
+    }
+    </script></head>
+    <body data-header-desktop="fixed" data-header-mobile="auto"><script type="text/javascript">(window.localStorage && localStorage.getItem('theme') ? localStorage.getItem('theme') === 'dark' : ('auto' === 'auto' ? window.matchMedia('(prefers-color-scheme: dark)').matches : 'auto' === 'dark')) && document.body.setAttribute('theme', 'dark');</script>
+
+        <div id="mask"></div><div class="wrapper"><header class="desktop" id="header-desktop">
+    <div class="header-wrapper">
+        <div class="header-title">
+            <a href="/" title="Masimaro&#39;s blog">My cool site</a>
+        </div>
+        <div class="menu">
+            <div class="menu-inner"><a class="menu-item" href="/posts/" title="文章列表"> 文章 </a><a class="menu-item" href="/tags/" title="标签"> 标签 </a><a class="menu-item" href="/categories/" title="分类"> 分类 </a><a class="menu-item" href="/about" title="关于本站"> 关于 </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-desktop">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-desktop" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-desktop" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-desktop">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </span><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                    <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+                </a></div>
+        </div>
+    </div>
+</header><header class="mobile" id="header-mobile">
+    <div class="header-container">
+        <div class="header-wrapper">
+            <div class="header-title">
+                <a href="/" title="Masimaro&#39;s blog">My cool site</a>
+            </div>
+            <div class="menu-toggle" id="menu-toggle-mobile">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+        <div class="menu" id="menu-mobile"><div class="search-wrapper">
+                    <div class="search mobile" id="search-mobile">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-mobile">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-mobile" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-mobile" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-mobile">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </div>
+                    <a href="javascript:void(0);" class="search-cancel" id="search-cancel-mobile">
+                        Cancel
+                    </a>
+                </div><a class="menu-item" href="/posts/" title="文章列表">文章</a><a class="menu-item" href="/tags/" title="标签">标签</a><a class="menu-item" href="/categories/" title="分类">分类</a><a class="menu-item" href="/about" title="关于本站">关于</a><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+            </a></div>
+    </div>
+</header><div class="search-dropdown desktop">
+        <div id="search-dropdown-desktop"></div>
+    </div>
+    <div class="search-dropdown mobile">
+        <div id="search-dropdown-mobile"></div>
+    </div><main class="main">
+                <div class="container"><div class="toc" id="toc-auto">
+            <h2 class="toc-title">Contents</h2>
+            <div class="toc-content" id="toc-content-auto"></div>
+        </div><article class="page single"><h1 class="single-title animate__animated animate__flipInX">从零开始配置vim(22)——lsp简介与treesitter 配置</h1><div class="post-meta">
+            <div class="post-meta-line"><span class="post-author"><a href="https://www.masimaro.xyz" title="Author" target="_blank" rel="noopener noreffer author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Masimaro</a></span>&nbsp;<span class="post-category">included in <a href="/categories/vim-%E9%85%8D%E7%BD%AE/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>vim 配置</a></span></div>
+            <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw" aria-hidden="true"></i>&nbsp;<time datetime="2022-09-07">2022-09-07</time>&nbsp;<i class="fas fa-pencil-alt fa-fw" aria-hidden="true"></i>&nbsp;1863 words&nbsp;
+                <i class="far fa-clock fa-fw" aria-hidden="true"></i>&nbsp;4 minutes&nbsp;</div>
+        </div><div class="details toc" id="toc-static"  data-kept="true">
+                <div class="details-summary toc-title">
+                    <span>Contents</span>
+                    <span><i class="details-icon fas fa-angle-right" aria-hidden="true"></i></span>
+                </div>
+                <div class="details-content toc-content" id="toc-content-static"><nav id="TableOfContents">
+  <ul>
+    <li><a href="#lsp-简介">lsp 简介</a></li>
+    <li><a href="#treesitter-配置">treesitter 配置</a></li>
+  </ul>
+</nav></div>
+            </div><div class="content" id="content"><p>截止到上一篇文章，我们配置了neovim的很多内容了。具备了一些编辑器的常用功能了，而且可以胜任日常的文档编辑工作了。但是想作为一个可靠的代码编辑器还缺少重要的一环，即代码语法部分的支持。</p>
+<p>在过去的vim配置中，我们基于 you-complete-me这个插件配置。但是对于不懂c语言甚至vim的小白来说简直是灾难。各种兼容问题、报错频出，而且效果也远不如 visual studio code等编辑器。也有可能是我那个时候比较菜，当初针对 python配置的补全效果很一般只能补全内置函数，自己定义的类和方法无法补全，而且跳转时好时坏。后来我抛弃了vim很长一段时间。好在微软提供了lsp这个大杀器，让vim、emacs这类编辑器的代码编辑体验提升了很大一截。而且配置还相对简单。</p>
+<h2 id="lsp-简介">lsp 简介</h2>
+<p>过去的编辑器包揽了诸如代码高亮、语法分析、跳转等功能，这样就导致了所有编辑器都有自己专有的一套显示、跳转等方案。而第三方编辑器想要达到完全相同的效果几乎是不可能的。但是微软提出的 lsp（<code>language server protocol</code>） 确改变了这一格局。</p>
+<p>lsp最重要的就是将语法分析、跳转、自动补全功能这些语言的核心功能和最终呈现效果分开。即server端主要提供了语法分析、补全、跳转的核心功能，而在客户端要做的就是调用服务端提供的这些功能来展示以及通过快捷键或者其他用户接口以便用户使用。而且语言服务器是以进程的方式单独运行，并不会影响客户端的运行。它们之间通过本地网络的形式进行信息交换</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://img-blog.csdnimg.cn/cd24768be23e4e4b802e03326b577872.png#pic_center"
+        data-srcset="https://img-blog.csdnimg.cn/cd24768be23e4e4b802e03326b577872.png#pic_center, https://img-blog.csdnimg.cn/cd24768be23e4e4b802e03326b577872.png#pic_center 1.5x, https://img-blog.csdnimg.cn/cd24768be23e4e4b802e03326b577872.png#pic_center 2x"
+        data-sizes="auto"
+        alt="https://img-blog.csdnimg.cn/cd24768be23e4e4b802e03326b577872.png#pic_center"
+        title="在这里插入图片描述" /></p>
+<ul>
+<li>用户在工具中打开一个的文件, 该工具通知语言服务器文档打开 (&rsquo;textDocument/didOpen&rsquo;) 。 从现在起，有关文档内容不再位于文件系统上，而是保存在编辑器开辟的一块内容中</li>
+<li>用户进行编辑：该工具通知服务器文档更改 (&rsquo;textDocument/didChange&rsquo;) ，程序语义信息由语言服务器更新。 发生这种情况时，语言服务器会分析此信息，并通知工具 (&rsquo;textDocument/publishDiagnostics&rsquo;) 检测到的错误和警告，并且还可能返回一些可能的用于补全的内容</li>
+<li>用户对编辑器中的符号执行“转到定义”：该工具发送具有两个参数的“textDocument/definition”请求： (1) 文档 URI， (2) 从服务器启动 Go to Definition 请求的文本位置。 服务器使用文档 URI 和符号定义在文档中的位置进行响应。客户端接到返回后，根据服务器标记的位置进行跳转</li>
+<li>用户关闭文档 (文件) ：工具发送“textDocument/didClose”通知，通知语言服务器文档现在不再处于内存中，并且将当前内容保存到文件系统中。</li>
+</ul>
+<h2 id="treesitter-配置">treesitter 配置</h2>
+<p>我们简单介绍过 <code>neovim-treesitter</code> 这个插件，它可以用来做代码高亮。它采用 <code>lsp</code> 协议实现，比起单纯使用正则表达式来说，它具有更好的渲染效果。那么我们体验 <code>lsp</code> 效果的第一步就来配置它吧。</p>
+<p><code>treesitter</code> 想要工作，需要根据语言下载配套语言对应的语法解析模块，我们可以使用 <code>:TSInstallInfo</code> 来查看当前我们安装了哪些解析模块。</p>
+<p>我们发现并没有安装任何的模块，基于当前配置文件的工程，我们先来体验一下 <code>lua</code> 的效果。</p>
+<p>我们使用 <code>:TSInstall &lt;language&gt;</code>的命令可以下载指定语言的模块。这里我们使用 <code>:TSInstall lua</code> 来下载lua模块。后续我们可以使用 <code>:TSUpdate lua</code> 来更新该模块。跟 <code>packer</code> 类似的 <code>:TSUpdate</code> 即可以用来下载也可以用来更新。也就是一条命令就搞定了</p>
+<p>安装完成之后我们可以使用 <code>:TSBufToggle highlight</code> 来使用 <code>treesitter</code> 进行高亮
+<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://img-blog.csdnimg.cn/9cb6271e68b948f3a58ca2a785d1796e.gif#pic_center"
+        data-srcset="https://img-blog.csdnimg.cn/9cb6271e68b948f3a58ca2a785d1796e.gif#pic_center, https://img-blog.csdnimg.cn/9cb6271e68b948f3a58ca2a785d1796e.gif#pic_center 1.5x, https://img-blog.csdnimg.cn/9cb6271e68b948f3a58ca2a785d1796e.gif#pic_center 2x"
+        data-sizes="auto"
+        alt="https://img-blog.csdnimg.cn/9cb6271e68b948f3a58ca2a785d1796e.gif#pic_center"
+        title="在这里插入图片描述" />
+如果我们每次都需要手工调用命令来进行高亮的话，就太不智能了。我们可以在配置文件中配置它自动加载语法高亮。</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-lua" data-lang="lua"><span class="line"><span class="cl"><span class="n">require</span><span class="p">(</span><span class="s1">&#39;nvim-treesitter.configs&#39;</span><span class="p">).</span><span class="n">setup</span><span class="p">({</span>                                               
+</span></span><span class="line"><span class="cl">    <span class="c1">-- 支持的语言</span>
+</span></span><span class="line"><span class="cl">    <span class="n">ensure_installed</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&#34;html&#34;</span><span class="p">,</span> <span class="s2">&#34;css&#34;</span><span class="p">,</span> <span class="s2">&#34;vim&#34;</span><span class="p">,</span> <span class="s2">&#34;lua&#34;</span><span class="p">,</span> <span class="s2">&#34;javascript&#34;</span><span class="p">,</span> <span class="s2">&#34;typescript&#34;</span><span class="p">,</span> <span class="s2">&#34;c&#34;</span><span class="p">,</span> <span class="s2">&#34;cpp&#34;</span><span class="p">,</span> <span class="s2">&#34;python&#34;</span><span class="p">},</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">-- 启用代码高亮</span>
+</span></span><span class="line"><span class="cl">    <span class="n">highlight</span> <span class="o">=</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">enable</span> <span class="o">=</span> <span class="kc">true</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">        <span class="n">additional_vim_regex_highlighting</span> <span class="o">=</span> <span class="kc">false</span>
+</span></span><span class="line"><span class="cl">    <span class="p">},</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">--启用增量选择</span>
+</span></span><span class="line"><span class="cl">    <span class="n">incremental_selection</span> <span class="o">=</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">enable</span> <span class="o">=</span> <span class="kc">true</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">        <span class="n">keymaps</span> <span class="o">=</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">            <span class="n">init_selection</span> <span class="o">=</span> <span class="s1">&#39;&lt;CR&gt;&#39;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">            <span class="n">node_incremental</span> <span class="o">=</span> <span class="s1">&#39;&lt;CR&gt;&#39;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">            <span class="n">node_decremental</span> <span class="o">=</span> <span class="s1">&#39;&lt;BS&gt;&#39;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">            <span class="n">scope_incremental</span> <span class="o">=</span> <span class="s1">&#39;&lt;TAB&gt;&#39;</span>
+</span></span><span class="line"><span class="cl">        <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="p">},</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">-- 启用基于 Treesitter 的代码格式化(=)</span>
+</span></span><span class="line"><span class="cl">    <span class="n">indent</span> <span class="o">=</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">enable</span> <span class="o">=</span> <span class="kc">true</span>
+</span></span><span class="line"><span class="cl">    <span class="p">},</span>
+</span></span><span class="line"><span class="cl"><span class="p">})</span>
+</span></span><span class="line"><span class="cl"><span class="c1">-- 开启代码折叠</span>
+</span></span><span class="line"><span class="cl"><span class="n">vim.wo</span><span class="p">.</span><span class="n">foldmethod</span> <span class="o">=</span> <span class="s1">&#39;expr&#39;</span>
+</span></span><span class="line"><span class="cl"><span class="n">vim.wo</span><span class="p">.</span><span class="n">foldexpr</span> <span class="o">=</span> <span class="s1">&#39;nvim_treesitter#foldexpr()&#39;</span>
+</span></span><span class="line"><span class="cl"><span class="c1">-- 默认不折叠</span>
+</span></span><span class="line"><span class="cl"><span class="n">vim.wo</span><span class="p">.</span><span class="n">foldlevel</span> <span class="o">=</span> <span class="mi">99</span>
+</span></span></code></pre></div><p>我们来一条条的解释这些配置
+<code>ensure_installed</code> 表示需要支持哪些语言，如果里面设置了某些语言，那么在启动之后它会自动调用  <code>:TSUpdate</code> 来下载和更新对应语言的 <code>server</code> 部分。</p>
+<p>等它下载完了对应的语言模块之后，我们发现它已经很好的完成了代码着色的功能。</p>
+<p>增量选择可以一次选择一块的代码，依次扩大或者缩小所选择的语言块，我们使用回车来开始和扩大增量选择，使用退格键来减少增量选择代码块。各位小伙伴可以根据自己的习惯来定义快捷键
+<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://img-blog.csdnimg.cn/c8a39fbe7d004596aec3653ec656b256.gif#pic_center"
+        data-srcset="https://img-blog.csdnimg.cn/c8a39fbe7d004596aec3653ec656b256.gif#pic_center, https://img-blog.csdnimg.cn/c8a39fbe7d004596aec3653ec656b256.gif#pic_center 1.5x, https://img-blog.csdnimg.cn/c8a39fbe7d004596aec3653ec656b256.gif#pic_center 2x"
+        data-sizes="auto"
+        alt="https://img-blog.csdnimg.cn/c8a39fbe7d004596aec3653ec656b256.gif#pic_center"
+        title="在这里插入图片描述" />
+另外我们可以使用 <code>=</code> 来格式化代码。为了方便我们定义自动命令，每当执行 <code>:w</code> 写入前前自动格式化代码</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-lua" data-lang="lua"><span class="line"><span class="cl"><span class="kd">local</span> <span class="n">auto_indent</span> <span class="o">=</span> <span class="n">vim.api</span><span class="p">.</span><span class="n">nvim_create_augroup</span><span class="p">(</span><span class="s2">&#34;AUTO_INDENT&#34;</span><span class="p">,</span> <span class="p">{</span><span class="n">clear</span> <span class="o">=</span> <span class="kc">true</span><span class="p">})</span>
+</span></span><span class="line"><span class="cl"><span class="n">vim.api</span><span class="p">.</span><span class="n">nvim_create_autocmd</span><span class="p">({</span><span class="s2">&#34;BufWritePost&#34;</span><span class="p">},</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">pattern</span> <span class="o">=</span> <span class="s2">&#34;*&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">group</span> <span class="o">=</span> <span class="n">auto_indent</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">command</span> <span class="o">=</span> <span class="s1">&#39;normal! gg=G``&#39;</span>
+</span></span><span class="line"><span class="cl"><span class="p">})</span>
+</span></span></code></pre></div><p>这里因为提前使用了 gg改变了光标位置，在格式化之后使用 `` 来回到上次跳转之前的位置。
+<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://img-blog.csdnimg.cn/c98b3b47f0c249069a32ab31825dae2f.gif#pic_center"
+        data-srcset="https://img-blog.csdnimg.cn/c98b3b47f0c249069a32ab31825dae2f.gif#pic_center, https://img-blog.csdnimg.cn/c98b3b47f0c249069a32ab31825dae2f.gif#pic_center 1.5x, https://img-blog.csdnimg.cn/c98b3b47f0c249069a32ab31825dae2f.gif#pic_center 2x"
+        data-sizes="auto"
+        alt="https://img-blog.csdnimg.cn/c98b3b47f0c249069a32ab31825dae2f.gif#pic_center"
+        title="在这里插入图片描述" /></p>
+<p>最后我们可以使用 <code>zc</code> 和 <code>zo</code> 来折叠和展开代码。不过我自己很少用，需要查看文件中的符号例如函数、变量等我可以使用其他插件来解决，如果要成块的跳转代码我比较喜欢使用 <code>%</code>。
+<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://img-blog.csdnimg.cn/4e790a79abd64bc89fd6963a109498e6.gif#pic_center"
+        data-srcset="https://img-blog.csdnimg.cn/4e790a79abd64bc89fd6963a109498e6.gif#pic_center, https://img-blog.csdnimg.cn/4e790a79abd64bc89fd6963a109498e6.gif#pic_center 1.5x, https://img-blog.csdnimg.cn/4e790a79abd64bc89fd6963a109498e6.gif#pic_center 2x"
+        data-sizes="auto"
+        alt="https://img-blog.csdnimg.cn/4e790a79abd64bc89fd6963a109498e6.gif#pic_center"
+        title="在这里插入图片描述" /></p>
+<p>好了，到此为止我们先体验了一下基于 <code>lsp</code> 实现的 <code>treesitter</code> 的功能，后面将展开讲述 <code>lsp</code> 对一些语言的支持，敬请期待</p>
+</div><div class="post-footer" id="post-footer">
+    <div class="post-info">
+        <div class="post-info-line">
+            <div class="post-info-mod">
+                <span>Updated on 2022-09-07</span>
+            </div></div>
+        <div class="post-info-line">
+            <div class="post-info-md"></div>
+            <div class="post-info-share">
+                <span><a href="javascript:void(0);" title="Share on Twitter" data-sharer="twitter" data-url="http://HaiLateBoy.github.io/posts/vim-config22/" data-title="从零开始配置vim(22)——lsp简介与treesitter 配置" data-hashtags="vim,编辑工具,文本处理,lua,编辑器"><i class="fab fa-twitter fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Facebook" data-sharer="facebook" data-url="http://HaiLateBoy.github.io/posts/vim-config22/" data-hashtag="vim"><i class="fab fa-facebook-square fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Hacker News" data-sharer="hackernews" data-url="http://HaiLateBoy.github.io/posts/vim-config22/" data-title="从零开始配置vim(22)——lsp简介与treesitter 配置"><i class="fab fa-hacker-news fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Line" data-sharer="line" data-url="http://HaiLateBoy.github.io/posts/vim-config22/" data-title="从零开始配置vim(22)——lsp简介与treesitter 配置"><i data-svg-src="https://cdn.jsdelivr.net/npm/simple-icons@7.3.0/icons/line.svg" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on 微博" data-sharer="weibo" data-url="http://HaiLateBoy.github.io/posts/vim-config22/" data-title="从零开始配置vim(22)——lsp简介与treesitter 配置"><i class="fab fa-weibo fa-fw" aria-hidden="true"></i></a></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="post-info-more">
+        <section class="post-tags"><i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/vim/">vim</a>,&nbsp;<a href="/tags/%E7%BC%96%E8%BE%91%E5%B7%A5%E5%85%B7/">编辑工具</a>,&nbsp;<a href="/tags/%E6%96%87%E6%9C%AC%E5%A4%84%E7%90%86/">文本处理</a>,&nbsp;<a href="/tags/lua/">lua</a>,&nbsp;<a href="/tags/%E7%BC%96%E8%BE%91%E5%99%A8/">编辑器</a></section>
+        <section>
+            <span><a href="javascript:void(0);" onclick="window.history.back();">Back</a></span>&nbsp;|&nbsp;<span><a href="/">Home</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav"><a href="/posts/vim-config21/" class="prev" rel="prev" title="从零开始配置vim(21)——会话管理"><i class="fas fa-angle-left fa-fw" aria-hidden="true"></i>从零开始配置vim(21)——会话管理</a>
+            <a href="/posts/vim-config23/" class="next" rel="next" title="从零开始配置vim(23)——lsp基础配置">从零开始配置vim(23)——lsp基础配置<i class="fas fa-angle-right fa-fw" aria-hidden="true"></i></a></div>
+</div>
+</article></div>
+            </main><footer class="footer">
+        <div class="footer-container"><div class="footer-line">Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener noreffer" title="Hugo 0.121.2">Hugo</a> | Theme - <a href="https://github.com/dillonzq/LoveIt" target="_blank" rel="noopener noreffer" title="LoveIt 0.2.11"><i class="far fa-kiss-wink-heart fa-fw" aria-hidden="true"></i> LoveIt</a>
+                </div><div class="footer-line" itemscope itemtype="http://schema.org/CreativeWork"><i class="far fa-copyright fa-fw" aria-hidden="true"></i><span itemprop="copyrightYear">2022 - 2024</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="https://www.masimaro.xyz" target="_blank">Masimaro</a></span></div>
+        </div>
+    </footer></div>
+
+        <div id="fixed-buttons"><a href="#" id="back-to-top" class="fixed-button" title="Back to Top">
+                <i class="fas fa-arrow-up fa-fw" aria-hidden="true"></i>
+            </a><a href="#" id="view-comments" class="fixed-button" title="View Comments">
+                <i class="fas fa-comment fa-fw" aria-hidden="true"></i>
+            </a>
+        </div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.css"><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/autocomplete.js@0.38.1/dist/autocomplete.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lunr@2.3.9/lunr.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lazysizes@5.3.2/lazysizes.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/clipboard@2.0.11/dist/clipboard.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/sharer.js@0.5.1/sharer.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/auto-render.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/copy-tex.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/mhchem.min.js"></script><script type="text/javascript">window.config={"code":{"copyTitle":"Copy to clipboard","maxShownLines":50},"comment":{},"math":{"delimiters":[{"display":true,"left":"$$","right":"$$"},{"display":true,"left":"\\[","right":"\\]"},{"display":true,"left":"\\begin{equation}","right":"\\end{equation}"},{"display":true,"left":"\\begin{equation*}","right":"\\end{equation*}"},{"display":true,"left":"\\begin{align}","right":"\\end{align}"},{"display":true,"left":"\\begin{align*}","right":"\\end{align*}"},{"display":true,"left":"\\begin{alignat}","right":"\\end{alignat}"},{"display":true,"left":"\\begin{alignat*}","right":"\\end{alignat*}"},{"display":true,"left":"\\begin{gather}","right":"\\end{gather}"},{"display":true,"left":"\\begin{CD}","right":"\\end{CD}"},{"display":false,"left":"$","right":"$"},{"display":false,"left":"\\(","right":"\\)"}],"strict":false},"search":{"highlightTag":"em","maxResultLength":10,"noResultsFound":"No results found","snippetLength":50}};</script><script type="text/javascript" src="/js/theme.min.js"></script></body>
+</html>

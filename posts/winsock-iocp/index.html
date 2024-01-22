@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="robots" content="noodp" />
+        <title>WinSock 完成端口模型 - Masimaro&#39;s blog</title><meta name="Description" content="这是我用于记录日常和学习的小站"><meta property="og:title" content="WinSock 完成端口模型" />
+<meta property="og:description" content="之前写了关于Winsock的重叠IO模型，按理来说重叠IO模型与之前的模型相比，它的socket即是非阻塞的，也是异步的，它基本上性能非常高" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://HaiLateBoy.github.io/posts/winsock-iocp/" /><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2018-07-06T20:44:39+00:00" />
+<meta property="article:modified_time" content="2018-07-06T20:44:39+00:00" /><meta property="og:site_name" content="Masimaro&#39;s blog" />
+
+<meta name="twitter:card" content="summary"/><meta name="twitter:title" content="WinSock 完成端口模型"/>
+<meta name="twitter:description" content="之前写了关于Winsock的重叠IO模型，按理来说重叠IO模型与之前的模型相比，它的socket即是非阻塞的，也是异步的，它基本上性能非常高"/>
+<meta name="application-name" content="My cool site">
+<meta name="apple-mobile-web-app-title" content="My cool site"><meta name="theme-color" content="#ffffff"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="manifest" href="/site.webmanifest"><link rel="canonical" href="http://HaiLateBoy.github.io/posts/winsock-iocp/" /><link rel="prev" href="http://HaiLateBoy.github.io/posts/brief-history-of-humankind/" /><link rel="next" href="http://HaiLateBoy.github.io/posts/winsock2-api/" /><link rel="stylesheet" href="/css/style.min.css"><link rel="preload" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css"></noscript><link rel="preload" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css"></noscript><script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "BlogPosting",
+        "headline": "WinSock 完成端口模型",
+        "inLanguage": "zh-CN",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "http:\/\/HaiLateBoy.github.io\/posts\/winsock-iocp\/"
+        },"genre": "posts","keywords": "WinSock 模型, 网络编程, 完成端口","wordcount":  3255 ,
+        "url": "http:\/\/HaiLateBoy.github.io\/posts\/winsock-iocp\/","datePublished": "2018-07-06T20:44:39+00:00","dateModified": "2018-07-06T20:44:39+00:00","publisher": {
+            "@type": "Organization",
+            "name": ""},"author": {
+                "@type": "Person",
+                "name": "Masimaro"
+            },"description": ""
+    }
+    </script></head>
+    <body data-header-desktop="fixed" data-header-mobile="auto"><script type="text/javascript">(window.localStorage && localStorage.getItem('theme') ? localStorage.getItem('theme') === 'dark' : ('auto' === 'auto' ? window.matchMedia('(prefers-color-scheme: dark)').matches : 'auto' === 'dark')) && document.body.setAttribute('theme', 'dark');</script>
+
+        <div id="mask"></div><div class="wrapper"><header class="desktop" id="header-desktop">
+    <div class="header-wrapper">
+        <div class="header-title">
+            <a href="/" title="Masimaro&#39;s blog">My cool site</a>
+        </div>
+        <div class="menu">
+            <div class="menu-inner"><a class="menu-item" href="/posts/" title="文章列表"> 文章 </a><a class="menu-item" href="/tags/" title="标签"> 标签 </a><a class="menu-item" href="/categories/" title="分类"> 分类 </a><a class="menu-item" href="/about" title="关于本站"> 关于 </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-desktop">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-desktop" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-desktop" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-desktop">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </span><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                    <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+                </a></div>
+        </div>
+    </div>
+</header><header class="mobile" id="header-mobile">
+    <div class="header-container">
+        <div class="header-wrapper">
+            <div class="header-title">
+                <a href="/" title="Masimaro&#39;s blog">My cool site</a>
+            </div>
+            <div class="menu-toggle" id="menu-toggle-mobile">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+        <div class="menu" id="menu-mobile"><div class="search-wrapper">
+                    <div class="search mobile" id="search-mobile">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-mobile">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-mobile" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-mobile" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-mobile">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </div>
+                    <a href="javascript:void(0);" class="search-cancel" id="search-cancel-mobile">
+                        Cancel
+                    </a>
+                </div><a class="menu-item" href="/posts/" title="文章列表">文章</a><a class="menu-item" href="/tags/" title="标签">标签</a><a class="menu-item" href="/categories/" title="分类">分类</a><a class="menu-item" href="/about" title="关于本站">关于</a><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+            </a></div>
+    </div>
+</header><div class="search-dropdown desktop">
+        <div id="search-dropdown-desktop"></div>
+    </div>
+    <div class="search-dropdown mobile">
+        <div id="search-dropdown-mobile"></div>
+    </div><main class="main">
+                <div class="container"><div class="toc" id="toc-auto">
+            <h2 class="toc-title">Contents</h2>
+            <div class="toc-content" id="toc-content-auto"></div>
+        </div><article class="page single"><h1 class="single-title animate__animated animate__flipInX">WinSock 完成端口模型</h1><div class="post-meta">
+            <div class="post-meta-line"><span class="post-author"><a href="https://www.masimaro.xyz" title="Author" target="_blank" rel="noopener noreffer author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Masimaro</a></span>&nbsp;<span class="post-category">included in <a href="/categories/windows-%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>Windows 网络编程</a></span></div>
+            <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw" aria-hidden="true"></i>&nbsp;<time datetime="2018-07-06">2018-07-06</time>&nbsp;<i class="fas fa-pencil-alt fa-fw" aria-hidden="true"></i>&nbsp;3255 words&nbsp;
+                <i class="far fa-clock fa-fw" aria-hidden="true"></i>&nbsp;7 minutes&nbsp;</div>
+        </div><div class="details toc" id="toc-static"  data-kept="true">
+                <div class="details-summary toc-title">
+                    <span>Contents</span>
+                    <span><i class="details-icon fas fa-angle-right" aria-hidden="true"></i></span>
+                </div>
+                <div class="details-content toc-content" id="toc-content-static"><nav id="TableOfContents">
+  <ul>
+    <li><a href="#完成端口简介">完成端口简介</a></li>
+    <li><a href="#完成端口的示例">完成端口的示例：</a></li>
+    <li><a href="#几种模型的比较">几种模型的比较</a></li>
+  </ul>
+</nav></div>
+            </div><div class="content" id="content"><p>之前写了关于Winsock的重叠IO模型，按理来说重叠IO模型与之前的模型相比，它的socket即是非阻塞的，也是异步的，它基本上性能非常高，但是它主要的缺点在于，即使我们使用历程来处理完成通知，但是我们知道历程它本身是在对应线程暂停，它借用当前线程的线程环境来执行完成通知，也就是说要执行完成通知就必须暂停当前线程的工作。这对工作线程来说也是一个不必要的性能浪费，这样我们自然就会想到，另外开辟一个线程来执行完成通知，而本来的线程就不需要暂停，而是一直执行它自身的任务。处于这个思想，WinSock提供了一个新的模型——完成端口模型。</p>
+<!-- raw HTML omitted -->
+<h2 id="完成端口简介">完成端口简介</h2>
+<p>完成端口本质上是一个线程池的模型，它需要我们创建对应的线程放在那，当完成通知到来时，他会直接执行线程。在这5中模型中它的性能是最高的。
+在文件中我们也提到过完成端口，其实我们利用Linux上一切皆文件的思想来考虑这个问题就可以很方便的理解，既然我们需要异步的方式来读写网卡的信息，这与读写文件的方式类似，既然文件中存在完成端口模型，网络上存在也就不足为奇了。
+对于完成端口Windows没有引入新的API函数，而是仍然采用文件中一堆相关的函数。可以使用CreateIoCompletionPort来创建完成端口的句柄，该函数原型如下:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="n">HANDLE</span> <span class="n">WINAPI</span> <span class="nf">CreateIoCompletionPort</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">  <span class="n">__in</span>      <span class="n">HANDLE</span> <span class="n">FileHandle</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">  <span class="n">__in_opt</span>  <span class="n">HANDLE</span> <span class="n">ExistingCompletionPort</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">  <span class="n">__in</span>      <span class="n">ULONG_PTR</span> <span class="n">CompletionKey</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">  <span class="n">__in</span>      <span class="n">DWORD</span> <span class="n">NumberOfConcurrentThreads</span>
+</span></span><span class="line"><span class="cl"><span class="p">);</span>
+</span></span></code></pre></div><p>第一个参数是与完成端口绑定的文件句柄，如果我们要创建完成端口句柄，这个值必须传入INVALID_HANDLE_VALUE。如果是要将文件句柄与完成端口绑定，这个参数必须穿入一个支持完成端口的文件句柄。在Winsock中如果要绑定SOCKET到完成端口只需要将SOCKET强转为HANDLE。
+第二个参数是一个已知的完成端口句柄，如果是创建完成端口，这个参数填入NULL。
+第三个参数是一个LONG型的指针，它作为一个标志，由完成通知传入完成线程中，用来标识不同的完成通知。一般我们会定义一个扩展来OVERLAPPED结构来标识不同的完成通知，所以这个参数一般不用传入NULL。
+第四个参数是同时执行的线程数，如果是绑定文件句柄到完成端口，则这个参数填入0</p>
+<p>我们可以在对应的完成线程中调用GetQueuedCompletionStatus函数来获取完成通知，这个函数只有当有IO操作完成时才会返回，函数原型如下:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="n">BOOL</span> <span class="n">WINAPI</span> <span class="nf">GetQueuedCompletionStatus</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">  <span class="n">__in</span>   <span class="n">HANDLE</span> <span class="n">CompletionPort</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">  <span class="n">__out</span>  <span class="n">LPDWORD</span> <span class="n">lpNumberOfBytes</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">  <span class="n">__out</span>  <span class="n">PULONG_PTR</span> <span class="n">lpCompletionKey</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">  <span class="n">__out</span>  <span class="n">LPOVERLAPPED</span><span class="o">*</span> <span class="n">lpOverlapped</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">  <span class="n">__in</span>   <span class="n">DWORD</span> <span class="n">dwMilliseconds</span>
+</span></span><span class="line"><span class="cl"><span class="p">);</span>
+</span></span></code></pre></div><p>它的第一个参数是一个完成端口的句柄。
+第二个参数表示当前有多少字节的数据完成IO操作。
+第三个参数是一个标记值，用来标识不同文件句柄对应的完成通知，它是通过 CreateIoCompletionPort 函数设置的那个标识。
+第四个参数是OVERLAPPED结构。
+第五个参数表示等待的时间，如果填入INFINITE则会一直等到有IO操作完成。</p>
+<h2 id="完成端口的示例">完成端口的示例：</h2>
+<p>下面是一个完成端口的示例</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="k">typedef</span> <span class="k">struct</span> <span class="nc">_tag_MY_OVERLAPPED</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">	<span class="n">OVERLAPPED</span> <span class="n">m_overlapped</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">SOCKET</span> <span class="n">m_sClient</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="kt">long</span> <span class="n">m_lEvent</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">DWORD</span> <span class="n">m_dwNumberOfBytesRecv</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">DWORD</span> <span class="n">m_dwFlags</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="kt">char</span> <span class="o">*</span><span class="n">m_pszBuf</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">LONG</span> <span class="n">m_dwBufSize</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span><span class="n">MY_OVERLAPPED</span><span class="p">,</span> <span class="o">*</span><span class="n">LPMY_OVERLAPPED</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kt">unsigned</span> <span class="kt">int</span> <span class="kr">__stdcall</span> <span class="nf">IOCPThread</span><span class="p">(</span><span class="n">LPVOID</span> <span class="n">lpParameter</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="cp">#define BUFFER_SIZE 1024
+</span></span></span><span class="line"><span class="cl"><span class="cp">#define SERVER_PORT 6000
+</span></span></span><span class="line"><span class="cl"><span class="cp"></span>
+</span></span><span class="line"><span class="cl"><span class="kt">int</span> <span class="nf">_tmain</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="n">TCHAR</span> <span class="o">*</span><span class="n">argv</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">	<span class="n">WSADATA</span> <span class="n">wd</span> <span class="o">=</span> <span class="p">{</span><span class="mi">0</span><span class="p">};</span>
+</span></span><span class="line"><span class="cl">	<span class="n">WSAStartup</span><span class="p">(</span><span class="n">MAKEWORD</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="o">&amp;</span><span class="n">wd</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="n">SYSTEM_INFO</span> <span class="n">si</span> <span class="o">=</span> <span class="p">{</span><span class="mi">0</span><span class="p">};</span>
+</span></span><span class="line"><span class="cl">	<span class="n">GetSystemInfo</span><span class="p">(</span><span class="o">&amp;</span><span class="n">si</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="c1">//创建完成端口对象
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="n">HANDLE</span> <span class="n">hIocp</span> <span class="o">=</span> <span class="n">CreateIoCompletionPort</span><span class="p">(</span><span class="n">INVALID_HANDLE_VALUE</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">,</span> <span class="n">si</span><span class="p">.</span><span class="n">dwNumberOfProcessors</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="c1">//创建完成端口对应的线程对象
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="n">HANDLE</span> <span class="o">*</span><span class="n">pThreadArray</span> <span class="o">=</span> <span class="p">(</span><span class="n">HANDLE</span> <span class="o">*</span><span class="p">)</span><span class="n">HeapAlloc</span><span class="p">(</span><span class="n">GetProcessHeap</span><span class="p">(),</span> <span class="n">HEAP_ZERO_MEMORY</span><span class="p">,</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">si</span><span class="p">.</span><span class="n">dwNumberOfProcessors</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">si</span><span class="p">.</span><span class="n">dwNumberOfProcessors</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">	<span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="n">pThreadArray</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">HANDLE</span><span class="p">)</span><span class="n">_beginthreadex</span><span class="p">(</span><span class="nb">NULL</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">IOCPThread</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">hIocp</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="n">SOCKET</span> <span class="n">SrvSocket</span> <span class="o">=</span> <span class="n">socket</span><span class="p">(</span><span class="n">AF_INET</span><span class="p">,</span> <span class="n">SOCK_STREAM</span><span class="p">,</span> <span class="n">IPPROTO_IP</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="n">SOCKADDR_IN</span> <span class="n">SockAddr</span> <span class="o">=</span> <span class="p">{</span><span class="mi">0</span><span class="p">};</span>
+</span></span><span class="line"><span class="cl">	<span class="n">SockAddr</span><span class="p">.</span><span class="n">sin_family</span> <span class="o">=</span> <span class="n">AF_INET</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">SockAddr</span><span class="p">.</span><span class="n">sin_port</span> <span class="o">=</span> <span class="n">htons</span><span class="p">(</span><span class="n">SERVER_PORT</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="n">SockAddr</span><span class="p">.</span><span class="n">sin_addr</span><span class="p">.</span><span class="n">s_addr</span> <span class="o">=</span> <span class="n">htonl</span><span class="p">(</span><span class="n">INADDR_ANY</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="n">bind</span><span class="p">(</span><span class="n">SrvSocket</span><span class="p">,</span> <span class="p">(</span><span class="n">SOCKADDR</span><span class="o">*</span><span class="p">)</span><span class="o">&amp;</span><span class="n">SockAddr</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">SOCKADDR</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">	<span class="n">listen</span><span class="p">(</span><span class="n">SrvSocket</span><span class="p">,</span> <span class="mi">5</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="n">SOCKET</span> <span class="n">sClient</span> <span class="o">=</span> <span class="n">accept</span><span class="p">(</span><span class="n">SrvSocket</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="n">CreateIoCompletionPort</span><span class="p">((</span><span class="n">HANDLE</span><span class="p">)</span><span class="n">sClient</span><span class="p">,</span> <span class="n">hIocp</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="n">WSABUF</span> <span class="n">buf</span> <span class="o">=</span> <span class="p">{</span><span class="mi">0</span><span class="p">};</span>
+</span></span><span class="line"><span class="cl">	<span class="n">buf</span><span class="p">.</span><span class="n">buf</span> <span class="o">=</span> <span class="p">(</span><span class="kt">char</span><span class="o">*</span><span class="p">)</span><span class="n">HeapAlloc</span><span class="p">(</span><span class="n">GetProcessHeap</span><span class="p">(),</span> <span class="n">HEAP_ZERO_MEMORY</span><span class="p">,</span> <span class="n">BUFFER_SIZE</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="n">buf</span><span class="p">.</span><span class="n">len</span> <span class="o">=</span> <span class="n">BUFFER_SIZE</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="n">MY_OVERLAPPED</span> <span class="n">AcceptOverlapped</span> <span class="o">=</span> <span class="p">{</span><span class="mi">0</span><span class="p">};</span>
+</span></span><span class="line"><span class="cl">	<span class="n">AcceptOverlapped</span><span class="p">.</span><span class="n">m_dwBufSize</span> <span class="o">=</span> <span class="n">BUFFER_SIZE</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">AcceptOverlapped</span><span class="p">.</span><span class="n">m_lEvent</span> <span class="o">=</span> <span class="n">FD_READ</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">AcceptOverlapped</span><span class="p">.</span><span class="n">m_pszBuf</span> <span class="o">=</span> <span class="n">buf</span><span class="p">.</span><span class="n">buf</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">AcceptOverlapped</span><span class="p">.</span><span class="n">m_sClient</span> <span class="o">=</span> <span class="n">sClient</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="n">WSARecv</span><span class="p">(</span><span class="n">sClient</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">buf</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">AcceptOverlapped</span><span class="p">.</span><span class="n">m_dwNumberOfBytesRecv</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">AcceptOverlapped</span><span class="p">.</span><span class="n">m_dwFlags</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">AcceptOverlapped</span><span class="p">.</span><span class="n">m_overlapped</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="k">while</span> <span class="p">(</span><span class="n">TRUE</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">	<span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="kt">int</span> <span class="n">nVirtKey</span> <span class="o">=</span> <span class="n">GetAsyncKeyState</span><span class="p">(</span><span class="n">VK_ESCAPE</span><span class="p">);</span> <span class="c1">//用户按下退出键(ESC)
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>		<span class="p">{</span>
+</span></span><span class="line"><span class="cl">			<span class="k">break</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">		<span class="p">}</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">si</span><span class="p">.</span><span class="n">dwNumberOfProcessors</span> <span class="o">*</span> <span class="mi">2</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">	<span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="c1">//向IOCP发送FD_CLOSE消息，以便对应线程退出
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>		<span class="n">AcceptOverlapped</span><span class="p">.</span><span class="n">m_lEvent</span> <span class="o">=</span> <span class="n">FD_CLOSE</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">		<span class="n">PostQueuedCompletionStatus</span><span class="p">(</span><span class="n">hIocp</span><span class="p">,</span> <span class="n">si</span><span class="p">.</span><span class="n">dwNumberOfProcessors</span> <span class="o">*</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">AcceptOverlapped</span><span class="p">.</span><span class="n">m_overlapped</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="n">WaitForMultipleObjects</span><span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">si</span><span class="p">.</span><span class="n">dwNumberOfProcessors</span><span class="p">,</span> <span class="n">pThreadArray</span><span class="p">,</span> <span class="n">TRUE</span><span class="p">,</span> <span class="n">INFINITE</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">si</span><span class="p">.</span><span class="n">dwNumberOfProcessors</span> <span class="o">*</span> <span class="mi">2</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">	<span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="n">CloseHandle</span><span class="p">(</span><span class="n">pThreadArray</span><span class="p">[</span><span class="n">i</span><span class="p">]);</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="n">HeapFree</span><span class="p">(</span><span class="n">GetProcessHeap</span><span class="p">(),</span> <span class="mi">0</span><span class="p">,</span> <span class="n">buf</span><span class="p">.</span><span class="n">buf</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="n">shutdown</span><span class="p">(</span><span class="n">sClient</span><span class="p">,</span> <span class="n">SD_BOTH</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="n">closesocket</span><span class="p">(</span><span class="n">sClient</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="n">CloseHandle</span><span class="p">(</span><span class="n">hIocp</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="n">WSACleanup</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">	<span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kt">unsigned</span> <span class="kt">int</span> <span class="kr">__stdcall</span> <span class="nf">IOCPThread</span><span class="p">(</span><span class="n">LPVOID</span> <span class="n">lpParameter</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">	<span class="n">HANDLE</span> <span class="n">hIocp</span> <span class="o">=</span> <span class="o">*</span><span class="p">(</span><span class="n">HANDLE</span><span class="o">*</span><span class="p">)</span><span class="n">lpParameter</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">DWORD</span> <span class="n">dwNumberOfBytes</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">MY_OVERLAPPED</span> <span class="o">*</span><span class="n">lpOverlapped</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">ULONG</span> <span class="n">key</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">BOOL</span> <span class="n">bLoop</span> <span class="o">=</span> <span class="n">TRUE</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="k">while</span> <span class="p">(</span><span class="n">bLoop</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">	<span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="n">BOOL</span> <span class="n">bRet</span> <span class="o">=</span> <span class="n">GetQueuedCompletionStatus</span><span class="p">(</span><span class="n">hIocp</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">dwNumberOfBytes</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">key</span><span class="p">,</span> <span class="p">(</span><span class="n">LPOVERLAPPED</span><span class="o">*</span><span class="p">)</span><span class="o">&amp;</span><span class="n">lpOverlapped</span><span class="p">,</span> <span class="n">INFINITE</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">		<span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">bRet</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">		<span class="p">{</span>
+</span></span><span class="line"><span class="cl">			<span class="k">continue</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">		<span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">		<span class="k">switch</span> <span class="p">(</span><span class="n">lpOverlapped</span><span class="o">-&gt;</span><span class="n">m_lEvent</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">		<span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="k">case</span> <span class="nl">FD_CLOSE</span><span class="p">:</span> <span class="c1">//退出
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>			<span class="p">{</span>
+</span></span><span class="line"><span class="cl">				<span class="n">bLoop</span> <span class="o">=</span> <span class="n">FALSE</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">				<span class="n">printf</span><span class="p">(</span><span class="s">&#34;线程[%08x]准备退出......</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">,</span> <span class="n">GetCurrentThreadId</span><span class="p">());</span>
+</span></span><span class="line"><span class="cl">			<span class="p">}</span>
+</span></span><span class="line"><span class="cl">			<span class="k">break</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">		<span class="k">case</span> <span class="nl">FD_WRITE</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">			<span class="p">{</span>
+</span></span><span class="line"><span class="cl">				<span class="n">printf</span><span class="p">(</span><span class="s">&#34;数据发送完成......</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">				<span class="n">shutdown</span><span class="p">(</span><span class="n">lpOverlapped</span><span class="o">-&gt;</span><span class="n">m_sClient</span><span class="p">,</span> <span class="n">SD_BOTH</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">				<span class="n">closesocket</span><span class="p">(</span><span class="n">lpOverlapped</span><span class="o">-&gt;</span><span class="n">m_sClient</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">			<span class="p">}</span>
+</span></span><span class="line"><span class="cl">			<span class="k">break</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">		<span class="k">case</span> <span class="nl">FD_READ</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">			<span class="p">{</span>
+</span></span><span class="line"><span class="cl">				<span class="n">printf</span><span class="p">(</span><span class="s">&#34;client&gt;%s&#34;</span><span class="p">,</span> <span class="n">lpOverlapped</span><span class="o">-&gt;</span><span class="n">m_pszBuf</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">				<span class="n">lpOverlapped</span><span class="o">-&gt;</span><span class="n">m_lEvent</span> <span class="o">=</span> <span class="n">FD_WRITE</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">				<span class="n">WSABUF</span> <span class="n">buf</span> <span class="o">=</span> <span class="p">{</span><span class="mi">0</span><span class="p">};</span>
+</span></span><span class="line"><span class="cl">				<span class="n">buf</span><span class="p">.</span><span class="n">buf</span> <span class="o">=</span> <span class="n">lpOverlapped</span><span class="o">-&gt;</span><span class="n">m_pszBuf</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">				<span class="n">buf</span><span class="p">.</span><span class="n">len</span> <span class="o">=</span> <span class="n">dwNumberOfBytes</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">				<span class="n">lpOverlapped</span><span class="o">-&gt;</span><span class="n">m_dwFlags</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">				<span class="n">WSASend</span><span class="p">(</span><span class="n">lpOverlapped</span><span class="o">-&gt;</span><span class="n">m_sClient</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">buf</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">lpOverlapped</span><span class="o">-&gt;</span><span class="n">m_dwNumberOfBytesRecv</span><span class="p">,</span> <span class="n">lpOverlapped</span><span class="o">-&gt;</span><span class="n">m_dwFlags</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">lpOverlapped</span><span class="o">-&gt;</span><span class="n">m_overlapped</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">			<span class="p">}</span>
+</span></span><span class="line"><span class="cl">		<span class="p">}</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="cl">	<span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p>在上述代码中，首先定义了一个结构体用来保存额外的数据。在main函数中首先查询CPU的核数，然后创建这个数目2倍的线程。接着创建一个完成端口对象。然后进行SOCKET的创建、绑定、监听、接收连接的操作。当有连接进来的时候。创建对应的扩展结构并调用WSARecv投递一个接收操作。由于后面的收发操作都在对应的线程中操作，因此在主线程中只需要等待即可。当用户确定退出时。先调用PostQueuedCompletionStatus函数向完成线程中发送完成通知，并将网络事件设置为FD_CLOSE，表示让线程退出。在这里没有使用TerminateThread这种暴力的方式，而选择了一种让线程自动退出的温和的方式。接着进行资源的回收，最后退出。
+在线程中，我们首先在循环中调用 GetQueuedCompletionStatus函数来获取完成通知，当发生完成事件时，我们在switch中根据不同的额网络事件来处理，针对FD_CLOSE事件，直接退出线程。针对FD_READ事件，先打印客户端发送的信息，然后调用WSASend将信息原样返回，接着设置网络事件为FD_WRITE，以便断开与客户端的链接。</p>
+<h2 id="几种模型的比较">几种模型的比较</h2>
+<p>最后针对5种模型和两种socket工作模式来做一个归纳说明。</p>
+<ol>
+<li>最先学习的是SOCKET的阻塞模式，它的效率最低，它会一直等待有客户端连接或者有数据发送过来才会返回。这就好像我们在等某个人的信，但是不知道这封信什么时候能送到，于是我们在自家门口的收信箱前一直等待，直到有信到来。</li>
+<li>为了解决这个问题，提出了SOCKET的非阻塞模式，它不会等待连接或者收发数据的操作完成，当我们调用对应的accept或者send、recv时会立即返回，但是我们不知道它什么时候有数据要处理，如果针对每个socket都等待直到有数据到来，那么跟之前的阻塞模式相比没有任何改进，于是就有了socket模式，它会等待多个socket，只要其中有一个有数据就返回，并处理。用收信的模型类比的话，现在我们不用在邮箱前等待了。但是我们会每隔一段时间就去邮箱那看看，有没有信，有信就将它收回否则空手而归。</li>
+<li>我们说select模型的最大问题在于不知道什么时候有待决的SOCKET，因此我们需要在循环中不停的等待。为了解决这个时机问题，又提出了WSAAsyncSelect模型和WSAEvent模型，它们主要用来解决调用对应函数的时机。用收信的例子类比就是现在我在邮箱上装了一个报警的按钮，只有有信，警报就会响，这个时候我们就去收信。而不用向之前那样每隔一段时间就去邮箱看看</li>
+<li>我们说解决了时机的问题，但是调用send和recv对网卡进行读写操作仍然是同步的操作，CPU需要傻傻的等着数据从网卡读到内存或者从内存写到网卡上。因此又有了重叠IO的模型和一些列的新的API，向WSARecv和WSASend等等函数。这样就相当于当有信来的警报响起时，我们不需要自己去取信了，另外派了一个人帮我们拿信，这样我们的工作效率又提高了一些。节约了我们的时间</li>
+<li>重叠IO也有它的问题，如果使用重叠IO的事件模型时，也需要在合适的时候等待，就好像我们虽然派了一个人来帮忙拿信，但是我们自己却需要停下手头上的工作，询问拿信的人回来了。而使用完成历程也存在自己的问题，因为它需要使用主线程的资源来执行历程，它需要主线程暂停下来，这样就可能出现两种情况：1）有通知事件到来，但是并没有进入可警告状态；2）进入可警告状态却没有客户端发送请求。这就相当于可能我们不停的等待但是拿信的那个人却没有回来，或者拿信的人回来了，我们却没有时间处理信件。</li>
+<li>针对重叠IO的上述问题，提出了完成端口的解决方案，完成事件由对应的线程处理，而主线程只需要专注于它自己的工作就好了，这就相当于警报响了，我们知道信来了，直接派一个人去拿信，后面的我就不管了，而拿信的人把信拿回来的时候将信放好。当我们忙完之后去处理这封信。没忙完的话信就一直放在那，甚至让拿信的人处理这封信，这样就能更高效的集中注意力来处理眼前的工作。</li>
+</ol>
+<!-- raw HTML omitted -->
+</div><div class="post-footer" id="post-footer">
+    <div class="post-info">
+        <div class="post-info-line">
+            <div class="post-info-mod">
+                <span>Updated on 2018-07-06</span>
+            </div></div>
+        <div class="post-info-line">
+            <div class="post-info-md"></div>
+            <div class="post-info-share">
+                <span><a href="javascript:void(0);" title="Share on Twitter" data-sharer="twitter" data-url="http://HaiLateBoy.github.io/posts/winsock-iocp/" data-title="WinSock 完成端口模型" data-hashtags="WinSock 模型,网络编程,完成端口"><i class="fab fa-twitter fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Facebook" data-sharer="facebook" data-url="http://HaiLateBoy.github.io/posts/winsock-iocp/" data-hashtag="WinSock 模型"><i class="fab fa-facebook-square fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Hacker News" data-sharer="hackernews" data-url="http://HaiLateBoy.github.io/posts/winsock-iocp/" data-title="WinSock 完成端口模型"><i class="fab fa-hacker-news fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Line" data-sharer="line" data-url="http://HaiLateBoy.github.io/posts/winsock-iocp/" data-title="WinSock 完成端口模型"><i data-svg-src="https://cdn.jsdelivr.net/npm/simple-icons@7.3.0/icons/line.svg" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on 微博" data-sharer="weibo" data-url="http://HaiLateBoy.github.io/posts/winsock-iocp/" data-title="WinSock 完成端口模型"><i class="fab fa-weibo fa-fw" aria-hidden="true"></i></a></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="post-info-more">
+        <section class="post-tags"><i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/winsock-%E6%A8%A1%E5%9E%8B/">WinSock 模型</a>,&nbsp;<a href="/tags/%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B/">网络编程</a>,&nbsp;<a href="/tags/%E5%AE%8C%E6%88%90%E7%AB%AF%E5%8F%A3/">完成端口</a></section>
+        <section>
+            <span><a href="javascript:void(0);" onclick="window.history.back();">Back</a></span>&nbsp;|&nbsp;<span><a href="/">Home</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav"><a href="/posts/brief-history-of-humankind/" class="prev" rel="prev" title="《人类简史》与《未来简史》 读后感"><i class="fas fa-angle-left fa-fw" aria-hidden="true"></i>《人类简史》与《未来简史》 读后感</a>
+            <a href="/posts/winsock2-api/" class="next" rel="next" title="WinSock2 API">WinSock2 API<i class="fas fa-angle-right fa-fw" aria-hidden="true"></i></a></div>
+</div>
+</article></div>
+            </main><footer class="footer">
+        <div class="footer-container"><div class="footer-line">Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener noreffer" title="Hugo 0.121.2">Hugo</a> | Theme - <a href="https://github.com/dillonzq/LoveIt" target="_blank" rel="noopener noreffer" title="LoveIt 0.2.11"><i class="far fa-kiss-wink-heart fa-fw" aria-hidden="true"></i> LoveIt</a>
+                </div><div class="footer-line" itemscope itemtype="http://schema.org/CreativeWork"><i class="far fa-copyright fa-fw" aria-hidden="true"></i><span itemprop="copyrightYear">2022 - 2024</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="https://www.masimaro.xyz" target="_blank">Masimaro</a></span></div>
+        </div>
+    </footer></div>
+
+        <div id="fixed-buttons"><a href="#" id="back-to-top" class="fixed-button" title="Back to Top">
+                <i class="fas fa-arrow-up fa-fw" aria-hidden="true"></i>
+            </a><a href="#" id="view-comments" class="fixed-button" title="View Comments">
+                <i class="fas fa-comment fa-fw" aria-hidden="true"></i>
+            </a>
+        </div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.css"><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/autocomplete.js@0.38.1/dist/autocomplete.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lunr@2.3.9/lunr.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lazysizes@5.3.2/lazysizes.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/clipboard@2.0.11/dist/clipboard.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/sharer.js@0.5.1/sharer.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/auto-render.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/copy-tex.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/mhchem.min.js"></script><script type="text/javascript">window.config={"code":{"copyTitle":"Copy to clipboard","maxShownLines":50},"comment":{},"math":{"delimiters":[{"display":true,"left":"$$","right":"$$"},{"display":true,"left":"\\[","right":"\\]"},{"display":true,"left":"\\begin{equation}","right":"\\end{equation}"},{"display":true,"left":"\\begin{equation*}","right":"\\end{equation*}"},{"display":true,"left":"\\begin{align}","right":"\\end{align}"},{"display":true,"left":"\\begin{align*}","right":"\\end{align*}"},{"display":true,"left":"\\begin{alignat}","right":"\\end{alignat}"},{"display":true,"left":"\\begin{alignat*}","right":"\\end{alignat*}"},{"display":true,"left":"\\begin{gather}","right":"\\end{gather}"},{"display":true,"left":"\\begin{CD}","right":"\\end{CD}"},{"display":false,"left":"$","right":"$"},{"display":false,"left":"\\(","right":"\\)"}],"strict":false},"search":{"highlightTag":"em","maxResultLength":10,"noResultsFound":"No results found","snippetLength":50}};</script><script type="text/javascript" src="/js/theme.min.js"></script></body>
+</html>

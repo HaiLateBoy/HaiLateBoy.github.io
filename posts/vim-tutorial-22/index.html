@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="robots" content="noodp" />
+        <title>vim 从嫌弃到依赖(21)——跨文件搜索 - Masimaro&#39;s blog</title><meta name="Description" content="这是我用于记录日常和学习的小站"><meta property="og:title" content="vim 从嫌弃到依赖(21)——跨文件搜索" />
+<meta property="og:description" content="之前介绍了vim中的搜索模式，使用正则表达式可以很方便的在一个文件中进行搜索。后续也介绍了如何使用 argsdo 命令在参数列表中进行替换操作。但是到目前" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://HaiLateBoy.github.io/posts/vim-tutorial-22/" /><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2022-06-28T15:56:30+08:00" />
+<meta property="article:modified_time" content="2022-06-28T15:56:30+08:00" /><meta property="og:site_name" content="Masimaro&#39;s blog" />
+
+<meta name="twitter:card" content="summary"/><meta name="twitter:title" content="vim 从嫌弃到依赖(21)——跨文件搜索"/>
+<meta name="twitter:description" content="之前介绍了vim中的搜索模式，使用正则表达式可以很方便的在一个文件中进行搜索。后续也介绍了如何使用 argsdo 命令在参数列表中进行替换操作。但是到目前"/>
+<meta name="application-name" content="My cool site">
+<meta name="apple-mobile-web-app-title" content="My cool site"><meta name="theme-color" content="#ffffff"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="manifest" href="/site.webmanifest"><link rel="canonical" href="http://HaiLateBoy.github.io/posts/vim-tutorial-22/" /><link rel="prev" href="http://HaiLateBoy.github.io/posts/vim-tutorial-21/" /><link rel="next" href="http://HaiLateBoy.github.io/posts/vim-tutorial-23/" /><link rel="stylesheet" href="/css/style.min.css"><link rel="preload" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css"></noscript><link rel="preload" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css"></noscript><script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "BlogPosting",
+        "headline": "vim 从嫌弃到依赖(21)——跨文件搜索",
+        "inLanguage": "zh-CN",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "http:\/\/HaiLateBoy.github.io\/posts\/vim-tutorial-22\/"
+        },"genre": "posts","keywords": "vim, 编辑工具, 文本处理","wordcount":  2962 ,
+        "url": "http:\/\/HaiLateBoy.github.io\/posts\/vim-tutorial-22\/","datePublished": "2022-06-28T15:56:30+08:00","dateModified": "2022-06-28T15:56:30+08:00","publisher": {
+            "@type": "Organization",
+            "name": ""},"author": {
+                "@type": "Person",
+                "name": "Masimaro"
+            },"description": ""
+    }
+    </script></head>
+    <body data-header-desktop="fixed" data-header-mobile="auto"><script type="text/javascript">(window.localStorage && localStorage.getItem('theme') ? localStorage.getItem('theme') === 'dark' : ('auto' === 'auto' ? window.matchMedia('(prefers-color-scheme: dark)').matches : 'auto' === 'dark')) && document.body.setAttribute('theme', 'dark');</script>
+
+        <div id="mask"></div><div class="wrapper"><header class="desktop" id="header-desktop">
+    <div class="header-wrapper">
+        <div class="header-title">
+            <a href="/" title="Masimaro&#39;s blog">My cool site</a>
+        </div>
+        <div class="menu">
+            <div class="menu-inner"><a class="menu-item" href="/posts/" title="文章列表"> 文章 </a><a class="menu-item" href="/tags/" title="标签"> 标签 </a><a class="menu-item" href="/categories/" title="分类"> 分类 </a><a class="menu-item" href="/about" title="关于本站"> 关于 </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-desktop">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-desktop" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-desktop" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-desktop">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </span><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                    <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+                </a></div>
+        </div>
+    </div>
+</header><header class="mobile" id="header-mobile">
+    <div class="header-container">
+        <div class="header-wrapper">
+            <div class="header-title">
+                <a href="/" title="Masimaro&#39;s blog">My cool site</a>
+            </div>
+            <div class="menu-toggle" id="menu-toggle-mobile">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+        <div class="menu" id="menu-mobile"><div class="search-wrapper">
+                    <div class="search mobile" id="search-mobile">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-mobile">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-mobile" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-mobile" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-mobile">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </div>
+                    <a href="javascript:void(0);" class="search-cancel" id="search-cancel-mobile">
+                        Cancel
+                    </a>
+                </div><a class="menu-item" href="/posts/" title="文章列表">文章</a><a class="menu-item" href="/tags/" title="标签">标签</a><a class="menu-item" href="/categories/" title="分类">分类</a><a class="menu-item" href="/about" title="关于本站">关于</a><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+            </a></div>
+    </div>
+</header><div class="search-dropdown desktop">
+        <div id="search-dropdown-desktop"></div>
+    </div>
+    <div class="search-dropdown mobile">
+        <div id="search-dropdown-mobile"></div>
+    </div><main class="main">
+                <div class="container"><div class="toc" id="toc-auto">
+            <h2 class="toc-title">Contents</h2>
+            <div class="toc-content" id="toc-content-auto"></div>
+        </div><article class="page single"><h1 class="single-title animate__animated animate__flipInX">vim 从嫌弃到依赖(21)——跨文件搜索</h1><div class="post-meta">
+            <div class="post-meta-line"><span class="post-author"><a href="https://www.masimaro.xyz" title="Author" target="_blank" rel="noopener noreffer author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Masimaro</a></span>&nbsp;<span class="post-category">included in <a href="/categories/vim/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>vim</a></span></div>
+            <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw" aria-hidden="true"></i>&nbsp;<time datetime="2022-06-28">2022-06-28</time>&nbsp;<i class="fas fa-pencil-alt fa-fw" aria-hidden="true"></i>&nbsp;2962 words&nbsp;
+                <i class="far fa-clock fa-fw" aria-hidden="true"></i>&nbsp;6 minutes&nbsp;</div>
+        </div><div class="details toc" id="toc-static"  data-kept="true">
+                <div class="details-summary toc-title">
+                    <span>Contents</span>
+                    <span><i class="details-icon fas fa-angle-right" aria-hidden="true"></i></span>
+                </div>
+                <div class="details-content toc-content" id="toc-content-static"><nav id="TableOfContents">
+  <ul>
+    <li><a href="#grep-命令">grep 命令</a></li>
+    <li><a href="#遍历-quickfix-列表">遍历 quickfix 列表</a></li>
+    <li><a href="#定制-grep命令">定制 grep命令</a></li>
+    <li><a href="#vimgrep-简介">vimgrep 简介</a></li>
+  </ul>
+</nav></div>
+            </div><div class="content" id="content"><p>之前介绍了vim中的搜索模式，使用正则表达式可以很方便的在一个文件中进行搜索。后续也介绍了如何使用 <code>argsdo</code> 命令在参数列表中进行替换操作。但是到目前为止还没有介绍如何在工程目录中进行搜索，而这个功能是其他编辑器的基本功能。</p>
+<p>vim 主要运行在 <code>unix</code> 平台，而 <code>unix</code> 平台信奉的哲学是专门的软件做好专门的事，在多个文件中搜索关键字是 <code>grep</code> 这个程序的工作，vim本身并没有单独提供类似 <code>grep</code> 的功能，而是提供了方法直接调用 <code>grep</code>。本篇我们将要讨论在vim中是如何调用 <code>grep</code> 进行搜索的。并且介绍其他搜索整个工程中代码的方式。</p>
+<p>提前声明一下，因为vim中 <code>grep</code> 命令与 shell中的 <code>grep</code> 重名了，容易造成误解，因此这里采用 <code>:grep</code> 来表示 vim 中的 <code>grep</code> 命令，<code>grep</code> 来表示 shell中的 <code>grep</code>，也就是 vim中的命令都以 <code>:</code> 开头</p>
+<h2 id="grep-命令">grep 命令</h2>
+<p>vim 中也提供了 <code>:grep</code> 命令，它是对 shell 中 <code>grep</code> 的封装。它可以让我们直接在vim中使用<code>grep</code>并且可以在vim中显示结果（当然我们也可以在命令模式中使用 <code>:!grep</code> 来调用shell的 <code>grep</code> 命令）。</p>
+<p>我们仍然以前面介绍的搜索 <code>TODO</code> 标签为例。
+我们先在 <code>shell</code> 中使用 <code>grep</code> 命令。</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">grep -n <span class="s2">&#34;\-\- TODO&#34;</span> **/*.lua
+</span></span></code></pre></div><p>因为 <code>--TODO</code> 中的 <code>-</code> 在shell中是传参的标志，所以这里需要进行转义。<code>-n</code> 表示在输出的结果中显示行号。<code>**/*.lua</code> 表示在所有lua文件中进行搜索。我们可以看到，它输出了我们想要的结果。
+<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://img-blog.csdnimg.cn/0929a5fc0c5343c59e64527f90c402bf.png#pic_center"
+        data-srcset="https://img-blog.csdnimg.cn/0929a5fc0c5343c59e64527f90c402bf.png#pic_center, https://img-blog.csdnimg.cn/0929a5fc0c5343c59e64527f90c402bf.png#pic_center 1.5x, https://img-blog.csdnimg.cn/0929a5fc0c5343c59e64527f90c402bf.png#pic_center 2x"
+        data-sizes="auto"
+        alt="https://img-blog.csdnimg.cn/0929a5fc0c5343c59e64527f90c402bf.png#pic_center"
+        title="在这里插入图片描述" />
+我们该如何根据这个结果快速跳转到对应位置呢？例如要跳转到 <code>lua/basic/settings.lua</code> 的第5行， 我们可以在 <code>shell</code> 中可以使用 <code>nvim lua/basic/settings.lua +5</code> 表示打开到该文件并跳转到第5行。</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://img-blog.csdnimg.cn/9cdd2ade4dd94f85a1f0d0086ed993e8.gif#pic_center"
+        data-srcset="https://img-blog.csdnimg.cn/9cdd2ade4dd94f85a1f0d0086ed993e8.gif#pic_center, https://img-blog.csdnimg.cn/9cdd2ade4dd94f85a1f0d0086ed993e8.gif#pic_center 1.5x, https://img-blog.csdnimg.cn/9cdd2ade4dd94f85a1f0d0086ed993e8.gif#pic_center 2x"
+        data-sizes="auto"
+        alt="https://img-blog.csdnimg.cn/9cdd2ade4dd94f85a1f0d0086ed993e8.gif#pic_center"
+        title="在这里插入图片描述" />
+当我们要频繁不同文件间进行跳转的时候，要频繁的退回到 <code>shell</code> 并执行 <code>vim</code> 来打开，操作上比较繁琐。<code>vim</code> 为这种需求提供了自己的工具—— <code>:grep</code> 命令和 <code>:vimgrep</code></p>
+<p>在vim中输入 <code>:grep &quot;\-\- TODO&quot; **/*.lua</code> 会发现 vim 在下方显示了当前所有搜索到的内容。
+<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://img-blog.csdnimg.cn/4b04fb1ec7d34e129a4222b965937f42.gif#pic_center"
+        data-srcset="https://img-blog.csdnimg.cn/4b04fb1ec7d34e129a4222b965937f42.gif#pic_center, https://img-blog.csdnimg.cn/4b04fb1ec7d34e129a4222b965937f42.gif#pic_center 1.5x, https://img-blog.csdnimg.cn/4b04fb1ec7d34e129a4222b965937f42.gif#pic_center 2x"
+        data-sizes="auto"
+        alt="https://img-blog.csdnimg.cn/4b04fb1ec7d34e129a4222b965937f42.gif#pic_center"
+        title="在这里插入图片描述" />
+这里我们没有加上 <code>-n</code> 选项，但是它仍然显示了行号，vim默认自动为 <code>grep</code> 添加了 <code>-n</code> 选项。这些内容被存储在一个被称之为 <code>quickfix</code> 的列表中。可以通过这个列表快速跳转到对应的位置。</p>
+<h2 id="遍历-quickfix-列表">遍历 quickfix 列表</h2>
+<p><code>quickfix</code> 列表是由我们执行 <code>:make</code> 命令或者 <code>:grep</code> 命令所产生的，它会保存一个或者多个文件位置信息。我们可以使用以 <code>c</code> 开头的一组命令来遍历，下面列举出相关的命令：</p>
+<ul>
+<li>cnext：跳转到下一项</li>
+<li>cprev：跳转到上一项</li>
+<li>cfirst：跳转到第一项</li>
+<li>clast：跳转到最后一项</li>
+<li>cnfile：跳转到下一个文件的第一项</li>
+<li>cpfile：跳转到上一个文件的第一项</li>
+<li>cc n：跳转到第你项</li>
+<li>copen：打开 quickfix列表</li>
+<li>cclose: 关闭 quickfix列表</li>
+</ul>
+<p>后续使用 vim 时会大量使用到 <code>quickfix</code> 列表，为了减轻输入的负担，可以考虑将其定义为快捷键。</p>
+<p><code>:cnext</code> 和 <code>:cprev</code> 命令前面可以加数字表示向后或者向前跳转多少次。例如我这里使用 <code>:2cnext</code> 表示向后跳转2次。
+<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://img-blog.csdnimg.cn/6470eeea74b04059b94bc4a71f8f5f60.gif#pic_center"
+        data-srcset="https://img-blog.csdnimg.cn/6470eeea74b04059b94bc4a71f8f5f60.gif#pic_center, https://img-blog.csdnimg.cn/6470eeea74b04059b94bc4a71f8f5f60.gif#pic_center 1.5x, https://img-blog.csdnimg.cn/6470eeea74b04059b94bc4a71f8f5f60.gif#pic_center 2x"
+        data-sizes="auto"
+        alt="https://img-blog.csdnimg.cn/6470eeea74b04059b94bc4a71f8f5f60.gif#pic_center"
+        title="在这里插入图片描述" /></p>
+<p>我们可以使用 <code>:copen</code> 来使用新的窗口来显示 <code>quickfix</code> 列表中的内容。在这个窗口中可以使用 <code>motion</code> 命令来移动光标。<code>quickfix</code> 列表无法进行修改，因此这里只能移动光标。它比较特别的一点在于，如果我们在某一行按下回车键，那么vim会自动跳转到光标所在行对应的位置。<code>quickfix</code> 所在窗口总有一项处于高亮状态，这个状态表示当前我们在访问哪个位置的内容，我们可以通过窗口跳转来改变高亮的行，执行 <code>:cnext</code> 和 <code>:cprev</code> 以及 <code>cc</code> 之类的命令也可以修改当前高亮的行。例如我在这里执行 <code>:cc 2</code> 来跳转到第二条记录
+<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://img-blog.csdnimg.cn/1739502852f14222b80ed62780993276.gif#pic_center"
+        data-srcset="https://img-blog.csdnimg.cn/1739502852f14222b80ed62780993276.gif#pic_center, https://img-blog.csdnimg.cn/1739502852f14222b80ed62780993276.gif#pic_center 1.5x, https://img-blog.csdnimg.cn/1739502852f14222b80ed62780993276.gif#pic_center 2x"
+        data-sizes="auto"
+        alt="https://img-blog.csdnimg.cn/1739502852f14222b80ed62780993276.gif#pic_center"
+        title="在这里插入图片描述" />
+另外 vim 会自动保存之前产生的 <code>quickfix</code> 列表，并不会随着执行新的 <code>:grep</code> 而发生覆盖。我们可以使用 <code>:colder</code> 来查看上一个列表，使用 <code>:cnewer</code> 来查看下一个。</p>
+<h2 id="定制-grep命令">定制 grep命令</h2>
+<p><code>vim</code> 中的 <code>:grep</code> 是对 <code>shell</code> 中的 <code>grep</code> 的一个封装。前面说道，<code>vim</code> 中的 <code>:grep</code> 命令会默认加上 <code>-n</code> 这个选项，而 <code>grep</code> 还可以使用 <code>-i</code> 来忽略大小写，我想把这项也加入到 <code>:grep</code> 命令中该如何做呢？另外 <code>:grep</code> 是对 <code>shell</code> 中的 <code>grep</code> 的封装，现在我有更好的文本搜索工具，我想用它来替换 <code>grep</code> 该如何做呢？还有一个很奇怪的点，在使用 <code>:grep</code> 进行搜索的时候，我们明明输入的是 <code>:grep &quot;\-\- TODO **/*.lua&quot;</code> 但是它给我们显示结果的时候显示的却是 <code>:!grep -n &quot;\-\- TODO&quot; **/*.lua /dev/null 2&gt;&amp;1| tee /tmp/nvimPRHF8B/6</code> 这是为什么呢？在这一小节我们将来探讨这些问题。</p>
+<p>当我们通过 <code>vim</code> 来执行 <code>:grep</code> 命令的时候，<code>grepprg</code> 负责制定将要调用的 <code>shell</code> 命令。<code>grepformat</code> 决定如何来 <code>:grep</code> 命令的输出结果。
+通过使用 <code>:h grepprg</code> 和 <code>:h grepformat</code> 看到，它们自身在 <code>vim</code> 中的默认值如下:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-viml" data-lang="viml"><span class="line"><span class="cl"><span class="nx">grepprg</span> <span class="p">=</span> <span class="s2">&#34;grep -n $* /dev/null&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="nx">grepformat</span> <span class="p">=</span> <span class="s2">&#34;%f:%l:%m,%f:%l%m,%f  %l%m&#34;</span>
+</span></span></code></pre></div><p>在 <code>grepprg</code> 中 <code>$*</code> 表示占位符，它将被 <code>:grep</code> 命令中输入的内容替换，这也就解释了为什么最后在显示的时候，会在我们输入的基础之上加上了后面那些内容。 我们只需要对其做一些修改就可以使我们的 <code>:grep</code> 自动忽略大小写</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-viml" data-lang="viml"><span class="line"><span class="cl"><span class="k">set</span> <span class="nx">grepprg</span><span class="p">=</span><span class="nx">grep</span>\ <span class="p">-</span><span class="nx">n</span>\ <span class="p">-</span><span class="nx">i</span>\ $*
+</span></span></code></pre></div><p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://img-blog.csdnimg.cn/f40ee783e31d49d896f93c8de72c00b1.png#pic_center"
+        data-srcset="https://img-blog.csdnimg.cn/f40ee783e31d49d896f93c8de72c00b1.png#pic_center, https://img-blog.csdnimg.cn/f40ee783e31d49d896f93c8de72c00b1.png#pic_center 1.5x, https://img-blog.csdnimg.cn/f40ee783e31d49d896f93c8de72c00b1.png#pic_center 2x"
+        data-sizes="auto"
+        alt="https://img-blog.csdnimg.cn/f40ee783e31d49d896f93c8de72c00b1.png#pic_center"
+        title="在这里插入图片描述" />
+<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://img-blog.csdnimg.cn/44dfe79c685d4b0587065124a5604d46.gif#pic_center"
+        data-srcset="https://img-blog.csdnimg.cn/44dfe79c685d4b0587065124a5604d46.gif#pic_center, https://img-blog.csdnimg.cn/44dfe79c685d4b0587065124a5604d46.gif#pic_center 1.5x, https://img-blog.csdnimg.cn/44dfe79c685d4b0587065124a5604d46.gif#pic_center 2x"
+        data-sizes="auto"
+        alt="https://img-blog.csdnimg.cn/44dfe79c685d4b0587065124a5604d46.gif#pic_center"
+        title="在这里插入图片描述" />
+我们看到，同样的命令现在多出来了一条小写的结果，另外从它的显示上看也已经加上了 <code>-i</code> 选项了。</p>
+<p>接下来我们来看看 vim是如何解析 :grep命令输出的。
+grepformat中各种匹配格式是按照 ,来进行分割。也就是它定义了多组可能的输出格式，每组以 ,分割。%f表示文件名称、%l表示行号，:m表示匹配的行。</p>
+<p>了解这些之后，我们来试试使用别的命令来替换默认的 grep。这里我们以 ack作为演示，当然你也可以使用其他的命令。插一句题外话，我觉得 ack相较于 grep来说，最大的优势在于它可以识别不同的文件类型，这样就可以做到只搜索某一类型文件中的内容，而且默认支持递归搜索当前目录下所有文件。</p>
+<p>在 <code>shell</code> 中，可以直接使用 <code>ack &quot;\-\- TODO&quot;</code> 来搜索所有的 todo项，也可以使用 <code>-i</code> 来忽略大小写。在默认情况下 <code>ack</code> 会用两行来显示搜索到的结果，第一行是 文件名，第二行是行号和匹配行的内容。
+<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://img-blog.csdnimg.cn/2c0ca1e8cc714e95a3aae72210e8c462.png#pic_center"
+        data-srcset="https://img-blog.csdnimg.cn/2c0ca1e8cc714e95a3aae72210e8c462.png#pic_center, https://img-blog.csdnimg.cn/2c0ca1e8cc714e95a3aae72210e8c462.png#pic_center 1.5x, https://img-blog.csdnimg.cn/2c0ca1e8cc714e95a3aae72210e8c462.png#pic_center 2x"
+        data-sizes="auto"
+        alt="https://img-blog.csdnimg.cn/2c0ca1e8cc714e95a3aae72210e8c462.png#pic_center"
+        title="在这里插入图片描述" />
+<code>ack</code> 默认会搜索当前目录中所有文件中的内容，所以这里可以不需要像 <code>grep</code> 那样给出具体的目录。</p>
+<p>我们可以使用 &ndash;nogroup来达到与 grep相同的输出格式。
+<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://img-blog.csdnimg.cn/67254063373a4aeb9667616c3df6875d.png#pic_center"
+        data-srcset="https://img-blog.csdnimg.cn/67254063373a4aeb9667616c3df6875d.png#pic_center, https://img-blog.csdnimg.cn/67254063373a4aeb9667616c3df6875d.png#pic_center 1.5x, https://img-blog.csdnimg.cn/67254063373a4aeb9667616c3df6875d.png#pic_center 2x"
+        data-sizes="auto"
+        alt="https://img-blog.csdnimg.cn/67254063373a4aeb9667616c3df6875d.png#pic_center"
+        title="在这里插入图片描述" />
+我们可以使用 <code>--nogroup</code> 来使 <code>ack</code> 达到与 <code>grep</code> 相同的输出，因此这里也可以不修改 <code>grepformat</code> 的内容。我们只需要修改 <code>grepprg</code> 即可：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-viml" data-lang="viml"><span class="line"><span class="cl"><span class="k">set</span> <span class="nx">grepprg</span><span class="p">=</span><span class="nx">ack</span>\ <span class="p">--</span><span class="nx">nogroup</span>\ $*
+</span></span></code></pre></div><p>另外 <code>ack</code> 还支持添加 <code>--column</code> 来输出对应的列，配合 <code>grepformat</code> 我们可以做到精确定位到对应的行和列。这里我们设置 <code>set grepprg=ack\ --nogroup\ --column\ $*</code>。同时设置 <code>set grepformat=%f:%l:%c:%m</code>
+<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://img-blog.csdnimg.cn/b8171e230cd64eef9ac965cf97978ad2.gif#pic_center"
+        data-srcset="https://img-blog.csdnimg.cn/b8171e230cd64eef9ac965cf97978ad2.gif#pic_center, https://img-blog.csdnimg.cn/b8171e230cd64eef9ac965cf97978ad2.gif#pic_center 1.5x, https://img-blog.csdnimg.cn/b8171e230cd64eef9ac965cf97978ad2.gif#pic_center 2x"
+        data-sizes="auto"
+        alt="https://img-blog.csdnimg.cn/b8171e230cd64eef9ac965cf97978ad2.gif#pic_center"
+        title="在这里插入图片描述" />
+从上图中可以看到，此时已经可以显示列号了，并且 <code>grep</code> 已经被替换成了 <code>ack</code> 了</p>
+<p>vim 提供了很方便的方式让我们修改 <code>:grep</code> 命令的行为。但是我们在执行 <code>:grep</code> 的时候发现它在调用 <code>ack</code> 命令有时候会造成一定的疑惑或者误解。而且并不是每次我都想使用某一个 <code>shell</code> 程序的。例如这次我想用 <code>grep</code> 进行搜索，下一次我想用 <code>ack</code> 搜索，这样每次修改外部命令，我都得修改 <code>grepprg</code> 和 <code>grepformat</code> 想想也挺麻烦的。为什么不创建一个 <code>:ack</code> 命令专门用于使用外部的 <code>ack</code>，或者其他命令专门用于调用其他外部程序呢？目前很多插件都是这么干的。在后续介绍 vim配置的时候我们将会给出这样的例子。</p>
+<h2 id="vimgrep-简介">vimgrep 简介</h2>
+<p>除了使用 <code>:grep</code> 来调用外部的搜索命令外，<code>vim</code> 自身也提供了 <code>:vimgrep</code> 命令。它最大的特色是支持 <code>vim</code> 自己的正则表达式。它的使用格式如下:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-viml" data-lang="viml"><span class="line"><span class="cl"><span class="p">:</span><span class="nx">vimgrep</span>[<span class="p">!</span>] <span class="sr">/{pattern}/</span>[<span class="nx">j</span>][<span class="nx">g</span>] {<span class="nx">file</span>}
+</span></span></code></pre></div><p>它的使用方式与之前介绍的 搜索模式类似。只是它只支持2个标志，<code>j</code> 表示不进行跳转只是将匹配结果保存到 <code>quickfix</code> 列表中，默认情况下，它会跳转到第一个匹配的位置，并且将搜索结果保存到 <code>quickfix</code> 中。<code>g</code> 表示将所有匹配都记录下来，默认只记录每一行第一个匹配处。</p>
+<p>因为它与搜索模式下使用的模式相同，因此这里我们可以先用查找模式来在一个文件中进行试验，试验成功后再使用 <code>vimgrep</code>，否则错误的结果将会污染历史的 <code>quickfix</code> 列表，影响后续使用 <code>colder</code> 和 <code>cnewer</code> 。</p>
+<p>例如这里我还是搜索 <code>--TODO</code> 可以现在单个文件中使用 <code>:\v--\s+TODO</code>进行搜索。
+<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://img-blog.csdnimg.cn/5501fc7915854bde9c7648bc74922d2c.gif#pic_center"
+        data-srcset="https://img-blog.csdnimg.cn/5501fc7915854bde9c7648bc74922d2c.gif#pic_center, https://img-blog.csdnimg.cn/5501fc7915854bde9c7648bc74922d2c.gif#pic_center 1.5x, https://img-blog.csdnimg.cn/5501fc7915854bde9c7648bc74922d2c.gif#pic_center 2x"
+        data-sizes="auto"
+        alt="https://img-blog.csdnimg.cn/5501fc7915854bde9c7648bc74922d2c.gif#pic_center"
+        title="在这里插入图片描述" />
+然后使用模式域留空的方式查找，即 <code>:vimgrep //gj **/*.lua</code></p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://img-blog.csdnimg.cn/519bd8f39f724bbca38a87506c8247ce.gif#pic_center"
+        data-srcset="https://img-blog.csdnimg.cn/519bd8f39f724bbca38a87506c8247ce.gif#pic_center, https://img-blog.csdnimg.cn/519bd8f39f724bbca38a87506c8247ce.gif#pic_center 1.5x, https://img-blog.csdnimg.cn/519bd8f39f724bbca38a87506c8247ce.gif#pic_center 2x"
+        data-sizes="auto"
+        alt="https://img-blog.csdnimg.cn/519bd8f39f724bbca38a87506c8247ce.gif#pic_center"
+        title="在这里插入图片描述" /></p>
+<p>关于 vimgrep的内容就介绍到这里了，一般我很少使用原装的 :grep和 :vimgrep。而是采用功能更加强大的其他搜索插件。各位小伙伴也不需要纠结究竟掌握它们中的哪个好，有更好的，直接用更好的就行。</p>
+</div><div class="post-footer" id="post-footer">
+    <div class="post-info">
+        <div class="post-info-line">
+            <div class="post-info-mod">
+                <span>Updated on 2022-06-28</span>
+            </div></div>
+        <div class="post-info-line">
+            <div class="post-info-md"></div>
+            <div class="post-info-share">
+                <span><a href="javascript:void(0);" title="Share on Twitter" data-sharer="twitter" data-url="http://HaiLateBoy.github.io/posts/vim-tutorial-22/" data-title="vim 从嫌弃到依赖(21)——跨文件搜索" data-hashtags="vim,编辑工具,文本处理"><i class="fab fa-twitter fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Facebook" data-sharer="facebook" data-url="http://HaiLateBoy.github.io/posts/vim-tutorial-22/" data-hashtag="vim"><i class="fab fa-facebook-square fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Hacker News" data-sharer="hackernews" data-url="http://HaiLateBoy.github.io/posts/vim-tutorial-22/" data-title="vim 从嫌弃到依赖(21)——跨文件搜索"><i class="fab fa-hacker-news fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Line" data-sharer="line" data-url="http://HaiLateBoy.github.io/posts/vim-tutorial-22/" data-title="vim 从嫌弃到依赖(21)——跨文件搜索"><i data-svg-src="https://cdn.jsdelivr.net/npm/simple-icons@7.3.0/icons/line.svg" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on 微博" data-sharer="weibo" data-url="http://HaiLateBoy.github.io/posts/vim-tutorial-22/" data-title="vim 从嫌弃到依赖(21)——跨文件搜索"><i class="fab fa-weibo fa-fw" aria-hidden="true"></i></a></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="post-info-more">
+        <section class="post-tags"><i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/vim/">vim</a>,&nbsp;<a href="/tags/%E7%BC%96%E8%BE%91%E5%B7%A5%E5%85%B7/">编辑工具</a>,&nbsp;<a href="/tags/%E6%96%87%E6%9C%AC%E5%A4%84%E7%90%86/">文本处理</a></section>
+        <section>
+            <span><a href="javascript:void(0);" onclick="window.history.back();">Back</a></span>&nbsp;|&nbsp;<span><a href="/">Home</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav"><a href="/posts/vim-tutorial-21/" class="prev" rel="prev" title="vim 从嫌弃到依赖(20)——global 命令"><i class="fas fa-angle-left fa-fw" aria-hidden="true"></i>vim 从嫌弃到依赖(20)——global 命令</a>
+            <a href="/posts/vim-tutorial-23/" class="next" rel="next" title="vim 从嫌弃到依赖(22)——自动补全">vim 从嫌弃到依赖(22)——自动补全<i class="fas fa-angle-right fa-fw" aria-hidden="true"></i></a></div>
+</div>
+</article></div>
+            </main><footer class="footer">
+        <div class="footer-container"><div class="footer-line">Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener noreffer" title="Hugo 0.121.2">Hugo</a> | Theme - <a href="https://github.com/dillonzq/LoveIt" target="_blank" rel="noopener noreffer" title="LoveIt 0.2.11"><i class="far fa-kiss-wink-heart fa-fw" aria-hidden="true"></i> LoveIt</a>
+                </div><div class="footer-line" itemscope itemtype="http://schema.org/CreativeWork"><i class="far fa-copyright fa-fw" aria-hidden="true"></i><span itemprop="copyrightYear">2022 - 2024</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="https://www.masimaro.xyz" target="_blank">Masimaro</a></span></div>
+        </div>
+    </footer></div>
+
+        <div id="fixed-buttons"><a href="#" id="back-to-top" class="fixed-button" title="Back to Top">
+                <i class="fas fa-arrow-up fa-fw" aria-hidden="true"></i>
+            </a><a href="#" id="view-comments" class="fixed-button" title="View Comments">
+                <i class="fas fa-comment fa-fw" aria-hidden="true"></i>
+            </a>
+        </div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.css"><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/autocomplete.js@0.38.1/dist/autocomplete.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lunr@2.3.9/lunr.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lazysizes@5.3.2/lazysizes.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/clipboard@2.0.11/dist/clipboard.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/sharer.js@0.5.1/sharer.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/auto-render.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/copy-tex.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/mhchem.min.js"></script><script type="text/javascript">window.config={"code":{"copyTitle":"Copy to clipboard","maxShownLines":50},"comment":{},"math":{"delimiters":[{"display":true,"left":"$$","right":"$$"},{"display":true,"left":"\\[","right":"\\]"},{"display":true,"left":"\\begin{equation}","right":"\\end{equation}"},{"display":true,"left":"\\begin{equation*}","right":"\\end{equation*}"},{"display":true,"left":"\\begin{align}","right":"\\end{align}"},{"display":true,"left":"\\begin{align*}","right":"\\end{align*}"},{"display":true,"left":"\\begin{alignat}","right":"\\end{alignat}"},{"display":true,"left":"\\begin{alignat*}","right":"\\end{alignat*}"},{"display":true,"left":"\\begin{gather}","right":"\\end{gather}"},{"display":true,"left":"\\begin{CD}","right":"\\end{CD}"},{"display":false,"left":"$","right":"$"},{"display":false,"left":"\\(","right":"\\)"}],"strict":false},"search":{"highlightTag":"em","maxResultLength":10,"noResultsFound":"No results found","snippetLength":50}};</script><script type="text/javascript" src="/js/theme.min.js"></script></body>
+</html>

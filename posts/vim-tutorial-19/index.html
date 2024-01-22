@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="robots" content="noodp" />
+        <title>vim 从嫌弃到依赖(18)——查找模式进阶 - Masimaro&#39;s blog</title><meta name="Description" content="这是我用于记录日常和学习的小站"><meta property="og:title" content="vim 从嫌弃到依赖(18)——查找模式进阶" />
+<meta property="og:description" content="上一篇文章中，我们初步结识了如何使用查找模式，也能够通过n和 N进行查找。这篇将会介绍搜索中更高级的用法。另外在写上一篇文章的时候我发现介绍查" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://HaiLateBoy.github.io/posts/vim-tutorial-19/" /><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2022-06-20T15:45:50+08:00" />
+<meta property="article:modified_time" content="2022-06-20T15:45:50+08:00" /><meta property="og:site_name" content="Masimaro&#39;s blog" />
+
+<meta name="twitter:card" content="summary"/><meta name="twitter:title" content="vim 从嫌弃到依赖(18)——查找模式进阶"/>
+<meta name="twitter:description" content="上一篇文章中，我们初步结识了如何使用查找模式，也能够通过n和 N进行查找。这篇将会介绍搜索中更高级的用法。另外在写上一篇文章的时候我发现介绍查"/>
+<meta name="application-name" content="My cool site">
+<meta name="apple-mobile-web-app-title" content="My cool site"><meta name="theme-color" content="#ffffff"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="manifest" href="/site.webmanifest"><link rel="canonical" href="http://HaiLateBoy.github.io/posts/vim-tutorial-19/" /><link rel="prev" href="http://HaiLateBoy.github.io/posts/vim-tutorial-18/" /><link rel="next" href="http://HaiLateBoy.github.io/posts/vim-tutorial-20/" /><link rel="stylesheet" href="/css/style.min.css"><link rel="preload" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css"></noscript><link rel="preload" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css"></noscript><script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "BlogPosting",
+        "headline": "vim 从嫌弃到依赖(18)——查找模式进阶",
+        "inLanguage": "zh-CN",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "http:\/\/HaiLateBoy.github.io\/posts\/vim-tutorial-19\/"
+        },"genre": "posts","keywords": "vim, 编辑工具, 文本处理","wordcount":  2486 ,
+        "url": "http:\/\/HaiLateBoy.github.io\/posts\/vim-tutorial-19\/","datePublished": "2022-06-20T15:45:50+08:00","dateModified": "2022-06-20T15:45:50+08:00","publisher": {
+            "@type": "Organization",
+            "name": ""},"author": {
+                "@type": "Person",
+                "name": "Masimaro"
+            },"description": ""
+    }
+    </script></head>
+    <body data-header-desktop="fixed" data-header-mobile="auto"><script type="text/javascript">(window.localStorage && localStorage.getItem('theme') ? localStorage.getItem('theme') === 'dark' : ('auto' === 'auto' ? window.matchMedia('(prefers-color-scheme: dark)').matches : 'auto' === 'dark')) && document.body.setAttribute('theme', 'dark');</script>
+
+        <div id="mask"></div><div class="wrapper"><header class="desktop" id="header-desktop">
+    <div class="header-wrapper">
+        <div class="header-title">
+            <a href="/" title="Masimaro&#39;s blog">My cool site</a>
+        </div>
+        <div class="menu">
+            <div class="menu-inner"><a class="menu-item" href="/posts/" title="文章列表"> 文章 </a><a class="menu-item" href="/tags/" title="标签"> 标签 </a><a class="menu-item" href="/categories/" title="分类"> 分类 </a><a class="menu-item" href="/about" title="关于本站"> 关于 </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-desktop">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-desktop" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-desktop" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-desktop">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </span><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                    <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+                </a></div>
+        </div>
+    </div>
+</header><header class="mobile" id="header-mobile">
+    <div class="header-container">
+        <div class="header-wrapper">
+            <div class="header-title">
+                <a href="/" title="Masimaro&#39;s blog">My cool site</a>
+            </div>
+            <div class="menu-toggle" id="menu-toggle-mobile">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+        <div class="menu" id="menu-mobile"><div class="search-wrapper">
+                    <div class="search mobile" id="search-mobile">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-mobile">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-mobile" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-mobile" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-mobile">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </div>
+                    <a href="javascript:void(0);" class="search-cancel" id="search-cancel-mobile">
+                        Cancel
+                    </a>
+                </div><a class="menu-item" href="/posts/" title="文章列表">文章</a><a class="menu-item" href="/tags/" title="标签">标签</a><a class="menu-item" href="/categories/" title="分类">分类</a><a class="menu-item" href="/about" title="关于本站">关于</a><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+            </a></div>
+    </div>
+</header><div class="search-dropdown desktop">
+        <div id="search-dropdown-desktop"></div>
+    </div>
+    <div class="search-dropdown mobile">
+        <div id="search-dropdown-mobile"></div>
+    </div><main class="main">
+                <div class="container"><div class="toc" id="toc-auto">
+            <h2 class="toc-title">Contents</h2>
+            <div class="toc-content" id="toc-content-auto"></div>
+        </div><article class="page single"><h1 class="single-title animate__animated animate__flipInX">vim 从嫌弃到依赖(18)——查找模式进阶</h1><div class="post-meta">
+            <div class="post-meta-line"><span class="post-author"><a href="https://www.masimaro.xyz" title="Author" target="_blank" rel="noopener noreffer author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Masimaro</a></span>&nbsp;<span class="post-category">included in <a href="/categories/vim/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>vim</a></span></div>
+            <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw" aria-hidden="true"></i>&nbsp;<time datetime="2022-06-20">2022-06-20</time>&nbsp;<i class="fas fa-pencil-alt fa-fw" aria-hidden="true"></i>&nbsp;2486 words&nbsp;
+                <i class="far fa-clock fa-fw" aria-hidden="true"></i>&nbsp;5 minutes&nbsp;</div>
+        </div><div class="details toc" id="toc-static"  data-kept="true">
+                <div class="details-summary toc-title">
+                    <span>Contents</span>
+                    <span><i class="details-icon fas fa-angle-right" aria-hidden="true"></i></span>
+                </div>
+                <div class="details-content toc-content" id="toc-content-static"><nav id="TableOfContents">
+  <ul>
+    <li><a href="#调整大小写敏感">调整大小写敏感</a></li>
+    <li><a href="#使用正则表达式匹配">使用正则表达式匹配</a></li>
+    <li><a href="#使用括号获取子匹配项">使用括号获取子匹配项</a></li>
+    <li><a href="#界定匹配范围">界定匹配范围</a></li>
+    <li><a href="#转义特殊字符">转义特殊字符</a></li>
+  </ul>
+</nav></div>
+            </div><div class="content" id="content"><p>上一篇文章中，我们初步结识了如何使用查找模式，也能够通过n和 N进行查找。这篇将会介绍搜索中更高级的用法。另外在写上一篇文章的时候我发现介绍查找相关内容的时候不能用动图来演示，主要是因为输入的内容太多了，剪成动图的话太大了，不一定能上传。第二个就是开启了匹配高亮的选项，比起动图来能更直观的看到匹配的结果。所以这篇文章就不采用动图了。</p>
+<h2 id="调整大小写敏感">调整大小写敏感</h2>
+<p>默认情况下，在搜索时是大小写敏感的，例如下面的例子中，我们无法匹配到大写的REQUIRE的</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://img-blog.csdnimg.cn/f4d8ac1b3b2a496a9545d5a795255377.png#pic_center"
+        data-srcset="https://img-blog.csdnimg.cn/f4d8ac1b3b2a496a9545d5a795255377.png#pic_center, https://img-blog.csdnimg.cn/f4d8ac1b3b2a496a9545d5a795255377.png#pic_center 1.5x, https://img-blog.csdnimg.cn/f4d8ac1b3b2a496a9545d5a795255377.png#pic_center 2x"
+        data-sizes="auto"
+        alt="https://img-blog.csdnimg.cn/f4d8ac1b3b2a496a9545d5a795255377.png#pic_center"
+        title="在这里插入图片描述" />
+可以使用 <code>ignorecase</code> 项来取消大小写敏感，例如在 <code>neovim</code> 中写上如下配置</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-lua" data-lang="lua"><span class="line"><span class="cl"><span class="n">vim.o</span><span class="p">.</span><span class="n">ignorecase</span> <span class="o">=</span> <span class="kc">true</span>
+</span></span></code></pre></div><p>或者在 <code>vim</code> 的配置文件中写上</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-vim" data-lang="vim"><span class="line"><span class="cl"><span class="k">set</span> <span class="nx">ignorecase</span>
+</span></span></code></pre></div><p>此时在输入 <code>require</code> 时，发现已经可以匹配到 <code>REQUIRE</code> 了
+<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://img-blog.csdnimg.cn/cda9a25b8a66461f9eec6799a5875035.png#pic_center"
+        data-srcset="https://img-blog.csdnimg.cn/cda9a25b8a66461f9eec6799a5875035.png#pic_center, https://img-blog.csdnimg.cn/cda9a25b8a66461f9eec6799a5875035.png#pic_center 1.5x, https://img-blog.csdnimg.cn/cda9a25b8a66461f9eec6799a5875035.png#pic_center 2x"
+        data-sizes="auto"
+        alt="https://img-blog.csdnimg.cn/cda9a25b8a66461f9eec6799a5875035.png#pic_center"
+        title="在这里插入图片描述" />
+但是在实际使用中我们希望有时候大小写敏感，有时候大小写不敏感，例如想模糊搜索某个函数或者变量的时候。更好的做法是设置 <code>smartcase</code> 项。它只有在输入的字符中有大写才启用大小写敏感，否则就是大小写不敏感。</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-lua" data-lang="lua"><span class="line"><span class="cl"><span class="n">vim.o</span><span class="p">.</span><span class="n">smartcase</span> <span class="o">=</span> <span class="kc">true</span>
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl"><span class="nb">set</span> smartcase
+</span></span></code></pre></div><p>当然我们也可以在每次搜索的时候单独指定本次搜索是否大小写敏感。可以在匹配时输入\c来不区分大小写而使用 \C区分大小写，这个符号可以出现在任何位置，哪怕你输入 /requ\Cire它也能正确找到所有的 require字符串。
+<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://img-blog.csdnimg.cn/0a194723d8f64fb08557c7f7f6f08ece.png#pic_center"
+        data-srcset="https://img-blog.csdnimg.cn/0a194723d8f64fb08557c7f7f6f08ece.png#pic_center, https://img-blog.csdnimg.cn/0a194723d8f64fb08557c7f7f6f08ece.png#pic_center 1.5x, https://img-blog.csdnimg.cn/0a194723d8f64fb08557c7f7f6f08ece.png#pic_center 2x"
+        data-sizes="auto"
+        alt="https://img-blog.csdnimg.cn/0a194723d8f64fb08557c7f7f6f08ece.png#pic_center"
+        title="在这里插入图片描述" /></p>
+<h2 id="使用正则表达式匹配">使用正则表达式匹配</h2>
+<p>vim支持正则表达式的搜索，vim采用的是 POXIS的正则表达式的规则，这就让我们一些习惯 Perl正则表达式规则的人在使用时会出现一些不适宜。现在我们来看一个具体的例子</p>
+<p>假设现在有一个 css 文件, 我需要搜索里面的16进制颜色</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-css" data-lang="css"><span class="line"><span class="cl"><span class="nt">body</span> <span class="p">{</span> <span class="k">color</span><span class="p">:</span> <span class="mh">#3c3c3c</span><span class="p">;</span> <span class="p">}</span> 
+</span></span><span class="line"><span class="cl"><span class="nt">a</span> <span class="p">{</span> <span class="k">color</span><span class="p">:</span> <span class="mh">#0000EE</span><span class="p">;</span> <span class="p">}</span> 
+</span></span><span class="line"><span class="cl"><span class="nt">strong</span> <span class="p">{</span> <span class="k">color</span><span class="p">:</span> <span class="mh">#000</span><span class="p">;</span> <span class="p">}</span>
+</span></span></code></pre></div><p>我们在搜索时输入这样一个正则表达式 <code>#([0-9a-fA-F]{6}|[0-9a-fA-F]{3})</code> 。发现它会报错，但是正则表达式来看，这么写是没问题的，我们要匹配的是以 <code>#</code> 开头，后面有6个或者3个16进制数的字符。</p>
+<p>这是因为里面有特殊字符，需要进行转义，例如 <code>()</code> 在 vim 中有特殊用途,我们将在接下来介绍它的用途。我们需要将正则表达式写成这样 <code>#\([0-9a-fA-F]\{6\}\|[0-9a-fA-F]\{3\}\)</code>
+<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://img-blog.csdnimg.cn/2e49b21a0ec149beaf44625cfe1bfcc3.png#pic_center"
+        data-srcset="https://img-blog.csdnimg.cn/2e49b21a0ec149beaf44625cfe1bfcc3.png#pic_center, https://img-blog.csdnimg.cn/2e49b21a0ec149beaf44625cfe1bfcc3.png#pic_center 1.5x, https://img-blog.csdnimg.cn/2e49b21a0ec149beaf44625cfe1bfcc3.png#pic_center 2x"
+        data-sizes="auto"
+        alt="https://img-blog.csdnimg.cn/2e49b21a0ec149beaf44625cfe1bfcc3.png#pic_center"
+        title="在这里插入图片描述" />
+好家伙，反斜杠居然有7个，而且 <code>()</code>、<code>{}</code> 需要转义，而 <code>[]</code> 不需要转义。正则表达式就够麻烦的了，还得记住vim与其他编辑器的不同，用一次人就麻了。</p>
+<p>好在vim提供了 <code>very magic</code> 模式，即除了 <code>_</code> 、 数字、字母之外的所有字符都具有特殊含义，这样我们就不用纠结哪些需要转义，哪些不需要了。可以在搜索的开头添加 <code>\v</code> 来启用这一模式，即我们可以输入 <code>\v#([0-9a-fA-F]{6}|[0-9a-fA-F]{3})</code>
+<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://img-blog.csdnimg.cn/ef7277d7ef664a7fb3f393c3685d01b6.png#pic_center"
+        data-srcset="https://img-blog.csdnimg.cn/ef7277d7ef664a7fb3f393c3685d01b6.png#pic_center, https://img-blog.csdnimg.cn/ef7277d7ef664a7fb3f393c3685d01b6.png#pic_center 1.5x, https://img-blog.csdnimg.cn/ef7277d7ef664a7fb3f393c3685d01b6.png#pic_center 2x"
+        data-sizes="auto"
+        alt="https://img-blog.csdnimg.cn/ef7277d7ef664a7fb3f393c3685d01b6.png#pic_center"
+        title="在这里插入图片描述" />
+我们还可以使用 <code>\x</code> 表示16进制数，以便简化上述正则表达式, <code>\v#(\x{6}|\x{3})</code>。
+<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://img-blog.csdnimg.cn/a25507164ea3498fa71cc17545c72e4b.png#pic_center"
+        data-srcset="https://img-blog.csdnimg.cn/a25507164ea3498fa71cc17545c72e4b.png#pic_center, https://img-blog.csdnimg.cn/a25507164ea3498fa71cc17545c72e4b.png#pic_center 1.5x, https://img-blog.csdnimg.cn/a25507164ea3498fa71cc17545c72e4b.png#pic_center 2x"
+        data-sizes="auto"
+        alt="https://img-blog.csdnimg.cn/a25507164ea3498fa71cc17545c72e4b.png#pic_center"
+        title="在这里插入图片描述" />
+<code>\x</code> 是vim 字符类中的一个成员，我认为比较有用的还有如下这些</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">字符</th>
+<th style="text-align:left">含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">\x</td>
+<td style="text-align:left">十六进制数</td>
+</tr>
+<tr>
+<td style="text-align:left">\X</td>
+<td style="text-align:left">非十六进制数</td>
+</tr>
+<tr>
+<td style="text-align:left">\d</td>
+<td style="text-align:left">数字</td>
+</tr>
+<tr>
+<td style="text-align:left">\D</td>
+<td style="text-align:left">非数字</td>
+</tr>
+<tr>
+<td style="text-align:left">\o</td>
+<td style="text-align:left">八进制数</td>
+</tr>
+<tr>
+<td style="text-align:left">\o</td>
+<td style="text-align:left">非八进制数</td>
+</tr>
+<tr>
+<td style="text-align:left">\w</td>
+<td style="text-align:left">包括字母、数字和 _</td>
+</tr>
+<tr>
+<td style="text-align:left">\W</td>
+<td style="text-align:left">不包括 字母、数字和 _</td>
+</tr>
+<tr>
+<td style="text-align:left">\h</td>
+<td style="text-align:left">包括 字母和 _</td>
+</tr>
+<tr>
+<td style="text-align:left">\H</td>
+<td style="text-align:left">不包括字母和 _</td>
+</tr>
+<tr>
+<td style="text-align:left">\l</td>
+<td style="text-align:left">小写字母</td>
+</tr>
+<tr>
+<td style="text-align:left">\L</td>
+<td style="text-align:left">非小写字母</td>
+</tr>
+<tr>
+<td style="text-align:left">\u</td>
+<td style="text-align:left">大写字母</td>
+</tr>
+<tr>
+<td style="text-align:left">\U</td>
+<td style="text-align:left">非大写字母</td>
+</tr>
+</tbody>
+</table>
+<p>除了有 <code>very magic</code>模式，vim 中还有 <code>very nomagic</code> 模式，在该模式中所有的字符都只表示它自身，没有特殊含义，例如 <code>.</code> 在正则表达中表示单个字符，但是在 <code>very nomagic</code> 模式中它就表示一个点，它可以匹配点这个字符本身，要启用 <code>very nomagic</code> 模式，可以使用 <code>\V</code> 作为前缀。</p>
+<h2 id="使用括号获取子匹配项">使用括号获取子匹配项</h2>
+<p>在 vim 中可以使用 <code>&lt;(\w+)\_s+\1&gt;</code> 来匹配重复单词，例如</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="cl">I love python
+</span></span><span class="line"><span class="cl">python is so good
+</span></span></code></pre></div><p>这句话中我们可以匹配到 <code>python</code> 这个单词。
+<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://img-blog.csdnimg.cn/d626b805f10c4881a001af68a0bd075e.png#pic_center"
+        data-srcset="https://img-blog.csdnimg.cn/d626b805f10c4881a001af68a0bd075e.png#pic_center, https://img-blog.csdnimg.cn/d626b805f10c4881a001af68a0bd075e.png#pic_center 1.5x, https://img-blog.csdnimg.cn/d626b805f10c4881a001af68a0bd075e.png#pic_center 2x"
+        data-sizes="auto"
+        alt="https://img-blog.csdnimg.cn/d626b805f10c4881a001af68a0bd075e.png#pic_center"
+        title="在这里插入图片描述" />
+我们来看这个正则表达式，<code>&lt;&gt;</code> 匹配以某些字符开头或者结尾的单词，例如 <code>&lt;Py</code> 将匹配所有以 <code>Py</code> 开头的单词，而 <code>on&gt;</code> 将匹配所有以 <code>on</code> 结尾的单词，因为这里我们的需求并没有要求要匹配以某些字符开头的单词，加上这个就限定我们要匹配单词而不是某些个字符。<code>\_</code> 后面可以加vim字符类中的任意字符，代表在原来的基础之上额外再匹配换行符，例如 <code>\x</code> 可以匹配16进制数，<code>\_x</code> 可以匹配16进制数和换行符。<code>\_s+</code>就是匹配 <code>&lt;Tab&gt;</code> 空白字符和换行符，并且是匹配1个或者多个。</p>
+<p>在vim中使用括号代表子匹配项，它是整个正则表达式匹配的一个子项，例如 <code>Py(tho)n</code> 它可以匹配到 <code>Python</code> 和 <code>Python</code> 字符串里面的 <code>tho</code>。\后面加数字代表第几个匹配项，第0个匹配项是整个正则表达式的匹配项，1、2、3、&hellip;.、n 则对应着第1个子匹配项，第二个、第n个子匹配项。</p>
+<p>了解了这些，我们就能读懂整个这个正则表达了，它匹配这样一个单词：他是任意单词，但是它后面需要出现一个跟他一样的单词，不管中间包含的是多个空格、制表符或者换行符。</p>
+<p>如果我们只是想匹配是否有多个重复的 Python可以这样写： <code>(&lt;Py\w+on&gt;)\_s+\1</code></p>
+<h2 id="界定匹配范围">界定匹配范围</h2>
+<p>在搜索模式中，vim把查找域中输入的内容（可以是正则表达或者是原意匹配的字符串）和它匹配的到的高亮的文本进行了区分。一般将查找域中的内容称之为模式，将被高亮显示的文本称之为匹配。一个模式可以对应多个匹配（这里的模式与前面提到的普通模式和插入模式的意思不同）。</p>
+<p>一个匹配的边界通常对应着一个模式的起始与结尾。例如 <code>&lt;&gt;</code> 表示一个匹配的边界将是一个单词。除了这个，vim提供了 <code>\zs</code> 和 <code>\ze</code> 这两个元字符来对一个匹配进行裁剪。<code>\zs</code> 表示去掉匹配中开头的指定部分、<code>\ze</code> 表示去掉匹配中结尾的指定部分。</p>
+<p>例如在上面这句话中，我通过 <code>&lt;\w+&gt;</code> 匹配到所有的单词。然后通过 <code>&lt;\zsPy\w+&gt;</code> 来对匹配内容进行裁剪，将高亮显示所有单词 <code>Py</code> 以及后面的内容，如果不是以 <code>Py</code> 开头的则完全被裁剪掉了。或者使用 <code>&lt;\w+\zeon&gt;</code> 来裁剪，只显示所有单词 <code>on</code> 前面的部分。</p>
+<h2 id="转义特殊字符">转义特殊字符</h2>
+<p>这里我们用一个URL 作为例子来演示</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="cl">https://www.baidu.com/search?q=\\/
+</span></span></code></pre></div><p>假设我们要匹配所有文档中出现的这个url，该如何做呢？</p>
+<p>首先考虑在匹配模式中输入一大串的内容，但是这一大串不需要手工输入。我们可以将vim的命令模式和现在的匹配模式看成一个特殊的插入模式中的文本，这样我们就可以使用前面介绍的在输入模式中使用寄存器的例子。先使用 <code>&quot;iy$</code> 粘贴一行，然后在匹配模式中使用 <code>&lt;Ctrl+r&gt;i</code> 来粘贴。
+<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://img-blog.csdnimg.cn/8241e6618546446baa255d52b5bf1dfb.png#pic_center"
+        data-srcset="https://img-blog.csdnimg.cn/8241e6618546446baa255d52b5bf1dfb.png#pic_center, https://img-blog.csdnimg.cn/8241e6618546446baa255d52b5bf1dfb.png#pic_center 1.5x, https://img-blog.csdnimg.cn/8241e6618546446baa255d52b5bf1dfb.png#pic_center 2x"
+        data-sizes="auto"
+        alt="https://img-blog.csdnimg.cn/8241e6618546446baa255d52b5bf1dfb.png#pic_center"
+        title="在这里插入图片描述" />
+但是这个时候我们发现匹配的结果并不是我们想要的，这是因为在匹配模式中 <code>/</code> 是具有特殊意义的特殊字符，我们需要告诉vim将其解释为普通字符，这个时候可以使用 <code>\V</code> 来进入 <code>very nomagic</code> 模式，该模式与 <code>very magic</code> 相反，将所有字符作为普通字符来解释。</p>
+<p>我们会返现它只匹配到了 <code>https:</code>，并且模式中的字符串也变成了 <code>https:</code> , 后面从/开始截断了，这时候我们可以使用 <code>\/</code> 对 <code>//</code> 进行转换。同时 <code>\</code> 本身也作为特殊字符，我们也需要对其进行转义。即整个匹配应该输入 <code>https:\/\/www.baidu.com\/search?q=\\\\\/</code>
+<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://img-blog.csdnimg.cn/8667f46538c84246aafba178add16633.png#pic_center"
+        data-srcset="https://img-blog.csdnimg.cn/8667f46538c84246aafba178add16633.png#pic_center, https://img-blog.csdnimg.cn/8667f46538c84246aafba178add16633.png#pic_center 1.5x, https://img-blog.csdnimg.cn/8667f46538c84246aafba178add16633.png#pic_center 2x"
+        data-sizes="auto"
+        alt="https://img-blog.csdnimg.cn/8667f46538c84246aafba178add16633.png#pic_center"
+        title="在这里插入图片描述" />
+本篇中主要讲述了如何在vim中使用正则表达式，到此应该已经聊完了vim中查找模式中的基本操作了。后面我们将介绍该如何进行替换操作。</p>
+</div><div class="post-footer" id="post-footer">
+    <div class="post-info">
+        <div class="post-info-line">
+            <div class="post-info-mod">
+                <span>Updated on 2022-06-20</span>
+            </div></div>
+        <div class="post-info-line">
+            <div class="post-info-md"></div>
+            <div class="post-info-share">
+                <span><a href="javascript:void(0);" title="Share on Twitter" data-sharer="twitter" data-url="http://HaiLateBoy.github.io/posts/vim-tutorial-19/" data-title="vim 从嫌弃到依赖(18)——查找模式进阶" data-hashtags="vim,编辑工具,文本处理"><i class="fab fa-twitter fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Facebook" data-sharer="facebook" data-url="http://HaiLateBoy.github.io/posts/vim-tutorial-19/" data-hashtag="vim"><i class="fab fa-facebook-square fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Hacker News" data-sharer="hackernews" data-url="http://HaiLateBoy.github.io/posts/vim-tutorial-19/" data-title="vim 从嫌弃到依赖(18)——查找模式进阶"><i class="fab fa-hacker-news fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Line" data-sharer="line" data-url="http://HaiLateBoy.github.io/posts/vim-tutorial-19/" data-title="vim 从嫌弃到依赖(18)——查找模式进阶"><i data-svg-src="https://cdn.jsdelivr.net/npm/simple-icons@7.3.0/icons/line.svg" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on 微博" data-sharer="weibo" data-url="http://HaiLateBoy.github.io/posts/vim-tutorial-19/" data-title="vim 从嫌弃到依赖(18)——查找模式进阶"><i class="fab fa-weibo fa-fw" aria-hidden="true"></i></a></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="post-info-more">
+        <section class="post-tags"><i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/vim/">vim</a>,&nbsp;<a href="/tags/%E7%BC%96%E8%BE%91%E5%B7%A5%E5%85%B7/">编辑工具</a>,&nbsp;<a href="/tags/%E6%96%87%E6%9C%AC%E5%A4%84%E7%90%86/">文本处理</a></section>
+        <section>
+            <span><a href="javascript:void(0);" onclick="window.history.back();">Back</a></span>&nbsp;|&nbsp;<span><a href="/">Home</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav"><a href="/posts/vim-tutorial-18/" class="prev" rel="prev" title="vim 从嫌弃到依赖(17)——查找模式"><i class="fas fa-angle-left fa-fw" aria-hidden="true"></i>vim 从嫌弃到依赖(17)——查找模式</a>
+            <a href="/posts/vim-tutorial-20/" class="next" rel="next" title="vim 从嫌弃到依赖(19)——替换">vim 从嫌弃到依赖(19)——替换<i class="fas fa-angle-right fa-fw" aria-hidden="true"></i></a></div>
+</div>
+</article></div>
+            </main><footer class="footer">
+        <div class="footer-container"><div class="footer-line">Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener noreffer" title="Hugo 0.121.2">Hugo</a> | Theme - <a href="https://github.com/dillonzq/LoveIt" target="_blank" rel="noopener noreffer" title="LoveIt 0.2.11"><i class="far fa-kiss-wink-heart fa-fw" aria-hidden="true"></i> LoveIt</a>
+                </div><div class="footer-line" itemscope itemtype="http://schema.org/CreativeWork"><i class="far fa-copyright fa-fw" aria-hidden="true"></i><span itemprop="copyrightYear">2022 - 2024</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="https://www.masimaro.xyz" target="_blank">Masimaro</a></span></div>
+        </div>
+    </footer></div>
+
+        <div id="fixed-buttons"><a href="#" id="back-to-top" class="fixed-button" title="Back to Top">
+                <i class="fas fa-arrow-up fa-fw" aria-hidden="true"></i>
+            </a><a href="#" id="view-comments" class="fixed-button" title="View Comments">
+                <i class="fas fa-comment fa-fw" aria-hidden="true"></i>
+            </a>
+        </div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.css"><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/autocomplete.js@0.38.1/dist/autocomplete.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lunr@2.3.9/lunr.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lazysizes@5.3.2/lazysizes.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/clipboard@2.0.11/dist/clipboard.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/sharer.js@0.5.1/sharer.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/auto-render.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/copy-tex.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/mhchem.min.js"></script><script type="text/javascript">window.config={"code":{"copyTitle":"Copy to clipboard","maxShownLines":50},"comment":{},"math":{"delimiters":[{"display":true,"left":"$$","right":"$$"},{"display":true,"left":"\\[","right":"\\]"},{"display":true,"left":"\\begin{equation}","right":"\\end{equation}"},{"display":true,"left":"\\begin{equation*}","right":"\\end{equation*}"},{"display":true,"left":"\\begin{align}","right":"\\end{align}"},{"display":true,"left":"\\begin{align*}","right":"\\end{align*}"},{"display":true,"left":"\\begin{alignat}","right":"\\end{alignat}"},{"display":true,"left":"\\begin{alignat*}","right":"\\end{alignat*}"},{"display":true,"left":"\\begin{gather}","right":"\\end{gather}"},{"display":true,"left":"\\begin{CD}","right":"\\end{CD}"},{"display":false,"left":"$","right":"$"},{"display":false,"left":"\\(","right":"\\)"}],"strict":false},"search":{"highlightTag":"em","maxResultLength":10,"noResultsFound":"No results found","snippetLength":50}};</script><script type="text/javascript" src="/js/theme.min.js"></script></body>
+</html>

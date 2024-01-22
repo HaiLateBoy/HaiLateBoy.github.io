@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="robots" content="noodp" />
+        <title>C/C&#43;&#43;中整数与浮点数在内存中的表示方式 - Masimaro&#39;s blog</title><meta name="Description" content="这是我用于记录日常和学习的小站"><meta property="og:title" content="C/C&#43;&#43;中整数与浮点数在内存中的表示方式" />
+<meta property="og:description" content="从这次开始，我会慢慢将原来CSDN上写的VC&#43;&#43;反汇编的内容搬过来，这一系列至今是我花费时间最多，阅读量较高，也是我比较满意的部分,同时也是VC&#43;&#43;基础所在" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://HaiLateBoy.github.io/posts/c-num-in-memory/" /><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2017-12-23T09:48:17+00:00" />
+<meta property="article:modified_time" content="2017-12-23T09:48:17+00:00" /><meta property="og:site_name" content="Masimaro&#39;s blog" />
+
+<meta name="twitter:card" content="summary"/><meta name="twitter:title" content="C/C&#43;&#43;中整数与浮点数在内存中的表示方式"/>
+<meta name="twitter:description" content="从这次开始，我会慢慢将原来CSDN上写的VC&#43;&#43;反汇编的内容搬过来，这一系列至今是我花费时间最多，阅读量较高，也是我比较满意的部分,同时也是VC&#43;&#43;基础所在"/>
+<meta name="application-name" content="My cool site">
+<meta name="apple-mobile-web-app-title" content="My cool site"><meta name="theme-color" content="#ffffff"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="manifest" href="/site.webmanifest"><link rel="canonical" href="http://HaiLateBoy.github.io/posts/c-num-in-memory/" /><link rel="prev" href="http://HaiLateBoy.github.io/posts/connect-mysql-maraidb/" /><link rel="next" href="http://HaiLateBoy.github.io/posts/point-and-q/" /><link rel="stylesheet" href="/css/style.min.css"><link rel="preload" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css"></noscript><link rel="preload" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css"></noscript><script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "BlogPosting",
+        "headline": "C/C++中整数与浮点数在内存中的表示方式",
+        "inLanguage": "zh-CN",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "http:\/\/HaiLateBoy.github.io\/posts\/c-num-in-memory\/"
+        },"genre": "posts","keywords": "VC\u002b\u002b, 反汇编, C\u002b\u002b实现原理","wordcount":  2228 ,
+        "url": "http:\/\/HaiLateBoy.github.io\/posts\/c-num-in-memory\/","datePublished": "2017-12-23T09:48:17+00:00","dateModified": "2017-12-23T09:48:17+00:00","publisher": {
+            "@type": "Organization",
+            "name": ""},"author": {
+                "@type": "Person",
+                "name": "Masimaro"
+            },"description": ""
+    }
+    </script></head>
+    <body data-header-desktop="fixed" data-header-mobile="auto"><script type="text/javascript">(window.localStorage && localStorage.getItem('theme') ? localStorage.getItem('theme') === 'dark' : ('auto' === 'auto' ? window.matchMedia('(prefers-color-scheme: dark)').matches : 'auto' === 'dark')) && document.body.setAttribute('theme', 'dark');</script>
+
+        <div id="mask"></div><div class="wrapper"><header class="desktop" id="header-desktop">
+    <div class="header-wrapper">
+        <div class="header-title">
+            <a href="/" title="Masimaro&#39;s blog">My cool site</a>
+        </div>
+        <div class="menu">
+            <div class="menu-inner"><a class="menu-item" href="/posts/" title="文章列表"> 文章 </a><a class="menu-item" href="/tags/" title="标签"> 标签 </a><a class="menu-item" href="/categories/" title="分类"> 分类 </a><a class="menu-item" href="/about" title="关于本站"> 关于 </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-desktop">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-desktop" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-desktop" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-desktop">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </span><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                    <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+                </a></div>
+        </div>
+    </div>
+</header><header class="mobile" id="header-mobile">
+    <div class="header-container">
+        <div class="header-wrapper">
+            <div class="header-title">
+                <a href="/" title="Masimaro&#39;s blog">My cool site</a>
+            </div>
+            <div class="menu-toggle" id="menu-toggle-mobile">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+        <div class="menu" id="menu-mobile"><div class="search-wrapper">
+                    <div class="search mobile" id="search-mobile">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-mobile">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-mobile" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-mobile" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-mobile">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </div>
+                    <a href="javascript:void(0);" class="search-cancel" id="search-cancel-mobile">
+                        Cancel
+                    </a>
+                </div><a class="menu-item" href="/posts/" title="文章列表">文章</a><a class="menu-item" href="/tags/" title="标签">标签</a><a class="menu-item" href="/categories/" title="分类">分类</a><a class="menu-item" href="/about" title="关于本站">关于</a><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+            </a></div>
+    </div>
+</header><div class="search-dropdown desktop">
+        <div id="search-dropdown-desktop"></div>
+    </div>
+    <div class="search-dropdown mobile">
+        <div id="search-dropdown-mobile"></div>
+    </div><main class="main">
+                <div class="container"><div class="toc" id="toc-auto">
+            <h2 class="toc-title">Contents</h2>
+            <div class="toc-content" id="toc-content-auto"></div>
+        </div><article class="page single"><h1 class="single-title animate__animated animate__flipInX">C/C++中整数与浮点数在内存中的表示方式</h1><div class="post-meta">
+            <div class="post-meta-line"><span class="post-author"><a href="https://www.masimaro.xyz" title="Author" target="_blank" rel="noopener noreffer author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Masimaro</a></span>&nbsp;<span class="post-category">included in <a href="/categories/vc++%E5%8F%8D%E6%B1%87%E7%BC%96%E5%88%86%E6%9E%90/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>VC++反汇编分析</a></span></div>
+            <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw" aria-hidden="true"></i>&nbsp;<time datetime="2017-12-23">2017-12-23</time>&nbsp;<i class="fas fa-pencil-alt fa-fw" aria-hidden="true"></i>&nbsp;2228 words&nbsp;
+                <i class="far fa-clock fa-fw" aria-hidden="true"></i>&nbsp;5 minutes&nbsp;</div>
+        </div><div class="details toc" id="toc-static"  data-kept="true">
+                <div class="details-summary toc-title">
+                    <span>Contents</span>
+                    <span><i class="details-icon fas fa-angle-right" aria-hidden="true"></i></span>
+                </div>
+                <div class="details-content toc-content" id="toc-content-static"><nav id="TableOfContents"></nav></div>
+            </div><div class="content" id="content"><p>从这次开始，我会慢慢将原来CSDN上写的VC++反汇编的内容搬过来，这一系列至今是我花费时间最多，阅读量较高，也是我比较满意的部分,同时也是VC++基础所在</p>
+<p>在C/C++中数字类型主要有整数与浮点数两种类型，在32位机器中整型占4字节，浮点数分为float，double两种类型，其中float占4字节，而double占8字节。下面来说明它们在内存中的具体表现形式：</p>
+<h1 id="整型">整型：</h1>
+<p>整型变量占4字节，在计算机中都是用二进制表示，整型有无符号和有符号两种形式。
+无符号变量在定义时只需要在相应类型名前加上unsigned 无符号整型变量用32位的二进制数字表示，在与十进制进行转化时只需要知道计算规则即可轻松转化。需要注意的是在计算机中一般使用主机字节序，即采用“高高低低的方式”，数字高位在高地址位，低位在低地址位，例如我们有一个整数0x10203040那么它在内存中存储的格式为：04 03 02 01。
+有符号数将最高位表示为符号位，0为正数，1为负数其余位都表示具体的数值，对于负数采用的是补码的方式，补码的规则是用0x100000000减去这个数的绝对值，也可以简单的几位将这个数的绝对值取反加1，这样做是为了方便将减法转化为加法，在数学中两个互为相反数的和为0，比如现在有一个负数数x，那么这个x + |x| = 0这个x的绝对值是一个正数，但是用二级制表示的两个数相加不会等于0，而计算机对于溢出采用的是简单的将溢出位丢弃，所以令x + |x| = 0x100000000，这个最高位1，已经溢出，所以这个结果用四字节保存结果肯定会是0，所以最终得到的x = 0x100000000 - |x|。</p>
+<h1 id="浮点数">浮点数：</h1>
+<p>早期的小数表示采用的固定小数点的方式，比如规定在32位二级制数字当中，哪几位表示整数部分，其余的表示小数部分，这样表示的数据范围有限，后来采用的是小数点浮动变化的表示方式，也就是所谓的浮点数。
+浮点数采用的是IEEE的表示方式，最高位表示符号位，在剩余的31位中，从左往右8位表示的是科学计数法的指数部分，其余的表示整数部分。例如我们将12.25f化为浮点数的表示方式：
+首先将它化为二进制表示1100.01，利用科学计数法可以表述为:1.10001 * 2^3
+分解出各个部分：指数部分3 + 127= 011 + 0111111、尾数数部分：10001
+需要注意的是：因为用科学计数法来表示的话，最高位肯定为1所以这个1不会被表示出来
+指数部分也有正负之分，最高位为1表示正指数，为0表示负指数，所以算出来指数部分后需要加上127进行转化。
+将这个转化为对应的32位二级制，尾数部分从31位开始填写，不足部分补0即：0 | 10000010 | 10001 |000000000000000000，隔开的位置分别为符号位、指数位，尾数位。
+因为有的浮点数没有办法完全化为二进制数，会产生一个无限值，编译器会舍弃一部分内容，也就说只能表示一个近似的数，所以在比较浮点数是否为0的时候不要用==而应该用近似表示，允许一定的误差，比如下面的代码：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="kt">float</span> <span class="n">fTemp</span> <span class="o">=</span> <span class="mf">0.0001f</span>  
+</span></span><span class="line"><span class="cl"><span class="k">if</span><span class="p">(</span><span class="n">fFloat</span> <span class="o">&gt;=</span> <span class="o">-</span><span class="n">fTemp</span> <span class="o">&amp;&amp;</span> <span class="n">fFloat</span> <span class="o">&lt;=</span> <span class="n">fTemp</span><span class="p">)</span>  
+</span></span><span class="line"><span class="cl"><span class="p">{</span>  
+</span></span><span class="line"><span class="cl">    <span class="c1">//这个是比较fFloat为0           
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">}</span>  
+</span></span></code></pre></div><p>double类型的浮点数的编码方式与float相同，只是位数不同。double用11位表示指数部分，其余的表示尾数部分。
+浮点数的计算在CPU中有专门的浮点数寄存器，和对应的计算指令，在效率上比整型数据的低。</p>
+<h1 id="变量的本质">变量的本质</h1>
+<p>在写程序的时候，我们利用变量名来进行变量的识别，但是计算机根本不认识这些变量名，计算机中采用的是直接使用地址的方式找到对应的变量，同时为了能准确找到对应的变量，编译器会生成一个结构专门用于保存变量的标识名与对应的地址，这个标识名不是我们定义的变量名，而是在此基础上添加了一些符号，如下面的例子：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="k">extern</span> <span class="kt">int</span> <span class="n">nTemp</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="kt">int</span> <span class="nf">main</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">cout</span><span class="o">&lt;&lt;</span><span class="n">nTemp</span><span class="o">&lt;&lt;</span><span class="n">endl</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p>我们申明一个变量，然后在不定义它的情况下，直接使用，这个时候编译器会报错，表示找不到这个变量，报错的截图如下：
+<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="c-num-in-memory/error.png"
+        data-srcset="c-num-in-memory/error.png, c-num-in-memory/error.png 1.5x, c-num-in-memory/error.png 2x"
+        data-sizes="auto"
+        alt="c-num-in-memory/error.png"
+        title="报错" />
+我们可以看到编译器为这个变量准备的名称并不是我们所定义的nTemp，而是添加了其他标示。
+在声明变量的时候编译器会为它准备一个标示名称，在定义时会给它一个对应的内存地址，以后在访问这个标示的时候编译器直接去它对应的内存位置去寻找它，下面我们添加这个变量的定义代码：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="k">extern</span> <span class="kt">int</span> <span class="n">nTemp</span><span class="p">;</span>  
+</span></span><span class="line"><span class="cl"><span class="kt">int</span> <span class="n">nTemp</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>  
+</span></span><span class="line"><span class="cl"><span class="kt">int</span> <span class="nf">main</span><span class="p">()</span>  
+</span></span><span class="line"><span class="cl"><span class="p">{</span>  
+</span></span><span class="line"><span class="cl">    <span class="n">cout</span><span class="o">&lt;&lt;</span><span class="n">nTemp</span><span class="o">&lt;&lt;</span><span class="n">endl</span><span class="p">;</span>  
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>  
+</span></span><span class="line"><span class="cl"><span class="p">}</span>  
+</span></span></code></pre></div><p>我们查看对应的汇编代码：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-asm" data-lang="asm"><span class="line"><span class="cl"><span class="err">11:</span>       <span class="c1">;int nTemp = 0;  
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">00401798</span>   <span class="nf">mov</span>         <span class="no">dword</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">ebp-4</span><span class="p">],</span><span class="mi">0</span>  
+</span></span><span class="line"><span class="cl"><span class="mi">12</span><span class="p">:</span>       <span class="c1">;cout&lt;&lt;nTemp&lt;&lt;endl;  
+</span></span></span></code></pre></div><p>我们可以看到在为这个变量初始化的时候编译器是直接找到对应的地址[ebp - 4]，没有出现相关的变量名，所以说我们定义的变量名只是为了程序员能够识别，而计算机是直接采用寄存器寻址的方式来取用变量。
+在编译器中同时也看不到与变量类型相关的代码，编译器在使用变量是只关心它的位置，存储的值，以及如何将其中的二进制翻译为对应的内容，代码如下：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="kt">int</span> <span class="nf">main</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">int</span> <span class="n">nTemp</span> <span class="o">=</span> <span class="mh">0x00010101</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">float</span> <span class="o">*</span><span class="n">pFloat</span> <span class="o">=</span> <span class="p">(</span><span class="kt">float</span><span class="o">*</span><span class="p">)</span><span class="o">&amp;</span><span class="n">nTemp</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">char</span> <span class="o">*</span><span class="n">pChar</span> <span class="o">=</span> <span class="p">(</span><span class="kt">char</span><span class="o">*</span><span class="p">)</span><span class="o">&amp;</span><span class="n">nTemp</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">cout</span><span class="o">&lt;&lt;</span><span class="n">nTemp</span><span class="o">&lt;&lt;</span><span class="n">endl</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">cout</span><span class="o">&lt;&lt;*</span><span class="n">pFloat</span><span class="o">&lt;&lt;</span><span class="n">endl</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">cout</span><span class="o">&lt;&lt;</span><span class="n">pChar</span><span class="o">&lt;&lt;</span><span class="n">endl</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p>在上面的程序中我们定义了一个float性变量，但是以16进制的形式进行赋值，在计算机中，数据的本质就是二进制数据，所以在这这样进行赋值编译器不会报错。
+接着我们定义一个char<em>的指针指向它，在将它作为字符串进行输出时，它会将这个地址中的每个字节进行编码并输出为对应的字符。而将它以float型输出，则会
+进行AEEE编码，转为对应的float数，因此结果就如下图所示：
+<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="c-num-in-memory/result.png"
+        data-srcset="c-num-in-memory/result.png, c-num-in-memory/result.png 1.5x, c-num-in-memory/result.png 2x"
+        data-sizes="auto"
+        alt="c-num-in-memory/result.png"
+        title="程序运行结果" />
+上面这段代码正是揭示了变量的本质，我们在使用变量的时候，计算机会首先进行寻址，找到对应的内存，然后根据变量类型来决定怎么取数据（取多少内存的
+数据，比如int型取4个字节，char型取1个字节，char</em>则一直取到&rsquo;\0&rsquo;），然后根据类型来翻译为人类能看懂的数据。</p></div><div class="post-footer" id="post-footer">
+    <div class="post-info">
+        <div class="post-info-line">
+            <div class="post-info-mod">
+                <span>Updated on 2017-12-23</span>
+            </div></div>
+        <div class="post-info-line">
+            <div class="post-info-md"></div>
+            <div class="post-info-share">
+                <span><a href="javascript:void(0);" title="Share on Twitter" data-sharer="twitter" data-url="http://HaiLateBoy.github.io/posts/c-num-in-memory/" data-title="C/C&#43;&#43;中整数与浮点数在内存中的表示方式" data-hashtags="VC&#43;&#43;,反汇编,C&#43;&#43;实现原理"><i class="fab fa-twitter fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Facebook" data-sharer="facebook" data-url="http://HaiLateBoy.github.io/posts/c-num-in-memory/" data-hashtag="VC&#43;&#43;"><i class="fab fa-facebook-square fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Hacker News" data-sharer="hackernews" data-url="http://HaiLateBoy.github.io/posts/c-num-in-memory/" data-title="C/C&#43;&#43;中整数与浮点数在内存中的表示方式"><i class="fab fa-hacker-news fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Line" data-sharer="line" data-url="http://HaiLateBoy.github.io/posts/c-num-in-memory/" data-title="C/C&#43;&#43;中整数与浮点数在内存中的表示方式"><i data-svg-src="https://cdn.jsdelivr.net/npm/simple-icons@7.3.0/icons/line.svg" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on 微博" data-sharer="weibo" data-url="http://HaiLateBoy.github.io/posts/c-num-in-memory/" data-title="C/C&#43;&#43;中整数与浮点数在内存中的表示方式"><i class="fab fa-weibo fa-fw" aria-hidden="true"></i></a></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="post-info-more">
+        <section class="post-tags"><i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/vc&#43;&#43;/">VC&#43;&#43;</a>,&nbsp;<a href="/tags/%E5%8F%8D%E6%B1%87%E7%BC%96/">反汇编</a>,&nbsp;<a href="/tags/c&#43;&#43;%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86/">C&#43;&#43;实现原理</a></section>
+        <section>
+            <span><a href="javascript:void(0);" onclick="window.history.back();">Back</a></span>&nbsp;|&nbsp;<span><a href="/">Home</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav"><a href="/posts/connect-mysql-maraidb/" class="prev" rel="prev" title="为 MariaDB 配置远程访问权限"><i class="fas fa-angle-left fa-fw" aria-hidden="true"></i>为 MariaDB 配置远程访问权限</a>
+            <a href="/posts/point-and-q/" class="next" rel="next" title="地址、指针与引用">地址、指针与引用<i class="fas fa-angle-right fa-fw" aria-hidden="true"></i></a></div>
+</div>
+</article></div>
+            </main><footer class="footer">
+        <div class="footer-container"><div class="footer-line">Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener noreffer" title="Hugo 0.121.2">Hugo</a> | Theme - <a href="https://github.com/dillonzq/LoveIt" target="_blank" rel="noopener noreffer" title="LoveIt 0.2.11"><i class="far fa-kiss-wink-heart fa-fw" aria-hidden="true"></i> LoveIt</a>
+                </div><div class="footer-line" itemscope itemtype="http://schema.org/CreativeWork"><i class="far fa-copyright fa-fw" aria-hidden="true"></i><span itemprop="copyrightYear">2022 - 2024</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="https://www.masimaro.xyz" target="_blank">Masimaro</a></span></div>
+        </div>
+    </footer></div>
+
+        <div id="fixed-buttons"><a href="#" id="back-to-top" class="fixed-button" title="Back to Top">
+                <i class="fas fa-arrow-up fa-fw" aria-hidden="true"></i>
+            </a><a href="#" id="view-comments" class="fixed-button" title="View Comments">
+                <i class="fas fa-comment fa-fw" aria-hidden="true"></i>
+            </a>
+        </div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.css"><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/autocomplete.js@0.38.1/dist/autocomplete.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lunr@2.3.9/lunr.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lazysizes@5.3.2/lazysizes.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/clipboard@2.0.11/dist/clipboard.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/sharer.js@0.5.1/sharer.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/auto-render.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/copy-tex.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/mhchem.min.js"></script><script type="text/javascript">window.config={"code":{"copyTitle":"Copy to clipboard","maxShownLines":50},"comment":{},"math":{"delimiters":[{"display":true,"left":"$$","right":"$$"},{"display":true,"left":"\\[","right":"\\]"},{"display":true,"left":"\\begin{equation}","right":"\\end{equation}"},{"display":true,"left":"\\begin{equation*}","right":"\\end{equation*}"},{"display":true,"left":"\\begin{align}","right":"\\end{align}"},{"display":true,"left":"\\begin{align*}","right":"\\end{align*}"},{"display":true,"left":"\\begin{alignat}","right":"\\end{alignat}"},{"display":true,"left":"\\begin{alignat*}","right":"\\end{alignat*}"},{"display":true,"left":"\\begin{gather}","right":"\\end{gather}"},{"display":true,"left":"\\begin{CD}","right":"\\end{CD}"},{"display":false,"left":"$","right":"$"},{"display":false,"left":"\\(","right":"\\)"}],"strict":false},"search":{"highlightTag":"em","maxResultLength":10,"noResultsFound":"No results found","snippetLength":50}};</script><script type="text/javascript" src="/js/theme.min.js"></script></body>
+</html>

@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="robots" content="noodp" />
+        <title>关联容器 - Masimaro&#39;s blog</title><meta name="Description" content="这是我用于记录日常和学习的小站"><meta property="og:title" content="关联容器" />
+<meta property="og:description" content="之前介绍过标准库中的顺序容器，顺序容器是元素在内存中按照一定顺序进行排列的，都是按线性结构进行排列。除了顺序容器外，c&#43;&#43;中还有关联容器。与" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://HaiLateBoy.github.io/posts/cpp-base-10/" /><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2021-05-16T09:21:45+00:00" />
+<meta property="article:modified_time" content="2021-05-16T09:21:45+00:00" /><meta property="og:site_name" content="Masimaro&#39;s blog" />
+
+<meta name="twitter:card" content="summary"/><meta name="twitter:title" content="关联容器"/>
+<meta name="twitter:description" content="之前介绍过标准库中的顺序容器，顺序容器是元素在内存中按照一定顺序进行排列的，都是按线性结构进行排列。除了顺序容器外，c&#43;&#43;中还有关联容器。与"/>
+<meta name="application-name" content="My cool site">
+<meta name="apple-mobile-web-app-title" content="My cool site"><meta name="theme-color" content="#ffffff"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="manifest" href="/site.webmanifest"><link rel="canonical" href="http://HaiLateBoy.github.io/posts/cpp-base-10/" /><link rel="prev" href="http://HaiLateBoy.github.io/posts/cpp-base-9/" /><link rel="next" href="http://HaiLateBoy.github.io/posts/cpp-base-11/" /><link rel="stylesheet" href="/css/style.min.css"><link rel="preload" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css"></noscript><link rel="preload" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css"></noscript><script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "BlogPosting",
+        "headline": "关联容器",
+        "inLanguage": "zh-CN",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "http:\/\/HaiLateBoy.github.io\/posts\/cpp-base-10\/"
+        },"genre": "posts","keywords": "C\u002b\u002b, 语法, 基础, c\u002b\u002b11","wordcount":  2879 ,
+        "url": "http:\/\/HaiLateBoy.github.io\/posts\/cpp-base-10\/","datePublished": "2021-05-16T09:21:45+00:00","dateModified": "2021-05-16T09:21:45+00:00","publisher": {
+            "@type": "Organization",
+            "name": ""},"author": {
+                "@type": "Person",
+                "name": "Masimaro"
+            },"description": ""
+    }
+    </script></head>
+    <body data-header-desktop="fixed" data-header-mobile="auto"><script type="text/javascript">(window.localStorage && localStorage.getItem('theme') ? localStorage.getItem('theme') === 'dark' : ('auto' === 'auto' ? window.matchMedia('(prefers-color-scheme: dark)').matches : 'auto' === 'dark')) && document.body.setAttribute('theme', 'dark');</script>
+
+        <div id="mask"></div><div class="wrapper"><header class="desktop" id="header-desktop">
+    <div class="header-wrapper">
+        <div class="header-title">
+            <a href="/" title="Masimaro&#39;s blog">My cool site</a>
+        </div>
+        <div class="menu">
+            <div class="menu-inner"><a class="menu-item" href="/posts/" title="文章列表"> 文章 </a><a class="menu-item" href="/tags/" title="标签"> 标签 </a><a class="menu-item" href="/categories/" title="分类"> 分类 </a><a class="menu-item" href="/about" title="关于本站"> 关于 </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-desktop">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-desktop" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-desktop" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-desktop">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </span><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                    <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+                </a></div>
+        </div>
+    </div>
+</header><header class="mobile" id="header-mobile">
+    <div class="header-container">
+        <div class="header-wrapper">
+            <div class="header-title">
+                <a href="/" title="Masimaro&#39;s blog">My cool site</a>
+            </div>
+            <div class="menu-toggle" id="menu-toggle-mobile">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+        <div class="menu" id="menu-mobile"><div class="search-wrapper">
+                    <div class="search mobile" id="search-mobile">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-mobile">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-mobile" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-mobile" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-mobile">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </div>
+                    <a href="javascript:void(0);" class="search-cancel" id="search-cancel-mobile">
+                        Cancel
+                    </a>
+                </div><a class="menu-item" href="/posts/" title="文章列表">文章</a><a class="menu-item" href="/tags/" title="标签">标签</a><a class="menu-item" href="/categories/" title="分类">分类</a><a class="menu-item" href="/about" title="关于本站">关于</a><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+            </a></div>
+    </div>
+</header><div class="search-dropdown desktop">
+        <div id="search-dropdown-desktop"></div>
+    </div>
+    <div class="search-dropdown mobile">
+        <div id="search-dropdown-mobile"></div>
+    </div><main class="main">
+                <div class="container"><div class="toc" id="toc-auto">
+            <h2 class="toc-title">Contents</h2>
+            <div class="toc-content" id="toc-content-auto"></div>
+        </div><article class="page single"><h1 class="single-title animate__animated animate__flipInX">关联容器</h1><div class="post-meta">
+            <div class="post-meta-line"><span class="post-author"><a href="https://www.masimaro.xyz" title="Author" target="_blank" rel="noopener noreffer author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Masimaro</a></span>&nbsp;<span class="post-category">included in <a href="/categories/c++/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>C++</a></span></div>
+            <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw" aria-hidden="true"></i>&nbsp;<time datetime="2021-05-16">2021-05-16</time>&nbsp;<i class="fas fa-pencil-alt fa-fw" aria-hidden="true"></i>&nbsp;2879 words&nbsp;
+                <i class="far fa-clock fa-fw" aria-hidden="true"></i>&nbsp;6 minutes&nbsp;</div>
+        </div><div class="details toc" id="toc-static"  data-kept="true">
+                <div class="details-summary toc-title">
+                    <span>Contents</span>
+                    <span><i class="details-icon fas fa-angle-right" aria-hidden="true"></i></span>
+                </div>
+                <div class="details-content toc-content" id="toc-content-static"><nav id="TableOfContents">
+  <ul>
+    <li><a href="#关联容器概述">关联容器概述</a></li>
+    <li><a href="#关联容器的操作">关联容器的操作</a></li>
+    <li><a href="#无序容器">无序容器</a></li>
+  </ul>
+</nav></div>
+            </div><div class="content" id="content"><p>之前介绍过标准库中的顺序容器，顺序容器是元素在内存中按照一定顺序进行排列的，都是按线性结构进行排列。除了顺序容器外，c++中还有关联容器。与顺序容器不同的是，关联容器中元素是按照关键字来保存和访问的。与之相对的顺序容器是按它们在容器中的位置来顺序的保存和访问的。</p>
+<!-- raw HTML omitted -->
+<p>关联容器支持高效的查找和访问。两个主要的关联容器类型是map和set。</p>
+<p>标准库提供8种关联容器，这8个容器见的不同体现在3个维度</p>
+<ol>
+<li>或者是一个set，或者是一个map</li>
+<li>或者要求不重复的关键字，或者允许重复关键字</li>
+<li>按顺序保存元素或者无序保存</li>
+</ol>
+<p>允许重复关键字的容器都包含单词 multi ，不保持关键字按顺序存储的容器的名字都以单词unordered 开头</p>
+<p>这8中容器分别是 map、set、multimap、multiset、unordered_map、unordered_set、unordered_multimap、unordered_multiset</p>
+<h2 id="关联容器概述">关联容器概述</h2>
+<p>关联容器不支持顺序容器中的位置相关操作，例如 push_back、push_front。原因是关联容器是按照关键字存储的，这些操作对关联容器没有意义</p>
+<p>对于map、multimap、set、multiset 关键字类型必须定义元素的比较方法。默认情况下标准库使用关键字类型的&lt; 运算符来比较两个关键字</p>
+<p>在介绍关联容器的操作之前，我们需要了解名为pair的标准库类型。</p>
+<p>一个pair保存两个数据成员。类似容器，pair是一个用来生成特定类型的模板。当创建一个pair时，需要提供两个类型名，pair的数据成员将具有对应的类型。两个类型不要求一样</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-c++" data-lang="c++"><span class="line"><span class="cl"><span class="n">pair</span><span class="o">&lt;</span><span class="n">string</span><span class="p">,</span> <span class="n">string</span><span class="o">&gt;</span> <span class="n">anon</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="n">pair</span><span class="o">&lt;</span><span class="n">string</span><span class="p">,</span> <span class="n">size_t</span><span class="o">&gt;</span> <span class="n">word_count</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="n">pair</span><span class="o">&lt;</span><span class="n">string</span><span class="p">,</span> <span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;&gt;</span> <span class="n">line</span><span class="p">;</span>
+</span></span></code></pre></div><p>初始化时，会调用类型的默认构造函数进行初始化，也可以为每个成员提供初始化器:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-c++" data-lang="c++"><span class="line"><span class="cl"><span class="n">pair</span><span class="o">&lt;</span><span class="n">string</span><span class="p">,</span> <span class="n">string</span><span class="o">&gt;</span> <span class="n">author</span><span class="p">{</span><span class="s">&#34;James&#34;</span><span class="p">,</span> <span class="s">&#34;Joyce&#34;</span><span class="p">};</span>
+</span></span></code></pre></div><p>pair 的数据成员是public的，两个成员分别命名为first和second。我们用普通的成员访问符号来访问它们。</p>
+<h2 id="关联容器的操作">关联容器的操作</h2>
+<p>关联容器定义了额外的类型别名</p>
+<ol>
+<li>key_type: 此容器类型的关键字类型</li>
+<li>mapped_type: 每个关键字关联的类型：只适用与map</li>
+<li>value_type: 对于set，与key_value 相同；对于map，为 <code>pair&lt;const key_type, mapped_type&gt;</code></li>
+</ol>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-c++" data-lang="c++"><span class="line"><span class="cl"><span class="n">set</span><span class="o">&lt;</span><span class="n">string</span><span class="o">&gt;::</span><span class="n">value_type</span> <span class="n">v1</span><span class="p">;</span> <span class="c1">//v1 是一个string
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="n">set</span><span class="o">&lt;</span><span class="n">string</span><span class="o">&gt;::</span><span class="n">key_value</span> <span class="n">v2</span><span class="p">;</span> <span class="c1">//v2 是一个string
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="n">map</span><span class="o">&lt;</span><span class="n">string</span><span class="p">,</span> <span class="kt">int</span><span class="o">&gt;::</span><span class="n">value_type</span> <span class="n">v3</span><span class="p">;</span> <span class="c1">//v3 是一个pair&lt;const string, int&gt;
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="n">map</span><span class="o">&lt;</span><span class="n">string</span><span class="p">,</span> <span class="kt">int</span><span class="o">&gt;::</span><span class="n">key_type</span> <span class="n">v4</span><span class="p">;</span> <span class="c1">//v4 是一个string
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="n">map</span><span class="o">&lt;</span><span class="n">string</span><span class="p">,</span> <span class="kt">int</span><span class="o">&gt;::</span><span class="n">mapped_type</span> <span class="n">v5</span><span class="p">;</span> <span class="c1">//v5 是一个int
+</span></span></span></code></pre></div><p>我们使用作用域运算符来提取一个类型的成员。</p>
+<p>当解引用一个关联容器的迭代器的时候，会得到一个类型为容器的value_type 的值的引用。对map而言，value_type 是一个pair 类型，其first成员保存const的关键字，second成员保存值</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-c++" data-lang="c++"><span class="line"><span class="cl"><span class="k">auto</span> <span class="n">map_it</span> <span class="o">=</span> <span class="n">word_count</span><span class="p">.</span><span class="n">begin</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl"><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">map_it</span><span class="o">-&gt;</span><span class="n">first</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&#34; &#34;</span> <span class="o">&lt;&lt;</span> <span class="n">map_it</span><span class="o">-&gt;</span><span class="n">second</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="n">map_it</span><span class="o">-&gt;</span><span class="n">first</span> <span class="o">=</span> <span class="s">&#34;new key&#34;</span><span class="p">;</span> <span class="c1">//错误 first是const类型
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="o">++</span><span class="n">map_it</span><span class="o">-&gt;</span><span class="n">second</span><span class="p">;</span>
+</span></span></code></pre></div><p>set 的迭代器是const的。关联容器中键值是无法通过迭代器进行修改的。只能通过迭代器读，每次修改键值都会导致容器中元素的重新排序。因此不允许通过迭代修改键值</p>
+<p>我们通常不能对关联容器使用泛型算法。关键字是const这一特性意味着不能将关联容器传递给修改或者重排容器元素的算法。关联容器可以使用只读取元素的算法。但是很多这类算法都要搜索序列。由于关联容器中的元素不能通过它们的关键字进行快速查找，因此对其使用泛型算法几乎总是一个坏主意</p>
+<p>关联容器中有一个find的成员，我们可以使用find算法来根据关键字查找元素。</p>
+<p>关联容器的insert成员可以向容器中添加一个元素或者元素范围。因为set和map无法包含关键字重复的元素，因此插入已存在的元素对容器没有任何影响</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-c++" data-lang="c++"><span class="line"><span class="cl"><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span> <span class="n">ivec</span> <span class="o">=</span> <span class="p">{</span><span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">8</span><span class="p">};</span> <span class="c1">//ivec 有8个元素
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="n">set</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span> <span class="n">set2</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="n">set2</span><span class="p">.</span><span class="n">insert</span><span class="p">(</span><span class="n">ivec</span><span class="p">.</span><span class="n">cbegin</span><span class="p">(),</span> <span class="n">ivec</span><span class="p">.</span><span class="n">cend</span><span class="p">());</span> <span class="c1">//set2 现在有4个元素
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="n">set2</span><span class="p">.</span><span class="n">insert</span><span class="p">({</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">7</span><span class="p">});</span> <span class="c1">//set2 现在有8个元素
+</span></span></span></code></pre></div><p>对一个map执行insert操作时，需要记住元素类型是pair。通常在insert的参数列表中创建一个pair</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-c++" data-lang="c++"><span class="line"><span class="cl"><span class="c1">//向word_count 插入word的4种方法
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="n">word_count</span><span class="p">.</span><span class="n">insert</span><span class="p">({</span><span class="n">word</span><span class="p">,</span> <span class="mi">1</span><span class="p">});</span>
+</span></span><span class="line"><span class="cl"><span class="n">word_count</span><span class="p">.</span><span class="n">insert</span><span class="p">(</span><span class="n">make_pair</span><span class="p">(</span><span class="n">word</span><span class="p">,</span> <span class="mi">1</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl"><span class="n">word_count</span><span class="p">.</span><span class="n">insert</span><span class="p">(</span><span class="n">pair</span><span class="o">&lt;</span><span class="n">string</span><span class="p">,</span> <span class="n">size_t</span><span class="p">)</span><span class="o">&gt;</span><span class="p">(</span><span class="n">word</span><span class="p">,</span> <span class="mi">1</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl"><span class="n">word_count</span><span class="p">.</span><span class="n">insert</span><span class="p">(</span><span class="n">map</span><span class="o">&lt;</span><span class="n">string</span><span class="p">,</span> <span class="n">size_t</span><span class="o">&gt;::</span><span class="n">value_type</span><span class="p">(</span><span class="n">word</span><span class="p">,</span> <span class="mi">1</span><span class="p">));</span>
+</span></span></code></pre></div><p>insert 的返回值依赖于容器类型和参数。对于不包含重复关键字的容器，添加单一元素的insert和emplace版本返回一个pair，告诉我们插入是否成功。pair的first成员是一个迭代器，指向具有给定关键字的元素；second成员是一个bool值，指出元素是插入成功还是已经存在于容器中。如果关键字已经存在于容器中，则insert什么也不做，且返回值中的bool部分为false。如果关键字不存在，元素被插入容器，且bool值为true</p>
+<p>对于允许重复关键字的容器，接受单个元素的insert操作返回一个指向新元素的迭代器。这里无须返回一个bool值，因为insert总是向这类容器中加入一个新元素</p>
+<p>关联容器定义了三个版本的erase。可以通过传入一个迭代器或者一个迭代器对来删除一个元素或者一个元素范围。如果指定的元素被删除，函数返回void</p>
+<p>关联容器提供一个额外的erase函数，它允许传入一个key_type 参数，删除所有匹配给定关键字的元素，返回实际删除元素的数量。</p>
+<p>对于map和unordered_map 容器提供了下标运算，下标中填入key_type的值，得到value_type，如果关键字不在map中，会为它创建一个元素并插入map中。</p>
+<p>使用容器的find访问关联容器，传入key_type，如果能找到对应值，返回一个指向对应元素的迭代器，否则返回一个指向容器end()位置的迭代器的</p>
+<p>使用容器的count方法，传入key_type，返回容器中相同关键字元素的个数</p>
+<p>对于map使用find代替下标操作，使用下标如果未找到对应关键字则会插入一个新的元素，这样会产生未知行为。如果我们只想知道一个给定关键字是否在map中，而不想改变map，这种情况下应该使用find。</p>
+<p>对于不允许存储重复关键字的关联容器来说，通过关键字查找元素只会找到一个，而对于允许重复关键字的关联容器来说，会返回第一个元素的迭代器，而相同关键字的元素会相邻存储。在遍历所有相同关键字的元素时，可以首先使用find找到第一个元素的迭代器，然后使用count找到公有多少个元素。最后循环递增迭代器即可访问到所有相同关键字的元素</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-c++" data-lang="c++"><span class="line"><span class="cl"><span class="n">string</span> <span class="nf">search_item</span><span class="p">(</span><span class="s">&#34;Alain de Botton&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="k">auto</span> <span class="n">enteris</span> <span class="o">=</span> <span class="n">authors</span><span class="p">.</span><span class="n">count</span><span class="p">(</span><span class="n">search_item</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="k">auto</span> <span class="n">iter</span> <span class="o">=</span> <span class="n">authors</span><span class="p">.</span><span class="n">find</span><span class="p">(</span><span class="n">search_item</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="k">while</span><span class="p">(</span><span class="n">enteris</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">iter</span><span class="o">-&gt;</span><span class="n">second</span> <span class="o">&lt;&lt;</span> <span class="n">endl</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="o">++</span><span class="n">iter</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="o">--</span><span class="n">enteris</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p>除了上述方法，还可以使用 lower_bound和 upper_bound；lower_bound 指向第一个对应的元素，upper_bound 指向匹配的最后一个元素的下一个位置。如果未找到对应元素，则二者指向同一个迭代器，指向一个不影响排序的关键字插入位置</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-c++" data-lang="c++"><span class="line"><span class="cl"><span class="k">for</span><span class="p">(</span><span class="k">auto</span> <span class="n">beg</span> <span class="o">=</span> <span class="n">authors</span><span class="p">.</span><span class="n">lower_bound</span><span class="p">(</span><span class="n">search_item</span><span class="p">),</span> <span class="n">end</span> <span class="o">=</span> <span class="n">authors</span><span class="p">.</span><span class="n">upper_bound</span><span class="p">(</span><span class="n">search_item</span><span class="p">);</span> <span class="n">beg</span> <span class="o">!=</span> <span class="n">end</span><span class="p">;</span> <span class="o">++</span><span class="n">beg</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">beg</span><span class="o">-&gt;</span><span class="n">second</span> <span class="o">&lt;&lt;</span> <span class="n">endl</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p>解决此问题的最后一个方法是直接使用容器的equal_range函数。该函数返回一个pair，保存的是两个迭代器。指向的位置与 lower_bound 和 upper_bound 相同</p>
+<p>解决此问题的最后一个方法是直接使用容器的equal_range函数。该函数返回一个pair，保存的是两个迭代器。指向的位置与 lower_bound 和 upper_bound 相同</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-c++" data-lang="c++"><span class="line"><span class="cl"><span class="k">for</span><span class="p">(</span><span class="k">auto</span> <span class="n">pos</span> <span class="o">=</span> <span class="n">authors</span><span class="p">.</span><span class="n">equal_range</span><span class="p">(</span><span class="n">search_item</span><span class="p">);</span> <span class="n">pos</span><span class="p">.</span><span class="n">first</span> <span class="o">!=</span> <span class="n">pos</span><span class="p">.</span><span class="n">end</span><span class="p">;</span> <span class="o">++</span><span class="n">pos</span><span class="p">.</span><span class="n">first</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">pos</span><span class="p">.</span><span class="n">first</span><span class="o">-&gt;</span><span class="n">second</span> <span class="o">&lt;&lt;</span> <span class="n">endl</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><h2 id="无序容器">无序容器</h2>
+<p>新标准中定义了4种无序关联容器，这些容器不是使用比较运算符来组织元素，而是使用一个哈希函数和关键字类型的 == 运算符。在关键字类型的元素没有明显的序关系时，无序容器是非常有用的。</p>
+<p>对于自定义类型的关键字，无法直接在无序容器中使用，还需要提供该类型的hash操作。</p>
+<!-- raw HTML omitted -->
+</div><div class="post-footer" id="post-footer">
+    <div class="post-info">
+        <div class="post-info-line">
+            <div class="post-info-mod">
+                <span>Updated on 2021-05-16</span>
+            </div></div>
+        <div class="post-info-line">
+            <div class="post-info-md"></div>
+            <div class="post-info-share">
+                <span><a href="javascript:void(0);" title="Share on Twitter" data-sharer="twitter" data-url="http://HaiLateBoy.github.io/posts/cpp-base-10/" data-title="关联容器" data-hashtags="C&#43;&#43;,语法,基础,c&#43;&#43;11"><i class="fab fa-twitter fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Facebook" data-sharer="facebook" data-url="http://HaiLateBoy.github.io/posts/cpp-base-10/" data-hashtag="C&#43;&#43;"><i class="fab fa-facebook-square fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Hacker News" data-sharer="hackernews" data-url="http://HaiLateBoy.github.io/posts/cpp-base-10/" data-title="关联容器"><i class="fab fa-hacker-news fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Line" data-sharer="line" data-url="http://HaiLateBoy.github.io/posts/cpp-base-10/" data-title="关联容器"><i data-svg-src="https://cdn.jsdelivr.net/npm/simple-icons@7.3.0/icons/line.svg" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on 微博" data-sharer="weibo" data-url="http://HaiLateBoy.github.io/posts/cpp-base-10/" data-title="关联容器"><i class="fab fa-weibo fa-fw" aria-hidden="true"></i></a></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="post-info-more">
+        <section class="post-tags"><i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/c&#43;&#43;/">C&#43;&#43;</a>,&nbsp;<a href="/tags/%E8%AF%AD%E6%B3%95/">语法</a>,&nbsp;<a href="/tags/%E5%9F%BA%E7%A1%80/">基础</a>,&nbsp;<a href="/tags/c&#43;&#43;11/">c&#43;&#43;11</a></section>
+        <section>
+            <span><a href="javascript:void(0);" onclick="window.history.back();">Back</a></span>&nbsp;|&nbsp;<span><a href="/">Home</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav"><a href="/posts/cpp-base-9/" class="prev" rel="prev" title="泛型算法"><i class="fas fa-angle-left fa-fw" aria-hidden="true"></i>泛型算法</a>
+            <a href="/posts/cpp-base-11/" class="next" rel="next" title="动态内存与智能指针">动态内存与智能指针<i class="fas fa-angle-right fa-fw" aria-hidden="true"></i></a></div>
+</div>
+</article></div>
+            </main><footer class="footer">
+        <div class="footer-container"><div class="footer-line">Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener noreffer" title="Hugo 0.121.2">Hugo</a> | Theme - <a href="https://github.com/dillonzq/LoveIt" target="_blank" rel="noopener noreffer" title="LoveIt 0.2.11"><i class="far fa-kiss-wink-heart fa-fw" aria-hidden="true"></i> LoveIt</a>
+                </div><div class="footer-line" itemscope itemtype="http://schema.org/CreativeWork"><i class="far fa-copyright fa-fw" aria-hidden="true"></i><span itemprop="copyrightYear">2022 - 2024</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="https://www.masimaro.xyz" target="_blank">Masimaro</a></span></div>
+        </div>
+    </footer></div>
+
+        <div id="fixed-buttons"><a href="#" id="back-to-top" class="fixed-button" title="Back to Top">
+                <i class="fas fa-arrow-up fa-fw" aria-hidden="true"></i>
+            </a><a href="#" id="view-comments" class="fixed-button" title="View Comments">
+                <i class="fas fa-comment fa-fw" aria-hidden="true"></i>
+            </a>
+        </div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.css"><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/autocomplete.js@0.38.1/dist/autocomplete.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lunr@2.3.9/lunr.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lazysizes@5.3.2/lazysizes.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/clipboard@2.0.11/dist/clipboard.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/sharer.js@0.5.1/sharer.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/auto-render.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/copy-tex.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/mhchem.min.js"></script><script type="text/javascript">window.config={"code":{"copyTitle":"Copy to clipboard","maxShownLines":50},"comment":{},"math":{"delimiters":[{"display":true,"left":"$$","right":"$$"},{"display":true,"left":"\\[","right":"\\]"},{"display":true,"left":"\\begin{equation}","right":"\\end{equation}"},{"display":true,"left":"\\begin{equation*}","right":"\\end{equation*}"},{"display":true,"left":"\\begin{align}","right":"\\end{align}"},{"display":true,"left":"\\begin{align*}","right":"\\end{align*}"},{"display":true,"left":"\\begin{alignat}","right":"\\end{alignat}"},{"display":true,"left":"\\begin{alignat*}","right":"\\end{alignat*}"},{"display":true,"left":"\\begin{gather}","right":"\\end{gather}"},{"display":true,"left":"\\begin{CD}","right":"\\end{CD}"},{"display":false,"left":"$","right":"$"},{"display":false,"left":"\\(","right":"\\)"}],"strict":false},"search":{"highlightTag":"em","maxResultLength":10,"noResultsFound":"No results found","snippetLength":50}};</script><script type="text/javascript" src="/js/theme.min.js"></script></body>
+</html>

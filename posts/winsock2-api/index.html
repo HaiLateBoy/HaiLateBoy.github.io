@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="robots" content="noodp" />
+        <title>WinSock2 API - Masimaro&#39;s blog</title><meta name="Description" content="这是我用于记录日常和学习的小站"><meta property="og:title" content="WinSock2 API" />
+<meta property="og:description" content="WinSock中提供的5种网络模型已经可以做到很高效了，特别是完成端口，它的高效的原因在于它不仅另外开启了线程来处理完成通知而不是占用主程序" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://HaiLateBoy.github.io/posts/winsock2-api/" /><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2018-07-21T10:36:09+00:00" />
+<meta property="article:modified_time" content="2018-07-21T10:36:09+00:00" /><meta property="og:site_name" content="Masimaro&#39;s blog" />
+
+<meta name="twitter:card" content="summary"/><meta name="twitter:title" content="WinSock2 API"/>
+<meta name="twitter:description" content="WinSock中提供的5种网络模型已经可以做到很高效了，特别是完成端口，它的高效的原因在于它不仅另外开启了线程来处理完成通知而不是占用主程序"/>
+<meta name="application-name" content="My cool site">
+<meta name="apple-mobile-web-app-title" content="My cool site"><meta name="theme-color" content="#ffffff"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="manifest" href="/site.webmanifest"><link rel="canonical" href="http://HaiLateBoy.github.io/posts/winsock2-api/" /><link rel="prev" href="http://HaiLateBoy.github.io/posts/winsock-iocp/" /><link rel="next" href="http://HaiLateBoy.github.io/posts/c-call-python/" /><link rel="stylesheet" href="/css/style.min.css"><link rel="preload" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css"></noscript><link rel="preload" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css"></noscript><script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "BlogPosting",
+        "headline": "WinSock2 API",
+        "inLanguage": "zh-CN",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "http:\/\/HaiLateBoy.github.io\/posts\/winsock2-api\/"
+        },"genre": "posts","keywords": "WinSock, 网络编程, WinSock2.0 API, 动态加载, WinSock 异步函数","wordcount":  6772 ,
+        "url": "http:\/\/HaiLateBoy.github.io\/posts\/winsock2-api\/","datePublished": "2018-07-21T10:36:09+00:00","dateModified": "2018-07-21T10:36:09+00:00","publisher": {
+            "@type": "Organization",
+            "name": ""},"author": {
+                "@type": "Person",
+                "name": "Masimaro"
+            },"description": ""
+    }
+    </script></head>
+    <body data-header-desktop="fixed" data-header-mobile="auto"><script type="text/javascript">(window.localStorage && localStorage.getItem('theme') ? localStorage.getItem('theme') === 'dark' : ('auto' === 'auto' ? window.matchMedia('(prefers-color-scheme: dark)').matches : 'auto' === 'dark')) && document.body.setAttribute('theme', 'dark');</script>
+
+        <div id="mask"></div><div class="wrapper"><header class="desktop" id="header-desktop">
+    <div class="header-wrapper">
+        <div class="header-title">
+            <a href="/" title="Masimaro&#39;s blog">My cool site</a>
+        </div>
+        <div class="menu">
+            <div class="menu-inner"><a class="menu-item" href="/posts/" title="文章列表"> 文章 </a><a class="menu-item" href="/tags/" title="标签"> 标签 </a><a class="menu-item" href="/categories/" title="分类"> 分类 </a><a class="menu-item" href="/about" title="关于本站"> 关于 </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-desktop">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-desktop" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-desktop" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-desktop">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </span><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                    <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+                </a></div>
+        </div>
+    </div>
+</header><header class="mobile" id="header-mobile">
+    <div class="header-container">
+        <div class="header-wrapper">
+            <div class="header-title">
+                <a href="/" title="Masimaro&#39;s blog">My cool site</a>
+            </div>
+            <div class="menu-toggle" id="menu-toggle-mobile">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+        <div class="menu" id="menu-mobile"><div class="search-wrapper">
+                    <div class="search mobile" id="search-mobile">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-mobile">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-mobile" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-mobile" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-mobile">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </div>
+                    <a href="javascript:void(0);" class="search-cancel" id="search-cancel-mobile">
+                        Cancel
+                    </a>
+                </div><a class="menu-item" href="/posts/" title="文章列表">文章</a><a class="menu-item" href="/tags/" title="标签">标签</a><a class="menu-item" href="/categories/" title="分类">分类</a><a class="menu-item" href="/about" title="关于本站">关于</a><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+            </a></div>
+    </div>
+</header><div class="search-dropdown desktop">
+        <div id="search-dropdown-desktop"></div>
+    </div>
+    <div class="search-dropdown mobile">
+        <div id="search-dropdown-mobile"></div>
+    </div><main class="main">
+                <div class="container"><div class="toc" id="toc-auto">
+            <h2 class="toc-title">Contents</h2>
+            <div class="toc-content" id="toc-content-auto"></div>
+        </div><article class="page single"><h1 class="single-title animate__animated animate__flipInX">WinSock2 API</h1><div class="post-meta">
+            <div class="post-meta-line"><span class="post-author"><a href="https://www.masimaro.xyz" title="Author" target="_blank" rel="noopener noreffer author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Masimaro</a></span>&nbsp;<span class="post-category">included in <a href="/categories/windows-%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>Windows 网络编程</a></span></div>
+            <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw" aria-hidden="true"></i>&nbsp;<time datetime="2018-07-21">2018-07-21</time>&nbsp;<i class="fas fa-pencil-alt fa-fw" aria-hidden="true"></i>&nbsp;6772 words&nbsp;
+                <i class="far fa-clock fa-fw" aria-hidden="true"></i>&nbsp;14 minutes&nbsp;</div>
+        </div><div class="details toc" id="toc-static"  data-kept="true">
+                <div class="details-summary toc-title">
+                    <span>Contents</span>
+                    <span><i class="details-icon fas fa-angle-right" aria-hidden="true"></i></span>
+                </div>
+                <div class="details-content toc-content" id="toc-content-static"><nav id="TableOfContents">
+  <ul>
+    <li><a href="#acceptex">AcceptEx</a></li>
+    <li><a href="#getacceptexsockaddr">GetAcceptExSockAddr</a></li>
+    <li><a href="#transmitfile">TransmitFile</a></li>
+    <li><a href="#transmitpackets">TransmitPackets</a></li>
+    <li><a href="#connectex">ConnectEx</a></li>
+    <li><a href="#disconnectex">DisConnectEx</a></li>
+    <li><a href="#扩展函数的动态加载">扩展函数的动态加载</a></li>
+  </ul>
+</nav></div>
+            </div><div class="content" id="content"><p>WinSock中提供的5种网络模型已经可以做到很高效了，特别是完成端口，它的高效的原因在于它不仅另外开启了线程来处理完成通知而不是占用主程序的时间，同时也在于我们在完成端口中运用了大量异步IO处理函数。比如<code>WSASend</code>、<code>WSARecv</code>等等。为了高效的处理网络IO，WinSock提供了大量这样的异步函数。这篇博文主要探讨这些函数的用法和他们与传统的巴克利套接字相比更加高效的秘密</p>
+<!-- raw HTML omitted -->
+<h2 id="acceptex">AcceptEx</h2>
+<p>其实在使用TCP协议编程时，接受连接的过程也是需要进行收发包操作的，具体的过程请参考TCP的三次握手。针对这种特性WinSock提供了对应的异步操作函数<code>AcceptEx</code>。函数原型如下:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="n">BOOL</span> <span class="nf">AcceptEx</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">  <span class="n">SOCKET</span> <span class="n">sListenSocket</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">	<span class="n">SOCKET</span> <span class="n">sAcceptSocket</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">	<span class="n">PVOID</span> <span class="n">lpOutputBuffer</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">	<span class="n">DWORD</span> <span class="n">dwReceiveDataLength</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">	<span class="n">DWORD</span> <span class="n">dwLocalAddressLength</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">	<span class="n">DWORD</span> <span class="n">dwRemoteAddressLength</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">	<span class="n">LPDWORD</span> <span class="n">lpdwBytesReceived</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">	<span class="n">LPOVERLAPPED</span> <span class="n">lpOverlapped</span>
+</span></span><span class="line"><span class="cl"><span class="p">);</span>
+</span></span></code></pre></div><p>sListenSocket: 监听套接字</p>
+<p>sAcceptSocket：该参数是一个SOCKET的句柄，一旦连接成功建立，那么会使用该SOCKET作为通信的SOCKET</p>
+<p>lpOutputBuffer：是三个数据一体化的缓冲区的指针，这三个数据分别是接收连接时顺带接收客户端发过来的数据的缓冲，之后是本地地址结构的缓冲，最后是远程客户端地址结构的指针</p>
+<p>dwReceiveDataLength：是<code>lpOutputBuffe</code>r的缓冲长度</p>
+<p>dwLocalAddressLength：是本地地址结构长度,其值等于<code>sizeof(SOCKADDR)+16</code></p>
+<p>dwRemoteAddressLength：是远程客户端地址结构长度,其值也等于<code>sizeof(SOCKADDR)+16</code></p>
+<p>lpdwBytesReceived：该参数用于返回接受连接请求时接收的数据的长度</p>
+<p>lpOverlapped：就是重叠I/O需要的结构</p>
+<p>第一个参数是一个十分重要的参数，这个参数是<code>AcceptEx</code>比较高效的一个重要的原因。从功能上来看它与传统的<code>accept</code>函数并没有什么区别，都是接受客户端连接的。它与<code>accpet</code>相比比较高效的原因如下：</p>
+<ol>
+<li>从内部机理来说<code>accpet</code>在内部其实有一个创建SOCKET的操作，当函数成功后会返回这个SOCKET，所以<code>AcceptEx</code>与<code>accept</code>相比少了一个创建SOCKET的操作，它的功能更加纯粹，这就给了我们一个启示：我们可以在初始化的时候创建大量的SOCKET，并投递到<code>AcceptEx</code>中，这样在接受连接时省去了创建SOCKET的时间，能够更快速的响应客户端的连接。</li>
+<li>由于<code>AcceptEx</code>不用创建SOCKET，所以它也将<code>accept</code>内部对socket设置的操作给省去了，也少了一些其他的附带操作，比如地址的解析，其实这里我们可以简单的理解为<code>lpOutputBuffer</code>中保存的信息就是TCP三次握手中的SYN包和ACK包，这些包的信息需要在函数返回后由用户通过其他方法来解析，而<code>accpet</code>帮我们解析了，所以<code>AcceptEx</code>比<code>accept</code>更加高效</li>
+</ol>
+<p>因为<code>AcceptEx</code>的设计目标纯粹就是为了性能,所以监听套接字的属性不会被代表客户端通讯的套接字自动继承。要继承属性(包括socket内部接受/发送缓存大小等等)就必须调用<code>setsockopt</code>使用选项<code>SO_UPDATE_ACCEPT_CONTEXT</code>,如下:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="kt">int</span> <span class="n">nRet</span> <span class="o">=</span> <span class="o">::</span><span class="n">setsockopt</span><span class="p">(</span><span class="n">skClient</span><span class="p">,</span> <span class="n">SOL_SOCKET</span> <span class="p">,</span><span class="n">SO_UPDATE_ACCEPT_CONTEXT</span> <span class="p">,(</span><span class="kt">char</span> <span class="o">*</span><span class="p">)</span><span class="o">&amp;</span><span class="n">skListen</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">skListen</span><span class="p">));</span>
+</span></span></code></pre></div><p><code>AcceptEx</code>函数除了能够接受客户端的连接之外，它也可以在接受连接的同时接收客户端随着连接请求一块发过来的数据，只要我们设置<code>dwReceiveDataLength</code> 参数大于0，并在<code>lpOutputBuffer</code>中分配相应的缓冲即可，但是这里会存在一个安全问题，当我们设置了这些之后，如果客户端只发送连接请求，但是不发送数据，<code>AcceptEx</code>会一直等待，如果有大量这样的客户端，那么可能会给服务器造成大量的资源浪费从而不能及时的服务其他正常客户端。要防止这样的情况，可以采用下列措施：</p>
+<ol>
+<li>设置<code>dwReceiveDataLength</code>为0，并且不分配对应的缓冲，也就是关闭这个接收数据的功能。</li>
+<li>启动一个监视线程对用于连接的SOCKET轮询调用：</li>
+</ol>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="kt">int</span> <span class="n">iSecs</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="kt">int</span> <span class="n">iBytes</span> <span class="o">=</span> <span class="k">sizeof</span><span class="p">(</span> <span class="kt">int</span> <span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="n">getsockopt</span><span class="p">(</span> <span class="n">hAcceptSocket</span><span class="p">,</span> <span class="n">SOL_SOCKET</span><span class="p">,</span> <span class="n">SO_CONNECT_TIME</span><span class="p">,</span> <span class="p">(</span><span class="kt">char</span> <span class="o">*</span><span class="p">)</span><span class="o">&amp;</span><span class="n">iSecs</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">iBytes</span> <span class="p">);</span> <span class="c1">//获取SOCKET连接时间
+</span></span></span></code></pre></div><p>iSecs 为 -1 表示还未建立连接, 否则就是已经连接的时间.
+当iSecs超过某个筏值时,就果断断开这个连接</p>
+<h2 id="getacceptexsockaddr">GetAcceptExSockAddr</h2>
+<p>前面说AcceptEx不会对地址进行解析，而是返回一个经过编码的地址信息，可以将它理解为原始的三次握手包。而函数<code>GetAcceptExSockAddr</code>的主要作用就是通过原始的二进制数据得到对应的地址结构。函数原型如下:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="kt">void</span> <span class="nf">GetAcceptExSockaddrs</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">		<span class="n">PVOID</span> <span class="n">lpOutputBuffer</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">		<span class="n">DWORD</span> <span class="n">dwReceiveDataLength</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">		<span class="n">DWORD</span> <span class="n">dwLocalAddressLength</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">		<span class="n">DWORD</span> <span class="n">dwRemoteAddressLength</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">		<span class="n">LPSOCKADDR</span><span class="o">*</span> <span class="n">LocalSockaddr</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">		<span class="n">LPINT</span> <span class="n">LocalSockaddrLength</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">		<span class="n">LPSOCKADDR</span><span class="o">*</span> <span class="n">RemoteSockaddr</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">		<span class="n">LPINT</span> <span class="n">RemoteSockaddrLength</span><span class="p">);</span>
+</span></span></code></pre></div><p>lpOutputBuffer:之前提供给AcceptEx函数的缓冲，如果<code>AcceptEx</code>调用成功，会在这个缓冲中写入地址信息，<code>GetAcceptExSockaddrs</code>通过这个缓冲中保存的地址信息来解析出地址结构</p>
+<p>dwReceiveDataLength：接收到的数据长度，注意这个长度不是<code>lpOutputBuffer</code>，而是客户端随着连接请求一起发送过来的其他数据的长度，其实这里应该理解为地址信息在缓冲中的偏移</p>
+<p>dwLocalAddressLength：本地地址信息的长度，这个长度为<code>sizeof(SOCKADDR)+16</code></p>
+<p>dwRemoteAddressLength：远程客户端的地址信息的长度，长度为<code>sizeof(SOCKADDR)+16</code></p>
+<p>LocalSockaddr：解析出来的本地地址结构</p>
+<p>LocalSockaddrLength:本地地址结构的长度，这个参数是一个输出参数</p>
+<p>RemoteSockaddr: 解析出来的远程客户端的地址结构</p>
+<p>RemoteSockaddrLength：解析出来的远程客户端的地址长度，这个参数是一个输出参数</p>
+<p>这里为什么要返回本地的地址结构呢，主要有两个原因：</p>
+<ol>
+<li>一般的服务器可能有多块网卡，返回本地地址我们就可以知道服务器用哪块网卡与客户端通信</li>
+<li>服务器用来监听的端口与用来进行通信的端口不是同一个，返回本地地址我们就能够知道服务器在使用哪个端口与客户端通信</li>
+</ol>
+<h2 id="transmitfile">TransmitFile</h2>
+<p>对于一些网络应用来说,发送文件有时是一个基本的功能,比如:web服务,FTP服务等。在Winsock中为此而专门提供了一个高效传输文件的API——TransmitFile。函数原型如下:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="n">BOOL</span> <span class="nf">TransmitFile</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">  <span class="n">SOCKET</span> <span class="n">hSocket</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">  <span class="n">HANDLE</span> <span class="n">hFile</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">  <span class="n">DWORD</span> <span class="n">nNumberOfBytesToWrite</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">  <span class="n">DWORD</span> <span class="n">nNumberOfBytesPerSend</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">  <span class="n">LPOVERLAPPED</span> <span class="n">lpOverlapped</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">  <span class="n">LPTRANSMIT_FILE_BUFFERS</span> <span class="n">lpTransmitBuffers</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">  <span class="n">DWORD</span> <span class="n">dwFlags</span><span class="p">);</span>
+</span></span></code></pre></div><p>这个函数主要工作在TCP协议上</p>
+<p>hSocket：与客户端进行通信的SOCKET</p>
+<p>hFile：是对应文件的句柄</p>
+<p>nNumberOfBytesToWrite：表示发送文件的长度，这个长度可以小于文件长度</p>
+<p>nNumberOfBytesPerSend：当文件较大时，可以进行拆包发送，这个参数表示每个数据包的大小，如果这个参数为0，将采用系统默认的包大小，NT内核中默认大小为64K</p>
+<p>lpOverlapped：重叠I/O需要的结构</p>
+<p>lpTransmitBuffers：是一个TRANSMIT_FILE_BUFFERS结构体,利用它可以指定在文件开始发送前需要发送的额外数据以及文件发送结束后需要发送的额外数据,这个参数也可以置为NULL,仅表示发送文件数据。它的结构如下所示:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="k">typedef</span> <span class="k">struct</span> <span class="nc">_TRANSMIT_FILE_BUFFERS</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>  
+</span></span><span class="line"><span class="cl">  <span class="n">PVOID</span> <span class="n">Head</span><span class="p">;</span>  
+</span></span><span class="line"><span class="cl">  <span class="n">DWORD</span> <span class="n">HeadLength</span><span class="p">;</span>  
+</span></span><span class="line"><span class="cl">  <span class="n">PVOID</span> <span class="n">Tail</span><span class="p">;</span>  
+</span></span><span class="line"><span class="cl">  <span class="n">DWORD</span> <span class="n">TailLength</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span> <span class="n">TRANSMIT_FILE_BUFFERS</span><span class="p">;</span>
+</span></span></code></pre></div><p>dwFlags：它是一个按位组合的标识。它的各个标识的含义如下</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">标识</th>
+<th style="text-align:left">含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">TF_DISCONNECT</td>
+<td style="text-align:left">在传输文件结束后,开始一个传输层断开动作</td>
+</tr>
+<tr>
+<td style="text-align:left">TF_REUSE_SOCKET</td>
+<td style="text-align:left">重置套接字,使其可以被AcceptEx等函数重用,这个标志需要与TF_DISCONNECT标志合用</td>
+</tr>
+<tr>
+<td style="text-align:left">TF_USE_DEFAULT_WORKER</td>
+<td style="text-align:left">指定发送文件使用系统默认线程,这对传输大型文件很有利</td>
+</tr>
+<tr>
+<td style="text-align:left">TF_USE_SYSTEM_THREAD</td>
+<td style="text-align:left">使用系统线程发送文件，它与TF_USE_DEFAULT_WORKER作用相同</td>
+</tr>
+<tr>
+<td style="text-align:left">TF_USE_KERNEL_APC</td>
+<td style="text-align:left">指定利用内核APC队列来代替工作线程来处理文件传输. 需要注意的是系统内核APC队列只在应用程序进入等待状态时才工作. 但不一定非要一个可警告状态的等待</td>
+</tr>
+<tr>
+<td style="text-align:left">TF_WRITE_BEHIND</td>
+<td style="text-align:left">指定TransmitFile函数尽可能立即返回,而不管远端是否确认已收到数据.这个标志不能与TF_DISCONNECT和TF_REUSE_SOCKET一起使用</td>
+</tr>
+</tbody>
+</table>
+<p>可以使用<code>TF_DISCONNECT</code>加上<code>TF_REUSE_SOCKET</code> 来回收SOCKET，以便像AcceptEx这样的函数可以重新利用。此时应该指定hFile为NULL，但这不是这个函数的主业(我觉得应该让专门的函数干专门的事，自己在封装函数的时候也应该要注意，不要向Win32 API这样使用各种标志来控制函数的功能)</p>
+<p>同时TransmitFile函数只有在服务器版Windows上才能发挥其全部功能。而在专业版或家庭版等Windows上它被限定为最多同时有两个调用在传输,而其他的调用都被置为排队等待状态。</p>
+<p>发送文件这个功能，是一个十分简单的功能，无非是应用层不断从磁盘文件中读取文件并使用WSASend这样的异步函数来发送，另一端不断用WSARecv接收并写入到文件中，为了性能在读写文件时也可以用IOCP的方式，那么为什么微软为了这么一个简单的功能还要独自封装一个函数，难道它封装的函数就一定比我们自己实现的性能高？</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="/WinSock2-API/1.png"
+        data-srcset="/WinSock2-API/1.png, /WinSock2-API/1.png 1.5x, /WinSock2-API/1.png 2x"
+        data-sizes="auto"
+        alt="/WinSock2-API/1.png"
+        title="1" /></p>
+<p>上图揭示了<code>TransmitFile</code>能够高效工作的秘密，一般我们来封装这个功能的时候会调用ReadFile，此时由内核层读取文件并将文件文件内容保存在内核的内存空间中，然后通过系统调用们将内容拷贝到R3层，在调用WSASend的时候会将文件内容再从R3层拷贝到R0层，这个过程经过系统调用们，需要调用各种函数，并且进行各种验证。这个操作是十分耗时的。</p>
+<p>而<code>TransmitFile</code>则相对要高效的多，既然最终是要发送文件，那么它将内容从文件中读取出来后直接将R0层中保存的文件内容通过SOCKET发送出去，有的时候直接采用文件映射的方式将磁盘地址映射到网卡中，直接由网卡读取并发送，这样又省去了从内核中读取文件并拷贝到网卡缓存中的操作。所以它比我们自己封装来的更加高效。</p>
+<h2 id="transmitpackets">TransmitPackets</h2>
+<p>有的时候需要发送超大型数据(有时是几十G)到客户端,有时甚至需要发送多个文件到客户端。这个时候<code>TransmitFile</code>就不再有效了。请注意<code>TransmitFile</code>的第三个参数 <code>nNumberOfBytesToWrite</code> 是一个DWORD类型，这也就标明这个函数最大只能发送4GB的文件，而对于更大的文件它就无能为力了，为了发送更大的文件WinSock专门封装了一个函数——<code>TransmitPackets</code></p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="n">BOOL</span> <span class="n">PASCAL</span> <span class="nf">TransmitPackets</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">    <span class="n">SOCKET</span> <span class="n">hSocket</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">LPTRANSMIT_PACKETS_ELEMENT</span> <span class="n">lpPacketArray</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">DWORD</span> <span class="n">nElementCount</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">DWORD</span> <span class="n">nSendSize</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">LPOVERLAPPED</span> <span class="n">lpOverlapped</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">DWORD</span> <span class="n">dwFlags</span>
+</span></span><span class="line"><span class="cl"><span class="p">);</span>
+</span></span></code></pre></div><p>这个函数不但可以在面向连接(面向流)式的协议(TCP)上工作,还可以在无连接式的数据报协议(UDP)上工作,而TransmitFile函数只能工作在TCP上</p>
+<p>hSocket：表示发送所用的SOCKET</p>
+<p>lpPacketArray：它是一个结构体数组的指针，这个结构体表示发送文件的相关信息，结构体的定义如下:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="k">typedef</span> <span class="k">struct</span> <span class="nc">_TRANSMIT_PACKETS_ELEMENT</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="n">ULONG</span> <span class="n">dwElFlags</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="n">ULONG</span> <span class="n">cLength</span><span class="p">;</span>  
+</span></span><span class="line"><span class="cl">  <span class="k">union</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">struct</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">      <span class="n">LARGE_INTEGER</span> <span class="n">nFileOffset</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">      <span class="n">HANDLE</span> <span class="n">hFile</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">};</span>
+</span></span><span class="line"><span class="cl">    <span class="n">PVOID</span> <span class="n">pBuffer</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="p">};</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span> <span class="n">TRANSMIT_PACKETS_ELEMENT</span><span class="p">;</span>
+</span></span></code></pre></div><p>这个结构体主要包含3个部分，第一个部分是一个标志，表示该如何解释后面的部分，这个标志有如下几个值</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">标志</th>
+<th style="text-align:left">含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">TP_ELEMENT_FILE</td>
+<td style="text-align:left">标明它将发送一个文件，此时会使用共用体中的结构体部分</td>
+</tr>
+<tr>
+<td style="text-align:left">TP_ELEMENT_MEMORY</td>
+<td style="text-align:left">标明它将要将发送内存中的一段空间的数据，此时会使用共用体中pBuffer部分</td>
+</tr>
+<tr>
+<td style="text-align:left">TP_ELEMENT_EOP</td>
+<td style="text-align:left">而最后一个标志用于辅助说明前两个标志,说明当前结构表示的数据应当作为一个结束包来发送,也就说之前所有的数据到当前这个结构描述的数据应当视为一个包</td>
+</tr>
+</tbody>
+</table>
+<p>第二部分是cLength用以说明当前结构描述的数据长度/发送文件内容的长度</p>
+<p>第三个部分联合定义根据第一个部分的实际标志值,用于说明是一个文件还是一个内存块,当是一个文件时还可以指定一个64位长整数型的文件内偏移,这为应用利用TransmitPackets发送大于4GB的文件创造了可能.当偏移为-1时,表示从文件当前指针位置开始发送</p>
+<p>需要注意的是因为TransmitPackets能够很快的处理数据发送,因此可能会造成大量待发送数据堆积在下层协议的协议栈上.而对于无连接的面向数据报的协议来说,有时协议驱动会选择将它们简单丢弃.</p>
+<p>另外对于TransmitPackets来说也只有服务器版的Windows能够发挥它全部的性能,而对于家庭版和专业版来说,最多能够同时处理两个TransmitPackets调用,其它的调用都会被排队处理</p>
+<p>最后TransmitPackets在发送文件时工作机理与TransmitFile是类似的,而TransmitPackets可以发送多个文件,并且可以发送超大文件(大于4GB),在发送内存块上,TransmitPackets也有很多优化,调用者可以放心的将超大的缓冲块传递给TransmitPackets而不必过多的担心</p>
+<h2 id="connectex">ConnectEx</h2>
+<p>作为客户端应用来说,或者说一些需要反连接工作的应用来说(如:Active FTP方式的服务器),使用传统的connect进行阻塞式或非阻塞式的编程都无法得到很好的性能响应</p>
+<p>它的定义如下:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="n">BOOL</span> <span class="n">PASCAL</span> <span class="nf">ConnectEx</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">  <span class="n">SOCKET</span> <span class="n">s</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">  <span class="k">const</span> <span class="k">struct</span> <span class="nc">sockaddr</span><span class="o">*</span> <span class="n">name</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">  <span class="kt">int</span> <span class="n">namelen</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">  <span class="n">PVOID</span> <span class="n">lpSendBuffer</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">  <span class="n">DWORD</span> <span class="n">dwSendDataLength</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">  <span class="n">LPDWORD</span> <span class="n">lpdwBytesSent</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">  <span class="n">LPOVERLAPPED</span> <span class="n">lpOverlapped</span>
+</span></span><span class="line"><span class="cl"><span class="p">);</span>
+</span></span></code></pre></div><p>s: 进行连接操作的SOCKET句柄,这个SOCKET句柄需要事先绑定，这里与调用普通的connect函数不同，<strong>它需要先调用bind函数将本地地址与SOCKET绑定</strong></p>
+<p>name：要连接的远端服务器的地址结构</p>
+<p>namelen：就是远端地址结构的长度</p>
+<p>lpSendBuffer,dwSendDataLength,lpdwBytesSent三个参数共同用于描述在连接到服务器成功之后向服务器直接发送的数据缓冲,长度以及实际发送的数据长度</p>
+<p>lpOverlapped就是重叠I/O操作需要的结构体</p>
+<p>与AcceptEx类似，在连接成功后，需要调用 <code>setsocketopt</code> 来设置SOCKET的属性。</p>
+<p>与传统的<code>connect</code>函数不同,<code>ConnectEx</code>函数要求一个已经绑定过的SOCKET句柄参数,其实这也是将connect内部的绑定操作排除在真正connect操作之外的一种策略。最终连接的操作也会很快的就被完成,而绑定可以提前甚至在初始化的时候就完成。这样做也是为了能够快速的处理网络事件。</p>
+<h2 id="disconnectex">DisConnectEx</h2>
+<p>前面在TransmitFile中说它可以使用<code>TF_DISCONNECT</code>加上<code>TF_REUSE_SOCKET</code> 来回收SOCKET，也提到应该用专门的函数来干专门的事，这里ConnectEx就是专门的函数。它主要的作用与普通的<code>closesocket</code>函数类似。</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="n">BOOL</span> <span class="nf">DisconnectEx</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl"><span class="n">SOCKET</span> <span class="n">hSocket</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl"><span class="n">LPOVERLAPPED</span> <span class="n">lpOverlapped</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl"><span class="n">DWORD</span> <span class="n">dwFlags</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl"><span class="n">DWORD</span> <span class="n">reserved</span>
+</span></span><span class="line"><span class="cl"><span class="p">);</span>
+</span></span></code></pre></div><p>hSocket ：表示将要被回收的SOCKET</p>
+<p>lpOverlapped：重叠IO所使用的结构</p>
+<p>dwFlags：它是一个标志值，表示是否需要回收SOCKET，如果为0则表示不需要回收，此时它的作用与<code>closesocket</code>类似。如果为<code>TF_REUSE_SOCKET</code>表示将回收SOCKET</p>
+<p>reserved：是一个保留值直接传0即可</p>
+<p>当以重叠I/O的方式调用<code>DisconnectEx</code>时,若该SOCKET还有未完成的传输调用时,该函数会返回<code>FALSE</code>,并且最终错误码是<code>WSA_IO_PENDING</code>,即断开/回收操作将在传输完成后执行。如果使用了重叠IO，同样在完成之后会调用完成处理函数。
+如果未采用重叠IO操作，那么函数会阻塞，直到数据发送完成并断开连接。</p>
+<h2 id="扩展函数的动态加载">扩展函数的动态加载</h2>
+<p>之前介绍的这一系列Winsock2.0的扩展API,最好都动态加载之后再行调用,因为它们具体的导出位置在不同平台上变动太大,如果静态联编的话,会给开发编译工作带来巨大的麻烦,所以使用运行时动态加载来调用这些API。</p>
+<p>但是这些函数的加载与加载普通的dll函数不同，为了方便操作，WinSock提供了一套完整的支持。这表示我们不需要知道它们所在的dll，我们可以直接使用WinSock提供的方法，即使以后它们所在的dll文件变化了，也不会影响我们的使用。</p>
+<p>加载它们需要使用到函数WSAIoctl,函数原型如下:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="kt">int</span> <span class="nf">WSAIoctl</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">    <span class="n">SOCKET</span> <span class="n">s</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">DWORD</span> <span class="n">dwIoControlCode</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">LPVOID</span> <span class="n">lpvInBuffer</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">DWORD</span> <span class="n">cbInBuffer</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">LPVOID</span> <span class="n">lpvOutBuffer</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">DWORD</span> <span class="n">cbOutBuffer</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">LPDWORD</span> <span class="n">lpcbBytesReturned</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">LPWSAOVERLAPPED</span> <span class="n">lpOverlapped</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">LPWSAOVERLAPPED_COMPLETION_ROUTINE</span> <span class="n">lpCompletionRoutine</span>
+</span></span><span class="line"><span class="cl"><span class="p">);</span>
+</span></span></code></pre></div><p>这个函数的使用方法与<code>ioctlsocket</code> 相似。这里不对它的详细用法进行讨论。这里就简单的说说该怎么用它加载这些函数。</p>
+<p>要加载WinSock API，首先需要将第二个控制码参数设置为SIO_GET_EXTENSION_FUNCTION_POINTER，表示获取扩展API的指针。设置了这个参数后，lpvInBuffer参数需要设置成相应函数的GUID，下面列举了各个函数的GUID值</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">GDUI</th>
+<th style="text-align:left">函数</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">WSAID_ACCEPTEX</td>
+<td style="text-align:left">AcceptEx</td>
+</tr>
+<tr>
+<td style="text-align:left">WSAID_CONNECTEX</td>
+<td style="text-align:left">ConnectEx</td>
+</tr>
+<tr>
+<td style="text-align:left">WSAID_DISCONNECTEX</td>
+<td style="text-align:left">DisconnectEx</td>
+</tr>
+<tr>
+<td style="text-align:left">WSAID_GETACCEPTEXSOCKADDRS</td>
+<td style="text-align:left">GetAcceptExSockaddrs</td>
+</tr>
+<tr>
+<td style="text-align:left">WSAID_TRANSMITFILE</td>
+<td style="text-align:left">TransmitFile</td>
+</tr>
+<tr>
+<td style="text-align:left">WSAID_TRANSMITPACKETS</td>
+<td style="text-align:left">TransmitPackets</td>
+</tr>
+<tr>
+<td style="text-align:left">WSAID_WSARECVMSG</td>
+<td style="text-align:left">WSARecvMsg</td>
+</tr>
+<tr>
+<td style="text-align:left">WSAID_WSASENDMSG</td>
+<td style="text-align:left">WSASendMsg</td>
+</tr>
+</tbody>
+</table>
+<p>函数的指针通过 lpvOutBuffer 参数返回，而cbOutBuffer表示接受缓冲的长度，lpcbBytesReturned表示返回数据的长度。后面两个参数都与完成IO有关，所以这里可以直接给NULL。
+下面是一个加载AcceptEx函数的例子</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="k">typedef</span>
+</span></span><span class="line"><span class="cl"><span class="nf">BOOL</span>
+</span></span><span class="line"><span class="cl"><span class="p">(</span><span class="n">PASCAL</span> <span class="n">FAR</span> <span class="o">*</span> <span class="n">LPFN_ACCEPTEX</span><span class="p">)(</span>
+</span></span><span class="line"><span class="cl">    <span class="n">IN</span> <span class="n">SOCKET</span> <span class="n">sListenSocket</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">IN</span> <span class="n">SOCKET</span> <span class="n">sAcceptSocket</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">IN</span> <span class="n">PVOID</span> <span class="n">lpOutputBuffer</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">IN</span> <span class="n">DWORD</span> <span class="n">dwReceiveDataLength</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">IN</span> <span class="n">DWORD</span> <span class="n">dwLocalAddressLength</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">IN</span> <span class="n">DWORD</span> <span class="n">dwRemoteAddressLength</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">OUT</span> <span class="n">LPDWORD</span> <span class="n">lpdwBytesReceived</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">IN</span> <span class="n">LPOVERLAPPED</span> <span class="n">lpOverlapped</span>
+</span></span><span class="line"><span class="cl">    <span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="n">LPFN_ACCEPTEX</span> <span class="n">pFun</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="n">SOCKET</span> <span class="n">sTemp</span> <span class="o">=</span> <span class="n">WSASocket</span><span class="p">(</span><span class="n">af</span><span class="p">,</span> <span class="n">type</span><span class="p">,</span> <span class="n">protocol</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="n">GUID</span> <span class="n">funGuid</span> <span class="o">=</span> <span class="n">WSAID_ACCEPTEX</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="k">if</span> <span class="p">(</span><span class="n">INVALID_SOCKET</span> <span class="o">!=</span> <span class="n">skTemp</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="n">DWORD</span> <span class="n">dwOutBufferSize</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="kt">int</span> <span class="n">Ret</span> <span class="o">=</span> <span class="o">::</span><span class="n">WSAIoctl</span><span class="p">(</span><span class="n">skTemp</span><span class="p">,</span> <span class="n">SIO_GET_EXTENSION_FUNCTION_POINTER</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">funGuid</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">funGuid</span><span class="p">),</span> <span class="o">&amp;</span><span class="n">pFun</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">pFun</span><span class="p">),</span> <span class="o">&amp;</span><span class="n">dwOutBufferSize</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p>这里调用WSAIoctl加载扩展函数时需要传入SOCKET句柄，它其实是利用传入的SOCKET的相关信息来导出对应版本的扩展函数，比如这里我们传入的是一个用在TCP协议之上的SOCKET，所以它会返回一个使用TCP协议的API，利用这个SOCKET，这个函数以及它返回的API真正做到了与协议无关。</p>
+<!-- raw HTML omitted -->
+</div><div class="post-footer" id="post-footer">
+    <div class="post-info">
+        <div class="post-info-line">
+            <div class="post-info-mod">
+                <span>Updated on 2018-07-21</span>
+            </div></div>
+        <div class="post-info-line">
+            <div class="post-info-md"></div>
+            <div class="post-info-share">
+                <span><a href="javascript:void(0);" title="Share on Twitter" data-sharer="twitter" data-url="http://HaiLateBoy.github.io/posts/winsock2-api/" data-title="WinSock2 API" data-hashtags="WinSock,网络编程,WinSock2.0 API,动态加载,WinSock 异步函数"><i class="fab fa-twitter fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Facebook" data-sharer="facebook" data-url="http://HaiLateBoy.github.io/posts/winsock2-api/" data-hashtag="WinSock"><i class="fab fa-facebook-square fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Hacker News" data-sharer="hackernews" data-url="http://HaiLateBoy.github.io/posts/winsock2-api/" data-title="WinSock2 API"><i class="fab fa-hacker-news fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Line" data-sharer="line" data-url="http://HaiLateBoy.github.io/posts/winsock2-api/" data-title="WinSock2 API"><i data-svg-src="https://cdn.jsdelivr.net/npm/simple-icons@7.3.0/icons/line.svg" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on 微博" data-sharer="weibo" data-url="http://HaiLateBoy.github.io/posts/winsock2-api/" data-title="WinSock2 API"><i class="fab fa-weibo fa-fw" aria-hidden="true"></i></a></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="post-info-more">
+        <section class="post-tags"><i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/winsock/">WinSock</a>,&nbsp;<a href="/tags/%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B/">网络编程</a>,&nbsp;<a href="/tags/winsock2.0-api/">WinSock2.0 API</a>,&nbsp;<a href="/tags/%E5%8A%A8%E6%80%81%E5%8A%A0%E8%BD%BD/">动态加载</a>,&nbsp;<a href="/tags/winsock-%E5%BC%82%E6%AD%A5%E5%87%BD%E6%95%B0/">WinSock 异步函数</a></section>
+        <section>
+            <span><a href="javascript:void(0);" onclick="window.history.back();">Back</a></span>&nbsp;|&nbsp;<span><a href="/">Home</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav"><a href="/posts/winsock-iocp/" class="prev" rel="prev" title="WinSock 完成端口模型"><i class="fas fa-angle-left fa-fw" aria-hidden="true"></i>WinSock 完成端口模型</a>
+            <a href="/posts/c-call-python/" class="next" rel="next" title="C&#43;&#43; 调用Python3">C++ 调用Python3<i class="fas fa-angle-right fa-fw" aria-hidden="true"></i></a></div>
+</div>
+</article></div>
+            </main><footer class="footer">
+        <div class="footer-container"><div class="footer-line">Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener noreffer" title="Hugo 0.121.2">Hugo</a> | Theme - <a href="https://github.com/dillonzq/LoveIt" target="_blank" rel="noopener noreffer" title="LoveIt 0.2.11"><i class="far fa-kiss-wink-heart fa-fw" aria-hidden="true"></i> LoveIt</a>
+                </div><div class="footer-line" itemscope itemtype="http://schema.org/CreativeWork"><i class="far fa-copyright fa-fw" aria-hidden="true"></i><span itemprop="copyrightYear">2022 - 2024</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="https://www.masimaro.xyz" target="_blank">Masimaro</a></span></div>
+        </div>
+    </footer></div>
+
+        <div id="fixed-buttons"><a href="#" id="back-to-top" class="fixed-button" title="Back to Top">
+                <i class="fas fa-arrow-up fa-fw" aria-hidden="true"></i>
+            </a><a href="#" id="view-comments" class="fixed-button" title="View Comments">
+                <i class="fas fa-comment fa-fw" aria-hidden="true"></i>
+            </a>
+        </div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.css"><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/autocomplete.js@0.38.1/dist/autocomplete.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lunr@2.3.9/lunr.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lazysizes@5.3.2/lazysizes.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/clipboard@2.0.11/dist/clipboard.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/sharer.js@0.5.1/sharer.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/auto-render.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/copy-tex.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/mhchem.min.js"></script><script type="text/javascript">window.config={"code":{"copyTitle":"Copy to clipboard","maxShownLines":50},"comment":{},"math":{"delimiters":[{"display":true,"left":"$$","right":"$$"},{"display":true,"left":"\\[","right":"\\]"},{"display":true,"left":"\\begin{equation}","right":"\\end{equation}"},{"display":true,"left":"\\begin{equation*}","right":"\\end{equation*}"},{"display":true,"left":"\\begin{align}","right":"\\end{align}"},{"display":true,"left":"\\begin{align*}","right":"\\end{align*}"},{"display":true,"left":"\\begin{alignat}","right":"\\end{alignat}"},{"display":true,"left":"\\begin{alignat*}","right":"\\end{alignat*}"},{"display":true,"left":"\\begin{gather}","right":"\\end{gather}"},{"display":true,"left":"\\begin{CD}","right":"\\end{CD}"},{"display":false,"left":"$","right":"$"},{"display":false,"left":"\\(","right":"\\)"}],"strict":false},"search":{"highlightTag":"em","maxResultLength":10,"noResultsFound":"No results found","snippetLength":50}};</script><script type="text/javascript" src="/js/theme.min.js"></script></body>
+</html>

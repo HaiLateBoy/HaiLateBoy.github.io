@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="robots" content="noodp" />
+        <title>使用miniblink 在程序中嵌入浏览器 - Masimaro&#39;s blog</title><meta name="Description" content="这是我用于记录日常和学习的小站"><meta property="og:title" content="使用miniblink 在程序中嵌入浏览器" />
+<meta property="og:description" content="最近公司产品中自定义浏览器比较老，打开一些支持h5 的站莫名报错，而且经常弹框。已经到了令人无法忍受的地步了，于是我想到了将内核由之前的IE 升" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://HaiLateBoy.github.io/posts/miniblink-use/" /><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2019-03-17T14:33:38+00:00" />
+<meta property="article:modified_time" content="2019-03-17T14:33:38+00:00" /><meta property="og:site_name" content="Masimaro&#39;s blog" />
+
+<meta name="twitter:card" content="summary"/><meta name="twitter:title" content="使用miniblink 在程序中嵌入浏览器"/>
+<meta name="twitter:description" content="最近公司产品中自定义浏览器比较老，打开一些支持h5 的站莫名报错，而且经常弹框。已经到了令人无法忍受的地步了，于是我想到了将内核由之前的IE 升"/>
+<meta name="application-name" content="My cool site">
+<meta name="apple-mobile-web-app-title" content="My cool site"><meta name="theme-color" content="#ffffff"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="manifest" href="/site.webmanifest"><link rel="canonical" href="http://HaiLateBoy.github.io/posts/miniblink-use/" /><link rel="prev" href="http://HaiLateBoy.github.io/posts/tree/" /><link rel="next" href="http://HaiLateBoy.github.io/posts/simple-sort/" /><link rel="stylesheet" href="/css/style.min.css"><link rel="preload" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css"></noscript><link rel="preload" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css"></noscript><script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "BlogPosting",
+        "headline": "使用miniblink 在程序中嵌入浏览器",
+        "inLanguage": "zh-CN",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "http:\/\/HaiLateBoy.github.io\/posts\/miniblink-use\/"
+        },"genre": "posts","keywords": "miniblink, Windows桌面程序, 浏览器, Chromium","wordcount":  3761 ,
+        "url": "http:\/\/HaiLateBoy.github.io\/posts\/miniblink-use\/","datePublished": "2019-03-17T14:33:38+00:00","dateModified": "2019-03-17T14:33:38+00:00","publisher": {
+            "@type": "Organization",
+            "name": ""},"author": {
+                "@type": "Person",
+                "name": "Masimaro"
+            },"description": ""
+    }
+    </script></head>
+    <body data-header-desktop="fixed" data-header-mobile="auto"><script type="text/javascript">(window.localStorage && localStorage.getItem('theme') ? localStorage.getItem('theme') === 'dark' : ('auto' === 'auto' ? window.matchMedia('(prefers-color-scheme: dark)').matches : 'auto' === 'dark')) && document.body.setAttribute('theme', 'dark');</script>
+
+        <div id="mask"></div><div class="wrapper"><header class="desktop" id="header-desktop">
+    <div class="header-wrapper">
+        <div class="header-title">
+            <a href="/" title="Masimaro&#39;s blog">My cool site</a>
+        </div>
+        <div class="menu">
+            <div class="menu-inner"><a class="menu-item" href="/posts/" title="文章列表"> 文章 </a><a class="menu-item" href="/tags/" title="标签"> 标签 </a><a class="menu-item" href="/categories/" title="分类"> 分类 </a><a class="menu-item" href="/about" title="关于本站"> 关于 </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-desktop">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-desktop" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-desktop" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-desktop">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </span><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                    <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+                </a></div>
+        </div>
+    </div>
+</header><header class="mobile" id="header-mobile">
+    <div class="header-container">
+        <div class="header-wrapper">
+            <div class="header-title">
+                <a href="/" title="Masimaro&#39;s blog">My cool site</a>
+            </div>
+            <div class="menu-toggle" id="menu-toggle-mobile">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+        <div class="menu" id="menu-mobile"><div class="search-wrapper">
+                    <div class="search mobile" id="search-mobile">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-mobile">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-mobile" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-mobile" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-mobile">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </div>
+                    <a href="javascript:void(0);" class="search-cancel" id="search-cancel-mobile">
+                        Cancel
+                    </a>
+                </div><a class="menu-item" href="/posts/" title="文章列表">文章</a><a class="menu-item" href="/tags/" title="标签">标签</a><a class="menu-item" href="/categories/" title="分类">分类</a><a class="menu-item" href="/about" title="关于本站">关于</a><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+            </a></div>
+    </div>
+</header><div class="search-dropdown desktop">
+        <div id="search-dropdown-desktop"></div>
+    </div>
+    <div class="search-dropdown mobile">
+        <div id="search-dropdown-mobile"></div>
+    </div><main class="main">
+                <div class="container"><div class="toc" id="toc-auto">
+            <h2 class="toc-title">Contents</h2>
+            <div class="toc-content" id="toc-content-auto"></div>
+        </div><article class="page single"><h1 class="single-title animate__animated animate__flipInX">使用miniblink 在程序中嵌入浏览器</h1><div class="post-meta">
+            <div class="post-meta-line"><span class="post-author"><a href="https://www.masimaro.xyz" title="Author" target="_blank" rel="noopener noreffer author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Masimaro</a></span>&nbsp;<span class="post-category">included in <a href="/categories/mfc-%E5%BC%80%E5%8F%91/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>MFC 开发</a></span></div>
+            <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw" aria-hidden="true"></i>&nbsp;<time datetime="2019-03-17">2019-03-17</time>&nbsp;<i class="fas fa-pencil-alt fa-fw" aria-hidden="true"></i>&nbsp;3761 words&nbsp;
+                <i class="far fa-clock fa-fw" aria-hidden="true"></i>&nbsp;8 minutes&nbsp;</div>
+        </div><div class="details toc" id="toc-static"  data-kept="true">
+                <div class="details-summary toc-title">
+                    <span>Contents</span>
+                    <span><i class="details-icon fas fa-angle-right" aria-hidden="true"></i></span>
+                </div>
+                <div class="details-content toc-content" id="toc-content-static"><nav id="TableOfContents">
+  <ul>
+    <li><a href="#什么是miniblink">什么是miniblink</a></li>
+    <li><a href="#使用miniblink">使用miniblink</a></li>
+    <li><a href="#在对话框中使用">在对话框中使用</a></li>
+    <li><a href="#按钮事件的处理">按钮事件的处理</a></li>
+    <li><a href="#wkeview-的回调函数">wkeView 的回调函数</a></li>
+  </ul>
+</nav></div>
+            </div><div class="content" id="content"><p>最近公司产品中自定义浏览器比较老，打开一些支持h5 的站莫名报错，而且经常弹框。已经到了令人无法忍受的地步了，于是我想到了将内核由之前的IE 升级到Chromium。之前想到的是使用cef来做，而且网上的资源和教程也很多，后来在自己尝试的过程中发现使用cef时程序会莫名其妙的崩溃，特别是在关闭对话框的时候。我在网上找了一堆资料，尝试了各种版本未果，这个方案也就放弃了。后来又搜到了wke和miniblink，对比二者官方的文档和demo，我决定使用miniblink，毕竟我直接搜索wke browser 出来的都是miniblink，只有搜索wke github 才会有真正的wke，而且wke似乎没有api文档，最后miniblink是国人写的，文档都是中文而且又有专门的qq交流群，有问题可以咨询一下。</p>
+<!-- raw HTML omitted -->
+<h2 id="什么是miniblink">什么是miniblink</h2>
+<p>miniblink 是由国内大神 <a href="https://www.zhihu.com/people/wang-bin-1-53/activities" target="_blank" rel="noopener noreffer ">龙泉寺扫地僧</a> 针对chromium内核进行裁剪去掉了所有多余的部件，只保留最基本的排版引擎blink，而产生的一款号称全球小巧的浏览器内核项目，目前miniblink 保持了10M左右的极简大小，相比CEF 动辄几百M的大小确实小巧许多。而且能很好的支持H5等一些列新标准，同时它内嵌了Nodejs 支持electron。而且也支持各种语言调用。</p>
+<p>官方的地址如下为 <a href="https://weolar.github.io/miniblink/index.html" target="_blank" rel="noopener noreffer ">https://weolar.github.io/miniblink/index.html</a></p>
+<h2 id="使用miniblink">使用miniblink</h2>
+<p>说了这么多那么该怎么用呢？从官方的介绍来看，我们可以使用VS的向导程序生成一个普通的win32 窗口程序，然后生成的这些代码中将函数InitInstance 中的代码全部删除加上这么5句话</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="n">wkeSetWkeDllPath</span><span class="p">(</span><span class="sa">L</span><span class="s">&#34;E:</span><span class="se">\\</span><span class="s">mycode</span><span class="se">\\</span><span class="s">miniblink49</span><span class="se">\\</span><span class="s">trunk</span><span class="se">\\</span><span class="s">out</span><span class="se">\\</span><span class="s">Release_vc6</span><span class="se">\\</span><span class="s">node.dll&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="n">wkeInitialize</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl"><span class="n">wkeWebView</span> <span class="n">window</span> <span class="o">=</span> <span class="n">wkeCreateWebWindow</span><span class="p">(</span><span class="n">WKE_WINDOW_TYPE_POPUP</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1080</span><span class="p">,</span> <span class="mi">680</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="n">wkeLoadURL</span><span class="p">(</span><span class="n">window</span><span class="p">,</span> <span class="s">&#34;qq.com&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="n">wkeShowWindow</span><span class="p">(</span><span class="n">window</span><span class="p">,</span> <span class="n">TRUE</span><span class="p">);</span>
+</span></span></code></pre></div><p>当然，使用这些函数需要下载它的SDK开发包，然后在对应位置包含wke.h。
+这些代码会生成一个窗口程序，具体的请敢兴趣的朋友自己去实践看看效果。或者编译运行一下它的demo程序。</p>
+<h2 id="在对话框中使用">在对话框中使用</h2>
+<p>现在我想在对话框中使用，那么该怎么办呢。</p>
+<p>首先也是先用MFC的向导生成一个对话框并编辑资源文件。最后我的对话框大概长成这样
+<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="/miniblink-use/%e5%af%b9%e8%af%9d%e6%a1%86.png"
+        data-srcset="/miniblink-use/%e5%af%b9%e8%af%9d%e6%a1%86.png, /miniblink-use/%e5%af%b9%e8%af%9d%e6%a1%86.png 1.5x, /miniblink-use/%e5%af%b9%e8%af%9d%e6%a1%86.png 2x"
+        data-sizes="auto"
+        alt="/miniblink-use/对话框.png"
+        title="1" />
+我会将按钮下面部分全部作为浏览器页面。</p>
+<p>我们在程序APP类的InitInstance函数 中初始化miniblink库,并在对话框被关闭后直接卸载miniblink的相关资源</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="n">wkeSetWkeDllPath</span><span class="p">(</span><span class="sa">L</span><span class="s">&#34;node.dll&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">wkeInitialize</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl"><span class="n">CWebBrowserDlg</span> <span class="n">dlg</span> <span class="o">=</span> <span class="n">CWebBrowserDlg</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl"><span class="n">m_pMainWnd</span> <span class="o">=</span> <span class="n">dlg</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="n">INT_PTR</span> <span class="n">nResponse</span> <span class="o">=</span> <span class="n">dlg</span><span class="p">.</span><span class="n">DoModal</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">if</span> <span class="p">(</span><span class="n">nResponse</span> <span class="o">==</span> <span class="n">IDOK</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="c1">// TODO: 在此放置处理何时用
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="c1">//  “确定”来关闭对话框的代码
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="k">else</span> <span class="nf">if</span> <span class="p">(</span><span class="n">nResponse</span> <span class="o">==</span> <span class="n">IDCANCEL</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="c1">// TODO: 在此放置处理何时用
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="c1">//  “取消”来关闭对话框的代码
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// 由于对话框已关闭，所以将返回 FALSE 以便退出应用程序，
+</span></span></span><span class="line"><span class="cl"><span class="c1">//  而不是启动应用程序的消息泵。
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="n">wkeFinalize</span><span class="p">();</span>
+</span></span></code></pre></div><p>然后在主对话框类中新增一个成员变量用来保存miniblink的web视图的句柄</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="n">wkeWebView</span> <span class="n">m_web</span><span class="p">;</span>
+</span></span></code></pre></div><p>我们在对话框的OnInitDialog函数中创建这么一个视图，用来加载百度的首页面</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="n">GetClientRect</span><span class="p">(</span><span class="o">&amp;</span><span class="n">rtClient</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="n">rtClient</span><span class="p">.</span><span class="n">top</span> <span class="o">+=</span> <span class="mi">24</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="n">m_web</span> <span class="o">=</span> <span class="n">wkeCreateWebWindow</span><span class="p">(</span><span class="n">WKE_WINDOW_TYPE_CONTROL</span><span class="p">,</span> <span class="o">*</span><span class="k">this</span><span class="p">,</span> <span class="n">rtClient</span><span class="p">.</span><span class="n">left</span><span class="p">,</span> <span class="n">rtClient</span><span class="p">.</span><span class="n">top</span><span class="p">,</span> <span class="n">rtClient</span><span class="p">.</span><span class="n">right</span> <span class="o">-</span> <span class="n">rtClient</span><span class="p">.</span><span class="n">left</span><span class="p">,</span> <span class="n">rtClient</span><span class="p">.</span><span class="n">bottom</span> <span class="o">-</span> <span class="n">rtClient</span><span class="p">.</span><span class="n">top</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="n">wkeLoadURL</span><span class="p">(</span><span class="n">m_web</span><span class="p">,</span> <span class="s">&#34;https://www.baidu.com&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="n">wkeShowWindow</span><span class="p">(</span><span class="n">m_web</span><span class="p">,</span> <span class="n">TRUE</span><span class="p">);</span>
+</span></span></code></pre></div><p>至此我们已经能够生成一个简单的浏览器程序
+<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="/miniblink-use/%e6%b5%8f%e8%a7%88%e5%99%a8.png"
+        data-srcset="/miniblink-use/%e6%b5%8f%e8%a7%88%e5%99%a8.png, /miniblink-use/%e6%b5%8f%e8%a7%88%e5%99%a8.png 1.5x, /miniblink-use/%e6%b5%8f%e8%a7%88%e5%99%a8.png 2x"
+        data-sizes="auto"
+        alt="/miniblink-use/浏览器.png"
+        title="浏览器程序" /></p>
+<p>似乎到这已经差不多该结束了，但是现在我遇到了在整个程序完成期间最大的问题，那就是web页面无法响应键盘消息，我尝试过改成窗口程序，发现改了之后能正常运行，但是我要的是对话框啊。这么改只能证明这个库是没问题的。</p>
+<p>后来我在群里面发出了这样的疑问，有朋友告诉我说应该是wkeWebView没有接受到键盘消息，于是我打算处理主对话框的WM_KEYDOWN 和WM_KEYUP 以及WM_CHAR消息，根据官方的文档，应该是只需要拦截对话框的这三个消息，然后使用函数wkeFireKeyUpEvent、wkeFireKeyDownEvent、wkeFireKeyPressEvent函数分别向wkeWebView发送键盘消息就可以了.于是我在对应的处理函数中添加了相关代码</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="c1">//OnChar
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">flags</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="k">if</span> <span class="p">(</span><span class="n">nFlags</span> <span class="o">&amp;</span> <span class="n">KF_REPEAT</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">  <span class="n">flags</span> <span class="o">|=</span> <span class="n">WKE_REPEAT</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="k">if</span> <span class="p">(</span><span class="n">nFlags</span> <span class="o">&amp;</span> <span class="n">KF_EXTENDED</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">  <span class="n">flags</span> <span class="o">|=</span> <span class="n">WKE_EXTENDED</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">wkeFireKeyPressEvent</span><span class="p">(</span><span class="n">m_web</span><span class="p">,</span> <span class="n">nChar</span><span class="p">,</span> <span class="n">flags</span><span class="p">,</span> <span class="nb">false</span><span class="p">);</span>
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="c1">//OnKeyUp
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">flags</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="k">if</span> <span class="p">(</span><span class="n">nFlags</span> <span class="o">&amp;</span> <span class="n">KF_REPEAT</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">  <span class="n">flags</span> <span class="o">|=</span> <span class="n">WKE_REPEAT</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="k">if</span> <span class="p">(</span><span class="n">nFlags</span> <span class="o">&amp;</span> <span class="n">KF_EXTENDED</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">  <span class="n">flags</span> <span class="o">|=</span> <span class="n">WKE_EXTENDED</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">wkeFireKeyUpEvent</span><span class="p">(</span><span class="n">m_web</span><span class="p">,</span> <span class="n">virtualKeyCode</span><span class="p">,</span> <span class="n">flags</span><span class="p">,</span> <span class="nb">false</span><span class="p">);</span>
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="c1">//OnKeyDown
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">flags</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="k">if</span> <span class="p">(</span><span class="n">nFlags</span> <span class="o">&amp;</span> <span class="n">KF_REPEAT</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">  <span class="n">flags</span> <span class="o">|=</span> <span class="n">WKE_REPEAT</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="k">if</span> <span class="p">(</span><span class="n">nFlags</span> <span class="o">&amp;</span> <span class="n">KF_EXTENDED</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">  <span class="n">flags</span> <span class="o">|=</span> <span class="n">WKE_EXTENDED</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">wkeFireKeyDownEvent</span><span class="p">(</span><span class="n">m_web</span><span class="p">,</span> <span class="n">virtualKeyCode</span><span class="p">,</span> <span class="n">flags</span><span class="p">,</span> <span class="nb">false</span><span class="p">);</span>
+</span></span></code></pre></div><p>但是这么干，我通过调试发现它好像并没有进入到这些函数里面来，也就是说键盘消息不是由主对话框来处理的。那么现在只能在wkeWebView 对应的窗口中来处理了。那么怎么捕获这个窗口的消息呢，miniblink提供了函数wkeGetHostHWND 来根据视图的句柄获取对应窗口的句柄，那么现在的思路就是这样的：首先获取对应的窗口句柄然后通过SetWindowLong来修改窗口的窗口过程，然后在窗口过程中处理这些消息就行了。根据这个思路整理一下代码</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="c1">//在创建wkeWebView 之后来hook窗口过程
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="n">HWND</span> <span class="n">hWnd</span> <span class="o">=</span> <span class="n">wkeGetHostHWND</span><span class="p">(</span><span class="n">m_web</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="n">g_OldProc</span> <span class="o">=</span> <span class="p">(</span><span class="n">WNDPROC</span><span class="p">)</span><span class="n">SetWindowLong</span><span class="p">(</span><span class="n">hWnd</span><span class="p">,</span> <span class="n">GWL_WNDPROC</span><span class="p">,</span> <span class="p">(</span><span class="n">LONG</span><span class="p">)</span><span class="n">MyWndProc</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="c1">//为了能够在全局函数中使用对话框类的东西，我们为窗口绑定一个对话框类的指针
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="n">SetWindowLong</span><span class="p">(</span><span class="n">hWnd</span><span class="p">,</span> <span class="n">GWL_USERDATA</span><span class="p">,</span> <span class="k">this</span><span class="p">);</span>
+</span></span></code></pre></div><p>接着在MyWndProc中处理对应的消息事件</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="n">LRESULT</span> <span class="n">CALLBACK</span> <span class="nf">MyWndProc</span><span class="p">(</span><span class="n">HWND</span> <span class="n">hWnd</span><span class="p">,</span> <span class="n">UINT</span> <span class="n">uMsg</span><span class="p">,</span> <span class="n">WPARAM</span> <span class="n">wParam</span><span class="p">,</span> <span class="n">LPARAM</span> <span class="n">lParam</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">CWebBrowserDlg</span><span class="o">*</span> <span class="n">pDlg</span> <span class="o">=</span> <span class="p">(</span><span class="n">CWebBrowserDlg</span><span class="o">*</span><span class="p">)</span><span class="n">GetWindowLong</span><span class="p">(</span><span class="n">hWnd</span><span class="p">,</span> <span class="n">GWL_USERDATA</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="p">(</span><span class="nb">NULL</span> <span class="o">==</span> <span class="n">pDlg</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="n">CallWindowProc</span><span class="p">(</span><span class="n">g_OldProc</span><span class="p">,</span> <span class="n">hWnd</span><span class="p">,</span> <span class="n">uMsg</span><span class="p">,</span> <span class="n">wParam</span><span class="p">,</span> <span class="n">lParam</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">switch</span> <span class="p">(</span><span class="n">uMsg</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="k">case</span> <span class="nl">WM_KEYUP</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">        <span class="p">{</span>
+</span></span><span class="line"><span class="cl">          <span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">virtualKeyCode</span> <span class="o">=</span> <span class="n">wParam</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">          <span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">flags</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">          <span class="k">if</span> <span class="p">(</span><span class="n">HIWORD</span><span class="p">(</span><span class="n">lParam</span><span class="p">)</span> <span class="o">&amp;</span> <span class="n">KF_REPEAT</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">          <span class="n">flags</span> <span class="o">|=</span> <span class="n">WKE_REPEAT</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">          <span class="k">if</span> <span class="p">(</span><span class="n">HIWORD</span><span class="p">(</span><span class="n">lParam</span><span class="p">)</span> <span class="o">&amp;</span> <span class="n">KF_EXTENDED</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">          <span class="n">flags</span> <span class="o">|=</span> <span class="n">WKE_EXTENDED</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">          <span class="n">wkeFireKeyDownEvent</span><span class="p">(</span><span class="n">pDlg</span><span class="o">-&gt;</span><span class="n">m_web</span><span class="p">,</span> <span class="n">virtualKeyCode</span><span class="p">,</span> <span class="n">flags</span><span class="p">,</span> <span class="nb">false</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="p">}</span>
+</span></span><span class="line"><span class="cl">        <span class="k">break</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="k">case</span> <span class="nl">WM_KEYDOWN</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">        <span class="p">{</span>
+</span></span><span class="line"><span class="cl">          <span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">virtualKeyCode</span> <span class="o">=</span> <span class="n">wParam</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">          <span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">flags</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">          <span class="k">if</span> <span class="p">(</span><span class="n">HIWORD</span><span class="p">(</span><span class="n">lParam</span><span class="p">)</span> <span class="o">&amp;</span> <span class="n">KF_REPEAT</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">          <span class="n">flags</span> <span class="o">|=</span> <span class="n">WKE_REPEAT</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">          <span class="k">if</span> <span class="p">(</span><span class="n">HIWORD</span><span class="p">(</span><span class="n">lParam</span><span class="p">)</span> <span class="o">&amp;</span> <span class="n">KF_EXTENDED</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">          <span class="n">flags</span> <span class="o">|=</span> <span class="n">WKE_EXTENDED</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">          <span class="n">wkeFireKeyUpEvent</span><span class="p">(</span><span class="n">pDlg</span><span class="o">-&gt;</span><span class="n">m_web</span><span class="p">,</span> <span class="n">virtualKeyCode</span><span class="p">,</span> <span class="n">flags</span><span class="p">,</span> <span class="nb">false</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="p">}</span>
+</span></span><span class="line"><span class="cl">        <span class="k">break</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="k">case</span> <span class="nl">WM_CHAR</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">        <span class="p">{</span>
+</span></span><span class="line"><span class="cl">          <span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">charCode</span> <span class="o">=</span> <span class="n">wParam</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">          <span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">flags</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">          <span class="k">if</span> <span class="p">(</span><span class="n">HIWORD</span><span class="p">(</span><span class="n">lParam</span><span class="p">)</span> <span class="o">&amp;</span> <span class="n">KF_REPEAT</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">          <span class="n">flags</span> <span class="o">|=</span> <span class="n">WKE_REPEAT</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">          <span class="k">if</span> <span class="p">(</span><span class="n">HIWORD</span><span class="p">(</span><span class="n">lParam</span><span class="p">)</span> <span class="o">&amp;</span> <span class="n">KF_EXTENDED</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">          <span class="n">flags</span> <span class="o">|=</span> <span class="n">WKE_EXTENDED</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">          <span class="n">wkeFireKeyPressEvent</span><span class="p">(</span><span class="n">pDlg</span><span class="o">-&gt;</span><span class="n">m_web</span><span class="p">,</span> <span class="n">charCode</span><span class="p">,</span> <span class="n">flags</span><span class="p">,</span> <span class="nb">false</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="p">}</span>
+</span></span><span class="line"><span class="cl">        <span class="k">break</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">        <span class="k">default</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">          <span class="k">return</span> <span class="n">CallWindowProc</span><span class="p">(</span><span class="n">g_OldProc</span><span class="p">,</span> <span class="n">hWnd</span><span class="p">,</span> <span class="n">uMsg</span><span class="p">,</span> <span class="n">wParam</span><span class="p">,</span> <span class="n">lParam</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p>这样做之后我发现它虽然能够截取到这些消息并执行它，但是在调用wkeFireKeyPressEvent等函数之后仍然无法响应键盘消息。难道是wkeCreateWebWindow 创建出来的窗口不能做子窗口？带着这个疑问我根据官方文档尝试了一下使用wkeCreateWebView ，然后将它绑定到对应的窗口上，然后这个整体作为子窗口的方式。</p>
+<p>代码太长了，我就不放出来了，有兴趣的可以翻到本文尾部，我将这个demo项目放到的GitHub上。</p>
+<p>结果还是不行。这些函数仍然进不来。</p>
+<p>真的郁闷，难道要换方案？我这个时候已经开始准备换方案了，在编译wke 的时候心情极度烦躁，我在之前的程序上不停的敲击键盘，就听见“等~等~等~”。我靠！这不是想从模态对话框上切换回主页面时的那个声音吗？会不会是因为模态对话框的关系？</p>
+<p>这个时候我瞬间来了灵感。那就换吧，主要改一下APP类中相关代码，吧模态改成非模态的就行</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="n">CWebBrowserDlg</span> <span class="o">*</span><span class="n">dlg</span> <span class="o">=</span> <span class="k">new</span> <span class="n">CWebBrowserDlg</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl"><span class="n">dlg</span><span class="o">-&gt;</span><span class="n">Create</span><span class="p">(</span><span class="n">IDD_WEBBROWSER_DIALOG</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="n">m_pMainWnd</span> <span class="o">=</span> <span class="n">dlg</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="n">INT_PTR</span> <span class="n">nResponse</span> <span class="o">=</span> <span class="n">dlg</span><span class="o">-&gt;</span><span class="n">ShowWindow</span><span class="p">(</span><span class="n">SW_SHOW</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">if</span> <span class="p">(</span><span class="n">nResponse</span> <span class="o">==</span> <span class="n">IDOK</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="c1">// TODO: 在此放置处理何时用
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="c1">//  “确定”来关闭对话框的代码
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="k">else</span> <span class="nf">if</span> <span class="p">(</span><span class="n">nResponse</span> <span class="o">==</span> <span class="n">IDCANCEL</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="c1">// TODO: 在此放置处理何时用
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="c1">//  “取消”来关闭对话框的代码
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// 由于对话框已关闭，所以将返回 FALSE 以便退出应用程序，
+</span></span></span><span class="line"><span class="cl"><span class="c1">//  而不是启动应用程序的消息泵。
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>
+</span></span><span class="line"><span class="cl"><span class="c1">//由于是非模态对话框，所以这里需要自己写消息环
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="n">MSG</span> <span class="n">msg</span> <span class="o">=</span> <span class="p">{</span> <span class="mi">0</span> <span class="p">};</span>
+</span></span><span class="line"><span class="cl"><span class="k">while</span> <span class="p">(</span><span class="n">GetMessage</span><span class="p">(</span><span class="o">&amp;</span><span class="n">msg</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="n">TranslateMessage</span><span class="p">(</span><span class="o">&amp;</span><span class="n">msg</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="n">DispatchMessageW</span><span class="p">(</span><span class="o">&amp;</span><span class="n">msg</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">delete</span> <span class="n">dlg</span><span class="p">;</span>
+</span></span></code></pre></div><p>卧槽，居然成功了，能正常相应了！为什么模态就不行呢，后来我在复盘的时候想到，应该是wkeWebView的窗口并没有做成那种严格意义上的子窗口，它是一个独立的，所以模态对话框把消息给拦截了不让传到其他的窗口导致的这个问题。
+这个也算是成功了。</p>
+<p>这个时候问题又来了，程序关不掉了，虽然说窗口是关了，但是程序并没有退出，后来调试发现，消息环没有退出。这个时候我想到应该是关闭时调用的是EndDialog。但是此时已经改成非模态了，需要最后调用DestroyWindow，那么这个地方就得去对话框的OnClose消息中改。</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="kt">void</span> <span class="n">CWebBrowserDlg</span><span class="o">::</span><span class="n">OnClose</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">	<span class="c1">// TODO: 在此添加消息处理程序代码和/或调用默认值
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="n">DestroyWindow</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">	<span class="c1">//CDialog::OnClose();
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">}</span>
+</span></span></code></pre></div><p>好了，这个时候基本已经完成了。就剩下一些按钮事件处理了。</p>
+<h2 id="按钮事件的处理">按钮事件的处理</h2>
+<p>这里直接贴代码吧，基本只有几行，很容易看懂的</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="kt">void</span> <span class="n">CWebBrowserDlg</span><span class="o">::</span><span class="n">OnBnClickedBtnBack</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">	<span class="c1">// TODO: 在此添加控件通知处理程序代码
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="k">if</span> <span class="p">(</span><span class="n">wkeCanGoBack</span><span class="p">(</span><span class="n">m_web</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl">	<span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="n">wkeGoBack</span><span class="p">(</span><span class="n">m_web</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kt">void</span> <span class="n">CWebBrowserDlg</span><span class="o">::</span><span class="n">OnBnClickedBtnForward</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">	<span class="c1">// TODO: 在此添加控件通知处理程序代码
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="k">if</span> <span class="p">(</span><span class="n">wkeCanGoForward</span><span class="p">(</span><span class="n">m_web</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl">	<span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="n">wkeGoForward</span><span class="p">(</span><span class="n">m_web</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kt">void</span> <span class="n">CWebBrowserDlg</span><span class="o">::</span><span class="n">OnBnClickedBtnStop</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">	<span class="c1">// TODO: 在此添加控件通知处理程序代码
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="n">wkeStopLoading</span><span class="p">(</span><span class="n">m_web</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kt">void</span> <span class="n">CWebBrowserDlg</span><span class="o">::</span><span class="n">OnBnClickedBtnRefresh</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">	<span class="c1">// TODO: 在此添加控件通知处理程序代码
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="n">wkeReload</span><span class="p">(</span><span class="n">m_web</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kt">void</span> <span class="n">CWebBrowserDlg</span><span class="o">::</span><span class="n">OnBnClickedBtnGo</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">	<span class="c1">// TODO: 在此添加控件通知处理程序代码
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="n">CString</span> <span class="n">csurl</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">GetDlgItem</span><span class="p">(</span><span class="n">IDC_EDIT_URL</span><span class="p">)</span><span class="o">-&gt;</span><span class="n">GetWindowText</span><span class="p">(</span><span class="n">csurl</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="n">wkeLoadURLW</span><span class="p">(</span><span class="n">m_web</span><span class="p">,</span> <span class="n">csurl</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">//设置代理
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kt">void</span> <span class="n">CWebBrowserDlg</span><span class="o">::</span><span class="n">OnBnClickedBtnProxy</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">	<span class="n">CDlgProxySet</span> <span class="n">dlgProxySet</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">dlgProxySet</span><span class="p">.</span><span class="n">DoModal</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">	<span class="n">wkeProxy</span> <span class="n">proxy</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">proxy</span><span class="p">.</span><span class="n">type</span> <span class="o">=</span> <span class="n">WKE_PROXY_HTTP</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">USES_CONVERSION</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">strcpy_s</span><span class="p">(</span><span class="n">proxy</span><span class="p">.</span><span class="n">hostname</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">proxy</span><span class="p">.</span><span class="n">hostname</span><span class="p">),</span> <span class="n">T2A</span><span class="p">(</span><span class="n">dlgProxySet</span><span class="p">.</span><span class="n">csIP</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="n">proxy</span><span class="p">.</span><span class="n">port</span> <span class="o">=</span> <span class="n">dlgProxySet</span><span class="p">.</span><span class="n">m_port</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">wkeSetProxy</span><span class="p">(</span><span class="o">&amp;</span><span class="n">proxy</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="c1">// TODO: 在此添加控件通知处理程序代码
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">}</span>
+</span></span></code></pre></div><h2 id="wkeview-的回调函数">wkeView 的回调函数</h2>
+<p>现在主体功能已经完成了，要跟浏览器类似，需要处理这样几个东西。第一个是url栏中的内容会根据当前主页面的url做调整，特别是针对302、301 跳转的情况。第二个是窗口的标题应该改为页面的标题；第三个是在某些页面中超链接用的是_blank，时应该能正常打开新窗口。</p>
+<p>为了实现这些目标，我们需要处理一些wkeView的事件,我们创建了wkeWebView 之后直接绑定这些事件</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="n">wkeOnTitleChanged</span><span class="p">(</span><span class="n">m_web</span><span class="p">,</span> <span class="n">wkeOnTitleChangedCallBack</span><span class="p">,</span> <span class="k">this</span><span class="p">);</span> <span class="c1">//最后一个参数是传递用户数据，这里我们传递this指针进去
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="n">wkeOnURLChanged</span><span class="p">(</span><span class="n">m_web</span><span class="p">,</span> <span class="n">wkeOnURLChangedCallBack</span><span class="p">,</span> <span class="k">this</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="n">wkeOnNavigation</span><span class="p">(</span><span class="n">m_web</span><span class="p">,</span> <span class="n">wkeOnNavigationCallBack</span><span class="p">,</span> <span class="k">this</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="n">wkeOnCreateView</span><span class="p">(</span><span class="n">m_web</span><span class="p">,</span> <span class="n">onBrowserCreateView</span><span class="p">,</span> <span class="k">this</span><span class="p">);</span>
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="c1">// 页面标题更改时调用此回调
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kt">void</span> <span class="n">_cdecl</span> <span class="nf">wkeOnTitleChangedCallBack</span><span class="p">(</span><span class="n">wkeWebView</span> <span class="n">webView</span><span class="p">,</span> <span class="kt">void</span><span class="o">*</span> <span class="n">param</span><span class="p">,</span> <span class="k">const</span> <span class="n">wkeString</span> <span class="n">title</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">	<span class="n">CWebBrowserDlg</span> <span class="o">*</span><span class="n">pDlg</span> <span class="o">=</span> <span class="p">(</span><span class="n">CWebBrowserDlg</span><span class="o">*</span><span class="p">)</span><span class="n">param</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="k">if</span> <span class="p">(</span><span class="nb">NULL</span> <span class="o">!=</span> <span class="n">pDlg</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">	<span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="n">pDlg</span><span class="o">-&gt;</span><span class="n">SetWindowText</span><span class="p">(</span><span class="n">wkeGetStringW</span><span class="p">(</span><span class="n">title</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">//url变更时调用此回调
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kt">void</span> <span class="n">_cdecl</span> <span class="nf">wkeOnURLChangedCallBack</span><span class="p">(</span><span class="n">wkeWebView</span> <span class="n">webView</span><span class="p">,</span> <span class="kt">void</span><span class="o">*</span> <span class="n">param</span><span class="p">,</span> <span class="k">const</span> <span class="n">wkeString</span> <span class="n">url</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">	<span class="n">CWebBrowserDlg</span> <span class="o">*</span><span class="n">pDlg</span> <span class="o">=</span> <span class="p">(</span><span class="n">CWebBrowserDlg</span><span class="o">*</span><span class="p">)</span><span class="n">param</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="k">if</span> <span class="p">(</span><span class="nb">NULL</span> <span class="o">!=</span> <span class="n">pDlg</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">	<span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="n">pDlg</span><span class="o">-&gt;</span><span class="n">GetDlgItem</span><span class="p">(</span><span class="n">IDC_EDIT_URL</span><span class="p">)</span><span class="o">-&gt;</span><span class="n">SetWindowTextW</span><span class="p">(</span><span class="n">wkeGetStringW</span><span class="p">(</span><span class="n">url</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">//网页开始浏览将触发回调, 这里主要是为了它能打开一些本地的程序
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kt">bool</span> <span class="n">_cdecl</span> <span class="nf">wkeOnNavigationCallBack</span><span class="p">(</span><span class="n">wkeWebView</span> <span class="n">webView</span><span class="p">,</span> <span class="kt">void</span><span class="o">*</span> <span class="n">param</span><span class="p">,</span> <span class="n">wkeNavigationType</span> <span class="n">navigationType</span><span class="p">,</span> <span class="k">const</span> <span class="n">wkeString</span> <span class="n">url</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">	<span class="k">const</span> <span class="kt">wchar_t</span><span class="o">*</span> <span class="n">urlStr</span> <span class="o">=</span> <span class="n">wkeGetStringW</span><span class="p">(</span><span class="n">url</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="k">if</span> <span class="p">(</span><span class="n">wcsstr</span><span class="p">(</span><span class="n">urlStr</span><span class="p">,</span> <span class="sa">L</span><span class="s">&#34;exec://&#34;</span><span class="p">)</span> <span class="o">==</span> <span class="n">urlStr</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="n">PROCESS_INFORMATION</span> <span class="n">processInfo</span> <span class="o">=</span> <span class="p">{</span> <span class="mi">0</span> <span class="p">};</span>
+</span></span><span class="line"><span class="cl">		<span class="n">STARTUPINFOW</span> <span class="n">startupInfo</span> <span class="o">=</span> <span class="p">{</span> <span class="mi">0</span> <span class="p">};</span>
+</span></span><span class="line"><span class="cl">		<span class="n">startupInfo</span><span class="p">.</span><span class="n">cb</span> <span class="o">=</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">startupInfo</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">		<span class="n">BOOL</span> <span class="n">succeeded</span> <span class="o">=</span> <span class="n">CreateProcessW</span><span class="p">(</span><span class="nb">NULL</span><span class="p">,</span> <span class="p">(</span><span class="n">LPWSTR</span><span class="p">)</span><span class="n">urlStr</span> <span class="o">+</span> <span class="mi">7</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">,</span> <span class="n">FALSE</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">startupInfo</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">processInfo</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">		<span class="k">if</span> <span class="p">(</span><span class="n">succeeded</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">			<span class="n">CloseHandle</span><span class="p">(</span><span class="n">processInfo</span><span class="p">.</span><span class="n">hProcess</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">			<span class="n">CloseHandle</span><span class="p">(</span><span class="n">processInfo</span><span class="p">.</span><span class="n">hThread</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">		<span class="p">}</span>
+</span></span><span class="line"><span class="cl">		<span class="k">return</span> <span class="nb">false</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="k">return</span> <span class="nb">true</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">//网页点击a标签创建新窗口时将触发回调
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="n">wkeWebView</span> <span class="n">_cdecl</span> <span class="nf">onBrowserCreateView</span><span class="p">(</span><span class="n">wkeWebView</span> <span class="n">webView</span><span class="p">,</span> <span class="kt">void</span><span class="o">*</span> <span class="n">param</span><span class="p">,</span> <span class="n">wkeNavigationType</span> <span class="n">navType</span><span class="p">,</span> <span class="k">const</span> <span class="n">wkeString</span> <span class="n">urlStr</span><span class="p">,</span> <span class="k">const</span> <span class="n">wkeWindowFeatures</span><span class="o">*</span> <span class="n">features</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">	<span class="k">const</span> <span class="kt">wchar_t</span><span class="o">*</span> <span class="n">url</span> <span class="o">=</span> <span class="n">wkeGetStringW</span><span class="p">(</span><span class="n">urlStr</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="n">wkeWebView</span> <span class="n">newWindow</span> <span class="o">=</span> <span class="n">wkeCreateWebWindow</span><span class="p">(</span><span class="n">WKE_WINDOW_TYPE_POPUP</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">,</span> <span class="n">features</span><span class="o">-&gt;</span><span class="n">x</span><span class="p">,</span> <span class="n">features</span><span class="o">-&gt;</span><span class="n">y</span><span class="p">,</span> <span class="n">features</span><span class="o">-&gt;</span><span class="n">width</span><span class="p">,</span> <span class="n">features</span><span class="o">-&gt;</span><span class="n">height</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="n">wkeShowWindow</span><span class="p">(</span><span class="n">newWindow</span><span class="p">,</span> <span class="nb">true</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="k">return</span> <span class="n">newWindow</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p>至此这个浏览器的demo就完成了。最后贴上对应的demo项目地址: <a href="https://github.com/aMonst/WebBrowser" target="_blank" rel="noopener noreffer ">https://github.com/aMonst/WebBrowser</a></p>
+<p><code>PS</code>:最近有一位朋友发邮件告诉我说，wkeWebView 不能响应键盘消息与对话框是模态还是非模态无关，主要是要处理wkeWebView的WM_GETDLGCODE 消息，那位朋友给出的代码如下:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="k">switch</span><span class="p">(</span><span class="n">uMsg</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">	<span class="k">case</span> <span class="nl">WM_GETDLGCODE</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">		<span class="k">return</span> <span class="n">DLGC_WANTARROWS</span> <span class="o">|</span> <span class="n">DLGC_WANTALLKEYS</span> <span class="o">|</span> <span class="n">DLGC_WANTCHARS</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p>我试了一下，发现确实是这样，相比较我上面提出的改为非模态的方式来说，还是用模态对话框方便、毕竟MFC对话框程序本来就是非模态的。所以这里我将代码做了一下修改。并同步到了GitHub上。最后再次感谢那位发邮件告诉的朋友。。。。。</p>
+<p>参考资料</p>
+<ul>
+<li><a href="https://weolar.github.io/miniblink/doc-main.html" target="_blank" rel="noopener noreffer ">miniblink API文档</a></li>
+<li><a href="https://github.com/weolar/mb-demo" target="_blank" rel="noopener noreffer ">官方DEMO</a></li>
+</ul>
+<!-- raw HTML omitted -->
+</div><div class="post-footer" id="post-footer">
+    <div class="post-info">
+        <div class="post-info-line">
+            <div class="post-info-mod">
+                <span>Updated on 2019-03-17</span>
+            </div></div>
+        <div class="post-info-line">
+            <div class="post-info-md"></div>
+            <div class="post-info-share">
+                <span><a href="javascript:void(0);" title="Share on Twitter" data-sharer="twitter" data-url="http://HaiLateBoy.github.io/posts/miniblink-use/" data-title="使用miniblink 在程序中嵌入浏览器" data-hashtags="miniblink,Windows桌面程序,浏览器,Chromium"><i class="fab fa-twitter fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Facebook" data-sharer="facebook" data-url="http://HaiLateBoy.github.io/posts/miniblink-use/" data-hashtag="miniblink"><i class="fab fa-facebook-square fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Hacker News" data-sharer="hackernews" data-url="http://HaiLateBoy.github.io/posts/miniblink-use/" data-title="使用miniblink 在程序中嵌入浏览器"><i class="fab fa-hacker-news fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Line" data-sharer="line" data-url="http://HaiLateBoy.github.io/posts/miniblink-use/" data-title="使用miniblink 在程序中嵌入浏览器"><i data-svg-src="https://cdn.jsdelivr.net/npm/simple-icons@7.3.0/icons/line.svg" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on 微博" data-sharer="weibo" data-url="http://HaiLateBoy.github.io/posts/miniblink-use/" data-title="使用miniblink 在程序中嵌入浏览器"><i class="fab fa-weibo fa-fw" aria-hidden="true"></i></a></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="post-info-more">
+        <section class="post-tags"><i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/miniblink/">miniblink</a>,&nbsp;<a href="/tags/windows%E6%A1%8C%E9%9D%A2%E7%A8%8B%E5%BA%8F/">Windows桌面程序</a>,&nbsp;<a href="/tags/%E6%B5%8F%E8%A7%88%E5%99%A8/">浏览器</a>,&nbsp;<a href="/tags/chromium/">Chromium</a></section>
+        <section>
+            <span><a href="javascript:void(0);" onclick="window.history.back();">Back</a></span>&nbsp;|&nbsp;<span><a href="/">Home</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav"><a href="/posts/tree/" class="prev" rel="prev" title="算法与数据结构(四)：树"><i class="fas fa-angle-left fa-fw" aria-hidden="true"></i>算法与数据结构(四)：树</a>
+            <a href="/posts/simple-sort/" class="next" rel="next" title="算法与数据结构(五)：基本排序算法">算法与数据结构(五)：基本排序算法<i class="fas fa-angle-right fa-fw" aria-hidden="true"></i></a></div>
+</div>
+</article></div>
+            </main><footer class="footer">
+        <div class="footer-container"><div class="footer-line">Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener noreffer" title="Hugo 0.121.2">Hugo</a> | Theme - <a href="https://github.com/dillonzq/LoveIt" target="_blank" rel="noopener noreffer" title="LoveIt 0.2.11"><i class="far fa-kiss-wink-heart fa-fw" aria-hidden="true"></i> LoveIt</a>
+                </div><div class="footer-line" itemscope itemtype="http://schema.org/CreativeWork"><i class="far fa-copyright fa-fw" aria-hidden="true"></i><span itemprop="copyrightYear">2022 - 2024</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="https://www.masimaro.xyz" target="_blank">Masimaro</a></span></div>
+        </div>
+    </footer></div>
+
+        <div id="fixed-buttons"><a href="#" id="back-to-top" class="fixed-button" title="Back to Top">
+                <i class="fas fa-arrow-up fa-fw" aria-hidden="true"></i>
+            </a><a href="#" id="view-comments" class="fixed-button" title="View Comments">
+                <i class="fas fa-comment fa-fw" aria-hidden="true"></i>
+            </a>
+        </div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.css"><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/autocomplete.js@0.38.1/dist/autocomplete.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lunr@2.3.9/lunr.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lazysizes@5.3.2/lazysizes.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/clipboard@2.0.11/dist/clipboard.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/sharer.js@0.5.1/sharer.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/auto-render.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/copy-tex.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/mhchem.min.js"></script><script type="text/javascript">window.config={"code":{"copyTitle":"Copy to clipboard","maxShownLines":50},"comment":{},"math":{"delimiters":[{"display":true,"left":"$$","right":"$$"},{"display":true,"left":"\\[","right":"\\]"},{"display":true,"left":"\\begin{equation}","right":"\\end{equation}"},{"display":true,"left":"\\begin{equation*}","right":"\\end{equation*}"},{"display":true,"left":"\\begin{align}","right":"\\end{align}"},{"display":true,"left":"\\begin{align*}","right":"\\end{align*}"},{"display":true,"left":"\\begin{alignat}","right":"\\end{alignat}"},{"display":true,"left":"\\begin{alignat*}","right":"\\end{alignat*}"},{"display":true,"left":"\\begin{gather}","right":"\\end{gather}"},{"display":true,"left":"\\begin{CD}","right":"\\end{CD}"},{"display":false,"left":"$","right":"$"},{"display":false,"left":"\\(","right":"\\)"}],"strict":false},"search":{"highlightTag":"em","maxResultLength":10,"noResultsFound":"No results found","snippetLength":50}};</script><script type="text/javascript" src="/js/theme.min.js"></script></body>
+</html>

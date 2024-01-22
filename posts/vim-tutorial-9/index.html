@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="robots" content="noodp" />
+        <title>vim 从嫌弃到依赖(8)——使用命令模式编辑文本 - Masimaro&#39;s blog</title><meta name="Description" content="这是我用于记录日常和学习的小站"><meta property="og:title" content="vim 从嫌弃到依赖(8)——使用命令模式编辑文本" />
+<meta property="og:description" content="通过前面的文章，我们已经介绍了vim的普通模式、插入模式、可视模式。接下来让我们接着介绍vim中另一个强大的模式——命令行模式 命令模式简介 命" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://HaiLateBoy.github.io/posts/vim-tutorial-9/" /><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2022-04-27T12:54:52+08:00" />
+<meta property="article:modified_time" content="2022-04-27T12:54:52+08:00" /><meta property="og:site_name" content="Masimaro&#39;s blog" />
+
+<meta name="twitter:card" content="summary"/><meta name="twitter:title" content="vim 从嫌弃到依赖(8)——使用命令模式编辑文本"/>
+<meta name="twitter:description" content="通过前面的文章，我们已经介绍了vim的普通模式、插入模式、可视模式。接下来让我们接着介绍vim中另一个强大的模式——命令行模式 命令模式简介 命"/>
+<meta name="application-name" content="My cool site">
+<meta name="apple-mobile-web-app-title" content="My cool site"><meta name="theme-color" content="#ffffff"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="manifest" href="/site.webmanifest"><link rel="canonical" href="http://HaiLateBoy.github.io/posts/vim-tutorial-9/" /><link rel="prev" href="http://HaiLateBoy.github.io/posts/vim-tutorial-8/" /><link rel="next" href="http://HaiLateBoy.github.io/posts/vim-tutorial-10/" /><link rel="stylesheet" href="/css/style.min.css"><link rel="preload" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css"></noscript><link rel="preload" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css"></noscript><script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "BlogPosting",
+        "headline": "vim 从嫌弃到依赖(8)——使用命令模式编辑文本",
+        "inLanguage": "zh-CN",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "http:\/\/HaiLateBoy.github.io\/posts\/vim-tutorial-9\/"
+        },"genre": "posts","keywords": "vim, 编辑工具, 文本处理","wordcount":  3148 ,
+        "url": "http:\/\/HaiLateBoy.github.io\/posts\/vim-tutorial-9\/","datePublished": "2022-04-27T12:54:52+08:00","dateModified": "2022-04-27T12:54:52+08:00","publisher": {
+            "@type": "Organization",
+            "name": ""},"author": {
+                "@type": "Person",
+                "name": "Masimaro"
+            },"description": ""
+    }
+    </script></head>
+    <body data-header-desktop="fixed" data-header-mobile="auto"><script type="text/javascript">(window.localStorage && localStorage.getItem('theme') ? localStorage.getItem('theme') === 'dark' : ('auto' === 'auto' ? window.matchMedia('(prefers-color-scheme: dark)').matches : 'auto' === 'dark')) && document.body.setAttribute('theme', 'dark');</script>
+
+        <div id="mask"></div><div class="wrapper"><header class="desktop" id="header-desktop">
+    <div class="header-wrapper">
+        <div class="header-title">
+            <a href="/" title="Masimaro&#39;s blog">My cool site</a>
+        </div>
+        <div class="menu">
+            <div class="menu-inner"><a class="menu-item" href="/posts/" title="文章列表"> 文章 </a><a class="menu-item" href="/tags/" title="标签"> 标签 </a><a class="menu-item" href="/categories/" title="分类"> 分类 </a><a class="menu-item" href="/about" title="关于本站"> 关于 </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-desktop">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-desktop" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-desktop" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-desktop">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </span><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                    <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+                </a></div>
+        </div>
+    </div>
+</header><header class="mobile" id="header-mobile">
+    <div class="header-container">
+        <div class="header-wrapper">
+            <div class="header-title">
+                <a href="/" title="Masimaro&#39;s blog">My cool site</a>
+            </div>
+            <div class="menu-toggle" id="menu-toggle-mobile">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+        <div class="menu" id="menu-mobile"><div class="search-wrapper">
+                    <div class="search mobile" id="search-mobile">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-mobile">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-mobile" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-mobile" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-mobile">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </div>
+                    <a href="javascript:void(0);" class="search-cancel" id="search-cancel-mobile">
+                        Cancel
+                    </a>
+                </div><a class="menu-item" href="/posts/" title="文章列表">文章</a><a class="menu-item" href="/tags/" title="标签">标签</a><a class="menu-item" href="/categories/" title="分类">分类</a><a class="menu-item" href="/about" title="关于本站">关于</a><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+            </a></div>
+    </div>
+</header><div class="search-dropdown desktop">
+        <div id="search-dropdown-desktop"></div>
+    </div>
+    <div class="search-dropdown mobile">
+        <div id="search-dropdown-mobile"></div>
+    </div><main class="main">
+                <div class="container"><div class="toc" id="toc-auto">
+            <h2 class="toc-title">Contents</h2>
+            <div class="toc-content" id="toc-content-auto"></div>
+        </div><article class="page single"><h1 class="single-title animate__animated animate__flipInX">vim 从嫌弃到依赖(8)——使用命令模式编辑文本</h1><div class="post-meta">
+            <div class="post-meta-line"><span class="post-author"><a href="https://www.masimaro.xyz" title="Author" target="_blank" rel="noopener noreffer author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Masimaro</a></span>&nbsp;<span class="post-category">included in <a href="/categories/vim/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>vim</a></span></div>
+            <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw" aria-hidden="true"></i>&nbsp;<time datetime="2022-04-27">2022-04-27</time>&nbsp;<i class="fas fa-pencil-alt fa-fw" aria-hidden="true"></i>&nbsp;3148 words&nbsp;
+                <i class="far fa-clock fa-fw" aria-hidden="true"></i>&nbsp;7 minutes&nbsp;</div>
+        </div><div class="details toc" id="toc-static"  data-kept="true">
+                <div class="details-summary toc-title">
+                    <span>Contents</span>
+                    <span><i class="details-icon fas fa-angle-right" aria-hidden="true"></i></span>
+                </div>
+                <div class="details-content toc-content" id="toc-content-static"><nav id="TableOfContents">
+  <ul>
+    <li><a href="#命令模式简介">命令模式简介</a></li>
+    <li><a href="#配合范围使用命令">配合范围使用命令</a>
+      <ul>
+        <li><a href="#使用数字代表对应行">使用数字代表对应行</a></li>
+        <li><a href="#使用特殊符号代表对应行">使用特殊符号代表对应行</a></li>
+        <li><a href="#使用位置偏移量来微调操作范围">使用位置偏移量来微调操作范围</a></li>
+        <li><a href="#将可视模式的选区作为操作范围">将可视模式的选区作为操作范围</a></li>
+      </ul>
+    </li>
+    <li><a href="#其他操作文本的命令">其他操作文本的命令</a>
+      <ul>
+        <li><a href="#使用t-命令">使用<code>t</code> 命令</a></li>
+      </ul>
+    </li>
+    <li><a href="#总结">总结</a></li>
+  </ul>
+</nav></div>
+            </div><div class="content" id="content"><p>通过前面的文章，我们已经介绍了vim的普通模式、插入模式、可视模式。接下来让我们接着介绍vim中另一个强大的模式——命令行模式</p>
+<h2 id="命令模式简介">命令模式简介</h2>
+<p>命令模式可以说在vim中的使用频率不亚于普通模式，像我们平时使用 <code>:w</code> 将缓冲区的内容写入文件，使用 <code>:q</code> 退出vim，这些都是在命令行模式下执行命令。</p>
+<p>vim最早是由 <code>ed</code> 编辑器发展而来，中间经历过了 <code>ed</code> &ndash;&gt; <code>ex</code> &ndash;&gt; <code>vi</code> &ndash;&gt; <code>vim</code> 的流程，vim继承了vi的模式区分以及ex的一些处理文本的命令，这也就是为什么有时候会将vim命令行模式中执行的命令叫做<code>ex命令</code></p>
+<p>在普通模式下，按下<code>:</code> 会切换到命令行模式，这个时候vim会等待我们输入一个命令,最后以回车(&lt;CR&gt;) 结束输入并执行</p>
+<p>在vim 中有许多自带的的命令，而且我们安装第三方插件的时候，插件也会提供一些使用的命令，这里我们主要还是战士如何在命令模式中操作文本。其他相关的命令在后面结合其他功能给出</p>
+<p>在命令行中的操作与在插入模式中类似，只是插入模式会将键盘输入写入缓冲区，而命令行模式则会将输入显示在命令行位置。二者的操作符也类似，例如可以适用 <code>&lt;Ctrl-w&gt;</code> 和 <code>&lt;Ctrl-u&gt;</code>来删除至上个单词的开头和行首。也可是使用 <code>&lt;Ctrl-v&gt;</code> 和 <code>&lt;Ctrl-k&gt;</code> 来输入键盘上找不到的字符。也可是使用方向键来移动光标，或者使用退格键删除命令。如果中途不想执行输入的命令，可以使用<code>&lt;Esc&gt;</code> 退回到普通模式。</p>
+<p>在普通模式下，我们需要使用 <code>operator +motion</code> 来操作指定范围的文本，这通常伴随着光标的移动。在命令行模式下，可以操作任意范围内的文本，这表示在某些情况下，使用命令相对于在普通模式下有着更高的效率</p>
+<p>我们可以在一个或者多个连续行上执行命令，例如</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="nb">print</span><span class="p">(</span><span class="s2">&#34;hello world1&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="nb">print</span><span class="p">(</span><span class="s2">&#34;hello world2&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="nb">print</span><span class="p">(</span><span class="s2">&#34;hello world3&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="nb">print</span><span class="p">(</span><span class="s2">&#34;hello world4&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="nb">print</span><span class="p">(</span><span class="s2">&#34;hello world5&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="nb">print</span><span class="p">(</span><span class="s2">&#34;hello world6&#34;</span><span class="p">)</span>
+</span></span></code></pre></div><p>假设光标在第一行的行首位置,我们输入 <code>:print</code> ，它会打印当前行。</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://img-blog.csdnimg.cn/876d8ec2917e4c8696f84aff5dd3d9f6.gif#pic_center"
+        data-srcset="https://img-blog.csdnimg.cn/876d8ec2917e4c8696f84aff5dd3d9f6.gif#pic_center, https://img-blog.csdnimg.cn/876d8ec2917e4c8696f84aff5dd3d9f6.gif#pic_center 1.5x, https://img-blog.csdnimg.cn/876d8ec2917e4c8696f84aff5dd3d9f6.gif#pic_center 2x"
+        data-sizes="auto"
+        alt="https://img-blog.csdnimg.cn/876d8ec2917e4c8696f84aff5dd3d9f6.gif#pic_center"
+        title="命令模式" />
+我们看到执行<code>print</code> 之后会打印光标所在行</p>
+<h2 id="配合范围使用命令">配合范围使用命令</h2>
+<p>与普通模式下 <code>operator</code> 配合一个 <code>motion</code> 来指定操作的文本范围类似，ex命令也可以带有一个范围值来指定操作的范围。这里我们给出一个使用范围的格式格式</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="cl">command = {startpoint},{endpoint} + cmd
+</span></span></code></pre></div><p>其中 startpoint 表示开始位置，endpoint表示结束位置，他们中间用<code>,</code>隔开，后面紧跟着一个命令。</p>
+<p>如果不加范围，则表示操作的范围是光标所在行，例如 <code>:print</code> 表示打印光标所在行的文本</p>
+<p>如果只输入一个数字，vim会首先将光标移动到对应的行上，然后针对该行文本执行操作，例如如果输入 <code>:2print</code> 它会将光标移动到第二行，然后对第二行文本执行打印操作。</p>
+<h3 id="使用数字代表对应行">使用数字代表对应行</h3>
+<p>下面再看一个例子：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="nb">print</span><span class="p">(</span><span class="s2">&#34;hello world1&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="nb">print</span><span class="p">(</span><span class="s2">&#34;hello world2&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="nb">print</span><span class="p">(</span><span class="s2">&#34;hello world3&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="nb">print</span><span class="p">(</span><span class="s2">&#34;hello world4&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="nb">print</span><span class="p">(</span><span class="s2">&#34;hello world5&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="nb">print</span><span class="p">(</span><span class="s2">&#34;hello world6&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="nb">print</span><span class="p">(</span><span class="s2">&#34;hello world7&#34;</span><span class="p">)</span>
+</span></span></code></pre></div><p>我们要删除第三到第5行范围内的文本，就可以输入 <code>:3,5d</code>, 其中<code>d</code> 代表 <code>delete</code> 是删除的命令
+<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://img-blog.csdnimg.cn/9fe4280eb4784ecbbac9192058f95c3b.gif#pic_center"
+        data-srcset="https://img-blog.csdnimg.cn/9fe4280eb4784ecbbac9192058f95c3b.gif#pic_center, https://img-blog.csdnimg.cn/9fe4280eb4784ecbbac9192058f95c3b.gif#pic_center 1.5x, https://img-blog.csdnimg.cn/9fe4280eb4784ecbbac9192058f95c3b.gif#pic_center 2x"
+        data-sizes="auto"
+        alt="https://img-blog.csdnimg.cn/9fe4280eb4784ecbbac9192058f95c3b.gif#pic_center"
+        title="使用范围" />
+通过上述例子发现，在使用命令模式的时候，不需要在意光标所在位置，如果我们采用普通模式的解法，就需要先使用 <code>3gg</code> 跳转到第三行，然后使用<code>3dd</code> 删除三行。或者在第三行使用<code>V</code> 进入可视模式，然后选中3行，接着使用<code>d</code> 删除选中。对比这么几种方式来看，使用命令模式更加的灵活</p>
+<h3 id="使用特殊符号代表对应行">使用特殊符号代表对应行</h3>
+<p>除了使用数字来代表对应行号所在行外，还是使用一些特殊符号来表达一些特殊含义，例如我们可以使用 <code>.</code> 来代表当前光标所在行，所以针对上述操作，我们还有一个解法：使用<code>3gg</code> 跳转到第三行，然后使用 <code>:.,5d</code> 删除当前行到第5行的内容</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://img-blog.csdnimg.cn/c31fa7c85d3d41569336a60d0406e43b.gif#pic_center"
+        data-srcset="https://img-blog.csdnimg.cn/c31fa7c85d3d41569336a60d0406e43b.gif#pic_center, https://img-blog.csdnimg.cn/c31fa7c85d3d41569336a60d0406e43b.gif#pic_center 1.5x, https://img-blog.csdnimg.cn/c31fa7c85d3d41569336a60d0406e43b.gif#pic_center 2x"
+        data-sizes="auto"
+        alt="https://img-blog.csdnimg.cn/c31fa7c85d3d41569336a60d0406e43b.gif#pic_center"
+        title="使用特殊符号" />
+除了使用<code>.</code> 来作为相对行号以外，命令模式中还有其他常用符号，这里列举一些供大家参考:</p>
+<ul>
+<li><code>.</code>:  当前行</li>
+<li><code>$</code>: 文件末尾</li>
+<li><code>0</code>: 虚拟行，位于文件第一行的上方</li>
+<li><code>1</code>: 文件第一行</li>
+<li><code>'m</code>: 包含标记m的行</li>
+<li><code>&lt;</code>: 高亮选区的起始行</li>
+<li><code>&gt;</code>: 高亮选区的结尾行</li>
+<li><code>%</code>: 整个文件，相当于 <code>:1,$</code></li>
+</ul>
+<p>介绍了这些操作符之后，如果我们需要删除整个文件，那么有这么几种方法</p>
+<ul>
+<li>方法1：普通模式下，使用 <code>0</code> 跳转到第一行, 然后使用<code>dG</code> 第一行到最后一行的内容</li>
+<li>方法2: 命令模式下，使用 <code>:1,$d</code> 删除第一行到最后一行的内容</li>
+<li>方法3: 命令模式下，使用 <code>:%d</code> 删除所有</li>
+</ul>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://img-blog.csdnimg.cn/ecb84694ffc949a5aa80b71eecaa2319.gif#pic_center"
+        data-srcset="https://img-blog.csdnimg.cn/ecb84694ffc949a5aa80b71eecaa2319.gif#pic_center, https://img-blog.csdnimg.cn/ecb84694ffc949a5aa80b71eecaa2319.gif#pic_center 1.5x, https://img-blog.csdnimg.cn/ecb84694ffc949a5aa80b71eecaa2319.gif#pic_center 2x"
+        data-sizes="auto"
+        alt="https://img-blog.csdnimg.cn/ecb84694ffc949a5aa80b71eecaa2319.gif#pic_center"
+        title="删除整个文件内容" /></p>
+<h3 id="使用位置偏移量来微调操作范围">使用位置偏移量来微调操作范围</h3>
+<p>在 <code>{startpoint}, {endpoint}</code> 中二者均为绝对地址，除了使用绝对地址，我们也可以使用绝对地址+偏移地址的方式来定义操作范围。</p>
+<p>可以在绝对地址上使用 <code>+</code> 或者 <code>-</code> 来定义如何进行偏移，例如 <code>$-3</code> 会定位到导数第4行。</p>
+<p>假设我有超过1000行的文本，我想保留前3行和后3行，使用命令的时候可以使用<code>:4,$-3d</code>
+<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://img-blog.csdnimg.cn/90527e4de0294e7786e1503d08cb7691.gif#pic_center"
+        data-srcset="https://img-blog.csdnimg.cn/90527e4de0294e7786e1503d08cb7691.gif#pic_center, https://img-blog.csdnimg.cn/90527e4de0294e7786e1503d08cb7691.gif#pic_center 1.5x, https://img-blog.csdnimg.cn/90527e4de0294e7786e1503d08cb7691.gif#pic_center 2x"
+        data-sizes="auto"
+        alt="https://img-blog.csdnimg.cn/90527e4de0294e7786e1503d08cb7691.gif#pic_center"
+        title="配合偏移量使用" /></p>
+<h3 id="将可视模式的选区作为操作范围">将可视模式的选区作为操作范围</h3>
+<p>手动指定范围的时候，有时候需要我们去手工数开始行号和结尾行号，数数也算是一个比较累的体力活。除了使用之前的方式外，还可以使用可视模式。将可视模式的选区作为操作区。</p>
+<p>我们还是来看上面的删除第一行到第5行的例子，配合可视模式就可以这么做：先使用<code>V</code> 进入可视模式，然后使用 <code>2j</code> 选中两行，然后输入<code>:d</code> 进行删除</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://img-blog.csdnimg.cn/cfde7f8d59c249cfb3f898c6b179ab7f.gif#pic_center"
+        data-srcset="https://img-blog.csdnimg.cn/cfde7f8d59c249cfb3f898c6b179ab7f.gif#pic_center, https://img-blog.csdnimg.cn/cfde7f8d59c249cfb3f898c6b179ab7f.gif#pic_center 1.5x, https://img-blog.csdnimg.cn/cfde7f8d59c249cfb3f898c6b179ab7f.gif#pic_center 2x"
+        data-sizes="auto"
+        alt="https://img-blog.csdnimg.cn/cfde7f8d59c249cfb3f898c6b179ab7f.gif#pic_center"
+        title="配合可视模式" />
+我们发现在选中一个选区后，按下<code>:</code> ，在左下角会出现 <code>&lt;,&gt;</code> 的字样，根据前面的列表知道 他们代表的是被选中的高亮选区。</p>
+<h2 id="其他操作文本的命令">其他操作文本的命令</h2>
+<p>在上面的例子中，我们主要使用了 <code>d</code> 这个命令来删除文本，除了它还有其他一些处理文本的命令，每个类型的命令接收的参数都各有千秋，但是也很好理解，这里我以 <code>t</code> (拷贝粘贴) 和 <code>m</code> （移动）为例，希望可以做到抛砖引玉的作用，帮助大家理解其他一些常用的命令。</p>
+<h3 id="使用t-命令">使用<code>t</code> 命令</h3>
+<p><code>t</code> 命令代表拷贝和粘贴，可以理解为 <code>CopyTo</code>。它需要两个参数，一个范围代表拷贝哪个范围的文本，一个位置，代表要将拷贝的内容放置在哪个位置。它的形式如下:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="cl">:range + t + address
+</span></span></code></pre></div><p>第一个<code>range</code> 代表的是范围，要将哪个范围内的文本进行粘贴，第二个<code>address</code> 代表的是一个行号，要将粘贴的内容放置到哪个位置</p>
+<p>这里我们给出一个示例来说明如何使用</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="cl">今日完成工作情况
+</span></span><span class="line"><span class="cl">	1. fixbug 1
+</span></span><span class="line"><span class="cl">	2. fixbug2
+</span></span><span class="line"><span class="cl">	3. fixbug3
+</span></span><span class="line"><span class="cl">	4. fixbug4
+</span></span><span class="line"><span class="cl">明日计划
+</span></span><span class="line"><span class="cl">	5. fixbug5
+</span></span><span class="line"><span class="cl">	6. fixbug6
+</span></span><span class="line"><span class="cl">	7. fixbug7
+</span></span></code></pre></div><p>假设有这么一个日报，但是我今日工作完成之后发现离下班还有点时间，为了获得内卷达人的称号，我决定先看看明天的 bug5但是又不想为此加班太多，只是简单的看看，然后在工作日报上进行汇报，也就是说我要将<code>fixbug5</code> 复制一份放到今天的任务中。我们可以使用 <code>:7t5</code> 来将第7行的内容复制到第5行下方
+<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://img-blog.csdnimg.cn/fa6b39b186954b6e9ef517dbdeca7ac1.gif#pic_center"
+        data-srcset="https://img-blog.csdnimg.cn/fa6b39b186954b6e9ef517dbdeca7ac1.gif#pic_center, https://img-blog.csdnimg.cn/fa6b39b186954b6e9ef517dbdeca7ac1.gif#pic_center 1.5x, https://img-blog.csdnimg.cn/fa6b39b186954b6e9ef517dbdeca7ac1.gif#pic_center 2x"
+        data-sizes="auto"
+        alt="https://img-blog.csdnimg.cn/fa6b39b186954b6e9ef517dbdeca7ac1.gif#pic_center"
+        title="复制" />
+当然也可以先使用 <code>7gg</code> 跳转到第7行，然后使用 <code>yy</code> 复制该行，接着使用 <code>5gg</code> 跳转到第5行，最后使用<code>p</code> 进行粘贴。对比这种方式使用命令更加简洁，它省略了几次光标跳转的过程。由此看来，在需要大范围操作或者跳转的时候，使用命令会更加简洁也会更加高效</p>
+<p>还是以这个日报为例，随着我不要命的卷，终于在今天把bug5给修复了，虽然拉着其他同事陪我加了“一会班”，但是我超额完成了任务，老板承诺的绩效和年终奖马上要到手了，想想就觉得心里美滋滋，我要把明天修复的bug5提前到今天。想到这里我使用 <code>:7m5</code> 完成这一操作之后，打卡下班，未来可期
+<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://img-blog.csdnimg.cn/32a9e7775fbf4c3082ebdbdd092139d7.gif#pic_center"
+        data-srcset="https://img-blog.csdnimg.cn/32a9e7775fbf4c3082ebdbdd092139d7.gif#pic_center, https://img-blog.csdnimg.cn/32a9e7775fbf4c3082ebdbdd092139d7.gif#pic_center 1.5x, https://img-blog.csdnimg.cn/32a9e7775fbf4c3082ebdbdd092139d7.gif#pic_center 2x"
+        data-sizes="auto"
+        alt="https://img-blog.csdnimg.cn/32a9e7775fbf4c3082ebdbdd092139d7.gif#pic_center"
+        title="移动光标" />
+如果再卷点，我能把明天要修复的bug全都在今天修完了，所以我这个时候想在工作日报中把明日计划工作全部移动到今天来，假设当前光标处于 <code>bug5</code>的位置，我可以执行<code>:.+2,$m.</code>。至此我带着出任总经理，担任CEO，迎娶白富美，走向人生巅峰的美梦沉沉睡去。</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://img-blog.csdnimg.cn/4c3cf91edd4f431c9f20d939015fa352.gif#pic_center"
+        data-srcset="https://img-blog.csdnimg.cn/4c3cf91edd4f431c9f20d939015fa352.gif#pic_center, https://img-blog.csdnimg.cn/4c3cf91edd4f431c9f20d939015fa352.gif#pic_center 1.5x, https://img-blog.csdnimg.cn/4c3cf91edd4f431c9f20d939015fa352.gif#pic_center 2x"
+        data-sizes="auto"
+        alt="https://img-blog.csdnimg.cn/4c3cf91edd4f431c9f20d939015fa352.gif#pic_center"
+        title="移动多行" /></p>
+<h2 id="总结">总结</h2>
+<p>到此为止，这篇文章的内容就完了，最后给大家总结一下主要内容</p>
+<ol>
+<li>命令模式是vim中又一重要的模式，使用率不亚于普通模式</li>
+<li>命令可以配合数字或者其他符号使用，代表将要操作的文本范围</li>
+<li>主要以 <code>t</code> 和 <code>m</code> 命令介绍了操作文本命令的用法</li>
+</ol>
+<p>最后再给出一些命令和范围的总结供大家查阅
+<em>文本操作命令</em></p>
+<table>
+<thead>
+<tr>
+<th>命令</th>
+<th>简写</th>
+<th>用途</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>:[range]delete [x]</td>
+<td>d</td>
+<td>删除指定范围内的行[到寄存器 x 中]</td>
+</tr>
+<tr>
+<td>:[range]yank [x]</td>
+<td>y</td>
+<td>复制指定范围的行[到寄存器 x 中]</td>
+</tr>
+<tr>
+<td>:[line]put [x]</td>
+<td>pu</td>
+<td>在指定行后粘贴寄存器 x 中的内容</td>
+</tr>
+<tr>
+<td>:[range]copy {address}</td>
+<td>t</td>
+<td>把指定范围内的行拷贝到 {address} 所指定的行之下</td>
+</tr>
+<tr>
+<td>:[range]move {address}</td>
+<td>m</td>
+<td>把指定范围内的行移动到 {address} 所指定的行之下</td>
+</tr>
+<tr>
+<td>:[range]join</td>
+<td>j</td>
+<td>连接指定范围内的行</td>
+</tr>
+<tr>
+<td>:[range]normal {commands}</td>
+<td>narm</td>
+<td>对指定范围内的每一行执行普通模式命令 {commands}</td>
+</tr>
+<tr>
+<td>:[range]substitute/{pattern}/ {string}/[flags]</td>
+<td>s</td>
+<td>把指定范围内出现{pattern}的地方替换为{string}</td>
+</tr>
+<tr>
+<td>:[range]global/{pattern}/[cmd]</td>
+<td>g</td>
+<td>对指定范围内匹配{pattern}的所有行，在其上执行Ex 命令{cmd}</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>有些命令暂时还不知道怎么用，不着急，后面说到对应部分，自然会提到的
+<em>范围符号</em></li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>符号</th>
+<th>用途</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>.</code></td>
+<td>当前行</td>
+</tr>
+<tr>
+<td><code>$</code></td>
+<td>文件末尾</td>
+</tr>
+<tr>
+<td><code>0</code></td>
+<td>虚拟行，位于文件第一行的上方</td>
+</tr>
+<tr>
+<td><code>1</code></td>
+<td>文件第一行</td>
+</tr>
+<tr>
+<td><code>'m</code></td>
+<td>包含标记m的行</td>
+</tr>
+<tr>
+<td><code>&lt;</code></td>
+<td>高亮选区的起始行</td>
+</tr>
+<tr>
+<td><code>&gt;</code></td>
+<td>高亮选区的结尾行</td>
+</tr>
+<tr>
+<td><code>%</code></td>
+<td>整个文件，相当于 <code>:1,$</code></td>
+</tr>
+</tbody>
+</table>
+</div><div class="post-footer" id="post-footer">
+    <div class="post-info">
+        <div class="post-info-line">
+            <div class="post-info-mod">
+                <span>Updated on 2022-04-27</span>
+            </div></div>
+        <div class="post-info-line">
+            <div class="post-info-md"></div>
+            <div class="post-info-share">
+                <span><a href="javascript:void(0);" title="Share on Twitter" data-sharer="twitter" data-url="http://HaiLateBoy.github.io/posts/vim-tutorial-9/" data-title="vim 从嫌弃到依赖(8)——使用命令模式编辑文本" data-hashtags="vim,编辑工具,文本处理"><i class="fab fa-twitter fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Facebook" data-sharer="facebook" data-url="http://HaiLateBoy.github.io/posts/vim-tutorial-9/" data-hashtag="vim"><i class="fab fa-facebook-square fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Hacker News" data-sharer="hackernews" data-url="http://HaiLateBoy.github.io/posts/vim-tutorial-9/" data-title="vim 从嫌弃到依赖(8)——使用命令模式编辑文本"><i class="fab fa-hacker-news fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Line" data-sharer="line" data-url="http://HaiLateBoy.github.io/posts/vim-tutorial-9/" data-title="vim 从嫌弃到依赖(8)——使用命令模式编辑文本"><i data-svg-src="https://cdn.jsdelivr.net/npm/simple-icons@7.3.0/icons/line.svg" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on 微博" data-sharer="weibo" data-url="http://HaiLateBoy.github.io/posts/vim-tutorial-9/" data-title="vim 从嫌弃到依赖(8)——使用命令模式编辑文本"><i class="fab fa-weibo fa-fw" aria-hidden="true"></i></a></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="post-info-more">
+        <section class="post-tags"><i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/vim/">vim</a>,&nbsp;<a href="/tags/%E7%BC%96%E8%BE%91%E5%B7%A5%E5%85%B7/">编辑工具</a>,&nbsp;<a href="/tags/%E6%96%87%E6%9C%AC%E5%A4%84%E7%90%86/">文本处理</a></section>
+        <section>
+            <span><a href="javascript:void(0);" onclick="window.history.back();">Back</a></span>&nbsp;|&nbsp;<span><a href="/">Home</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav"><a href="/posts/vim-tutorial-8/" class="prev" rel="prev" title="vim 从嫌弃到依赖(7)——可视模式"><i class="fas fa-angle-left fa-fw" aria-hidden="true"></i>vim 从嫌弃到依赖(7)——可视模式</a>
+            <a href="/posts/vim-tutorial-10/" class="next" rel="next" title="vim 从嫌弃到依赖(9)——命令模式进阶">vim 从嫌弃到依赖(9)——命令模式进阶<i class="fas fa-angle-right fa-fw" aria-hidden="true"></i></a></div>
+</div>
+</article></div>
+            </main><footer class="footer">
+        <div class="footer-container"><div class="footer-line">Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener noreffer" title="Hugo 0.121.2">Hugo</a> | Theme - <a href="https://github.com/dillonzq/LoveIt" target="_blank" rel="noopener noreffer" title="LoveIt 0.2.11"><i class="far fa-kiss-wink-heart fa-fw" aria-hidden="true"></i> LoveIt</a>
+                </div><div class="footer-line" itemscope itemtype="http://schema.org/CreativeWork"><i class="far fa-copyright fa-fw" aria-hidden="true"></i><span itemprop="copyrightYear">2022 - 2024</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="https://www.masimaro.xyz" target="_blank">Masimaro</a></span></div>
+        </div>
+    </footer></div>
+
+        <div id="fixed-buttons"><a href="#" id="back-to-top" class="fixed-button" title="Back to Top">
+                <i class="fas fa-arrow-up fa-fw" aria-hidden="true"></i>
+            </a><a href="#" id="view-comments" class="fixed-button" title="View Comments">
+                <i class="fas fa-comment fa-fw" aria-hidden="true"></i>
+            </a>
+        </div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.css"><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/autocomplete.js@0.38.1/dist/autocomplete.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lunr@2.3.9/lunr.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lazysizes@5.3.2/lazysizes.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/clipboard@2.0.11/dist/clipboard.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/sharer.js@0.5.1/sharer.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/auto-render.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/copy-tex.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/mhchem.min.js"></script><script type="text/javascript">window.config={"code":{"copyTitle":"Copy to clipboard","maxShownLines":50},"comment":{},"math":{"delimiters":[{"display":true,"left":"$$","right":"$$"},{"display":true,"left":"\\[","right":"\\]"},{"display":true,"left":"\\begin{equation}","right":"\\end{equation}"},{"display":true,"left":"\\begin{equation*}","right":"\\end{equation*}"},{"display":true,"left":"\\begin{align}","right":"\\end{align}"},{"display":true,"left":"\\begin{align*}","right":"\\end{align*}"},{"display":true,"left":"\\begin{alignat}","right":"\\end{alignat}"},{"display":true,"left":"\\begin{alignat*}","right":"\\end{alignat*}"},{"display":true,"left":"\\begin{gather}","right":"\\end{gather}"},{"display":true,"left":"\\begin{CD}","right":"\\end{CD}"},{"display":false,"left":"$","right":"$"},{"display":false,"left":"\\(","right":"\\)"}],"strict":false},"search":{"highlightTag":"em","maxResultLength":10,"noResultsFound":"No results found","snippetLength":50}};</script><script type="text/javascript" src="/js/theme.min.js"></script></body>
+</html>

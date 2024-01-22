@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="robots" content="noodp" />
+        <title>VC&#43;&#43; 崩溃处理以及打印调用堆栈 - Masimaro&#39;s blog</title><meta name="Description" content="这是我用于记录日常和学习的小站"><meta property="og:title" content="VC&#43;&#43; 崩溃处理以及打印调用堆栈" />
+<meta property="og:description" content="我们在程序发布后总会面临崩溃的情况，这个时候一般很难重现或者很难定位到程序崩溃的位置，之前有方法在程序崩溃的时候记录dump文件然后通过wi" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://HaiLateBoy.github.io/posts/vc-exception-callstack/" /><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2018-08-28T20:59:54+00:00" />
+<meta property="article:modified_time" content="2018-08-28T20:59:54+00:00" /><meta property="og:site_name" content="Masimaro&#39;s blog" />
+
+<meta name="twitter:card" content="summary"/><meta name="twitter:title" content="VC&#43;&#43; 崩溃处理以及打印调用堆栈"/>
+<meta name="twitter:description" content="我们在程序发布后总会面临崩溃的情况，这个时候一般很难重现或者很难定位到程序崩溃的位置，之前有方法在程序崩溃的时候记录dump文件然后通过wi"/>
+<meta name="application-name" content="My cool site">
+<meta name="apple-mobile-web-app-title" content="My cool site"><meta name="theme-color" content="#ffffff"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="manifest" href="/site.webmanifest"><link rel="canonical" href="http://HaiLateBoy.github.io/posts/vc-exception-callstack/" /><link rel="prev" href="http://HaiLateBoy.github.io/posts/20180819/" /><link rel="next" href="http://HaiLateBoy.github.io/posts/heap-manage/" /><link rel="stylesheet" href="/css/style.min.css"><link rel="preload" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css"></noscript><link rel="preload" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css"></noscript><script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "BlogPosting",
+        "headline": "VC++ 崩溃处理以及打印调用堆栈",
+        "inLanguage": "zh-CN",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "http:\/\/HaiLateBoy.github.io\/posts\/vc-exception-callstack\/"
+        },"genre": "posts","keywords": "VC\u002b\u002b, 结构化异常处理, 崩溃日志记录","wordcount":  4570 ,
+        "url": "http:\/\/HaiLateBoy.github.io\/posts\/vc-exception-callstack\/","datePublished": "2018-08-28T20:59:54+00:00","dateModified": "2018-08-28T20:59:54+00:00","publisher": {
+            "@type": "Organization",
+            "name": ""},"author": {
+                "@type": "Person",
+                "name": "Masimaro"
+            },"description": ""
+    }
+    </script></head>
+    <body data-header-desktop="fixed" data-header-mobile="auto"><script type="text/javascript">(window.localStorage && localStorage.getItem('theme') ? localStorage.getItem('theme') === 'dark' : ('auto' === 'auto' ? window.matchMedia('(prefers-color-scheme: dark)').matches : 'auto' === 'dark')) && document.body.setAttribute('theme', 'dark');</script>
+
+        <div id="mask"></div><div class="wrapper"><header class="desktop" id="header-desktop">
+    <div class="header-wrapper">
+        <div class="header-title">
+            <a href="/" title="Masimaro&#39;s blog">My cool site</a>
+        </div>
+        <div class="menu">
+            <div class="menu-inner"><a class="menu-item" href="/posts/" title="文章列表"> 文章 </a><a class="menu-item" href="/tags/" title="标签"> 标签 </a><a class="menu-item" href="/categories/" title="分类"> 分类 </a><a class="menu-item" href="/about" title="关于本站"> 关于 </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-desktop">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-desktop" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-desktop" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-desktop">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </span><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                    <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+                </a></div>
+        </div>
+    </div>
+</header><header class="mobile" id="header-mobile">
+    <div class="header-container">
+        <div class="header-wrapper">
+            <div class="header-title">
+                <a href="/" title="Masimaro&#39;s blog">My cool site</a>
+            </div>
+            <div class="menu-toggle" id="menu-toggle-mobile">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+        <div class="menu" id="menu-mobile"><div class="search-wrapper">
+                    <div class="search mobile" id="search-mobile">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-mobile">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-mobile" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-mobile" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-mobile">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </div>
+                    <a href="javascript:void(0);" class="search-cancel" id="search-cancel-mobile">
+                        Cancel
+                    </a>
+                </div><a class="menu-item" href="/posts/" title="文章列表">文章</a><a class="menu-item" href="/tags/" title="标签">标签</a><a class="menu-item" href="/categories/" title="分类">分类</a><a class="menu-item" href="/about" title="关于本站">关于</a><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+            </a></div>
+    </div>
+</header><div class="search-dropdown desktop">
+        <div id="search-dropdown-desktop"></div>
+    </div>
+    <div class="search-dropdown mobile">
+        <div id="search-dropdown-mobile"></div>
+    </div><main class="main">
+                <div class="container"><div class="toc" id="toc-auto">
+            <h2 class="toc-title">Contents</h2>
+            <div class="toc-content" id="toc-content-auto"></div>
+        </div><article class="page single"><h1 class="single-title animate__animated animate__flipInX">VC++ 崩溃处理以及打印调用堆栈</h1><div class="post-meta">
+            <div class="post-meta-line"><span class="post-author"><a href="https://www.masimaro.xyz" title="Author" target="_blank" rel="noopener noreffer author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Masimaro</a></span>&nbsp;<span class="post-category">included in <a href="/categories/windows-%E9%AB%98%E7%BA%A7%E7%BC%96%E7%A8%8B/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>Windows 高级编程</a></span></div>
+            <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw" aria-hidden="true"></i>&nbsp;<time datetime="2018-08-28">2018-08-28</time>&nbsp;<i class="fas fa-pencil-alt fa-fw" aria-hidden="true"></i>&nbsp;4570 words&nbsp;
+                <i class="far fa-clock fa-fw" aria-hidden="true"></i>&nbsp;10 minutes&nbsp;</div>
+        </div><div class="details toc" id="toc-static"  data-kept="true">
+                <div class="details-summary toc-title">
+                    <span>Contents</span>
+                    <span><i class="details-icon fas fa-angle-right" aria-hidden="true"></i></span>
+                </div>
+                <div class="details-content toc-content" id="toc-content-static"><nav id="TableOfContents">
+  <ul>
+    <li><a href="#异常处理">异常处理</a></li>
+    <li><a href="#打印函数调用堆栈">打印函数调用堆栈</a></li>
+    <li><a href="#实现">实现</a>
+      <ul>
+        <li><a href="#cbaseexception-类">CBaseException 类</a></li>
+        <li><a href="#cstackwalker类">CStackWalker类</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav></div>
+            </div><div class="content" id="content"><p>我们在程序发布后总会面临崩溃的情况，这个时候一般很难重现或者很难定位到程序崩溃的位置，之前有方法在程序崩溃的时候记录dump文件然后通过windbg来分析。那种方法对开发人员的要求较高，它需要程序员理解内存、寄存器等等一系列概念还需要手动加载对应的符号表。Java、Python等等语言在崩溃的时候都会打印一条异常的堆栈信息并告诉用户那块出错了，根据这个信息程序员可以很容易找到对应的代码位置并进行处理，而C/C++则会弹出一个框告诉用户程序崩溃了，二者对比来看，C++似乎对用户太不友好了，而且根据它的弹框很难找到对应的问题，那么有没有可能使c++像Java那样打印异常的堆栈呢？这个自然是可能的，本文就是要讨论如何在Windows上实现类似的功能</p>
+<!-- raw HTML omitted -->
+<h2 id="异常处理">异常处理</h2>
+<p>一般当程序发生异常时，用户代码停止执行，并将CPU的控制权转交给操作系统，操作系统接到控制权后，将当前线程的环境保存到结构体CONTEXT中，然后查找针对此异常的处理函数。系统利用结构EXCEPTION_RECORD保存了异常描述信息，它与CONTEXT一同构成了结构体EXCEPTION_POINTERS，一般在异常处理中经常使用这个结构体。
+异常信息EXCEPTION_RECORD的定义如下：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="k">typedef</span> <span class="k">struct</span> <span class="nc">_EXCEPTION_RECORD</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">   <span class="n">DWORD</span> <span class="n">ExceptionCode</span><span class="p">;</span>  <span class="c1">//异常码
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>   <span class="n">DWORD</span> <span class="n">ExceptionFlags</span><span class="p">;</span>  <span class="c1">//标志异常是否继续，标志异常处理完成后是否接着之前有问题的代码
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>   <span class="k">struct</span> <span class="nc">_EXCEPTION_RECORD</span><span class="o">*</span> <span class="n">ExceptionRecord</span><span class="p">;</span> <span class="c1">//指向下一个异常节点的指针，这是一个链表结构
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>   <span class="n">PVOID</span> <span class="n">ExceptionAddress</span><span class="p">;</span> <span class="c1">//异常发生的地址
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>   <span class="n">DWORD</span> <span class="n">NumberParameters</span><span class="p">;</span> <span class="c1">//异常附加信息
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>   <span class="n">ULONG_PTR</span> <span class="n">ExceptionInformation</span><span class="p">[</span><span class="n">EXCEPTION_MAXIMUM_PARAMETERS</span><span class="p">];</span> <span class="c1">//异常的字符串
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">}</span> <span class="n">EXCEPTION_RECORD</span><span class="p">,</span>  <span class="o">*</span><span class="n">PEXCEPTION_RECORD</span><span class="p">;</span>
+</span></span></code></pre></div><p>Windows平台提供的这一套异常处理的机制，我们叫它结构化异常处理(SEH)，它的处理过程一般如下:</p>
+<ol>
+<li>如果程序是被调试运行的（比如我们在VS编译器中调试运行程序），当异常发生时，系统首先将异常信息交给调试程序，如果调试程序处理了那么程序继续运行，否则系统便在发生异常的线程栈中查找可能的处理代码。若找到则处理异常，并继续运行程序</li>
+<li>如果在线程栈中没有找到，则再次通知调试程序，如果这个时候仍然不能处理这个异常，那么操作系统会对异常进程默认处理，这个时候一般都是直接弹出一个错误的对话框然后终止程序。</li>
+</ol>
+<p>系统在每个线程的堆栈环境中都维护了一个SEH表，表中是用户注册的异常类型以及它对应的处理函数，每当用户在函数中注册新的异常处理函数，那么这个信息会被保存在链表的头部，也就是说它是采用头插法来插入新的处理函数，从这个角度上来说，我们可以很容易理解为什么在一般的高级语言中一般会先找与try块最近的catch块，然后在找它的上层catch，由里到外依次查找。与try块最近的catch是最后注册的，由于采用的是头插法，自然它会被首先处理。</p>
+<p>在Windows中针对异常处理，扩展了<code>__try</code> 和 <code>__except</code> 两个操作符，这两个操作符与c++中的try和catch非常相似,作用也基本类似，它的一般的语法结构如下:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="kr">__try</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="c1">//do something
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="kr">__except</span><span class="p">(</span><span class="n">filter</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="c1">//handle
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">}</span>
+</span></span></code></pre></div><p>使用 <code>__try</code> 和 <code>__except</code> 的时候它主要分为3个部分，分别为:保护代码体、过滤表达式、异常处理块</p>
+<ol>
+<li>保护代码体一般是try中的语句，它值被保护的代码，也就是说我们希望处理那个代码块产生的异常</li>
+<li>过滤表达式是 except后面扩号中的值，它只能是3个值中的一个，EXCEPTION_CONTINUE_SEARCH继续向下查找异常处理，也就是说这里的异常处理块不处理这种异常，EXCEPTION_CONTINUE_EXECUTION表示异常已被处理，这个时候可以继续执行直线产生异常的代码，EXCEPTION_EXECUTE_HANDLER表示异常已被处理，此时直接跳转到except里面的代码块中，这种方式下它的执行流程与一般的异常处理的流程类似.</li>
+<li>异常处理块，指的是except下面的扩号中的代码块.</li>
+</ol>
+<p>注意：我们说过滤表达式只能是这三个值中的一个，但是没有说这里一定得填这三个值，它还支持函数或者其他的表达式类型，只要函数或者表达式的返回值是这三个值中的一个即可。</p>
+<p>上述的方式也有他的局限性，也就是说它只能保护我们指定的代码，如果是在 <code>__try</code> 块之外的代码发生了崩溃，可能还是会造成程序被kill掉，而且每个位置都需要写上这么些代码实在是太麻烦了。其实处理异常还有一种方式，那就是采用 <code>SetUnhandledExceptionFilter</code>来注册一个全局的异常处理函数来处理所有未被处理的异常，其实它的主要工作原理就是往异常处理的链表头上添加一个处理函数，函数的原型如下:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="n">LPTOP_LEVEL_EXCEPTION_FILTER</span> <span class="n">WINAPI</span> <span class="nf">SetUnhandledExceptionFilter</span><span class="p">(</span><span class="n">__in</span>  <span class="n">LPTOP_LEVEL_EXCEPTION_FILTER</span> <span class="n">lpTopLevelExceptionFilter</span><span class="p">);</span>
+</span></span></code></pre></div><p>它需要传入一个函数，以便发生异常的时候调用这个函数，这个回调函数的原型如下:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="n">LONG</span> <span class="n">WINAPI</span> <span class="nf">UnhandledExceptionFilter</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">  <span class="n">__in</span>  <span class="k">struct</span> <span class="nc">_EXCEPTION_POINTERS</span><span class="o">*</span> <span class="n">ExceptionInfo</span>
+</span></span><span class="line"><span class="cl"><span class="p">);</span>
+</span></span></code></pre></div><p>回调函数会传入一个表示当前堆栈和异常信息的结构体的指针，结构的具体信息请参考MSDN, 函数会返回一个long型的数值，这个数值为上述3个值中的一个，表示当系统调用了这个异常处理函数处理异常之后该如何继续执行用户代码。</p>
+<p><code>SetUnhandledExceptionFilter</code> 函数返回一个函数指针，这个指针指向链表的头部，如果插入处理函数失败那么它将指向原来的链表头，否则指向新的链表头(也就是注册的这个回调函数的地址)</p>
+<p>而这次要实现这么一个能打印异常信息和调用堆栈的功能就是要使用这个方法。</p>
+<h2 id="打印函数调用堆栈">打印函数调用堆栈</h2>
+<p>关于打印堆栈的内容，这里不再多说了，请参考本人之前写的博客
+<a href="https://blog.csdn.net/lanuage/article/details/52203447" target="_blank" rel="noopener noreffer ">windows平台调用函数堆栈的追踪方法</a>
+这里的主要思路是使用StackWalker来根据当前的堆栈环境来获取对应的函数信息，这个信息需要根据符号表来生成，因此我们需要首先加载符号表，而获取当前线程的环境，我们可以像我博客中写的那样使用GetThreadContext来获取，但是在异常中就简单的多了，还记得异常处理函数的原型吗？异常处理函数本身会带入一个EXCEPTION_POINTERS结构的指针，而这个结构中就包含了异常堆栈的信息。</p>
+<p>还有一些需要注意的问题，我把它放到实现那块了，请小心的往下看^_^</p>
+<h2 id="实现">实现</h2>
+<p>实现部分的源码我放到了github上，<a href="https://github.com/aMonst/RptCrash.git" target="_blank" rel="noopener noreffer ">地址</a></p>
+<p>这个项目中主要分为两个类CBaseException，主要是对异常的一个简单的封装，提供了我们需要的一些功能，比如获取加载的模块的信息，获取调用的堆栈，以及解析发生异常时的相关信息。而这些的基础都在CStackWalker中。
+使用上，我把CBaseException中的大部分函数都定义成了virtual 允许进行重写。因为具体我还没想好这块后续会需要进行哪些扩展。但是里面最主要的功能是OutputString函数，这个函数是用来进行信息输出的，默认CBaseException是将信息输出到控制台上，后续可以重载这个函数把数据输出到日志中。</p>
+<h3 id="cbaseexception-类">CBaseException 类</h3>
+<p>CBaseException 主要是用来处理异常，在代码里面我提供了两种方式来进行异常处理，第一种是通过 <code>SetUnhandledExceptionFilter</code> 来注册一个全局的处理函数，这个函数是类中的静态函数UnhandledExceptionFilter，在这个函数中我主要根据异常的堆栈环境来初始化了一个CBaseException类，然后简单的调用类的方法显示异常与堆栈的相关信息。第二种是通过 <code>_set_se_translator</code> 来注册一个将SEH转化为C++异常的方法，在对应的回调中我简单的抛出了一个CBaseException的异常，在具体的代码中只要简单的用c++的异常处理捕获这么一个异常即可</p>
+<p>CBaseException 类中主要用来解析异常的信息，里面提供这样功能的函数主要有3个</p>
+<ol>
+<li>ShowExceptionResoult: 这个函数主要是根据异常码来获取到异常的具体字符串信息，比如非法内存访问、除0异常等等</li>
+<li>GetLogicalAddress：根据发生异常的代码的地址来获取对应的模块信息，比如它在PE文件中属于第几个节，节的地址范围等等，它在实现上首先使用 VirtualQuery来获取对应的虚拟内存信息，主要是这个模块的首地址信息，然后解析PE文件获取节表的信息，我们循环节表中的每一项，根据节表中的地址范围来判断它属于第几个节，注意这里我们根据它在内存中的偏移计算了它在PE文件中的偏移，具体的计算方式请参考PE文件的相关内容.
+3.ShowRegistorInformation：获取各个寄存器的值，这个值保存在CONTEXT结构中，我们只需要简单打印它就好</li>
+</ol>
+<h3 id="cstackwalker类">CStackWalker类</h3>
+<p>这个类主要实现一些基础的功能，它主要提供了初始化符号表环境、获取对应的调用堆栈信息、获取加载的模块信息
+在初始化符号表的时候尽可以多的遍历了常见的几种符号表的位置并将这些位置中的符号表加载进来，以便能更好的获取到堆栈调用的情况。在获取到对应的符号表位置后有这样的代码</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="k">if</span> <span class="p">(</span><span class="nb">NULL</span> <span class="o">!=</span> <span class="n">m_lpszSymbolPath</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="n">m_bSymbolLoaded</span> <span class="o">=</span> <span class="n">SymInitialize</span><span class="p">(</span><span class="n">m_hProcess</span><span class="p">,</span> <span class="n">T2A</span><span class="p">(</span><span class="n">m_lpszSymbolPath</span><span class="p">),</span> <span class="n">TRUE</span><span class="p">);</span> <span class="c1">//这里设置为TRUE，让它在初始化符号表的同时加载符号表
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">DWORD</span> <span class="n">symOptions</span> <span class="o">=</span> <span class="n">SymGetOptions</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl"><span class="n">symOptions</span> <span class="o">|=</span> <span class="n">SYMOPT_LOAD_LINES</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="n">symOptions</span> <span class="o">|=</span> <span class="n">SYMOPT_FAIL_CRITICAL_ERRORS</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="n">symOptions</span> <span class="o">|=</span> <span class="n">SYMOPT_DEBUG</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="n">SymSetOptions</span><span class="p">(</span><span class="n">symOptions</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">return</span> <span class="n">m_bSymbolLoaded</span><span class="p">;</span>
+</span></span></code></pre></div><p>这里将 SymInitialize的最后一个函数置为TRUE，这个参数的意思是是否枚举加载的模块并加载对应的符号表，直接在开始的时候加载上可能会比较浪费内存，这个时候我们可以采用动态加载的方式，在初始化的时候先填入FALSE，然后在需要的时候自己枚举所有的模块，然后手动加载所有模块的符号表，手动加载需要调用SymLoadModuleEx。这里需要提醒各位的是，这里如果填的是FALSE的话，后续一定得自己加载模块的符号表，否则在后续调用SymGetSymFromAddr64的时候会得到一堆的487错误（也就是地址无效）
+我之前就是这个问题困扰了我很久的时间。</p>
+<p>在获取模块的信息时主要提供了两种方式，一种是使用CreateToolhelp32Snapshot 函数来获取进程中模块信息的快照然后调用Module32Next 和 Module32First来枚举模块信息，还有一种是使用EnumProcessModules来获取所有模块的句柄，然后根据句柄来获取模块的信息，当然还有另外的方式，其他的方式可以参考我的这篇博客 <a href="https://blog.csdn.net/lanuage/article/details/72331277" target="_blank" rel="noopener noreffer ">枚举进程中的模块</a></p>
+<p>在枚举加载的模块的同时还针对每个模块调用了 <code>GetModuleInformation</code> 函数，这个函数主要有两个功能，获取模块文件的版本号和获取加载的符号表信息。</p>
+<p>接下来就是重头戏了——获取调用堆栈。获取调用堆栈首先得获取当前的环境，在代码中进行了相应的判断，如果当前传入的CONTEXT为NULL，则函数自己获取当前的堆栈信息。在获取堆栈信息的时候首先判断是否为当前线程，如果不是那么为了结果准确，需要先停止目标线程，然后获取，否则直接使用宏来获取，对应的宏定义如下:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="cp">#define GET_CURRENT_THREAD_CONTEXT(c, contextFlags) \
+</span></span></span><span class="line"><span class="cl"><span class="cp">	do\
+</span></span></span><span class="line"><span class="cl"><span class="cp">	{\
+</span></span></span><span class="line"><span class="cl"><span class="cp">		memset(&amp;c, 0, sizeof(CONTEXT));\
+</span></span></span><span class="line"><span class="cl"><span class="cp">		c.ContextFlags = contextFlags;\
+</span></span></span><span class="line"><span class="cl"><span class="cp">		__asm    call $+5\
+</span></span></span><span class="line"><span class="cl"><span class="cp">		__asm    pop eax\
+</span></span></span><span class="line"><span class="cl"><span class="cp">		__asm    mov c.Eip, eax\
+</span></span></span><span class="line"><span class="cl"><span class="cp">		__asm    mov c.Ebp, ebp\
+</span></span></span><span class="line"><span class="cl"><span class="cp">		__asm    mov c.Esp, esp\
+</span></span></span><span class="line"><span class="cl"><span class="cp">} while (0)
+</span></span></span></code></pre></div><p>在调用StackWalker时只需要关注esp ebp eip的信息，所以这里我们也只简单的获取这些寄存器的环境，而其他的就不管了。这样有一个问题，就是我们是在CStackWalker类中的函数中获取的这个线程环境，那么这个环境里面会包含CStackWalker::StackWalker，结果自然与我们想要的不太一样（我们想要的是隐藏这个库中的相关信息，而只保留调用者的相关堆栈信息）。这个问题我还没有什么好的解决方案。</p>
+<p>在获取到线程环境后就是简单的调用StackWalker以及那堆Sym开头的函数来获取各种信息了，这里就不再详细说明了。</p>
+<p>至此这个功能已经实现的差不多了。库的具体使用请参考main.cpp这个文件，相信有这篇博文以及源码各位应该很容易就能够使用它。</p>
+<p>据说这些函数不是多线程安全的，我自己没有在多线程环境下进行测试，所以具体它在多线程环境下表现如何还是个未知数，如果后续我有兴趣继续完善它的话，可能会加入多线程的支持。</p>
+<!-- raw HTML omitted -->
+</div><div class="post-footer" id="post-footer">
+    <div class="post-info">
+        <div class="post-info-line">
+            <div class="post-info-mod">
+                <span>Updated on 2018-08-28</span>
+            </div></div>
+        <div class="post-info-line">
+            <div class="post-info-md"></div>
+            <div class="post-info-share">
+                <span><a href="javascript:void(0);" title="Share on Twitter" data-sharer="twitter" data-url="http://HaiLateBoy.github.io/posts/vc-exception-callstack/" data-title="VC&#43;&#43; 崩溃处理以及打印调用堆栈" data-hashtags="VC&#43;&#43;,结构化异常处理,崩溃日志记录"><i class="fab fa-twitter fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Facebook" data-sharer="facebook" data-url="http://HaiLateBoy.github.io/posts/vc-exception-callstack/" data-hashtag="VC&#43;&#43;"><i class="fab fa-facebook-square fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Hacker News" data-sharer="hackernews" data-url="http://HaiLateBoy.github.io/posts/vc-exception-callstack/" data-title="VC&#43;&#43; 崩溃处理以及打印调用堆栈"><i class="fab fa-hacker-news fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Line" data-sharer="line" data-url="http://HaiLateBoy.github.io/posts/vc-exception-callstack/" data-title="VC&#43;&#43; 崩溃处理以及打印调用堆栈"><i data-svg-src="https://cdn.jsdelivr.net/npm/simple-icons@7.3.0/icons/line.svg" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on 微博" data-sharer="weibo" data-url="http://HaiLateBoy.github.io/posts/vc-exception-callstack/" data-title="VC&#43;&#43; 崩溃处理以及打印调用堆栈"><i class="fab fa-weibo fa-fw" aria-hidden="true"></i></a></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="post-info-more">
+        <section class="post-tags"><i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/vc&#43;&#43;/">VC&#43;&#43;</a>,&nbsp;<a href="/tags/%E7%BB%93%E6%9E%84%E5%8C%96%E5%BC%82%E5%B8%B8%E5%A4%84%E7%90%86/">结构化异常处理</a>,&nbsp;<a href="/tags/%E5%B4%A9%E6%BA%83%E6%97%A5%E5%BF%97%E8%AE%B0%E5%BD%95/">崩溃日志记录</a></section>
+        <section>
+            <span><a href="javascript:void(0);" onclick="window.history.back();">Back</a></span>&nbsp;|&nbsp;<span><a href="/">Home</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav"><a href="/posts/20180819/" class="prev" rel="prev" title="毕业两年的反思"><i class="fas fa-angle-left fa-fw" aria-hidden="true"></i>毕业两年的反思</a>
+            <a href="/posts/heap-manage/" class="next" rel="next" title="C 堆内存管理">C 堆内存管理<i class="fas fa-angle-right fa-fw" aria-hidden="true"></i></a></div>
+</div>
+</article></div>
+            </main><footer class="footer">
+        <div class="footer-container"><div class="footer-line">Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener noreffer" title="Hugo 0.121.2">Hugo</a> | Theme - <a href="https://github.com/dillonzq/LoveIt" target="_blank" rel="noopener noreffer" title="LoveIt 0.2.11"><i class="far fa-kiss-wink-heart fa-fw" aria-hidden="true"></i> LoveIt</a>
+                </div><div class="footer-line" itemscope itemtype="http://schema.org/CreativeWork"><i class="far fa-copyright fa-fw" aria-hidden="true"></i><span itemprop="copyrightYear">2022 - 2024</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="https://www.masimaro.xyz" target="_blank">Masimaro</a></span></div>
+        </div>
+    </footer></div>
+
+        <div id="fixed-buttons"><a href="#" id="back-to-top" class="fixed-button" title="Back to Top">
+                <i class="fas fa-arrow-up fa-fw" aria-hidden="true"></i>
+            </a><a href="#" id="view-comments" class="fixed-button" title="View Comments">
+                <i class="fas fa-comment fa-fw" aria-hidden="true"></i>
+            </a>
+        </div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.css"><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/autocomplete.js@0.38.1/dist/autocomplete.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lunr@2.3.9/lunr.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lazysizes@5.3.2/lazysizes.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/clipboard@2.0.11/dist/clipboard.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/sharer.js@0.5.1/sharer.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/auto-render.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/copy-tex.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/mhchem.min.js"></script><script type="text/javascript">window.config={"code":{"copyTitle":"Copy to clipboard","maxShownLines":50},"comment":{},"math":{"delimiters":[{"display":true,"left":"$$","right":"$$"},{"display":true,"left":"\\[","right":"\\]"},{"display":true,"left":"\\begin{equation}","right":"\\end{equation}"},{"display":true,"left":"\\begin{equation*}","right":"\\end{equation*}"},{"display":true,"left":"\\begin{align}","right":"\\end{align}"},{"display":true,"left":"\\begin{align*}","right":"\\end{align*}"},{"display":true,"left":"\\begin{alignat}","right":"\\end{alignat}"},{"display":true,"left":"\\begin{alignat*}","right":"\\end{alignat*}"},{"display":true,"left":"\\begin{gather}","right":"\\end{gather}"},{"display":true,"left":"\\begin{CD}","right":"\\end{CD}"},{"display":false,"left":"$","right":"$"},{"display":false,"left":"\\(","right":"\\)"}],"strict":false},"search":{"highlightTag":"em","maxResultLength":10,"noResultsFound":"No results found","snippetLength":50}};</script><script type="text/javascript" src="/js/theme.min.js"></script></body>
+</html>

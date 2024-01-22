@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="robots" content="noodp" />
+        <title>WinSock WSAEventSelect 模型 - Masimaro&#39;s blog</title><meta name="Description" content="这是我用于记录日常和学习的小站"><meta property="og:title" content="WinSock WSAEventSelect 模型" />
+<meta property="og:description" content="在前面我们说了WSAAsyncSelect 模型，它相比于select模型来说提供了这样一种机制：当发生对应的IO通知时会立即通知操作系统，并" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://HaiLateBoy.github.io/posts/winsock-wsaeventselect/" /><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2018-06-23T10:48:36+00:00" />
+<meta property="article:modified_time" content="2018-06-23T10:48:36+00:00" /><meta property="og:site_name" content="Masimaro&#39;s blog" />
+
+<meta name="twitter:card" content="summary"/><meta name="twitter:title" content="WinSock WSAEventSelect 模型"/>
+<meta name="twitter:description" content="在前面我们说了WSAAsyncSelect 模型，它相比于select模型来说提供了这样一种机制：当发生对应的IO通知时会立即通知操作系统，并"/>
+<meta name="application-name" content="My cool site">
+<meta name="apple-mobile-web-app-title" content="My cool site"><meta name="theme-color" content="#ffffff"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="manifest" href="/site.webmanifest"><link rel="canonical" href="http://HaiLateBoy.github.io/posts/winsock-wsaeventselect/" /><link rel="prev" href="http://HaiLateBoy.github.io/posts/why-c-has-head-file/" /><link rel="next" href="http://HaiLateBoy.github.io/posts/winsock-overlapped/" /><link rel="stylesheet" href="/css/style.min.css"><link rel="preload" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css"></noscript><link rel="preload" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css"></noscript><script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "BlogPosting",
+        "headline": "WinSock WSAEventSelect 模型",
+        "inLanguage": "zh-CN",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "http:\/\/HaiLateBoy.github.io\/posts\/winsock-wsaeventselect\/"
+        },"genre": "posts","keywords": "WinSock, 网络编程, WinSock2.0 API, 动态加载, WinSock 异步函数","wordcount":  2804 ,
+        "url": "http:\/\/HaiLateBoy.github.io\/posts\/winsock-wsaeventselect\/","datePublished": "2018-06-23T10:48:36+00:00","dateModified": "2018-06-23T10:48:36+00:00","publisher": {
+            "@type": "Organization",
+            "name": ""},"author": {
+                "@type": "Person",
+                "name": "Masimaro"
+            },"description": ""
+    }
+    </script></head>
+    <body data-header-desktop="fixed" data-header-mobile="auto"><script type="text/javascript">(window.localStorage && localStorage.getItem('theme') ? localStorage.getItem('theme') === 'dark' : ('auto' === 'auto' ? window.matchMedia('(prefers-color-scheme: dark)').matches : 'auto' === 'dark')) && document.body.setAttribute('theme', 'dark');</script>
+
+        <div id="mask"></div><div class="wrapper"><header class="desktop" id="header-desktop">
+    <div class="header-wrapper">
+        <div class="header-title">
+            <a href="/" title="Masimaro&#39;s blog">My cool site</a>
+        </div>
+        <div class="menu">
+            <div class="menu-inner"><a class="menu-item" href="/posts/" title="文章列表"> 文章 </a><a class="menu-item" href="/tags/" title="标签"> 标签 </a><a class="menu-item" href="/categories/" title="分类"> 分类 </a><a class="menu-item" href="/about" title="关于本站"> 关于 </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-desktop">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-desktop" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-desktop" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-desktop">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </span><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                    <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+                </a></div>
+        </div>
+    </div>
+</header><header class="mobile" id="header-mobile">
+    <div class="header-container">
+        <div class="header-wrapper">
+            <div class="header-title">
+                <a href="/" title="Masimaro&#39;s blog">My cool site</a>
+            </div>
+            <div class="menu-toggle" id="menu-toggle-mobile">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+        <div class="menu" id="menu-mobile"><div class="search-wrapper">
+                    <div class="search mobile" id="search-mobile">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-mobile">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-mobile" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-mobile" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-mobile">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </div>
+                    <a href="javascript:void(0);" class="search-cancel" id="search-cancel-mobile">
+                        Cancel
+                    </a>
+                </div><a class="menu-item" href="/posts/" title="文章列表">文章</a><a class="menu-item" href="/tags/" title="标签">标签</a><a class="menu-item" href="/categories/" title="分类">分类</a><a class="menu-item" href="/about" title="关于本站">关于</a><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+            </a></div>
+    </div>
+</header><div class="search-dropdown desktop">
+        <div id="search-dropdown-desktop"></div>
+    </div>
+    <div class="search-dropdown mobile">
+        <div id="search-dropdown-mobile"></div>
+    </div><main class="main">
+                <div class="container"><div class="toc" id="toc-auto">
+            <h2 class="toc-title">Contents</h2>
+            <div class="toc-content" id="toc-content-auto"></div>
+        </div><article class="page single"><h1 class="single-title animate__animated animate__flipInX">WinSock WSAEventSelect 模型</h1><div class="post-meta">
+            <div class="post-meta-line"><span class="post-author"><a href="https://www.masimaro.xyz" title="Author" target="_blank" rel="noopener noreffer author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Masimaro</a></span>&nbsp;<span class="post-category">included in <a href="/categories/windows-%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>Windows 网络编程</a></span></div>
+            <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw" aria-hidden="true"></i>&nbsp;<time datetime="2018-06-23">2018-06-23</time>&nbsp;<i class="fas fa-pencil-alt fa-fw" aria-hidden="true"></i>&nbsp;2804 words&nbsp;
+                <i class="far fa-clock fa-fw" aria-hidden="true"></i>&nbsp;6 minutes&nbsp;</div>
+        </div><div class="details toc" id="toc-static"  data-kept="true">
+                <div class="details-summary toc-title">
+                    <span>Contents</span>
+                    <span><i class="details-icon fas fa-angle-right" aria-hidden="true"></i></span>
+                </div>
+                <div class="details-content toc-content" id="toc-content-static"><nav id="TableOfContents">
+  <ul>
+    <li><a href="#模型简介">模型简介</a></li>
+    <li><a href="#示例">示例</a></li>
+  </ul>
+</nav></div>
+            </div><div class="content" id="content"><p>在前面我们说了WSAAsyncSelect 模型，它相比于select模型来说提供了这样一种机制：当发生对应的IO通知时会立即通知操作系统，并调用对应的处理函数，它解决了调用send和 recv的时机问题，但是它有一个明显的缺点，就是它必须依赖窗口。对此WinSock 提供了另一种模型 WSAEventSelect</p>
+<!-- raw HTML omitted -->
+<h2 id="模型简介">模型简介</h2>
+<p>该模型主要特色在于它使用事件句柄来完成SOCKET事件的通知。与WSAAsyncSelect 模型类似，它也允许使用事件对象来完成多个socket的完成通知。
+该模型首先在每个socket句柄上调用WSACreateEvent来创建一个WSAEvent对象句柄（早期的WSAEvent与传统的Event句柄有一定的区别，但是从WinSock2.0 以后二者是同一个东西）。接着调用WSAEventSelect将SOCKET句柄和WSAEvent对象绑定，最终通过WSAWaitForMultiEvents来等待WSAEvent变为有信号，然后再来处理对应的socket</p>
+<p>WSAEvent有两种工作模式和工作状态
+工作状态有有信号和无信号两种
+工作模式有手工重置和人工重置，手工重置指的是每当WSAWaitForMultiEvents或者WSAWaitForSingleEvents 返回之后，WSAEvent不会自动变为无信号，需要手工调用WSAResetEvent来将WSAEvent对象设置为无信号，而自动重置表示每次等待函数返回后会自动重置为无信号；调用WSACreateEvent创建的WSAEvent对象是需要手工重置的，如果想创建自动重置的WSAEvent对象可以调用CreateEvent函数来创建（由于WinSock2.0 之后二者没有任何区别，所以只需要调用CreateEvent并将返回值强转为WSAEvent即可）</p>
+<p>WSAEventSelect函数的原型如下:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="kt">int</span> <span class="nf">WSAEventSelect</span><span class="p">(</span>  <span class="n">SOCKET</span> <span class="n">s</span><span class="p">,</span>  <span class="n">WSAEVENT</span> <span class="n">hEventObject</span><span class="p">,</span>  <span class="kt">long</span> <span class="n">lNetworkEvents</span><span class="p">);</span>
+</span></span></code></pre></div><p>其中s表示对应的SOCKET，hEventObject表示对应的WSAEvent对象，lNetworkEvents 表示我们需要处理哪些事件，它有一些对应的宏定义</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">网络事件</th>
+<th>对应的含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">FD_READ</td>
+<td>当前可以进行数据接收操作，此时可以调用像 recv, recvfrom, WSARecv, 或者 WSARecvFrom 这样的函数</td>
+</tr>
+<tr>
+<td style="text-align:left">FD_WRITE</td>
+<td>此时可以发送数据，可以调用 send, sendto, WSASend, or WSASendTo</td>
+</tr>
+<tr>
+<td style="text-align:left">FD_ACCEPT</td>
+<td>可以调用accept (Windows Sockets) 或者 WSAAccept 除非返回的错误代码是WSATRY_AGAIN.</td>
+</tr>
+<tr>
+<td style="text-align:left">FD_CONNECT</td>
+<td>表示当前可以连接远程服务器</td>
+</tr>
+<tr>
+<td style="text-align:left">FD_CLOSE</td>
+<td>当前收到关闭的消息</td>
+</tr>
+</tbody>
+</table>
+<p>当WSAWaitForMultipleEvents返回时同时会返回一个序号，用于标识是数组中的哪个WSAEvent有信号，我们使用 <code>index - WSA_WAIT_EVENT_0</code> 来获取对应WSAEvent在数组中的下标，然后根据这个事件对象找到对应的SOCKET即可
+获得了对应的SOCKET以后，还需要获取到当前是哪个事件发生导致它变为有信号，我们可以调用WSAEnumNetworkEvents函数来获取对应发生的网络事件</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="kt">int</span> <span class="nf">WSAEnumNetworkEvents</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">    <span class="n">SOCKET</span> <span class="n">s</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">WSAEVENT</span> <span class="n">hEventObject</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">LPWSANETWORKEVENTS</span> <span class="n">lpNetworkEvents</span>
+</span></span><span class="line"><span class="cl"><span class="p">);</span>
+</span></span></code></pre></div><p>s就是要获取其具体事件通知的SOCKET句柄
+hEventObject就是对应的WSAEvent句柄,可以不传入,因为SOCKET句柄已经说明了要获取那个句柄上的通知,当然如果传入了,那么这个函数会对这个WSAEvent做一次重置,置为无信号的状态,相当于WSAResetEvent调用。此时我们就不需要调用WSAResetEvent函数了</p>
+<p>最后一个参数是一个结构，结构的定义如下:</p>
+<pre tabindex="0"><code>typedef struct _WSANETWORKEVENTS {  
+    long lNetworkEvents;  
+    int iErrorCode[FD_MAX_EVENTS];
+} WSANETWORKEVENTS,  *LPWSANETWORKEVENTS;
+</code></pre><p>第一个数据是当前产生的网络事件。
+iErrorCode数组是对应每个网络事件可能发生的错误代码,对于每个事件错误代码其具体数组下标是预定义的一组FD_开头的串再加上一个_BIT结尾的宏,比如FD_READ事件对应的错误码下标是FD_READ_BIT</p>
+<p>下面的代码演示了处理接收(读取)数据的事件错误的例子代码</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="k">if</span> <span class="p">(</span><span class="n">NetworkEvents</span><span class="p">.</span><span class="n">lNetworkEvents</span> <span class="o">&amp;</span> <span class="n">FD_READ</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="p">(</span><span class="n">NetworkEvents</span><span class="p">.</span><span class="n">iErrorCode</span><span class="p">[</span><span class="n">FD_READ_BIT</span><span class="p">]</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="cl">       <span class="n">printf</span><span class="p">(</span><span class="s">&#34;FD_READ failed with error %d</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">           <span class="n">NetworkEvents</span><span class="p">.</span><span class="n">iErrorCode</span><span class="p">[</span><span class="n">FD_READ_BIT</span><span class="p">]);</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p>到目前为止，我们可以总结一下使用WSAEventSelect模型的步骤</p>
+<ol>
+<li>调用WSACreateEvent为每一个SOCKET创建一个等待对象，并与对应的SOCKET形成映射关系</li>
+<li>调用WSAEventSelect函数将SOCKET于WSAEvent对象进行绑定</li>
+<li>调用WSAWaitForMultipleEvents 函数对所有SOCKET句柄进行等待</li>
+<li>当WSAWaitForMultipleEvents 函数返回时利用返回的索引找到对应的WSAEvent对象和SOCKET对象</li>
+<li>调用WSAEnumNetworkEvents来获取对应的网络事件，根据网络事件来进行对应的收发操作</li>
+<li>重复3~5的步骤</li>
+</ol>
+<h2 id="示例">示例</h2>
+<p>下面是一个简单的例子</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="kt">int</span> <span class="nf">_tmain</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="n">TCHAR</span> <span class="o">*</span><span class="n">argv</span><span class="p">[])</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">	<span class="n">WSADATA</span> <span class="n">wd</span> <span class="o">=</span> <span class="p">{</span><span class="mi">0</span><span class="p">};</span>
+</span></span><span class="line"><span class="cl">	<span class="n">WSAStartup</span><span class="p">(</span><span class="n">MAKEWORD</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="o">&amp;</span><span class="n">wd</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="n">SOCKET</span> <span class="n">skServer</span> <span class="o">=</span> <span class="n">socket</span><span class="p">(</span><span class="n">AF_INET</span><span class="p">,</span> <span class="n">SOCK_STREAM</span><span class="p">,</span> <span class="n">IPPROTO_IP</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="n">SOCKADDR_IN</span> <span class="n">AddrServer</span> <span class="o">=</span> <span class="p">{</span><span class="n">AF_INET</span><span class="p">};</span>
+</span></span><span class="line"><span class="cl">	<span class="n">AddrServer</span><span class="p">.</span><span class="n">sin_port</span> <span class="o">=</span> <span class="n">htons</span><span class="p">(</span><span class="n">SERVER_PORT</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="n">AddrServer</span><span class="p">.</span><span class="n">sin_addr</span><span class="p">.</span><span class="n">s_addr</span> <span class="o">=</span> <span class="n">htonl</span><span class="p">(</span><span class="n">INADDR_ANY</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="n">bind</span><span class="p">(</span><span class="n">skServer</span><span class="p">,</span> <span class="p">(</span><span class="n">SOCKADDR</span><span class="o">*</span><span class="p">)</span><span class="o">&amp;</span><span class="n">AddrServer</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">SOCKADDR</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">	<span class="n">listen</span><span class="p">(</span><span class="n">skServer</span><span class="p">,</span> <span class="mi">5</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="n">printf</span><span class="p">(</span><span class="s">&#34;服务端正在监听...........</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="n">CWSAEvent</span> <span class="n">WSAEvent</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">WSAEvent</span><span class="p">.</span><span class="n">InsertClient</span><span class="p">(</span><span class="n">skServer</span><span class="p">,</span> <span class="n">FD_ACCEPT</span> <span class="o">|</span> <span class="n">FD_CLOSE</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="n">WSAEvent</span><span class="p">.</span><span class="n">EventLoop</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="n">WSACleanup</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">	<span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p>在代码中定义了一个类CWSAEvent，该类封装了关于该模型的相关操作和对应事件对象和SOCKET对象的操作，在主函数中首先创建监听的SOCKET，然后绑定、监听,并提交监听SOCKET到类中，以便对它进行管理,函数InsertClient的定义如下:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="kt">void</span> <span class="n">CWSAEvent</span><span class="o">::</span><span class="n">InsertClient</span><span class="p">(</span><span class="n">SOCKET</span> <span class="n">skClient</span><span class="p">,</span> <span class="kt">long</span> <span class="n">lNetworkEvents</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">	<span class="n">m_socketArray</span><span class="p">[</span><span class="n">m_nTotalItem</span><span class="p">]</span> <span class="o">=</span> <span class="n">skClient</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">m_EventArray</span><span class="p">[</span><span class="n">m_nTotalItem</span><span class="p">]</span> <span class="o">=</span> <span class="n">WSACreateEvent</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">	<span class="n">WSAEventSelect</span><span class="p">(</span><span class="n">skClient</span><span class="p">,</span> <span class="n">m_EventArray</span><span class="p">[</span><span class="n">m_nTotalItem</span><span class="o">++</span><span class="p">],</span> <span class="n">lNetworkEvents</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p>这个函数中主要向事件数组和SOCKET数组的对应位置添加了相应的成员，然后调用WSAEventSelect。</p>
+<p>而类的EventLoop函数定义了一个循环来重复前面的3~5步,函数的部分代码如下:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="kt">int</span> <span class="n">CWSAEvent</span><span class="o">::</span><span class="n">WaitForAllClient</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">	<span class="n">DWORD</span> <span class="n">dwRet</span> <span class="o">=</span> <span class="n">WSAWaitForMultipleEvents</span><span class="p">(</span><span class="n">m_nTotalItem</span><span class="p">,</span> <span class="n">m_EventArray</span><span class="p">,</span> <span class="n">FALSE</span><span class="p">,</span> <span class="n">WSA_INFINITE</span><span class="p">,</span> <span class="n">FALSE</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="n">WSAResetEvent</span><span class="p">(</span><span class="n">m_EventArray</span><span class="p">[</span><span class="n">dwRet</span> <span class="o">-</span> <span class="n">WSA_WAIT_EVENT_0</span><span class="p">]);</span>
+</span></span><span class="line"><span class="cl">	<span class="k">return</span> <span class="n">dwRet</span> <span class="o">-</span> <span class="n">WSA_WAIT_EVENT_0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kt">int</span> <span class="n">CWSAEvent</span><span class="o">::</span><span class="n">EventLoop</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">	<span class="n">WSANETWORKEVENTS</span> <span class="n">wne</span> <span class="o">=</span> <span class="p">{</span><span class="mi">0</span><span class="p">};</span>
+</span></span><span class="line"><span class="cl">	<span class="k">while</span> <span class="p">(</span><span class="n">TRUE</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">	<span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="kt">int</span> <span class="n">nRet</span> <span class="o">=</span> <span class="n">WaitForAllClient</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">		<span class="n">WSAEnumNetworkEvents</span><span class="p">(</span><span class="n">m_socketArray</span><span class="p">[</span><span class="n">nRet</span><span class="p">],</span> <span class="n">m_EventArray</span><span class="p">[</span><span class="n">nRet</span><span class="p">],</span> <span class="o">&amp;</span><span class="n">wne</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">		<span class="k">if</span> <span class="p">(</span><span class="n">wne</span><span class="p">.</span><span class="n">lNetworkEvents</span> <span class="o">&amp;</span> <span class="n">FD_ACCEPT</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">		<span class="p">{</span>
+</span></span><span class="line"><span class="cl">			<span class="k">if</span> <span class="p">(</span><span class="mi">0</span> <span class="o">!=</span> <span class="n">wne</span><span class="p">.</span><span class="n">iErrorCode</span><span class="p">[</span><span class="n">FD_ACCEPT_BIT</span><span class="p">])</span>
+</span></span><span class="line"><span class="cl">			<span class="p">{</span>
+</span></span><span class="line"><span class="cl">				<span class="n">OnAcceptError</span><span class="p">(</span><span class="n">nRet</span><span class="p">,</span> <span class="n">m_socketArray</span><span class="p">[</span><span class="n">nRet</span><span class="p">],</span> <span class="n">wne</span><span class="p">.</span><span class="n">iErrorCode</span><span class="p">[</span><span class="n">FD_ACCEPT_BIT</span><span class="p">]);</span>
+</span></span><span class="line"><span class="cl">			<span class="p">}</span><span class="k">else</span>
+</span></span><span class="line"><span class="cl">			<span class="p">{</span>
+</span></span><span class="line"><span class="cl">				<span class="n">OnAcccept</span><span class="p">(</span><span class="n">nRet</span><span class="p">,</span> <span class="n">m_socketArray</span><span class="p">[</span><span class="n">nRet</span><span class="p">]);</span>
+</span></span><span class="line"><span class="cl">			<span class="p">}</span>
+</span></span><span class="line"><span class="cl">		<span class="p">}</span><span class="k">else</span> <span class="nf">if</span> <span class="p">(</span><span class="n">wne</span><span class="p">.</span><span class="n">lNetworkEvents</span> <span class="o">&amp;</span> <span class="n">FD_CLOSE</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">		<span class="p">{</span>
+</span></span><span class="line"><span class="cl">			<span class="k">if</span> <span class="p">(</span><span class="mi">0</span> <span class="o">!=</span> <span class="n">wne</span><span class="p">.</span><span class="n">iErrorCode</span><span class="p">[</span><span class="n">FD_CLOSE_BIT</span><span class="p">])</span>
+</span></span><span class="line"><span class="cl">			<span class="p">{</span>
+</span></span><span class="line"><span class="cl">				<span class="n">OnCloseError</span><span class="p">(</span><span class="n">nRet</span><span class="p">,</span> <span class="n">m_socketArray</span><span class="p">[</span><span class="n">nRet</span><span class="p">],</span> <span class="n">wne</span><span class="p">.</span><span class="n">iErrorCode</span><span class="p">[</span><span class="n">FD_CLOSE_BIT</span><span class="p">]);</span>
+</span></span><span class="line"><span class="cl">			<span class="p">}</span><span class="k">else</span>
+</span></span><span class="line"><span class="cl">			<span class="p">{</span>
+</span></span><span class="line"><span class="cl">				<span class="n">OnClose</span><span class="p">(</span><span class="n">nRet</span><span class="p">,</span> <span class="n">m_socketArray</span><span class="p">[</span><span class="n">nRet</span><span class="p">]);</span>
+</span></span><span class="line"><span class="cl">			<span class="p">}</span>
+</span></span><span class="line"><span class="cl">		<span class="p">}</span><span class="k">else</span> <span class="nf">if</span> <span class="p">(</span><span class="n">wne</span><span class="p">.</span><span class="n">lNetworkEvents</span> <span class="o">&amp;</span> <span class="n">FD_READ</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">		<span class="p">{</span>
+</span></span><span class="line"><span class="cl">			<span class="k">if</span> <span class="p">(</span><span class="mi">0</span> <span class="o">!=</span> <span class="n">wne</span><span class="p">.</span><span class="n">iErrorCode</span><span class="p">[</span><span class="n">FD_READ_BIT</span><span class="p">])</span>
+</span></span><span class="line"><span class="cl">			<span class="p">{</span>
+</span></span><span class="line"><span class="cl">				<span class="n">OnReadError</span><span class="p">(</span><span class="n">nRet</span><span class="p">,</span> <span class="n">m_socketArray</span><span class="p">[</span><span class="n">nRet</span><span class="p">],</span> <span class="n">wne</span><span class="p">.</span><span class="n">iErrorCode</span><span class="p">[</span><span class="n">FD_READ_BIT</span><span class="p">]);</span>
+</span></span><span class="line"><span class="cl">			<span class="p">}</span><span class="k">else</span>
+</span></span><span class="line"><span class="cl">			<span class="p">{</span>
+</span></span><span class="line"><span class="cl">				<span class="n">OnRead</span><span class="p">(</span><span class="n">nRet</span><span class="p">,</span> <span class="n">m_socketArray</span><span class="p">[</span><span class="n">nRet</span><span class="p">]);</span>
+</span></span><span class="line"><span class="cl">			<span class="p">}</span>
+</span></span><span class="line"><span class="cl">		<span class="p">}</span><span class="k">else</span> <span class="nf">if</span> <span class="p">(</span><span class="n">wne</span><span class="p">.</span><span class="n">lNetworkEvents</span> <span class="o">&amp;</span> <span class="n">FD_WRITE</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">		<span class="p">{</span>
+</span></span><span class="line"><span class="cl">			<span class="k">if</span> <span class="p">(</span><span class="mi">0</span> <span class="o">!=</span> <span class="n">wne</span><span class="p">.</span><span class="n">iErrorCode</span><span class="p">[</span><span class="n">FD_WRITE_BIT</span><span class="p">])</span>
+</span></span><span class="line"><span class="cl">			<span class="p">{</span>
+</span></span><span class="line"><span class="cl">				<span class="n">OnWriteError</span><span class="p">(</span><span class="n">nRet</span><span class="p">,</span> <span class="n">m_socketArray</span><span class="p">[</span><span class="n">nRet</span><span class="p">],</span> <span class="n">wne</span><span class="p">.</span><span class="n">iErrorCode</span><span class="p">[</span><span class="n">FD_WRITE_BIT</span><span class="p">]);</span>
+</span></span><span class="line"><span class="cl">			<span class="p">}</span><span class="k">else</span>
+</span></span><span class="line"><span class="cl">			<span class="p">{</span>
+</span></span><span class="line"><span class="cl">				<span class="n">OnWrite</span><span class="p">(</span><span class="n">nRet</span><span class="p">,</span> <span class="n">m_socketArray</span><span class="p">[</span><span class="n">nRet</span><span class="p">]);</span>
+</span></span><span class="line"><span class="cl">			<span class="p">}</span>
+</span></span><span class="line"><span class="cl">		<span class="p">}</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p>函数首先进行了等待，当等待函数返回时，获取对应的下标，以此来获取到socket和事件对象，然后调用WSAEnumNetworkEvents来获取对应的网络事件，最后根据事件调用不同的处理函数来处理
+在上面的代码中，这个循环有一个潜在的问题，我们来设想这么一个场景，当有多个客户端同时连接服务器，在第一次等待返回时，我们主要精力在进行该IO事件的处理，也就是响应这个客户端A的请求，而此时客户端A又发送了一个请求，而另外几个客户端B随后也发送了一个请求，在第一次处理完成后，等待得到的将又是客户端A，而后续客户端B的请求又被排到了后面，如果这个客户端A一直不停的发送请求，可能造成的问题是服务器一直响应A的请求，而对于B来说，它的请求迟迟得不到响应。为了避免这个问题，我们可以在函数WSAWaitForMultipleEvents 返回后，针对数组中的每个SOCKET循环调用WSAWaitForMultipleEvents将等待的数量设置为1，并将超时值设置为0，这个时候这个函数的作用就相当于查看数组中的每个SOCKET，看看是不是有待决的，当所有遍历完成后依次处理这些请求或者专门创建对应的线程来处理请求</p>
+<p>最后，<a href="https://gitee.com/masimaro/codes/teo94n8jkzcd23iqxgswa69" target="_blank" rel="noopener noreffer ">整个示例代码</a></p>
+<!-- raw HTML omitted -->
+</div><div class="post-footer" id="post-footer">
+    <div class="post-info">
+        <div class="post-info-line">
+            <div class="post-info-mod">
+                <span>Updated on 2018-06-23</span>
+            </div></div>
+        <div class="post-info-line">
+            <div class="post-info-md"></div>
+            <div class="post-info-share">
+                <span><a href="javascript:void(0);" title="Share on Twitter" data-sharer="twitter" data-url="http://HaiLateBoy.github.io/posts/winsock-wsaeventselect/" data-title="WinSock WSAEventSelect 模型" data-hashtags="WinSock,网络编程,WinSock2.0 API,动态加载,WinSock 异步函数"><i class="fab fa-twitter fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Facebook" data-sharer="facebook" data-url="http://HaiLateBoy.github.io/posts/winsock-wsaeventselect/" data-hashtag="WinSock"><i class="fab fa-facebook-square fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Hacker News" data-sharer="hackernews" data-url="http://HaiLateBoy.github.io/posts/winsock-wsaeventselect/" data-title="WinSock WSAEventSelect 模型"><i class="fab fa-hacker-news fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Line" data-sharer="line" data-url="http://HaiLateBoy.github.io/posts/winsock-wsaeventselect/" data-title="WinSock WSAEventSelect 模型"><i data-svg-src="https://cdn.jsdelivr.net/npm/simple-icons@7.3.0/icons/line.svg" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on 微博" data-sharer="weibo" data-url="http://HaiLateBoy.github.io/posts/winsock-wsaeventselect/" data-title="WinSock WSAEventSelect 模型"><i class="fab fa-weibo fa-fw" aria-hidden="true"></i></a></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="post-info-more">
+        <section class="post-tags"><i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/winsock/">WinSock</a>,&nbsp;<a href="/tags/%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B/">网络编程</a>,&nbsp;<a href="/tags/winsock2.0-api/">WinSock2.0 API</a>,&nbsp;<a href="/tags/%E5%8A%A8%E6%80%81%E5%8A%A0%E8%BD%BD/">动态加载</a>,&nbsp;<a href="/tags/winsock-%E5%BC%82%E6%AD%A5%E5%87%BD%E6%95%B0/">WinSock 异步函数</a></section>
+        <section>
+            <span><a href="javascript:void(0);" onclick="window.history.back();">Back</a></span>&nbsp;|&nbsp;<span><a href="/">Home</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav"><a href="/posts/why-c-has-head-file/" class="prev" rel="prev" title="为什么C语言会有头文件"><i class="fas fa-angle-left fa-fw" aria-hidden="true"></i>为什么C语言会有头文件</a>
+            <a href="/posts/winsock-overlapped/" class="next" rel="next" title="WinSock 重叠IO模型">WinSock 重叠IO模型<i class="fas fa-angle-right fa-fw" aria-hidden="true"></i></a></div>
+</div>
+</article></div>
+            </main><footer class="footer">
+        <div class="footer-container"><div class="footer-line">Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener noreffer" title="Hugo 0.121.2">Hugo</a> | Theme - <a href="https://github.com/dillonzq/LoveIt" target="_blank" rel="noopener noreffer" title="LoveIt 0.2.11"><i class="far fa-kiss-wink-heart fa-fw" aria-hidden="true"></i> LoveIt</a>
+                </div><div class="footer-line" itemscope itemtype="http://schema.org/CreativeWork"><i class="far fa-copyright fa-fw" aria-hidden="true"></i><span itemprop="copyrightYear">2022 - 2024</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="https://www.masimaro.xyz" target="_blank">Masimaro</a></span></div>
+        </div>
+    </footer></div>
+
+        <div id="fixed-buttons"><a href="#" id="back-to-top" class="fixed-button" title="Back to Top">
+                <i class="fas fa-arrow-up fa-fw" aria-hidden="true"></i>
+            </a><a href="#" id="view-comments" class="fixed-button" title="View Comments">
+                <i class="fas fa-comment fa-fw" aria-hidden="true"></i>
+            </a>
+        </div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.css"><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/autocomplete.js@0.38.1/dist/autocomplete.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lunr@2.3.9/lunr.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lazysizes@5.3.2/lazysizes.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/clipboard@2.0.11/dist/clipboard.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/sharer.js@0.5.1/sharer.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/auto-render.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/copy-tex.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/mhchem.min.js"></script><script type="text/javascript">window.config={"code":{"copyTitle":"Copy to clipboard","maxShownLines":50},"comment":{},"math":{"delimiters":[{"display":true,"left":"$$","right":"$$"},{"display":true,"left":"\\[","right":"\\]"},{"display":true,"left":"\\begin{equation}","right":"\\end{equation}"},{"display":true,"left":"\\begin{equation*}","right":"\\end{equation*}"},{"display":true,"left":"\\begin{align}","right":"\\end{align}"},{"display":true,"left":"\\begin{align*}","right":"\\end{align*}"},{"display":true,"left":"\\begin{alignat}","right":"\\end{alignat}"},{"display":true,"left":"\\begin{alignat*}","right":"\\end{alignat*}"},{"display":true,"left":"\\begin{gather}","right":"\\end{gather}"},{"display":true,"left":"\\begin{CD}","right":"\\end{CD}"},{"display":false,"left":"$","right":"$"},{"display":false,"left":"\\(","right":"\\)"}],"strict":false},"search":{"highlightTag":"em","maxResultLength":10,"noResultsFound":"No results found","snippetLength":50}};</script><script type="text/javascript" src="/js/theme.min.js"></script></body>
+</html>

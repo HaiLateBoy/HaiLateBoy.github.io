@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="robots" content="noodp" />
+        <title>从零开始配置 vim(6)——缩写 - Masimaro&#39;s blog</title><meta name="Description" content="这是我用于记录日常和学习的小站"><meta property="og:title" content="从零开始配置 vim(6)——缩写" />
+<meta property="og:description" content="关于vim能快速编辑文本的能力，我们见识到了 operator &#43; motion ，见识到了. 范式和宏。甚至可以使用命令来加快文本编辑。在后面我们又介绍了快捷键绑定来快速执" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://HaiLateBoy.github.io/posts/vim-config6/" /><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2022-08-03T10:22:17+08:00" />
+<meta property="article:modified_time" content="2022-08-03T10:22:17+08:00" /><meta property="og:site_name" content="Masimaro&#39;s blog" />
+
+<meta name="twitter:card" content="summary"/><meta name="twitter:title" content="从零开始配置 vim(6)——缩写"/>
+<meta name="twitter:description" content="关于vim能快速编辑文本的能力，我们见识到了 operator &#43; motion ，见识到了. 范式和宏。甚至可以使用命令来加快文本编辑。在后面我们又介绍了快捷键绑定来快速执"/>
+<meta name="application-name" content="My cool site">
+<meta name="apple-mobile-web-app-title" content="My cool site"><meta name="theme-color" content="#ffffff"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="manifest" href="/site.webmanifest"><link rel="canonical" href="http://HaiLateBoy.github.io/posts/vim-config6/" /><link rel="prev" href="http://HaiLateBoy.github.io/posts/vim-config5/" /><link rel="next" href="http://HaiLateBoy.github.io/posts/vim-config7/" /><link rel="stylesheet" href="/css/style.min.css"><link rel="preload" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css"></noscript><link rel="preload" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css"></noscript><script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "BlogPosting",
+        "headline": "从零开始配置 vim(6)——缩写",
+        "inLanguage": "zh-CN",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "http:\/\/HaiLateBoy.github.io\/posts\/vim-config6\/"
+        },"genre": "posts","keywords": "vim, 编辑工具, 文本处理, lua, 编辑器","wordcount":  1587 ,
+        "url": "http:\/\/HaiLateBoy.github.io\/posts\/vim-config6\/","datePublished": "2022-08-03T10:22:17+08:00","dateModified": "2022-08-03T10:22:17+08:00","publisher": {
+            "@type": "Organization",
+            "name": ""},"author": {
+                "@type": "Person",
+                "name": "Masimaro"
+            },"description": ""
+    }
+    </script></head>
+    <body data-header-desktop="fixed" data-header-mobile="auto"><script type="text/javascript">(window.localStorage && localStorage.getItem('theme') ? localStorage.getItem('theme') === 'dark' : ('auto' === 'auto' ? window.matchMedia('(prefers-color-scheme: dark)').matches : 'auto' === 'dark')) && document.body.setAttribute('theme', 'dark');</script>
+
+        <div id="mask"></div><div class="wrapper"><header class="desktop" id="header-desktop">
+    <div class="header-wrapper">
+        <div class="header-title">
+            <a href="/" title="Masimaro&#39;s blog">My cool site</a>
+        </div>
+        <div class="menu">
+            <div class="menu-inner"><a class="menu-item" href="/posts/" title="文章列表"> 文章 </a><a class="menu-item" href="/tags/" title="标签"> 标签 </a><a class="menu-item" href="/categories/" title="分类"> 分类 </a><a class="menu-item" href="/about" title="关于本站"> 关于 </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-desktop">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-desktop" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-desktop" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-desktop">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </span><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                    <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+                </a></div>
+        </div>
+    </div>
+</header><header class="mobile" id="header-mobile">
+    <div class="header-container">
+        <div class="header-wrapper">
+            <div class="header-title">
+                <a href="/" title="Masimaro&#39;s blog">My cool site</a>
+            </div>
+            <div class="menu-toggle" id="menu-toggle-mobile">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+        <div class="menu" id="menu-mobile"><div class="search-wrapper">
+                    <div class="search mobile" id="search-mobile">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-mobile">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-mobile" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-mobile" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-mobile">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </div>
+                    <a href="javascript:void(0);" class="search-cancel" id="search-cancel-mobile">
+                        Cancel
+                    </a>
+                </div><a class="menu-item" href="/posts/" title="文章列表">文章</a><a class="menu-item" href="/tags/" title="标签">标签</a><a class="menu-item" href="/categories/" title="分类">分类</a><a class="menu-item" href="/about" title="关于本站">关于</a><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+            </a></div>
+    </div>
+</header><div class="search-dropdown desktop">
+        <div id="search-dropdown-desktop"></div>
+    </div>
+    <div class="search-dropdown mobile">
+        <div id="search-dropdown-mobile"></div>
+    </div><main class="main">
+                <div class="container"><div class="toc" id="toc-auto">
+            <h2 class="toc-title">Contents</h2>
+            <div class="toc-content" id="toc-content-auto"></div>
+        </div><article class="page single"><h1 class="single-title animate__animated animate__flipInX">从零开始配置 vim(6)——缩写</h1><div class="post-meta">
+            <div class="post-meta-line"><span class="post-author"><a href="https://www.masimaro.xyz" title="Author" target="_blank" rel="noopener noreffer author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Masimaro</a></span>&nbsp;<span class="post-category">included in <a href="/categories/vim-%E9%85%8D%E7%BD%AE/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>vim 配置</a></span></div>
+            <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw" aria-hidden="true"></i>&nbsp;<time datetime="2022-08-03">2022-08-03</time>&nbsp;<i class="fas fa-pencil-alt fa-fw" aria-hidden="true"></i>&nbsp;1587 words&nbsp;
+                <i class="far fa-clock fa-fw" aria-hidden="true"></i>&nbsp;4 minutes&nbsp;</div>
+        </div><div class="details toc" id="toc-static"  data-kept="true">
+                <div class="details-summary toc-title">
+                    <span>Contents</span>
+                    <span><i class="details-icon fas fa-angle-right" aria-hidden="true"></i></span>
+                </div>
+                <div class="details-content toc-content" id="toc-content-static"><nav id="TableOfContents">
+  <ul>
+    <li><a href="#缩写简介">缩写简介</a></li>
+    <li><a href="#对比键盘映射">对比键盘映射</a></li>
+    <li><a href="#keywords-characters">keywords characters</a></li>
+    <li><a href="#本地缓冲缩写">本地缓冲缩写</a></li>
+    <li><a href="#如何形成记忆">如何形成记忆</a></li>
+  </ul>
+</nav></div>
+            </div><div class="content" id="content"><p>关于vim能快速编辑文本的能力，我们见识到了 <code>operator + motion</code> ，见识到了<code>.</code> 范式和宏。甚至可以使用命令来加快文本编辑。在后面我们又介绍了快捷键绑定来快速执行我们想要的操作。今天我们再来介绍一个新的能加快我们编辑文本速度的东西——<code>Abbreviations</code></p>
+<h2 id="缩写简介">缩写简介</h2>
+<p><code>Abbreviations</code> 翻译成中文的意思大概是缩写。但是仅仅以缩写来描述这个特性，似乎是不够的,但是也找不到准确的中文来描述，暂时就采用这个名称吧。它的这个特性允许我们将输入的一段内容自动更新为新的内容</p>
+<p>我们先来体验一下它的基本用法。</p>
+<p>在命令中输入 <code>:iabbrev mian main</code></p>
+<p>我们输入 <code>mian(</code> 后它会自动将内容替换为 <code>main(</code>。这样即使我们手误将 <code>main</code> 写成了 <code>mian</code> ，vim能自动帮我们更新。再也不用怕编辑器报找不到 <code>main</code> 函数了
+<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://img-blog.csdnimg.cn/4cb7306c48ee4bcdab84fa0b9ff7c441.gif#pic_center"
+        data-srcset="https://img-blog.csdnimg.cn/4cb7306c48ee4bcdab84fa0b9ff7c441.gif#pic_center, https://img-blog.csdnimg.cn/4cb7306c48ee4bcdab84fa0b9ff7c441.gif#pic_center 1.5x, https://img-blog.csdnimg.cn/4cb7306c48ee4bcdab84fa0b9ff7c441.gif#pic_center 2x"
+        data-sizes="auto"
+        alt="https://img-blog.csdnimg.cn/4cb7306c48ee4bcdab84fa0b9ff7c441.gif#pic_center"
+        title="在这里插入图片描述" />
+我们发现了它的第一个用途——纠正笔误。但是基于这一特性，我们还可以使用几个简单的字符来快速展开成常用的长文本。例如
+<code>:iabbrev pcr Copyright 2022 Masimaro, all rights reserved</code> 通过输入 <code>pcr(program copy right)</code> 来快速产生一条程序的版权信息。
+<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://img-blog.csdnimg.cn/d66857273c2a4eb9801b05bc5b864926.gif#pic_center"
+        data-srcset="https://img-blog.csdnimg.cn/d66857273c2a4eb9801b05bc5b864926.gif#pic_center, https://img-blog.csdnimg.cn/d66857273c2a4eb9801b05bc5b864926.gif#pic_center 1.5x, https://img-blog.csdnimg.cn/d66857273c2a4eb9801b05bc5b864926.gif#pic_center 2x"
+        data-sizes="auto"
+        alt="https://img-blog.csdnimg.cn/d66857273c2a4eb9801b05bc5b864926.gif#pic_center"
+        title="在这里插入图片描述" />
+又或者在 <code>python</code> 使用 <code>nmain</code> 展开成 <code>if name== &quot;__main__&quot;:</code>。快速写下测试语句。
+<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://img-blog.csdnimg.cn/12b798aa878943e1857d4d624e2d3a83.gif#pic_center"
+        data-srcset="https://img-blog.csdnimg.cn/12b798aa878943e1857d4d624e2d3a83.gif#pic_center, https://img-blog.csdnimg.cn/12b798aa878943e1857d4d624e2d3a83.gif#pic_center 1.5x, https://img-blog.csdnimg.cn/12b798aa878943e1857d4d624e2d3a83.gif#pic_center 2x"
+        data-sizes="auto"
+        alt="https://img-blog.csdnimg.cn/12b798aa878943e1857d4d624e2d3a83.gif#pic_center"
+        title="在这里插入图片描述" />
+我们发现 <code>iabbrev</code> 是 <code>i+ abbrev</code> 合成的一条命令。看到这相信各位小伙伴应该明白了。这个命令是作用于插入模式下。该特性还可以作用于 命令模式和替换模式。但是这里就不对它做深入的介绍了。有兴趣的小伙伴可以查看vim手册来了解。</p>
+<h2 id="对比键盘映射">对比键盘映射</h2>
+<p>我们可以使用快捷键映射来达到同样的效果，例如我们可以定义 <code>:inoremap mian &lt;esc&gt;viwdimain</code> 同样可以达到更正 <code>mian</code> 为 <code>main</code> 的效果
+<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://img-blog.csdnimg.cn/f8bed24d62dd4b479170ff0bb84d3e98.gif#pic_center"
+        data-srcset="https://img-blog.csdnimg.cn/f8bed24d62dd4b479170ff0bb84d3e98.gif#pic_center, https://img-blog.csdnimg.cn/f8bed24d62dd4b479170ff0bb84d3e98.gif#pic_center 1.5x, https://img-blog.csdnimg.cn/f8bed24d62dd4b479170ff0bb84d3e98.gif#pic_center 2x"
+        data-sizes="auto"
+        alt="https://img-blog.csdnimg.cn/f8bed24d62dd4b479170ff0bb84d3e98.gif#pic_center"
+        title="在这里插入图片描述" /></p>
+<p>但是我们发现这有几个弊端，第一因为我们定义了一个 <code>mian</code> 的关键字，这就需要手速要够快了，在短时间内输入完成 <code>mian</code> 。第二我们针对只输入<code>mian</code> 确实能达到更正的效果，但是如果我连着其他的语句一起输入就不一定有这个效果了，例如我们想输入 <code>miantest</code> 但是它会给我们替换成 <code>maintest</code> 这就有点得不偿失了。在这种情况下，<code>abbreviations</code> 可以正常工作。而且我们发现相比于使用映射，<code>abbreviations</code> 显得更为简洁，也更加符合逻辑。</p>
+<h2 id="keywords-characters">keywords characters</h2>
+<p>我们发现在使用 <code>abbreviations</code> 这一特性的时候，只有在输入空格或者回车的时候它才会启用自动更新，但是输入字母的时候却不会。如何定义输入何种字符的时候它才会启用自动更新呢？</p>
+<p><code>abbreviations</code> 这一特性是在我们输入 <code>non-keyword character</code> 的时候会检查上一个 <code>non-keyword character</code> 到这个之间的单词是否符合之前定义的替换规则，如果符合将会发生替换行为，否则不会发生。只要定义了 <code>non-keyword character</code> 就可以定义它发生更新的时机。那么我们该如何定义 <code>non-keyword character</code> 字符呢？</p>
+<p>只要不在 <code>iskeyword</code> 中的字符都算是 <code>non-keyword character</code>。我们执行 <code>set iskeyword?</code> 可以看到 <code>iskeyword</code> 的定义如下:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="cl">@,48-57,_,192-255
+</span></span></code></pre></div><p>看起来很复杂是不是？首先 <code>@</code> 代表字母字符，48-57是字符0到字符9的ascii 编码，<code>_</code> 单纯的代表下划线，192-255代表ascii码中一些特殊字符。你只需要记住它包含一切字母，数字，_ 以及一些特殊字符。或者更简单地说，格式控制字符（像空格、制表符、回车）都会触发这一行为。如果你想修改 <code>keyword</code> 。可以在vim手册中详细阅读关于 <code>iskeyword</code> 部分的说明。这里就不再过多介绍，我认为当前定义更符合编码时的直觉。</p>
+<h2 id="本地缓冲缩写">本地缓冲缩写</h2>
+<p>结合上一章学习的本地设置，我们也可以设置本地缓冲的缩写，例如</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-lua" data-lang="lua"><span class="line"><span class="cl"><span class="p">:</span><span class="n">iabbre</span> <span class="o">&lt;</span><span class="n">buffer</span><span class="o">&gt;</span> <span class="n">mian</span> <span class="n">main</span>
+</span></span></code></pre></div><p>我们发现它只在当前缓冲区中启用了。
+<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://img-blog.csdnimg.cn/c7b0891dd1924ef2806961d1473dfcf3.gif#pic_center"
+        data-srcset="https://img-blog.csdnimg.cn/c7b0891dd1924ef2806961d1473dfcf3.gif#pic_center, https://img-blog.csdnimg.cn/c7b0891dd1924ef2806961d1473dfcf3.gif#pic_center 1.5x, https://img-blog.csdnimg.cn/c7b0891dd1924ef2806961d1473dfcf3.gif#pic_center 2x"
+        data-sizes="auto"
+        alt="https://img-blog.csdnimg.cn/c7b0891dd1924ef2806961d1473dfcf3.gif#pic_center"
+        title="在这里插入图片描述" /></p>
+<p>到现在我们似乎可以结合缩写的这个特性完成代码片段的功能呢。但是别着急，要得到这个功能，还得接着往下学习。</p>
+<h2 id="如何形成记忆">如何形成记忆</h2>
+<p>跟快捷键类似，我们一时兴起，根据自己的习惯定义了一堆缩写，例如 定义 <code>fnc</code> 为 <code>function</code>，定义 <code>ret</code> 为 <code>return</code> 结果自己之前养成了把这些关键字都输全的习惯。后面怎么也改不过来，这些都白定义了，该如何解决这个问题呢？</p>
+<p>与我们当初禁用快捷键类似，我们也可以禁用某些内容，只是<code>iabbrev</code> 并没有提供类似 <code>&lt;nop&gt;</code> 的指令已达到禁用的目的，但是我们我们可以将对应的字符串映射成为某些无效的字符。例如我们使用如下两个命令</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-lua" data-lang="lua"><span class="line"><span class="cl"><span class="p">:</span><span class="n">iabbrev</span> <span class="kr">return</span> <span class="o">&lt;</span><span class="n">space</span><span class="o">&gt;</span>
+</span></span><span class="line"><span class="cl"><span class="p">:</span><span class="n">iabbrev</span> <span class="n">ret</span> <span class="kr">return</span>
+</span></span></code></pre></div><p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://img-blog.csdnimg.cn/373ef257df9c46649bf271e2d5b26e23.gif#pic_center"
+        data-srcset="https://img-blog.csdnimg.cn/373ef257df9c46649bf271e2d5b26e23.gif#pic_center, https://img-blog.csdnimg.cn/373ef257df9c46649bf271e2d5b26e23.gif#pic_center 1.5x, https://img-blog.csdnimg.cn/373ef257df9c46649bf271e2d5b26e23.gif#pic_center 2x"
+        data-sizes="auto"
+        alt="https://img-blog.csdnimg.cn/373ef257df9c46649bf271e2d5b26e23.gif#pic_center"
+        title="在这里插入图片描述" /></p>
+<p>为了养成习惯我们将 <code>return</code> 映射为空格，一旦我们习惯输入 <code>return</code> 就会意识到我们已经用简写 <code>ret</code> 代替了。当我们养成肌肉记忆之后这条映射的作用也就显得可有可无了。</p>
+</div><div class="post-footer" id="post-footer">
+    <div class="post-info">
+        <div class="post-info-line">
+            <div class="post-info-mod">
+                <span>Updated on 2022-08-03</span>
+            </div></div>
+        <div class="post-info-line">
+            <div class="post-info-md"></div>
+            <div class="post-info-share">
+                <span><a href="javascript:void(0);" title="Share on Twitter" data-sharer="twitter" data-url="http://HaiLateBoy.github.io/posts/vim-config6/" data-title="从零开始配置 vim(6)——缩写" data-hashtags="vim,编辑工具,文本处理,lua,编辑器"><i class="fab fa-twitter fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Facebook" data-sharer="facebook" data-url="http://HaiLateBoy.github.io/posts/vim-config6/" data-hashtag="vim"><i class="fab fa-facebook-square fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Hacker News" data-sharer="hackernews" data-url="http://HaiLateBoy.github.io/posts/vim-config6/" data-title="从零开始配置 vim(6)——缩写"><i class="fab fa-hacker-news fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Line" data-sharer="line" data-url="http://HaiLateBoy.github.io/posts/vim-config6/" data-title="从零开始配置 vim(6)——缩写"><i data-svg-src="https://cdn.jsdelivr.net/npm/simple-icons@7.3.0/icons/line.svg" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on 微博" data-sharer="weibo" data-url="http://HaiLateBoy.github.io/posts/vim-config6/" data-title="从零开始配置 vim(6)——缩写"><i class="fab fa-weibo fa-fw" aria-hidden="true"></i></a></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="post-info-more">
+        <section class="post-tags"><i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/vim/">vim</a>,&nbsp;<a href="/tags/%E7%BC%96%E8%BE%91%E5%B7%A5%E5%85%B7/">编辑工具</a>,&nbsp;<a href="/tags/%E6%96%87%E6%9C%AC%E5%A4%84%E7%90%86/">文本处理</a>,&nbsp;<a href="/tags/lua/">lua</a>,&nbsp;<a href="/tags/%E7%BC%96%E8%BE%91%E5%99%A8/">编辑器</a></section>
+        <section>
+            <span><a href="javascript:void(0);" onclick="window.history.back();">Back</a></span>&nbsp;|&nbsp;<span><a href="/">Home</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav"><a href="/posts/vim-config5/" class="prev" rel="prev" title="从零开始配置 vim(5)——本地设置与全局设置"><i class="fas fa-angle-left fa-fw" aria-hidden="true"></i>从零开始配置 vim(5)——本地设置与全局设置</a>
+            <a href="/posts/vim-config7/" class="next" rel="next" title="从零开始配置 vim(7)——自动命令">从零开始配置 vim(7)——自动命令<i class="fas fa-angle-right fa-fw" aria-hidden="true"></i></a></div>
+</div>
+</article></div>
+            </main><footer class="footer">
+        <div class="footer-container"><div class="footer-line">Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener noreffer" title="Hugo 0.121.2">Hugo</a> | Theme - <a href="https://github.com/dillonzq/LoveIt" target="_blank" rel="noopener noreffer" title="LoveIt 0.2.11"><i class="far fa-kiss-wink-heart fa-fw" aria-hidden="true"></i> LoveIt</a>
+                </div><div class="footer-line" itemscope itemtype="http://schema.org/CreativeWork"><i class="far fa-copyright fa-fw" aria-hidden="true"></i><span itemprop="copyrightYear">2022 - 2024</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="https://www.masimaro.xyz" target="_blank">Masimaro</a></span></div>
+        </div>
+    </footer></div>
+
+        <div id="fixed-buttons"><a href="#" id="back-to-top" class="fixed-button" title="Back to Top">
+                <i class="fas fa-arrow-up fa-fw" aria-hidden="true"></i>
+            </a><a href="#" id="view-comments" class="fixed-button" title="View Comments">
+                <i class="fas fa-comment fa-fw" aria-hidden="true"></i>
+            </a>
+        </div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.css"><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/autocomplete.js@0.38.1/dist/autocomplete.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lunr@2.3.9/lunr.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lazysizes@5.3.2/lazysizes.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/clipboard@2.0.11/dist/clipboard.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/sharer.js@0.5.1/sharer.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/auto-render.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/copy-tex.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/mhchem.min.js"></script><script type="text/javascript">window.config={"code":{"copyTitle":"Copy to clipboard","maxShownLines":50},"comment":{},"math":{"delimiters":[{"display":true,"left":"$$","right":"$$"},{"display":true,"left":"\\[","right":"\\]"},{"display":true,"left":"\\begin{equation}","right":"\\end{equation}"},{"display":true,"left":"\\begin{equation*}","right":"\\end{equation*}"},{"display":true,"left":"\\begin{align}","right":"\\end{align}"},{"display":true,"left":"\\begin{align*}","right":"\\end{align*}"},{"display":true,"left":"\\begin{alignat}","right":"\\end{alignat}"},{"display":true,"left":"\\begin{alignat*}","right":"\\end{alignat*}"},{"display":true,"left":"\\begin{gather}","right":"\\end{gather}"},{"display":true,"left":"\\begin{CD}","right":"\\end{CD}"},{"display":false,"left":"$","right":"$"},{"display":false,"left":"\\(","right":"\\)"}],"strict":false},"search":{"highlightTag":"em","maxResultLength":10,"noResultsFound":"No results found","snippetLength":50}};</script><script type="text/javascript" src="/js/theme.min.js"></script></body>
+</html>

@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="robots" content="noodp" />
+        <title>顺序容器 - Masimaro&#39;s blog</title><meta name="Description" content="这是我用于记录日常和学习的小站"><meta property="og:title" content="顺序容器" />
+<meta property="og:description" content="所有容器类都共享公共的接口，不同容器按不同的方式进行扩展，这个公共接口使得学习容器更加容器。我们基于这种容器所学习的内容也都适用于其他容器。" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://HaiLateBoy.github.io/posts/cpp-base-8/" /><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2021-04-11T16:09:45+00:00" />
+<meta property="article:modified_time" content="2021-04-11T16:09:45+00:00" /><meta property="og:site_name" content="Masimaro&#39;s blog" />
+
+<meta name="twitter:card" content="summary"/><meta name="twitter:title" content="顺序容器"/>
+<meta name="twitter:description" content="所有容器类都共享公共的接口，不同容器按不同的方式进行扩展，这个公共接口使得学习容器更加容器。我们基于这种容器所学习的内容也都适用于其他容器。"/>
+<meta name="application-name" content="My cool site">
+<meta name="apple-mobile-web-app-title" content="My cool site"><meta name="theme-color" content="#ffffff"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="manifest" href="/site.webmanifest"><link rel="canonical" href="http://HaiLateBoy.github.io/posts/cpp-base-8/" /><link rel="prev" href="http://HaiLateBoy.github.io/posts/cpp-base-7/" /><link rel="next" href="http://HaiLateBoy.github.io/posts/cpp-base-9/" /><link rel="stylesheet" href="/css/style.min.css"><link rel="preload" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css"></noscript><link rel="preload" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css"></noscript><script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "BlogPosting",
+        "headline": "顺序容器",
+        "inLanguage": "zh-CN",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "http:\/\/HaiLateBoy.github.io\/posts\/cpp-base-8\/"
+        },"genre": "posts","keywords": "C\u002b\u002b, 语法, 基础, c\u002b\u002b11","wordcount":  4978 ,
+        "url": "http:\/\/HaiLateBoy.github.io\/posts\/cpp-base-8\/","datePublished": "2021-04-11T16:09:45+00:00","dateModified": "2021-04-11T16:09:45+00:00","publisher": {
+            "@type": "Organization",
+            "name": ""},"author": {
+                "@type": "Person",
+                "name": "Masimaro"
+            },"description": ""
+    }
+    </script></head>
+    <body data-header-desktop="fixed" data-header-mobile="auto"><script type="text/javascript">(window.localStorage && localStorage.getItem('theme') ? localStorage.getItem('theme') === 'dark' : ('auto' === 'auto' ? window.matchMedia('(prefers-color-scheme: dark)').matches : 'auto' === 'dark')) && document.body.setAttribute('theme', 'dark');</script>
+
+        <div id="mask"></div><div class="wrapper"><header class="desktop" id="header-desktop">
+    <div class="header-wrapper">
+        <div class="header-title">
+            <a href="/" title="Masimaro&#39;s blog">My cool site</a>
+        </div>
+        <div class="menu">
+            <div class="menu-inner"><a class="menu-item" href="/posts/" title="文章列表"> 文章 </a><a class="menu-item" href="/tags/" title="标签"> 标签 </a><a class="menu-item" href="/categories/" title="分类"> 分类 </a><a class="menu-item" href="/about" title="关于本站"> 关于 </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-desktop">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-desktop" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-desktop" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-desktop">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </span><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                    <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+                </a></div>
+        </div>
+    </div>
+</header><header class="mobile" id="header-mobile">
+    <div class="header-container">
+        <div class="header-wrapper">
+            <div class="header-title">
+                <a href="/" title="Masimaro&#39;s blog">My cool site</a>
+            </div>
+            <div class="menu-toggle" id="menu-toggle-mobile">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+        <div class="menu" id="menu-mobile"><div class="search-wrapper">
+                    <div class="search mobile" id="search-mobile">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-mobile">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-mobile" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-mobile" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-mobile">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </div>
+                    <a href="javascript:void(0);" class="search-cancel" id="search-cancel-mobile">
+                        Cancel
+                    </a>
+                </div><a class="menu-item" href="/posts/" title="文章列表">文章</a><a class="menu-item" href="/tags/" title="标签">标签</a><a class="menu-item" href="/categories/" title="分类">分类</a><a class="menu-item" href="/about" title="关于本站">关于</a><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+            </a></div>
+    </div>
+</header><div class="search-dropdown desktop">
+        <div id="search-dropdown-desktop"></div>
+    </div>
+    <div class="search-dropdown mobile">
+        <div id="search-dropdown-mobile"></div>
+    </div><main class="main">
+                <div class="container"><div class="toc" id="toc-auto">
+            <h2 class="toc-title">Contents</h2>
+            <div class="toc-content" id="toc-content-auto"></div>
+        </div><article class="page single"><h1 class="single-title animate__animated animate__flipInX">顺序容器</h1><div class="post-meta">
+            <div class="post-meta-line"><span class="post-author"><a href="https://www.masimaro.xyz" title="Author" target="_blank" rel="noopener noreffer author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Masimaro</a></span>&nbsp;<span class="post-category">included in <a href="/categories/c++/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>C++</a></span></div>
+            <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw" aria-hidden="true"></i>&nbsp;<time datetime="2021-04-11">2021-04-11</time>&nbsp;<i class="fas fa-pencil-alt fa-fw" aria-hidden="true"></i>&nbsp;4978 words&nbsp;
+                <i class="far fa-clock fa-fw" aria-hidden="true"></i>&nbsp;10 minutes&nbsp;</div>
+        </div><div class="details toc" id="toc-static"  data-kept="true">
+                <div class="details-summary toc-title">
+                    <span>Contents</span>
+                    <span><i class="details-icon fas fa-angle-right" aria-hidden="true"></i></span>
+                </div>
+                <div class="details-content toc-content" id="toc-content-static"><nav id="TableOfContents">
+  <ul>
+    <li><a href="#顺序容器概述">顺序容器概述</a></li>
+    <li><a href="#容器库概述">容器库概述</a>
+      <ul>
+        <li><a href="#迭代器">迭代器</a></li>
+        <li><a href="#容器类型成员">容器类型成员</a></li>
+        <li><a href="#begin-和-end-成员">begin 和 end 成员</a></li>
+        <li><a href="#容器定义和初始化">容器定义和初始化</a></li>
+        <li><a href="#赋值和swap">赋值和swap</a></li>
+        <li><a href="#容器大小操作">容器大小操作</a></li>
+        <li><a href="#关系运算符">关系运算符</a></li>
+      </ul>
+    </li>
+    <li><a href="#顺序容器的操作">顺序容器的操作</a>
+      <ul>
+        <li><a href="#向顺序容器中添加元素">向顺序容器中添加元素</a></li>
+        <li><a href="#访问顺序容器">访问顺序容器</a></li>
+        <li><a href="#删除元素">删除元素</a></li>
+        <li><a href="#特殊的-forward_list-操作">特殊的 forward_list 操作</a></li>
+        <li><a href="#改变容器大小">改变容器大小</a></li>
+        <li><a href="#容器操作可能使迭代器失效">容器操作可能使迭代器失效</a></li>
+      </ul>
+    </li>
+    <li><a href="#vector-容器是如何增长的">vector 容器是如何增长的</a></li>
+    <li><a href="#额外的string操作">额外的string操作</a>
+      <ul>
+        <li><a href="#搜索操作">搜索操作</a></li>
+        <li><a href="#compare-函数">compare 函数</a></li>
+        <li><a href="#数值转化">数值转化</a></li>
+        <li><a href="#容器适配器">容器适配器</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav></div>
+            </div><div class="content" id="content"><p>所有容器类都共享公共的接口，不同容器按不同的方式进行扩展，这个公共接口使得学习容器更加容器。我们基于这种容器所学习的内容也都适用于其他容器。每种容器都提供了不同的性能和功能权衡</p>
+<!-- raw HTML omitted -->
+<p>一个容器就是一些特定类型对象的集合。顺序容器为程序员提供了控制元素存储顺序的能力。这种顺序不依赖于元素的值，而是与元素加入容器的位置相对应。</p>
+<h2 id="顺序容器概述">顺序容器概述</h2>
+<p>所谓的顺序容器是指，在内存中数据存储有一定顺序。数据结构中的顺序容器有：可变数组、队列、数组、链表、栈。</p>
+<p>c++ 标准库中的顺序容器提供了快速顺序访问元素的能力。但是这些容器在一下方面都有不同的性能折中</p>
+<ol>
+<li>向容器中添加或者删除元素的代价</li>
+<li>非顺序访问容器中元素的代价</li>
+</ol>
+<p>标准库中顺序容器主要有：</p>
+<ol>
+<li>vector：可变大小的数组。支持快速随机访问，在尾部之外插入或者删除元素可能会很慢</li>
+<li>dque：双端队列，支持快速随机访问，在头尾位置插入/删除元素速度很快</li>
+<li>list：双向连标，只支持双向顺序访问，在list中任何位置进行插入删除操作速度都很快</li>
+<li>forward_list: 单向链表，只支持单向顺序访问，在链表任何位置插入删除元素速度很快</li>
+<li>array: 固定大小的数组，支持快速随机访问，不能添加或者删除元素</li>
+<li>string: 与vector容器类似，但专门用于保存字符，随机访问快。在尾部插入与删除速度快</li>
+</ol>
+<p>c++ 标准库中的容器是经过精心优化设计过的。性能通常会是同类数据结构中最好的。现代c++ 程序应该使用标准库容器，而不是原始的数据结构（如内置数组）</p>
+<p>通常使用vector 是最好的选择，除非你有很好的理由选择其他容器</p>
+<p>一下是一些选择容器的基本原则:</p>
+<ol>
+<li>除非你有很好的理由选择其他容器，否则使用vector</li>
+<li>如果你的程序有很多小的元素，且额外开销很严重，否则不要使用list或者forward_list</li>
+<li>如果程序要求随机访问元素，应该使用vector 或者deque</li>
+<li>如果程序要求在容器中间插入或者删除元素，应该使用list或者forward_list</li>
+<li>如果程序要在头尾位置插入或者删除元素，但是不会在中间位置插入删除元素，则应该使用deque</li>
+<li>如果程序只有在读取输入时才需要在容器中间插入元素，随后需要随机访问元素，则：
+6.1 首先确定是否真的需要在容器中间位置添加元素。当处理输入数据时通常很容易向vector中添加数据，然后再调用标准库的sort函数，来重排元素，避免在中间位置添加元素
+6.2 如果必须在中间位置插入元素考虑在输入阶段使用list，一旦输入完成，将list中的内容拷贝到一个vector中</li>
+</ol>
+<p>如果你不确定该使用哪种容器，可以在程序中只使用vector 和list公共的操作，不使用下标操作，使用迭代器，避免随机访问</p>
+<h2 id="容器库概述">容器库概述</h2>
+<h3 id="迭代器">迭代器</h3>
+<p>迭代器是访问容器中元素的公共接口</p>
+<p>所有迭代器都通过解引用运算符来实现这个操作。标准库中的所有迭代器都定义了递增运算符，从当前元素移动到下一个元素。部分容器的迭代器也定义了递减运算符，用于从一个元素移动到上一个元素</p>
+<p>一个迭代器范围是由一对迭代器来表示的。两个迭代器分别指向同一个容器的元素或者尾元素之后的位置。</p>
+<p>如果两个迭代器满足以下两个条件，则这两个迭代器构成一个迭代器范围：</p>
+<ol>
+<li>它们指向同一个容器中的元素，或者是容器最后一个元素之后的位置</li>
+<li>我们可以通过反复递增begin 来到达end位置，换句话说，end不在begin之前</li>
+</ol>
+<p>如果两个迭代器构成一个迭代器范围，则：</p>
+<ol>
+<li>如果begin和end相等，则范围为空</li>
+<li>如果begin和end不等，则范围至少包含一个元素，且begin指向该范围中的第一个元素</li>
+<li>我们可以对begin递增若干次，使得begin== end</li>
+</ol>
+<h3 id="容器类型成员">容器类型成员</h3>
+<p>每个容器都定义了多个类型，我们已经使用了其中的3种：size_type、iterator、const_iterator</p>
+<p>除了正向的迭代器，容器库还提供了反向遍历容器的迭代器，反向迭代器就是一种反向遍历容器的迭代器。与正向迭代器相比各种操作的含义也都发生了颠倒。例如对一个反向迭代器执行++操作，会得到上一个元素。</p>
+<p>剩下的就是类型别名了。通过类型别名，我们可以在不了解容器中元素类型的情况下使用它，如果需要元素类型可以使用容器的value_type ，如果需要元素类型的一个引用可以使用reference或者const_reference。</p>
+<h3 id="begin-和-end-成员">begin 和 end 成员</h3>
+<p><code>begin</code> 和 <code>end</code> 操作生成一个指向容器中第一个元素和尾元素之后位置的迭代器范围。<code>begin</code>和<code>end</code>有多个版本。带r的版本返回反向迭代器，带c的版本返回const型迭代器</p>
+<h3 id="容器定义和初始化">容器定义和初始化</h3>
+<p>可以将一个容器初始化为另一个容器的拷贝
+将一个新容器创建为另一个容器的拷贝的方法有两种：可以直接拷贝整个容器，或者拷贝由一个迭代器对指定的元素范围
+为了创建一个容器为另一个容器的拷贝，两个容器的类型及其元素类型必须匹配。当传递迭代器参数来拷贝一个范围时，就不要求容器类型是相同的了。而且新容器和原容器中的元素类型也可以不同，只要能将拷贝的元素转化为要初始化的容器的元素类型即可</p>
+<p>在新标准中我们对一个容器进行列表初始化</p>
+<p>标准库array在定义之处就应该给出具体的大小，而且后续不允许修改它的大小</p>
+<p>我们不能直接对内置数组执行拷贝或者对象赋值操作，但是array对象允许</p>
+<h3 id="赋值和swap">赋值和swap</h3>
+<p>我们直接使用 = 运算符来将一个容器赋值为另一个容器的拷贝，但是要求容器类型完全相同，array也支持这种操作</p>
+<p>顺序容器(array除外)还定义了一个assign的成员，assign操作用参数所指定的元素替换左边容器中的所有元素</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="n">list</span><span class="o">&lt;</span><span class="n">string</span><span class="o">&gt;</span> <span class="n">name</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="n">vector</span><span class="o">&lt;</span><span class="k">const</span> <span class="kt">char</span><span class="o">*&gt;</span> <span class="n">oldstyle</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="n">name</span> <span class="o">=</span> <span class="n">oldstyle</span><span class="p">;</span> <span class="c1">//错误 = 要求两侧容器类型完全相同
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="n">name</span><span class="p">.</span><span class="n">assign</span><span class="p">(</span><span class="n">oldstyle</span><span class="p">);</span>
+</span></span></code></pre></div><p>可以使用swap交换两个容器中的内容，要求两个容器类型完全相同。除了array外，swap不对任何元素进行拷贝、删除或者插入操作，可以保证在常量时间内完成</p>
+<h3 id="容器大小操作">容器大小操作</h3>
+<p>每个容器都有三大与大小相关的操作。</p>
+<ol>
+<li>size: 返回容器中元素数目</li>
+<li>empty: 当容器中元素数量为0时，返回<code>true</code>，否则返回<code>false</code></li>
+<li>max_size: 返回一个大于或者等于该类型容器所能容纳的最大元素数的值</li>
+</ol>
+<h3 id="关系运算符">关系运算符</h3>
+<p>除了无序容器外的所有容器都支持关系运算符</p>
+<p>关系运算符左右两边的运算对象必须是相同类型的容器，且必须保存相同类型的元素</p>
+<p>比较的过程与比较string大小的过程类似</p>
+<ol>
+<li>如果两个容器具有相同大小且所有元素都两辆对应相等，则两个容器相等。否则两个容器不等</li>
+<li>如果两个容器大小不同，但较小容器中每个元素都等于较大容器中对应元素。则较小容器大于较大容器</li>
+<li>如果两个容器都不是另一个容器的前缀自序列，则它们的比较结果取决于第一个不相等的元素的比较结果</li>
+</ol>
+<p>容器的相等运算符实际上是使用元素的<code>==</code>运算符实现比较的。而其他关系是使用元素的<code>&lt;</code> 运算符</p>
+<h2 id="顺序容器的操作">顺序容器的操作</h2>
+<h3 id="向顺序容器中添加元素">向顺序容器中添加元素</h3>
+<ol>
+<li>push_back：将内容追加到容器尾部</li>
+<li>push_front: 将内容添加到容器的首部</li>
+<li>insert: 在容器的特定位置插入0个或者多个元素,返回插入元素位置的迭代器</li>
+<li>emplace_back、emplace_front、emplace: 这些函数是直接在容器内部进行元素构造，而上述函数是将内容进行拷贝。从效率上讲emplace 函数会高一些</li>
+</ol>
+<p>使用这些操作时必须记得不同类型的容器使用不同的元素分配策略，而这些策略直接影响性能。</p>
+<h3 id="访问顺序容器">访问顺序容器</h3>
+<p>每个顺序容器中都有一个front 函数，返回容器内第一个元素的引用。而除了forward_list 之外的所有顺序容器都有一个back成员函数。</p>
+<p>另外可以使用at来访问随机位置的元素</p>
+<p>记住，这些访问函数返回的都是引用</p>
+<h3 id="删除元素">删除元素</h3>
+<ol>
+<li>pop_front: 删除首元素</li>
+<li>pop_back: 删除尾元素</li>
+<li>erase: 可以从容器中删除指定位置的元素,可以传入一个范围，删除指定范围内的元素</li>
+</ol>
+<h3 id="特殊的-forward_list-操作">特殊的 forward_list 操作</h3>
+<p>在对forward_list 进行增删操作的时候，需要找到对应位置的前驱节点，而单向链表无法很容器的找到一个节点的前驱节点。因此对单向链表，提供了类似 insert_after、emplace_after、erase_after等操作</p>
+<h3 id="改变容器大小">改变容器大小</h3>
+<p>可以使用resize 来增大或者缩小容器大小,如果是缩小容器大小，则指向被删除元素的迭代器、引用、指针都会失效</p>
+<h3 id="容器操作可能使迭代器失效">容器操作可能使迭代器失效</h3>
+<p>在向容器中添加元素后：</p>
+<ol>
+<li>如果容器是vector或者string，且存储空间被重新分配，则指向容器的迭代器、指针都会失效。如果存储空间未重新分配，指向插入位置之前的迭代器、指针、引用仍然有效，但是指向插入位置之后元素的迭代器、指针和引用将会失效</li>
+<li>对于deque，插入到首尾位置之外的任何位置都会导致迭代器、指针和引用失效。如果在首尾位置添加元素，迭代器会失效，但指向存在的元素的引用和指针不会失效</li>
+<li>对于list和forward_list，指向容器的迭代器、指针和引用仍然有效</li>
+</ol>
+<p>删除一个元素后，指向原来被删除元素的迭代器、指针和引用都会失效。</p>
+<ol>
+<li>对于forward_list 和list来说，指向容器其他位置的迭代器、引用和指针仍然有效</li>
+<li>对于deque，如果在首尾之外的任何位置删除元素，那么指向被删除元素以外的其他元素的迭代器、引用和指针也会失效。如果是删除deque的尾元素，则尾后迭代器也会失效。但是其他迭代器、引用和指针不受影响，如果删除首元素，这些也不会受到影响</li>
+<li>对于vector和string，指向被删除元素之前元素的迭代器、引用和指针仍然有效</li>
+</ol>
+<p>删除元素时尾后迭代器总是会失效</p>
+<p>使用insert插入元素后可以保存返回的迭代器，然后用该迭代器进行迭代可以保证迭代器有效</p>
+<p>不要保存end返回的迭代器</p>
+<h2 id="vector-容器是如何增长的">vector 容器是如何增长的</h2>
+<p>为了支持快速随机访问，vector 将元素连续存储。如果往容器中添加一个新元素时，发现容器空间已经不够了，就需要重新分配空间。并将已有元素逐一拷贝到新的内存空间中，然后添加新元素。</p>
+<p>为了避免这种代价，标准库实现者采用了可以减少容器空间重新分配次数的策略。当不得不获取新的内存空间时，vector和string的实现通常会分配比新的空间需求更大的内存空间</p>
+<p>vector和string也提供了一些成员函数，允许我们与它的实现中内存分配部分互动。</p>
+<ol>
+<li>capacity: 告诉我们容器在不扩张内存空间的情况下可以容纳多少个元素</li>
+<li>reserve: 允许我们同志容器它应该准备保存多少个元素</li>
+</ol>
+<p>一般来讲，<code>vector</code> 的实现采用的策略似乎是在每次需要分配新内容空间时将当前容量翻倍</p>
+<h2 id="额外的string操作">额外的string操作</h2>
+<p>除了顺序容器共同的操作之外，string类还提供了一些额外的操作。</p>
+<p>这些操作中的大部分要么是提供string类和C风格字符串之间的互相转换，要么是增加了允许我们用下标代替迭代器的版本。</p>
+<ol>
+<li>substr: 返回一个string，它是原始string的一部分或者全部的拷贝</li>
+<li>可以使用insert、erase、assign 来改变字符串的内容</li>
+<li>append可以在字符串尾部添加一个新字符串; replace 进行查找替换</li>
+</ol>
+<h3 id="搜索操作">搜索操作</h3>
+<p>标准库中提供了6个不同的搜索函数，每个函数有4中不同形式的重载版本。每个搜索操作都返回string::size_type 值，表示匹配发生位置的下标。如果搜索失败返回一个名为string::npos 的static成员</p>
+<ol>
+<li>s.find(arg): 查找字符串中第一次出现某个字符串的位置</li>
+<li>s.rfind(arg): 查找字符串中最后一次出现某个字符串的位置</li>
+<li>s.find_first_of(arg): 在s中查找arg中任意一个字符第一次出现的位置</li>
+<li>s.find_last_of(arg): 在s中查找arg中任意一个字符最后一次出现的位置</li>
+<li>s.find_first_not_of(arg): 在s中查找第一个不在arg 中的字符</li>
+<li>s.find_last_not_of(arg): 在s中查找最后一个不在arg 中的字符</li>
+</ol>
+<h3 id="compare-函数">compare 函数</h3>
+<p>compare函数用于比较两个大小字符串，与C标准库中的strcmp类似</p>
+<h3 id="数值转化">数值转化</h3>
+<ol>
+<li>to_string: 将数值数据转化为字符串</li>
+<li>stod: 将字符串转化为double</li>
+<li>stof: 将字符串转化为float</li>
+<li>stoi: 将字符串转化为int</li>
+<li>stol: 将字符串转化为long</li>
+<li>stoul: 将字符串转化为 unsigned long</li>
+<li>stoll: 将字符串转化为 long long</li>
+<li>stoull: 将字符串转化为 unsigned long long</li>
+<li>stold: 将字符串转化为 long double</li>
+</ol>
+<h3 id="容器适配器">容器适配器</h3>
+<p>适配器是标准库提供的一组概念，能使某种事物的行为看起来像另一种事物一样。一个容器适配器接受一种已有的容器类型，使其行为看起来像另一种事物一样</p>
+<p>标准库提供了三种适配器: <code>stack</code>、<code>queue</code>、<code>priority_queue</code>(优先级队列)</p>
+<p>所有的适配器都要求容器具有添加和删除元素的能力。</p>
+<p><code>stack</code> 只要求类型容器具有 <code>push_back</code>、<code>pop_back</code> 操作因此可以使用除了 <code>array</code> 和 <code>forward_list</code> 之外的任何容器类型来进行构造</p>
+<p><code>queue</code> 要求容器类型具有 <code>back</code>、<code>push_back</code>、<code>front</code>、<code>pop_back</code> 因此它可以构造在<code>list</code>或者<code>deque</code>之上但不能基于 <code>vector</code> 构造</p>
+<p><code>priority_queue</code> 要求容器类型具有<code>push_back</code>、<code>front、pop_back</code> 之外还要求容器具有随机访问的能力，所以它必须构造在 <code>vector</code> 之上</p>
+<!-- raw HTML omitted -->
+</div><div class="post-footer" id="post-footer">
+    <div class="post-info">
+        <div class="post-info-line">
+            <div class="post-info-mod">
+                <span>Updated on 2021-04-11</span>
+            </div></div>
+        <div class="post-info-line">
+            <div class="post-info-md"></div>
+            <div class="post-info-share">
+                <span><a href="javascript:void(0);" title="Share on Twitter" data-sharer="twitter" data-url="http://HaiLateBoy.github.io/posts/cpp-base-8/" data-title="顺序容器" data-hashtags="C&#43;&#43;,语法,基础,c&#43;&#43;11"><i class="fab fa-twitter fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Facebook" data-sharer="facebook" data-url="http://HaiLateBoy.github.io/posts/cpp-base-8/" data-hashtag="C&#43;&#43;"><i class="fab fa-facebook-square fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Hacker News" data-sharer="hackernews" data-url="http://HaiLateBoy.github.io/posts/cpp-base-8/" data-title="顺序容器"><i class="fab fa-hacker-news fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Line" data-sharer="line" data-url="http://HaiLateBoy.github.io/posts/cpp-base-8/" data-title="顺序容器"><i data-svg-src="https://cdn.jsdelivr.net/npm/simple-icons@7.3.0/icons/line.svg" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on 微博" data-sharer="weibo" data-url="http://HaiLateBoy.github.io/posts/cpp-base-8/" data-title="顺序容器"><i class="fab fa-weibo fa-fw" aria-hidden="true"></i></a></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="post-info-more">
+        <section class="post-tags"><i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/c&#43;&#43;/">C&#43;&#43;</a>,&nbsp;<a href="/tags/%E8%AF%AD%E6%B3%95/">语法</a>,&nbsp;<a href="/tags/%E5%9F%BA%E7%A1%80/">基础</a>,&nbsp;<a href="/tags/c&#43;&#43;11/">c&#43;&#43;11</a></section>
+        <section>
+            <span><a href="javascript:void(0);" onclick="window.history.back();">Back</a></span>&nbsp;|&nbsp;<span><a href="/">Home</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav"><a href="/posts/cpp-base-7/" class="prev" rel="prev" title="IO库"><i class="fas fa-angle-left fa-fw" aria-hidden="true"></i>IO库</a>
+            <a href="/posts/cpp-base-9/" class="next" rel="next" title="泛型算法">泛型算法<i class="fas fa-angle-right fa-fw" aria-hidden="true"></i></a></div>
+</div>
+</article></div>
+            </main><footer class="footer">
+        <div class="footer-container"><div class="footer-line">Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener noreffer" title="Hugo 0.121.2">Hugo</a> | Theme - <a href="https://github.com/dillonzq/LoveIt" target="_blank" rel="noopener noreffer" title="LoveIt 0.2.11"><i class="far fa-kiss-wink-heart fa-fw" aria-hidden="true"></i> LoveIt</a>
+                </div><div class="footer-line" itemscope itemtype="http://schema.org/CreativeWork"><i class="far fa-copyright fa-fw" aria-hidden="true"></i><span itemprop="copyrightYear">2022 - 2024</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="https://www.masimaro.xyz" target="_blank">Masimaro</a></span></div>
+        </div>
+    </footer></div>
+
+        <div id="fixed-buttons"><a href="#" id="back-to-top" class="fixed-button" title="Back to Top">
+                <i class="fas fa-arrow-up fa-fw" aria-hidden="true"></i>
+            </a><a href="#" id="view-comments" class="fixed-button" title="View Comments">
+                <i class="fas fa-comment fa-fw" aria-hidden="true"></i>
+            </a>
+        </div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.css"><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/autocomplete.js@0.38.1/dist/autocomplete.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lunr@2.3.9/lunr.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lazysizes@5.3.2/lazysizes.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/clipboard@2.0.11/dist/clipboard.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/sharer.js@0.5.1/sharer.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/auto-render.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/copy-tex.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/mhchem.min.js"></script><script type="text/javascript">window.config={"code":{"copyTitle":"Copy to clipboard","maxShownLines":50},"comment":{},"math":{"delimiters":[{"display":true,"left":"$$","right":"$$"},{"display":true,"left":"\\[","right":"\\]"},{"display":true,"left":"\\begin{equation}","right":"\\end{equation}"},{"display":true,"left":"\\begin{equation*}","right":"\\end{equation*}"},{"display":true,"left":"\\begin{align}","right":"\\end{align}"},{"display":true,"left":"\\begin{align*}","right":"\\end{align*}"},{"display":true,"left":"\\begin{alignat}","right":"\\end{alignat}"},{"display":true,"left":"\\begin{alignat*}","right":"\\end{alignat*}"},{"display":true,"left":"\\begin{gather}","right":"\\end{gather}"},{"display":true,"left":"\\begin{CD}","right":"\\end{CD}"},{"display":false,"left":"$","right":"$"},{"display":false,"left":"\\(","right":"\\)"}],"strict":false},"search":{"highlightTag":"em","maxResultLength":10,"noResultsFound":"No results found","snippetLength":50}};</script><script type="text/javascript" src="/js/theme.min.js"></script></body>
+</html>

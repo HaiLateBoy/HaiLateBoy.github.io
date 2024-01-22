@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="robots" content="noodp" />
+        <title>为 MariaDB 配置远程访问权限 - Masimaro&#39;s blog</title><meta name="Description" content="这是我用于记录日常和学习的小站"><meta property="og:title" content="为 MariaDB 配置远程访问权限" />
+<meta property="og:description" content="最近在配置MySQL远程连接的时候发现我的MySQL数据库采用的是 MariaDB 引擎，与普通的数据库配置有点不同
+经过查找资料终于完成了，特此记录方便以后查询" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://HaiLateBoy.github.io/posts/connect-mysql-maraidb/" /><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2017-12-18T20:08:40+00:00" />
+<meta property="article:modified_time" content="2017-12-18T20:08:40+00:00" /><meta property="og:site_name" content="Masimaro&#39;s blog" />
+
+<meta name="twitter:card" content="summary"/><meta name="twitter:title" content="为 MariaDB 配置远程访问权限"/>
+<meta name="twitter:description" content="最近在配置MySQL远程连接的时候发现我的MySQL数据库采用的是 MariaDB 引擎，与普通的数据库配置有点不同
+经过查找资料终于完成了，特此记录方便以后查询"/>
+<meta name="application-name" content="My cool site">
+<meta name="apple-mobile-web-app-title" content="My cool site"><meta name="theme-color" content="#ffffff"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="manifest" href="/site.webmanifest"><link rel="canonical" href="http://HaiLateBoy.github.io/posts/connect-mysql-maraidb/" /><link rel="prev" href="http://HaiLateBoy.github.io/posts/upround/" /><link rel="next" href="http://HaiLateBoy.github.io/posts/c-num-in-memory/" /><link rel="stylesheet" href="/css/style.min.css"><link rel="preload" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css"></noscript><link rel="preload" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css"></noscript><script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "BlogPosting",
+        "headline": "为 MariaDB 配置远程访问权限",
+        "inLanguage": "zh-CN",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "http:\/\/HaiLateBoy.github.io\/posts\/connect-mysql-maraidb\/"
+        },"genre": "posts","keywords": "MySQL, MariaDB, 数据库配置","wordcount":  1051 ,
+        "url": "http:\/\/HaiLateBoy.github.io\/posts\/connect-mysql-maraidb\/","datePublished": "2017-12-18T20:08:40+00:00","dateModified": "2017-12-18T20:08:40+00:00","publisher": {
+            "@type": "Organization",
+            "name": ""},"author": {
+                "@type": "Person",
+                "name": "Masimaro"
+            },"description": ""
+    }
+    </script></head>
+    <body data-header-desktop="fixed" data-header-mobile="auto"><script type="text/javascript">(window.localStorage && localStorage.getItem('theme') ? localStorage.getItem('theme') === 'dark' : ('auto' === 'auto' ? window.matchMedia('(prefers-color-scheme: dark)').matches : 'auto' === 'dark')) && document.body.setAttribute('theme', 'dark');</script>
+
+        <div id="mask"></div><div class="wrapper"><header class="desktop" id="header-desktop">
+    <div class="header-wrapper">
+        <div class="header-title">
+            <a href="/" title="Masimaro&#39;s blog">My cool site</a>
+        </div>
+        <div class="menu">
+            <div class="menu-inner"><a class="menu-item" href="/posts/" title="文章列表"> 文章 </a><a class="menu-item" href="/tags/" title="标签"> 标签 </a><a class="menu-item" href="/categories/" title="分类"> 分类 </a><a class="menu-item" href="/about" title="关于本站"> 关于 </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-desktop">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-desktop" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-desktop" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-desktop">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </span><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                    <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+                </a></div>
+        </div>
+    </div>
+</header><header class="mobile" id="header-mobile">
+    <div class="header-container">
+        <div class="header-wrapper">
+            <div class="header-title">
+                <a href="/" title="Masimaro&#39;s blog">My cool site</a>
+            </div>
+            <div class="menu-toggle" id="menu-toggle-mobile">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+        <div class="menu" id="menu-mobile"><div class="search-wrapper">
+                    <div class="search mobile" id="search-mobile">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-mobile">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-mobile" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-mobile" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-mobile">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </div>
+                    <a href="javascript:void(0);" class="search-cancel" id="search-cancel-mobile">
+                        Cancel
+                    </a>
+                </div><a class="menu-item" href="/posts/" title="文章列表">文章</a><a class="menu-item" href="/tags/" title="标签">标签</a><a class="menu-item" href="/categories/" title="分类">分类</a><a class="menu-item" href="/about" title="关于本站">关于</a><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+            </a></div>
+    </div>
+</header><div class="search-dropdown desktop">
+        <div id="search-dropdown-desktop"></div>
+    </div>
+    <div class="search-dropdown mobile">
+        <div id="search-dropdown-mobile"></div>
+    </div><main class="main">
+                <div class="container"><div class="toc" id="toc-auto">
+            <h2 class="toc-title">Contents</h2>
+            <div class="toc-content" id="toc-content-auto"></div>
+        </div><article class="page single"><h1 class="single-title animate__animated animate__flipInX">为 MariaDB 配置远程访问权限</h1><div class="post-meta">
+            <div class="post-meta-line"><span class="post-author"><a href="https://www.masimaro.xyz" title="Author" target="_blank" rel="noopener noreffer author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Masimaro</a></span>&nbsp;<span class="post-category">included in <a href="/categories/%E6%95%B0%E6%8D%AE%E5%BA%93/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>数据库</a></span></div>
+            <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw" aria-hidden="true"></i>&nbsp;<time datetime="2017-12-18">2017-12-18</time>&nbsp;<i class="fas fa-pencil-alt fa-fw" aria-hidden="true"></i>&nbsp;1051 words&nbsp;
+                <i class="far fa-clock fa-fw" aria-hidden="true"></i>&nbsp;3 minutes&nbsp;</div>
+        </div><div class="details toc" id="toc-static"  data-kept="true">
+                <div class="details-summary toc-title">
+                    <span>Contents</span>
+                    <span><i class="details-icon fas fa-angle-right" aria-hidden="true"></i></span>
+                </div>
+                <div class="details-content toc-content" id="toc-content-static"><nav id="TableOfContents"></nav></div>
+            </div><div class="content" id="content"><p>最近在配置MySQL远程连接的时候发现我的MySQL数据库采用的是 MariaDB 引擎，与普通的数据库配置有点不同
+经过查找资料终于完成了，特此记录方便以后查询</p>
+<p>MariaDB 与普通的MySQL数据库的一个不同在于它的配置文件不止一个，它将不同的数据放入到不同的配置文件中，之前的/etc/mysql/my.cnf内容如下：
+<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="/connect-mysql-maraidb/my.cnf.PNG"
+        data-srcset="/connect-mysql-maraidb/my.cnf.PNG, /connect-mysql-maraidb/my.cnf.PNG 1.5x, /connect-mysql-maraidb/my.cnf.PNG 2x"
+        data-sizes="auto"
+        alt="/connect-mysql-maraidb/my.cnf.PNG"
+        title="my.conf" />
+从文件中的注释上来看，它主要有这么几个配置文件</p>
+<ol>
+<li>/etc/mysql/mariadb.cnf 默认配置文件,</li>
+<li>/etc/mysql/conf.d/*.cnf 设置全局项的文件</li>
+<li>&ldquo;/etc/mysql/mariadb.conf.d/*.cnf&rdquo; 设置与MariaDB相关的信息</li>
+<li>&ldquo;~/.my.cnf&rdquo; 设置该账户对应的信息</li>
+</ol>
+<p>这也就是为什么我们在my.cnf做相关设置有的时候不起作用（可能在其他配置文件中有相同的项，MySQL最终采用的是另外一个文件中的设置）。
+根据官方的说法， MariaDB为了提高安全性，默认只监听127.0.0.1中的3306端口并且禁止了远程的TCP链接，我们可以通过下面两步来开启MySQL的远程服务</p>
+<ol>
+<li>注释掉skip-networking选项来开启远程访问.</li>
+<li>注释bind-address项，该项表示运行哪些IP地址的机器连接，允许所有远程的机器连接
+但是配置文件这么多，这两选项究竟在哪呢？这个时候使用grep在/etc/mysql/目录中的所有文件中递归查找，看哪个文件中含有这个字符串
+我们输入：</li>
+</ol>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">grep -rn <span class="s2">&#34;skip-networking&#34;</span> *
+</span></span></code></pre></div><p>，结果如下：
+<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="connect-mysql-maraidb/find_file.PNG"
+        data-srcset="connect-mysql-maraidb/find_file.PNG, connect-mysql-maraidb/find_file.PNG 1.5x, connect-mysql-maraidb/find_file.PNG 2x"
+        data-sizes="auto"
+        alt="connect-mysql-maraidb/find_file.PNG"
+        title="1" />
+十分幸运的是这两项都在同一文件中（我自己的是没有skip-networking项）
+我们打开文件/etc/mysql/mariadb.conf.d/50-server.cnf，注释掉bind-address项，如下：
+<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="/connect-mysql-maraidb/compiler.PNG"
+        data-srcset="/connect-mysql-maraidb/compiler.PNG, /connect-mysql-maraidb/compiler.PNG 1.5x, /connect-mysql-maraidb/compiler.PNG 2x"
+        data-sizes="auto"
+        alt="/connect-mysql-maraidb/compiler.PNG"
+        title="注释掉bind-address项" />
+只有这些仍然不够，我们只是开启了MySQL监听远程连接的选项，接下来需要给对应的MySQL账户分配权限，允许使用该账户远程连接到MySQL
+输入</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="cl"><span class="k">select</span><span class="w"> </span><span class="k">User</span><span class="p">,</span><span class="w"> </span><span class="k">host</span><span class="w"> </span><span class="k">from</span><span class="w"> </span><span class="n">mysql</span><span class="p">.</span><span class="k">user</span><span class="p">;</span><span class="w">
+</span></span></span></code></pre></div><p>查看用户账号信息：
+<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="/connect-mysql-maraidb/user_info.PNG"
+        data-srcset="/connect-mysql-maraidb/user_info.PNG, /connect-mysql-maraidb/user_info.PNG 1.5x, /connect-mysql-maraidb/user_info.PNG 2x"
+        data-sizes="auto"
+        alt="/connect-mysql-maraidb/user_info.PNG"
+        title="账号信息" />
+root账户中的host项是localhost表示该账号只能进行本地登录，我们需要修改权限，输入命令：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="cl"><span class="k">GRANT</span><span class="w"> </span><span class="k">ALL</span><span class="w"> </span><span class="k">PRIVILEGES</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="o">*</span><span class="p">.</span><span class="o">*</span><span class="w"> </span><span class="k">TO</span><span class="w"> </span><span class="s1">&#39;root&#39;</span><span class="o">@</span><span class="s1">&#39;%&#39;</span><span class="w"> </span><span class="n">IDENTIFIED</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="s1">&#39;password&#39;</span><span class="w"> </span><span class="k">WITH</span><span class="w"> </span><span class="k">GRANT</span><span class="w"> </span><span class="k">OPTION</span><span class="p">;</span><span class="w">
+</span></span></span></code></pre></div><p>修改权限。%表示针对所有IP，password表示将用这个密码登录root用户，如果想只让某个IP段的主机连接，可以修改为</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="cl"><span class="k">GRANT</span><span class="w"> </span><span class="k">ALL</span><span class="w"> </span><span class="k">PRIVILEGES</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="o">*</span><span class="p">.</span><span class="o">*</span><span class="w"> </span><span class="k">TO</span><span class="w"> </span><span class="s1">&#39;root&#39;</span><span class="o">@</span><span class="s1">&#39;192.168.100.%&#39;</span><span class="w"> </span><span class="n">IDENTIFIED</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="s1">&#39;my-new-password&#39;</span><span class="w"> </span><span class="k">WITH</span><span class="w"> </span><span class="k">GRANT</span><span class="w"> </span><span class="k">OPTION</span><span class="p">;</span><span class="w">
+</span></span></span></code></pre></div><p><strong>注意：此时远程连接的密码可能与你在本地登录时的密码不同了，主要看你在IDENTIFIED BY后面给了什么密码</strong>
+具体的请参考GRANT命令
+最后别忘了</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="cl"><span class="n">FLUSH</span><span class="w"> </span><span class="k">PRIVILEGES</span><span class="p">;</span><span class="w">
+</span></span></span></code></pre></div><p>保存更改。再看看用户信息:
+<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="/connect-mysql-maraidb/now_user_info.PNG"
+        data-srcset="/connect-mysql-maraidb/now_user_info.PNG, /connect-mysql-maraidb/now_user_info.PNG 1.5x, /connect-mysql-maraidb/now_user_info.PNG 2x"
+        data-sizes="auto"
+        alt="/connect-mysql-maraidb/now_user_info.PNG"
+        title="1" />
+这个时候发现相比之前多了一项，它的host项是%，这个时候说明配置成功了，我们可以用该账号进行远程访问了
+输入</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">service mysql restart
+</span></span></code></pre></div><p>重启远程服务器，测试一下：
+<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="/connect-mysql-maraidb/connect.PNG"
+        data-srcset="/connect-mysql-maraidb/connect.PNG, /connect-mysql-maraidb/connect.PNG 1.5x, /connect-mysql-maraidb/connect.PNG 2x"
+        data-sizes="auto"
+        alt="/connect-mysql-maraidb/connect.PNG"
+        title="连接成功" />
+如果这些都做完了，还是不能连接，可以看一下端口是不是被防火墙拦截了
+参考地址：<a href="https://mariadb.com/kb/zh-cn/configuring-mariadb-for-remote-client-access/" target="_blank" rel="noopener noreffer ">官方文档</a></p></div><div class="post-footer" id="post-footer">
+    <div class="post-info">
+        <div class="post-info-line">
+            <div class="post-info-mod">
+                <span>Updated on 2017-12-18</span>
+            </div></div>
+        <div class="post-info-line">
+            <div class="post-info-md"></div>
+            <div class="post-info-share">
+                <span><a href="javascript:void(0);" title="Share on Twitter" data-sharer="twitter" data-url="http://HaiLateBoy.github.io/posts/connect-mysql-maraidb/" data-title="为 MariaDB 配置远程访问权限" data-hashtags="MySQL,MariaDB,数据库配置"><i class="fab fa-twitter fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Facebook" data-sharer="facebook" data-url="http://HaiLateBoy.github.io/posts/connect-mysql-maraidb/" data-hashtag="MySQL"><i class="fab fa-facebook-square fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Hacker News" data-sharer="hackernews" data-url="http://HaiLateBoy.github.io/posts/connect-mysql-maraidb/" data-title="为 MariaDB 配置远程访问权限"><i class="fab fa-hacker-news fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Line" data-sharer="line" data-url="http://HaiLateBoy.github.io/posts/connect-mysql-maraidb/" data-title="为 MariaDB 配置远程访问权限"><i data-svg-src="https://cdn.jsdelivr.net/npm/simple-icons@7.3.0/icons/line.svg" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on 微博" data-sharer="weibo" data-url="http://HaiLateBoy.github.io/posts/connect-mysql-maraidb/" data-title="为 MariaDB 配置远程访问权限"><i class="fab fa-weibo fa-fw" aria-hidden="true"></i></a></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="post-info-more">
+        <section class="post-tags"><i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/mysql/">MySQL</a>,&nbsp;<a href="/tags/mariadb/">MariaDB</a>,&nbsp;<a href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93%E9%85%8D%E7%BD%AE/">数据库配置</a></section>
+        <section>
+            <span><a href="javascript:void(0);" onclick="window.history.back();">Back</a></span>&nbsp;|&nbsp;<span><a href="/">Home</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav"><a href="/posts/upround/" class="prev" rel="prev" title="向上取整算法"><i class="fas fa-angle-left fa-fw" aria-hidden="true"></i>向上取整算法</a>
+            <a href="/posts/c-num-in-memory/" class="next" rel="next" title="C/C&#43;&#43;中整数与浮点数在内存中的表示方式">C/C++中整数与浮点数在内存中的表示方式<i class="fas fa-angle-right fa-fw" aria-hidden="true"></i></a></div>
+</div>
+</article></div>
+            </main><footer class="footer">
+        <div class="footer-container"><div class="footer-line">Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener noreffer" title="Hugo 0.121.2">Hugo</a> | Theme - <a href="https://github.com/dillonzq/LoveIt" target="_blank" rel="noopener noreffer" title="LoveIt 0.2.11"><i class="far fa-kiss-wink-heart fa-fw" aria-hidden="true"></i> LoveIt</a>
+                </div><div class="footer-line" itemscope itemtype="http://schema.org/CreativeWork"><i class="far fa-copyright fa-fw" aria-hidden="true"></i><span itemprop="copyrightYear">2022 - 2024</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="https://www.masimaro.xyz" target="_blank">Masimaro</a></span></div>
+        </div>
+    </footer></div>
+
+        <div id="fixed-buttons"><a href="#" id="back-to-top" class="fixed-button" title="Back to Top">
+                <i class="fas fa-arrow-up fa-fw" aria-hidden="true"></i>
+            </a><a href="#" id="view-comments" class="fixed-button" title="View Comments">
+                <i class="fas fa-comment fa-fw" aria-hidden="true"></i>
+            </a>
+        </div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.css"><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/autocomplete.js@0.38.1/dist/autocomplete.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lunr@2.3.9/lunr.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lazysizes@5.3.2/lazysizes.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/clipboard@2.0.11/dist/clipboard.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/sharer.js@0.5.1/sharer.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/auto-render.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/copy-tex.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/mhchem.min.js"></script><script type="text/javascript">window.config={"code":{"copyTitle":"Copy to clipboard","maxShownLines":50},"comment":{},"math":{"delimiters":[{"display":true,"left":"$$","right":"$$"},{"display":true,"left":"\\[","right":"\\]"},{"display":true,"left":"\\begin{equation}","right":"\\end{equation}"},{"display":true,"left":"\\begin{equation*}","right":"\\end{equation*}"},{"display":true,"left":"\\begin{align}","right":"\\end{align}"},{"display":true,"left":"\\begin{align*}","right":"\\end{align*}"},{"display":true,"left":"\\begin{alignat}","right":"\\end{alignat}"},{"display":true,"left":"\\begin{alignat*}","right":"\\end{alignat*}"},{"display":true,"left":"\\begin{gather}","right":"\\end{gather}"},{"display":true,"left":"\\begin{CD}","right":"\\end{CD}"},{"display":false,"left":"$","right":"$"},{"display":false,"left":"\\(","right":"\\)"}],"strict":false},"search":{"highlightTag":"em","maxResultLength":10,"noResultsFound":"No results found","snippetLength":50}};</script><script type="text/javascript" src="/js/theme.min.js"></script></body>
+</html>

@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="robots" content="noodp" />
+        <title>从零开始配置 vim(7)——自动命令 - Masimaro&#39;s blog</title><meta name="Description" content="这是我用于记录日常和学习的小站"><meta property="og:title" content="从零开始配置 vim(7)——自动命令" />
+<meta property="og:description" content="这篇我们来谈论vim一个相当重要的东西——自动命令。 从编程的角度来看，自动命令有点类似于事件响应，或者回调函数之类。当外部发生某些事件的时候" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://HaiLateBoy.github.io/posts/vim-config7/" /><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2022-08-04T11:12:56+08:00" />
+<meta property="article:modified_time" content="2022-08-04T11:12:56+08:00" /><meta property="og:site_name" content="Masimaro&#39;s blog" />
+
+<meta name="twitter:card" content="summary"/><meta name="twitter:title" content="从零开始配置 vim(7)——自动命令"/>
+<meta name="twitter:description" content="这篇我们来谈论vim一个相当重要的东西——自动命令。 从编程的角度来看，自动命令有点类似于事件响应，或者回调函数之类。当外部发生某些事件的时候"/>
+<meta name="application-name" content="My cool site">
+<meta name="apple-mobile-web-app-title" content="My cool site"><meta name="theme-color" content="#ffffff"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="manifest" href="/site.webmanifest"><link rel="canonical" href="http://HaiLateBoy.github.io/posts/vim-config7/" /><link rel="prev" href="http://HaiLateBoy.github.io/posts/vim-config6/" /><link rel="next" href="http://HaiLateBoy.github.io/posts/vim-config8/" /><link rel="stylesheet" href="/css/style.min.css"><link rel="preload" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css"></noscript><link rel="preload" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css"></noscript><script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "BlogPosting",
+        "headline": "从零开始配置 vim(7)——自动命令",
+        "inLanguage": "zh-CN",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "http:\/\/HaiLateBoy.github.io\/posts\/vim-config7\/"
+        },"genre": "posts","keywords": "vim, 编辑工具, 文本处理, lua, 编辑器","wordcount":  2896 ,
+        "url": "http:\/\/HaiLateBoy.github.io\/posts\/vim-config7\/","datePublished": "2022-08-04T11:12:56+08:00","dateModified": "2022-08-04T11:12:56+08:00","publisher": {
+            "@type": "Organization",
+            "name": ""},"author": {
+                "@type": "Person",
+                "name": "Masimaro"
+            },"description": ""
+    }
+    </script></head>
+    <body data-header-desktop="fixed" data-header-mobile="auto"><script type="text/javascript">(window.localStorage && localStorage.getItem('theme') ? localStorage.getItem('theme') === 'dark' : ('auto' === 'auto' ? window.matchMedia('(prefers-color-scheme: dark)').matches : 'auto' === 'dark')) && document.body.setAttribute('theme', 'dark');</script>
+
+        <div id="mask"></div><div class="wrapper"><header class="desktop" id="header-desktop">
+    <div class="header-wrapper">
+        <div class="header-title">
+            <a href="/" title="Masimaro&#39;s blog">My cool site</a>
+        </div>
+        <div class="menu">
+            <div class="menu-inner"><a class="menu-item" href="/posts/" title="文章列表"> 文章 </a><a class="menu-item" href="/tags/" title="标签"> 标签 </a><a class="menu-item" href="/categories/" title="分类"> 分类 </a><a class="menu-item" href="/about" title="关于本站"> 关于 </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-desktop">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-desktop" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-desktop" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-desktop">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </span><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                    <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+                </a></div>
+        </div>
+    </div>
+</header><header class="mobile" id="header-mobile">
+    <div class="header-container">
+        <div class="header-wrapper">
+            <div class="header-title">
+                <a href="/" title="Masimaro&#39;s blog">My cool site</a>
+            </div>
+            <div class="menu-toggle" id="menu-toggle-mobile">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+        <div class="menu" id="menu-mobile"><div class="search-wrapper">
+                    <div class="search mobile" id="search-mobile">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-mobile">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-mobile" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-mobile" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-mobile">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </div>
+                    <a href="javascript:void(0);" class="search-cancel" id="search-cancel-mobile">
+                        Cancel
+                    </a>
+                </div><a class="menu-item" href="/posts/" title="文章列表">文章</a><a class="menu-item" href="/tags/" title="标签">标签</a><a class="menu-item" href="/categories/" title="分类">分类</a><a class="menu-item" href="/about" title="关于本站">关于</a><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+            </a></div>
+    </div>
+</header><div class="search-dropdown desktop">
+        <div id="search-dropdown-desktop"></div>
+    </div>
+    <div class="search-dropdown mobile">
+        <div id="search-dropdown-mobile"></div>
+    </div><main class="main">
+                <div class="container"><div class="toc" id="toc-auto">
+            <h2 class="toc-title">Contents</h2>
+            <div class="toc-content" id="toc-content-auto"></div>
+        </div><article class="page single"><h1 class="single-title animate__animated animate__flipInX">从零开始配置 vim(7)——自动命令</h1><div class="post-meta">
+            <div class="post-meta-line"><span class="post-author"><a href="https://www.masimaro.xyz" title="Author" target="_blank" rel="noopener noreffer author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Masimaro</a></span>&nbsp;<span class="post-category">included in <a href="/categories/vim-%E9%85%8D%E7%BD%AE/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>vim 配置</a></span></div>
+            <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw" aria-hidden="true"></i>&nbsp;<time datetime="2022-08-04">2022-08-04</time>&nbsp;<i class="fas fa-pencil-alt fa-fw" aria-hidden="true"></i>&nbsp;2896 words&nbsp;
+                <i class="far fa-clock fa-fw" aria-hidden="true"></i>&nbsp;6 minutes&nbsp;</div>
+        </div><div class="details toc" id="toc-static"  data-kept="true">
+                <div class="details-summary toc-title">
+                    <span>Contents</span>
+                    <span><i class="details-icon fas fa-angle-right" aria-hidden="true"></i></span>
+                </div>
+                <div class="details-content toc-content" id="toc-content-static"><nav id="TableOfContents">
+  <ul>
+    <li><a href="#自动命令的事件类型">自动命令的事件类型</a></li>
+    <li><a href="#同时绑定多个事件">同时绑定多个事件</a></li>
+    <li><a href="#filetype-事件">FileType 事件</a></li>
+    <li><a href="#自动命令组">自动命令组</a></li>
+    <li><a href="#改进自动加载配置文件的操作">改进自动加载配置文件的操作</a></li>
+  </ul>
+</nav></div>
+            </div><div class="content" id="content"><p>这篇我们来谈论vim一个相当重要的东西——自动命令。</p>
+<p>从编程的角度来看，自动命令有点类似于事件响应，或者回调函数之类。当外部发生某些事件的时候，自动执行事先定义好的一组命令。</p>
+<p>定义一个自动命令的格式如下</p>
+<pre tabindex="0"><code class="language-vimscript" data-lang="vimscript">autocmd type pattern cmd
+</code></pre><ul>
+<li><code>autocmd</code>:  自动命令以 <code>autocmd</code> 关键字开始，它的作用类似与 <code>js</code> 中定义函数时使用的 <code>function</code> 关键字</li>
+<li><code>type</code>: 触发该命令的事件类型</li>
+<li><code>pattern</code>: 事件的过滤，根据不同的事件类型有不同的含义</li>
+<li><code>cmd</code> : 将要执行的命令</li>
+</ul>
+<p>说了这么多，我们以一个例子来说明：
+当我们使用 <code>vim</code> 打开一个不存在的文件，如果直接退出，我们会发现它并没有被保存。因为打开一个不存在的文件时 <code>vim</code> 并没有真的在磁盘中创建这么一个文件，它仅仅新开了一个缓冲区，当执行写命令的时候才真正会创建文件。我们使用 <code>q!</code> 退出的话，它是不会往文件中写的</p>
+<p>我们来试试修改这一行为，打开新文件的时候就创建，也就是打开一个新文件的时候就执行写操作。打开新文件的事件使用 <code>BufNewFile</code> 来表示。这里我们不限定文件格式，因此 <code>pattern</code> 这块就使用 <code>*</code> 来表示，执行的命令是 <code>:w</code> 来写入。</p>
+<pre tabindex="0"><code class="language-vimscript" data-lang="vimscript">:autocmd BufNewFile * w
+</code></pre><h2 id="自动命令的事件类型">自动命令的事件类型</h2>
+<p>自动命令可以监听的事件类型主要有以下几种</p>
+<ul>
+<li>开始编辑一个当前并不存在的文件，也就是我们上面介绍的一种情况。这种情况使用 <code>BufNewFile</code> 来表示</li>
+<li>开始编辑一个已存在的文件。这种情况使用 <code>BufReadPre</code> 或者 <code>BufReadPost</code> 来表示。他们分别表示文件内容被加载前和被加载后</li>
+<li>改变一个缓冲区的 <code>filetype</code> 选项的时候，它与 <code>vim</code> 的文件类型配合使用。这种情况使用 <code>FileType</code> 来表示</li>
+<li>文件被写回磁盘。这种情况用 <code>BufWritePre</code> 和 <code>BufWritePost</code>。他们的含义与上面 <code>BufReadPre</code> 和 <code>BufReadPost</code> 类似。</li>
+<li>进入和退出插入模式，进入插入模式时使用 <code>InsertEnter</code>，退出插入模式时使用 <code>InsertLevel</code>。</li>
+<li>Vim 完成启动所有初始化操作之后可以使用 <code>VimEnter</code> 来表示</li>
+<li>输入可以使 <code>vim</code> 退出的命令，可以使用 <code>ExitPre</code> 来表示。如果输入 <code>:quit</code> ，在决定是否退出之前，可以使用 <code>QuitPre</code>。</li>
+</ul>
+<p>这些只是 <code>vim</code> 庞大事件中的一小部分，想要了解其他的事件，可以使用 <code>:help autocmd-events</code></p>
+<h2 id="同时绑定多个事件">同时绑定多个事件</h2>
+<p>我们可以同时绑定多个事件，事件之间使用逗号作为分割即可，例如我们想要在写入或者加载HTML文件之前对其进行自动排版，那么就可以使用如下代码</p>
+<pre tabindex="0"><code class="language-vimscript" data-lang="vimscript">:autocmd BufReadPost,BufWritePre *.html normal gg=G
+</code></pre><p>自动命令它是在事件触发时，执行命令。相当于我们在命令模式下手动输入命令。在之前介绍命令模式的时候说到过，要在命令模式下使用普通模式的操作可以使用 normal。gg表示将光标移动到第一行，=G表示从当前光标到最后一行执行自动排版的操作。</p>
+<p>我们在 <code>html</code> 文件中输入</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-html" data-lang="html"><span class="line"><span class="cl"><span class="p">&lt;</span><span class="nt">html</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl"><span class="p">&lt;</span><span class="nt">body</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">&lt;</span><span class="nt">div</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl"><span class="p">&lt;</span><span class="nt">div</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">        <span class="p">&lt;</span><span class="nt">p</span><span class="p">&gt;</span>hello!<span class="p">&lt;/</span><span class="nt">p</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl"><span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl"><span class="p">&lt;/</span><span class="nt">body</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl"><span class="p">&lt;/</span><span class="nt">html</span><span class="p">&gt;</span>
+</span></span></code></pre></div><p>执行 :w之后我们发现它自动排版了。或者我们也可以使用 :edit打开一个排版混乱的HTML文件，会发现vim自动为它排版了。
+<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://img-blog.csdnimg.cn/278583d7020e4c0e956836a92d60e1e4.gif#pic_center"
+        data-srcset="https://img-blog.csdnimg.cn/278583d7020e4c0e956836a92d60e1e4.gif#pic_center, https://img-blog.csdnimg.cn/278583d7020e4c0e956836a92d60e1e4.gif#pic_center 1.5x, https://img-blog.csdnimg.cn/278583d7020e4c0e956836a92d60e1e4.gif#pic_center 2x"
+        data-sizes="auto"
+        alt="https://img-blog.csdnimg.cn/278583d7020e4c0e956836a92d60e1e4.gif#pic_center"
+        title="在这里插入图片描述" />
+或者我们再举一个例子，我们在之前设置了自动换行功能，因为在一般的编程语言中，一行代码写太长确实不是一个好习惯。但是像 <code>markdown</code> 或者 <code>html</code> 这种用来写文档的标记语言，难免会出现很长的文本，这个时候再设置自动换行就有点不合适了，我们可以使用下面的语句来针对这两种文档来消除</p>
+<pre tabindex="0"><code class="language-vimscript" data-lang="vimscript">:autocmd BufNewFile, BufReadPost *.html setlocal nowrap
+</code></pre><p>这里我们使用 BufNewFile和 BufReadPost，因为我们需要对新创建的和已存在的 html文件都启用该设置。</p>
+<h2 id="filetype-事件">FileType 事件</h2>
+<p>这种类型的事件可以说是我们最常用的，通过这个事件配合 <code>setlocal</code> 可以很方便的针对不同的编程语言做不同的设置
+例如我们将上述取消 <code>HTML</code> 自动换行的代码做一个改写，改写成使用 <code>FileType</code></p>
+<pre tabindex="0"><code class="language-vimscript" data-lang="vimscript">:autocmd FileType html setlocal nowrap
+</code></pre><p>又或者我们可以根据不同的语言，定义一个快捷键快速添加注释</p>
+<pre tabindex="0"><code class="language-vimscript" data-lang="vimscript">:autocmd FileType python nnoremap &lt;buffer&gt; &lt;localleader&gt;c I#&lt;esc&gt;
+:autocmd FileType javascript nnoremap &lt;buffer&gt; &lt;localleader&gt;c I//&lt;esc&gt;
+</code></pre><p>在输入完命令之后，我们新打开一个 js或者 python文件，就可以直接测试
+<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://img-blog.csdnimg.cn/e7436d27a1a543bfb22b1cb23d89580d.gif#pic_center"
+        data-srcset="https://img-blog.csdnimg.cn/e7436d27a1a543bfb22b1cb23d89580d.gif#pic_center, https://img-blog.csdnimg.cn/e7436d27a1a543bfb22b1cb23d89580d.gif#pic_center 1.5x, https://img-blog.csdnimg.cn/e7436d27a1a543bfb22b1cb23d89580d.gif#pic_center 2x"
+        data-sizes="auto"
+        alt="https://img-blog.csdnimg.cn/e7436d27a1a543bfb22b1cb23d89580d.gif#pic_center"
+        title="在这里插入图片描述" />
+我们也可以结合之前介绍过的本地缩写的定义，针对不同的文件类型定义不同的缩写，例如</p>
+<pre tabindex="0"><code class="language-vimscript" data-lang="vimscript">:autocmd FileType c iabbrev &lt;buffer&gt; main int main(int argc, char* argv[])
+:autocmd FileType python iabbrev &lt;buffer&gt; main if __name__ == &#34;__main__&#34;:
+</code></pre><p>针对不同语言快速填充main函数。</p>
+<p>我们结合<code>FileType</code> 事件和缩写似乎可以针对不同语言定义出对应的代码片段，这个也就是有的编辑器提供的 <code>code snippet</code> 的功能，结合插件我们可以使用 <code>vim</code> 定义出更加强大的代码片段</p>
+<h2 id="自动命令组">自动命令组</h2>
+<p>已经讨论了自动命令的这么多东西了，各位小伙伴可能已经掌握了甚至已经开始迫不及待想往配置文件里面添加内容了。但是在 lua中该怎么使用自动命令呢？先别着急，自动命令相关内容还没讨论完，先容我卖个关子，我们在后面来讨论如何在 lua中添加自动命令吧。</p>
+<p>我们暂时不讲如何在 <code>lua</code> 中添加自动命令，这里我们先尝试启用 <code>init.vim</code> 文件。我们在里面加入一行</p>
+<pre tabindex="0"><code class="language-vimscript" data-lang="vimscript">autocmd BufWrite * sleep 200m
+</code></pre><p>然后我们保存并使用 <code>:source $MYVIMRC</code>启用</p>
+<p>好像也没什么变化是不是。别着急，我们多次执行 <code>:source $MYVIMRC</code>。然后再执行保存操作。是不是发现vim越来越慢了。这是怎么回事呢？</p>
+<p>我们每次执行 <code>:source $MYVIMRC</code> 的时候，<code>vim</code> 不会丢弃原有的设置，只会重头再来读取并加载新的设置，有点像文件的追加。在多次加载配置文件的时候，<code>vim</code> 已经创建了多个自动命令了。随着加载次数的增多，<code>vim</code> 中保存了多个休眠的自动命令了。所以 <code>vim</code> 会变得越来越卡。</p>
+<p>你可能会说，谁没事闲着一直加载配置文件玩啊，而且也没有人会写延时吧。但是想想这个场景是不是像我们在反复修改并测试配置的时候会做的操作。虽然我们不会做延时，但是加载配置或者加载插件也是要时间的，插件有的也会执行自动命令，如果数量大起来了，自然会影响vim的启动速度。</p>
+<p>我们该如何处理这个问题呢？</p>
+<p>vim中给出的解决办法是将自动命令放到一个用户命名的组中，组成一个自动命令组。</p>
+<p>使用关键字 <code>augroup</code> 来创建一个自动命令组。例如我们可以创建下面的自动命令组</p>
+<pre tabindex="0"><code class="language-vimscript" data-lang="vimscript">:augroup testgrp
+:    autocmd BufWrite * echom &#34;hello1&#34;
+:    autocmd BufWrite * echom &#34;hello2&#34;
+:augroup END
+</code></pre><p>直接在命令行输入这么些东西太麻烦了，我们还是在 <code>init.vim</code> 中输入。启用之后我们再来执行保存操作接着，执行 <code>:message</code> 命令来查看日志，发现有两条打印
+<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://img-blog.csdnimg.cn/42d85850d3844ba0a42813baeb252209.gif#pic_center"
+        data-srcset="https://img-blog.csdnimg.cn/42d85850d3844ba0a42813baeb252209.gif#pic_center, https://img-blog.csdnimg.cn/42d85850d3844ba0a42813baeb252209.gif#pic_center 1.5x, https://img-blog.csdnimg.cn/42d85850d3844ba0a42813baeb252209.gif#pic_center 2x"
+        data-sizes="auto"
+        alt="https://img-blog.csdnimg.cn/42d85850d3844ba0a42813baeb252209.gif#pic_center"
+        title="在这里插入图片描述" /></p>
+<p>我们再来修改一下配置文件或者在命令行输入添加下面一句</p>
+<pre tabindex="0"><code class="language-vimscript" data-lang="vimscript">:augroup testgrp
+:    autocmd BufWrite * echom &#34;hello3&#34;
+:augroup END
+</code></pre><p>我们先退出vim，再打开，然后执行保存操作，再看看日志里面有几条输出呢？</p>
+<p>答案可能会另各位百思不得其解，它会打印三条。并不是各位想象的那样，同名的组发生覆盖。这里它也会发生追加现象，将同一组的多个命令组合在一起。既然用不用组都会追加，那么我要它有何用，我还多写了这么多代码。别着急，我们慢慢往下看。
+<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://img-blog.csdnimg.cn/a4c512bb37b7422f8bee0b1d46310bbb.gif#pic_center"
+        data-srcset="https://img-blog.csdnimg.cn/a4c512bb37b7422f8bee0b1d46310bbb.gif#pic_center, https://img-blog.csdnimg.cn/a4c512bb37b7422f8bee0b1d46310bbb.gif#pic_center 1.5x, https://img-blog.csdnimg.cn/a4c512bb37b7422f8bee0b1d46310bbb.gif#pic_center 2x"
+        data-sizes="auto"
+        alt="https://img-blog.csdnimg.cn/a4c512bb37b7422f8bee0b1d46310bbb.gif#pic_center"
+        title="在这里插入图片描述" /></p>
+<p>分组一个是为了划分模块，第二个原因就是我们可以使用 <code>autocmd!</code> 来清除同一组之前的命令。
+例如我们将上述命令修改为</p>
+<pre tabindex="0"><code class="language-vimscript" data-lang="vimscript">:augroup testgrp
+:    autocmd!
+:    autocmd BufWrite * echom &#34;hello3&#34;
+:augroup END
+</code></pre><p>这个时候再次测试，我们发现它只会打印一条语句了。
+<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://img-blog.csdnimg.cn/a4b8ec4a242b4ba4bcb4a0aacbd83c0c.gif#pic_center"
+        data-srcset="https://img-blog.csdnimg.cn/a4b8ec4a242b4ba4bcb4a0aacbd83c0c.gif#pic_center, https://img-blog.csdnimg.cn/a4b8ec4a242b4ba4bcb4a0aacbd83c0c.gif#pic_center 1.5x, https://img-blog.csdnimg.cn/a4b8ec4a242b4ba4bcb4a0aacbd83c0c.gif#pic_center 2x"
+        data-sizes="auto"
+        alt="https://img-blog.csdnimg.cn/a4b8ec4a242b4ba4bcb4a0aacbd83c0c.gif#pic_center"
+        title="在这里插入图片描述" /></p>
+<p>但是这里如果我们将它放在不同组的时候，情况就又发生变化了</p>
+<pre tabindex="0"><code class="language-vimscript" data-lang="vimscript">:augroup testgrp
+:    autocmd BufWrite * echom &#34;hello1&#34;
+:    autocmd BufWrite * echom &#34;hello2&#34;
+:augroup END
+
+:augroup testgrp1
+:    autocmd!
+:    autocmd BufWrite * echom &#34;hello3&#34;
+:augroup END
+</code></pre><p>我们发现在保存之后，它还是会打印3条语句</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://img-blog.csdnimg.cn/ef45e7a0f1fe4f448ce4bcf40e71374e.gif#pic_center"
+        data-srcset="https://img-blog.csdnimg.cn/ef45e7a0f1fe4f448ce4bcf40e71374e.gif#pic_center, https://img-blog.csdnimg.cn/ef45e7a0f1fe4f448ce4bcf40e71374e.gif#pic_center 1.5x, https://img-blog.csdnimg.cn/ef45e7a0f1fe4f448ce4bcf40e71374e.gif#pic_center 2x"
+        data-sizes="auto"
+        alt="https://img-blog.csdnimg.cn/ef45e7a0f1fe4f448ce4bcf40e71374e.gif#pic_center"
+        title="在这里插入图片描述" />
+<code>autocmd!</code> 只会清除同一组之前的所有命令，而不同组的命令它不会生效。这就给我们按模块划分命名提供了便利。</p>
+<h2 id="改进自动加载配置文件的操作">改进自动加载配置文件的操作</h2>
+<p>之前我们通过绑定快捷键 <code>&lt;leader&gt;ss</code>来自动重新加载配置，学习了自动命令之后我们可以进一步的偷懒了，利用自动命令，我们可以做到只要配置文件被保存了，就自动加载。</p>
+<pre tabindex="0"><code class="language-vimscript" data-lang="vimscript">:augroup NVIMRC
+:    autocmd!
+:    autocmd BufWritePost init.vim source %
+:augroup END
+</code></pre><p>这里我们先使用 autocmd!清除之前的加载操作。后面的自动命令中，我们使用 BufWritePost在配置文件保存到磁盘之后再来执行加载操作，保证从磁盘中加载到的配置文件与我们修改过后的保持一致。</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://img-blog.csdnimg.cn/09d27f83936e418bb86de21a5bc63f29.gif#pic_center"
+        data-srcset="https://img-blog.csdnimg.cn/09d27f83936e418bb86de21a5bc63f29.gif#pic_center, https://img-blog.csdnimg.cn/09d27f83936e418bb86de21a5bc63f29.gif#pic_center 1.5x, https://img-blog.csdnimg.cn/09d27f83936e418bb86de21a5bc63f29.gif#pic_center 2x"
+        data-sizes="auto"
+        alt="https://img-blog.csdnimg.cn/09d27f83936e418bb86de21a5bc63f29.gif#pic_center"
+        title="在这里插入图片描述" /></p>
+<p>自动命名在我们实现 <code>vim</code> 自动化编程的一个重要工具。甚至 <code>vim</code> 自身也有很多功能依靠它来实现，比如文件类型检测。文件类型检测我们将在下一章进行讨论。</p>
+</div><div class="post-footer" id="post-footer">
+    <div class="post-info">
+        <div class="post-info-line">
+            <div class="post-info-mod">
+                <span>Updated on 2022-08-04</span>
+            </div></div>
+        <div class="post-info-line">
+            <div class="post-info-md"></div>
+            <div class="post-info-share">
+                <span><a href="javascript:void(0);" title="Share on Twitter" data-sharer="twitter" data-url="http://HaiLateBoy.github.io/posts/vim-config7/" data-title="从零开始配置 vim(7)——自动命令" data-hashtags="vim,编辑工具,文本处理,lua,编辑器"><i class="fab fa-twitter fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Facebook" data-sharer="facebook" data-url="http://HaiLateBoy.github.io/posts/vim-config7/" data-hashtag="vim"><i class="fab fa-facebook-square fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Hacker News" data-sharer="hackernews" data-url="http://HaiLateBoy.github.io/posts/vim-config7/" data-title="从零开始配置 vim(7)——自动命令"><i class="fab fa-hacker-news fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Line" data-sharer="line" data-url="http://HaiLateBoy.github.io/posts/vim-config7/" data-title="从零开始配置 vim(7)——自动命令"><i data-svg-src="https://cdn.jsdelivr.net/npm/simple-icons@7.3.0/icons/line.svg" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on 微博" data-sharer="weibo" data-url="http://HaiLateBoy.github.io/posts/vim-config7/" data-title="从零开始配置 vim(7)——自动命令"><i class="fab fa-weibo fa-fw" aria-hidden="true"></i></a></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="post-info-more">
+        <section class="post-tags"><i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/vim/">vim</a>,&nbsp;<a href="/tags/%E7%BC%96%E8%BE%91%E5%B7%A5%E5%85%B7/">编辑工具</a>,&nbsp;<a href="/tags/%E6%96%87%E6%9C%AC%E5%A4%84%E7%90%86/">文本处理</a>,&nbsp;<a href="/tags/lua/">lua</a>,&nbsp;<a href="/tags/%E7%BC%96%E8%BE%91%E5%99%A8/">编辑器</a></section>
+        <section>
+            <span><a href="javascript:void(0);" onclick="window.history.back();">Back</a></span>&nbsp;|&nbsp;<span><a href="/">Home</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav"><a href="/posts/vim-config6/" class="prev" rel="prev" title="从零开始配置 vim(6)——缩写"><i class="fas fa-angle-left fa-fw" aria-hidden="true"></i>从零开始配置 vim(6)——缩写</a>
+            <a href="/posts/vim-config8/" class="next" rel="next" title="从零开始配置 vim(8)——文件类型检测">从零开始配置 vim(8)——文件类型检测<i class="fas fa-angle-right fa-fw" aria-hidden="true"></i></a></div>
+</div>
+</article></div>
+            </main><footer class="footer">
+        <div class="footer-container"><div class="footer-line">Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener noreffer" title="Hugo 0.121.2">Hugo</a> | Theme - <a href="https://github.com/dillonzq/LoveIt" target="_blank" rel="noopener noreffer" title="LoveIt 0.2.11"><i class="far fa-kiss-wink-heart fa-fw" aria-hidden="true"></i> LoveIt</a>
+                </div><div class="footer-line" itemscope itemtype="http://schema.org/CreativeWork"><i class="far fa-copyright fa-fw" aria-hidden="true"></i><span itemprop="copyrightYear">2022 - 2024</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="https://www.masimaro.xyz" target="_blank">Masimaro</a></span></div>
+        </div>
+    </footer></div>
+
+        <div id="fixed-buttons"><a href="#" id="back-to-top" class="fixed-button" title="Back to Top">
+                <i class="fas fa-arrow-up fa-fw" aria-hidden="true"></i>
+            </a><a href="#" id="view-comments" class="fixed-button" title="View Comments">
+                <i class="fas fa-comment fa-fw" aria-hidden="true"></i>
+            </a>
+        </div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.css"><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/autocomplete.js@0.38.1/dist/autocomplete.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lunr@2.3.9/lunr.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lazysizes@5.3.2/lazysizes.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/clipboard@2.0.11/dist/clipboard.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/sharer.js@0.5.1/sharer.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/auto-render.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/copy-tex.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/mhchem.min.js"></script><script type="text/javascript">window.config={"code":{"copyTitle":"Copy to clipboard","maxShownLines":50},"comment":{},"math":{"delimiters":[{"display":true,"left":"$$","right":"$$"},{"display":true,"left":"\\[","right":"\\]"},{"display":true,"left":"\\begin{equation}","right":"\\end{equation}"},{"display":true,"left":"\\begin{equation*}","right":"\\end{equation*}"},{"display":true,"left":"\\begin{align}","right":"\\end{align}"},{"display":true,"left":"\\begin{align*}","right":"\\end{align*}"},{"display":true,"left":"\\begin{alignat}","right":"\\end{alignat}"},{"display":true,"left":"\\begin{alignat*}","right":"\\end{alignat*}"},{"display":true,"left":"\\begin{gather}","right":"\\end{gather}"},{"display":true,"left":"\\begin{CD}","right":"\\end{CD}"},{"display":false,"left":"$","right":"$"},{"display":false,"left":"\\(","right":"\\)"}],"strict":false},"search":{"highlightTag":"em","maxResultLength":10,"noResultsFound":"No results found","snippetLength":50}};</script><script type="text/javascript" src="/js/theme.min.js"></script></body>
+</html>

@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="robots" content="noodp" />
+        <title>从零开始配置vim(30)——DAP的其他配置 - Masimaro&#39;s blog</title><meta name="Description" content="这是我用于记录日常和学习的小站"><meta property="og:title" content="从零开始配置vim(30)——DAP的其他配置" />
+<meta property="og:description" content="很抱歉这么久才来更新这一系列，主要是来新公司还在试用期，我希望在试用期干出点事来，所以摸鱼的时间就少了。加上前面自己阳了休息了一段时间。在想" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://HaiLateBoy.github.io/posts/vim-config30/" /><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2022-12-30T16:57:31+08:00" />
+<meta property="article:modified_time" content="2022-12-30T16:57:31+08:00" /><meta property="og:site_name" content="Masimaro&#39;s blog" />
+
+<meta name="twitter:card" content="summary"/><meta name="twitter:title" content="从零开始配置vim(30)——DAP的其他配置"/>
+<meta name="twitter:description" content="很抱歉这么久才来更新这一系列，主要是来新公司还在试用期，我希望在试用期干出点事来，所以摸鱼的时间就少了。加上前面自己阳了休息了一段时间。在想"/>
+<meta name="application-name" content="My cool site">
+<meta name="apple-mobile-web-app-title" content="My cool site"><meta name="theme-color" content="#ffffff"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="manifest" href="/site.webmanifest"><link rel="canonical" href="http://HaiLateBoy.github.io/posts/vim-config30/" /><link rel="prev" href="http://HaiLateBoy.github.io/posts/work/" /><link rel="next" href="http://HaiLateBoy.github.io/posts/2022-new-year-plan/" /><link rel="stylesheet" href="/css/style.min.css"><link rel="preload" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css"></noscript><link rel="preload" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css"></noscript><script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "BlogPosting",
+        "headline": "从零开始配置vim(30)——DAP的其他配置",
+        "inLanguage": "zh-CN",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "http:\/\/HaiLateBoy.github.io\/posts\/vim-config30\/"
+        },"genre": "posts","keywords": "vim, 编辑工具, 文本处理, lua, 编辑器","wordcount":  5353 ,
+        "url": "http:\/\/HaiLateBoy.github.io\/posts\/vim-config30\/","datePublished": "2022-12-30T16:57:31+08:00","dateModified": "2022-12-30T16:57:31+08:00","publisher": {
+            "@type": "Organization",
+            "name": ""},"author": {
+                "@type": "Person",
+                "name": "Masimaro"
+            },"description": ""
+    }
+    </script></head>
+    <body data-header-desktop="fixed" data-header-mobile="auto"><script type="text/javascript">(window.localStorage && localStorage.getItem('theme') ? localStorage.getItem('theme') === 'dark' : ('auto' === 'auto' ? window.matchMedia('(prefers-color-scheme: dark)').matches : 'auto' === 'dark')) && document.body.setAttribute('theme', 'dark');</script>
+
+        <div id="mask"></div><div class="wrapper"><header class="desktop" id="header-desktop">
+    <div class="header-wrapper">
+        <div class="header-title">
+            <a href="/" title="Masimaro&#39;s blog">My cool site</a>
+        </div>
+        <div class="menu">
+            <div class="menu-inner"><a class="menu-item" href="/posts/" title="文章列表"> 文章 </a><a class="menu-item" href="/tags/" title="标签"> 标签 </a><a class="menu-item" href="/categories/" title="分类"> 分类 </a><a class="menu-item" href="/about" title="关于本站"> 关于 </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-desktop">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-desktop" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-desktop" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-desktop">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </span><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                    <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+                </a></div>
+        </div>
+    </div>
+</header><header class="mobile" id="header-mobile">
+    <div class="header-container">
+        <div class="header-wrapper">
+            <div class="header-title">
+                <a href="/" title="Masimaro&#39;s blog">My cool site</a>
+            </div>
+            <div class="menu-toggle" id="menu-toggle-mobile">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+        <div class="menu" id="menu-mobile"><div class="search-wrapper">
+                    <div class="search mobile" id="search-mobile">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-mobile">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-mobile" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-mobile" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-mobile">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </div>
+                    <a href="javascript:void(0);" class="search-cancel" id="search-cancel-mobile">
+                        Cancel
+                    </a>
+                </div><a class="menu-item" href="/posts/" title="文章列表">文章</a><a class="menu-item" href="/tags/" title="标签">标签</a><a class="menu-item" href="/categories/" title="分类">分类</a><a class="menu-item" href="/about" title="关于本站">关于</a><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+            </a></div>
+    </div>
+</header><div class="search-dropdown desktop">
+        <div id="search-dropdown-desktop"></div>
+    </div>
+    <div class="search-dropdown mobile">
+        <div id="search-dropdown-mobile"></div>
+    </div><main class="main">
+                <div class="container"><div class="toc" id="toc-auto">
+            <h2 class="toc-title">Contents</h2>
+            <div class="toc-content" id="toc-content-auto"></div>
+        </div><article class="page single"><h1 class="single-title animate__animated animate__flipInX">从零开始配置vim(30)——DAP的其他配置</h1><div class="post-meta">
+            <div class="post-meta-line"><span class="post-author"><a href="https://www.masimaro.xyz" title="Author" target="_blank" rel="noopener noreffer author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Masimaro</a></span>&nbsp;<span class="post-category">included in <a href="/categories/vim-%E9%85%8D%E7%BD%AE/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>vim 配置</a></span></div>
+            <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw" aria-hidden="true"></i>&nbsp;<time datetime="2022-12-30">2022-12-30</time>&nbsp;<i class="fas fa-pencil-alt fa-fw" aria-hidden="true"></i>&nbsp;5353 words&nbsp;
+                <i class="far fa-clock fa-fw" aria-hidden="true"></i>&nbsp;11 minutes&nbsp;</div>
+        </div><div class="details toc" id="toc-static"  data-kept="true">
+                <div class="details-summary toc-title">
+                    <span>Contents</span>
+                    <span><i class="details-icon fas fa-angle-right" aria-hidden="true"></i></span>
+                </div>
+                <div class="details-content toc-content" id="toc-content-static"><nav id="TableOfContents">
+  <ul>
+    <li><a href="#repl-窗口">repl 窗口</a>
+      <ul>
+        <li><a href="#示例1调试单线程死循环">示例1：调试单线程死循环</a></li>
+        <li><a href="#示例2调试多线程死锁">示例2：调试多线程死锁</a></li>
+      </ul>
+    </li>
+    <li><a href="#nvim-gdb-插件">nvim-gdb 插件</a>
+      <ul>
+        <li><a href="#基础配置">基础配置</a></li>
+        <li><a href="#显示窗口的配置">显示窗口的配置</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav></div>
+            </div><div class="content" id="content"><p>很抱歉这么久才来更新这一系列，主要是来新公司还在试用期，我希望在试用期干出点事来，所以摸鱼的时间就少了。加上前面自己阳了休息了一段时间。在想起来更新就过去一个多月了。废话不多说了，让我们开始进入正题。</p>
+<p>在前一章，我们谈论了如何在 <code>neovim</code> 中使用<code>cpptools</code> 这个<code>DAP</code> 的适配器对代码进行调试，目前针对编译型和解释型语言来说我们都有了对应的方法来配置调试器对其进行调试。本节将要介绍关于<code>dap</code>的其他一些功能，主要包括 <code>repl</code>窗口和 <code>gdb</code>的集成</p>
+<h2 id="repl-窗口">repl 窗口</h2>
+<p>什么是 <code>repl</code> 呢？它的全称是 <code>Read Eval Print Loop</code> 中文一般翻译为交互式解析器，可能看到这你还是一脸懵逼，你可以想想 <code>python</code> 或者<code>nodejs</code>，在控制台输入<code>python</code> 就可以进入到它的交互式解析器中，随着我们输入<code>python</code> 的语句，它会实时的给出运行的结果。交互式解析器就是这么一个东西，输入命令，它给你一个实时的结果。在调试中使用交互式解析器还是很有用的，比如我想显示当前某个变量的值，当前执行到哪个语句了等等。</p>
+<p><code>nvim-dap</code>已经提供了一个内置的 <code>repl</code> 窗口，我们每次启动调试的时候都会看到它每次都会创建一个新的名为 <code>dap-repl</code>的<code>buffer</code>。之前我们没怎么关注它主要还是因为那个时候的重点在于如何进行调试，现在我们将要来优化这部分的显示和功能。</p>
+<p>首先我们发现每次调试结束的时候这个<code>buffer</code> 都会被遗留，需要我们手动的进行关闭，除了针对<code>buffer</code>通用的 <code>:q</code> 或者 <code>:bd</code>命令进行关闭，还可以使用 <code>:lua require('dap').repl.close()</code>。当然也可以配套使用 <code>:lua require('dap').repl.open()</code>来打开一个 repl的窗口，既然每次都会自动新建，那么这里我们就不需要进行新建，主要用于想办法关闭就可以了。</p>
+<p>还记得之前介绍 <code>nvim-dapui</code> 插件的时候介绍的那两个监听函数吗，同样的我们要在监听调试结束的函数中添加代码来关闭<code>repl</code> 窗口，函数的整个代码如下</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-lua" data-lang="lua"><span class="line"><span class="cl"><span class="n">dap.listeners</span><span class="p">.</span><span class="n">before.event_terminated</span><span class="p">[</span><span class="s2">&#34;dapui_config&#34;</span><span class="p">]</span> <span class="o">=</span> <span class="kr">function</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">    <span class="n">dapui.close</span><span class="p">({})</span>
+</span></span><span class="line"><span class="cl">    <span class="n">dap.repl</span><span class="p">.</span><span class="n">close</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="kr">end</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">dap.listeners</span><span class="p">.</span><span class="n">before.event_exited</span><span class="p">[</span><span class="s2">&#34;dapui_config&#34;</span><span class="p">]</span> <span class="o">=</span> <span class="kr">function</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">    <span class="n">dapui.close</span><span class="p">({})</span>
+</span></span><span class="line"><span class="cl">    <span class="n">dap.repl</span><span class="p">.</span><span class="n">close</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="kr">end</span>
+</span></span></code></pre></div><p>再启动调试的时候发现它已经可以在调试结束的时候自动关闭了。</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://img-blog.csdnimg.cn/1ee4d09437374bc0af22d8560d7dbf8b.gif#pic_center"
+        data-srcset="https://img-blog.csdnimg.cn/1ee4d09437374bc0af22d8560d7dbf8b.gif#pic_center, https://img-blog.csdnimg.cn/1ee4d09437374bc0af22d8560d7dbf8b.gif#pic_center 1.5x, https://img-blog.csdnimg.cn/1ee4d09437374bc0af22d8560d7dbf8b.gif#pic_center 2x"
+        data-sizes="auto"
+        alt="https://img-blog.csdnimg.cn/1ee4d09437374bc0af22d8560d7dbf8b.gif#pic_center"
+        title="在这里插入图片描述" /></p>
+<p>还有另外一个问题就是我不太喜欢现在这样在最下角显示 <code>repl</code>。我希望它能够在最下方以整行的形式显示。或者可以方便的不显示，只有在需要的时候显示。要达成这个目的我们需要修改 <code>dapui</code> 的配置。
+<code>dapui</code> 的配置主要以 <code>element</code>为基础，每个 <code>element</code> 代表一个提供对应功能的窗口。我们先来根据它默认的配置来讲解每部分的含义</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-lua" data-lang="lua"><span class="line"><span class="cl"><span class="n">require</span><span class="p">(</span><span class="s2">&#34;dapui&#34;</span><span class="p">).</span><span class="n">setup</span><span class="p">({</span>
+</span></span><span class="line"><span class="cl">  <span class="n">icons</span> <span class="o">=</span> <span class="p">{</span> <span class="n">expanded</span> <span class="o">=</span> <span class="s2">&#34;&#34;</span><span class="p">,</span> <span class="n">collapsed</span> <span class="o">=</span> <span class="s2">&#34;&#34;</span><span class="p">,</span> <span class="n">current_frame</span> <span class="o">=</span> <span class="s2">&#34;&#34;</span> <span class="p">},</span>
+</span></span><span class="line"><span class="cl">  <span class="n">mappings</span> <span class="o">=</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">-- Use a table to apply multiple mappings</span>
+</span></span><span class="line"><span class="cl">    <span class="n">expand</span> <span class="o">=</span> <span class="p">{</span> <span class="s2">&#34;&lt;CR&gt;&#34;</span><span class="p">,</span> <span class="s2">&#34;&lt;2-LeftMouse&gt;&#34;</span> <span class="p">},</span>
+</span></span><span class="line"><span class="cl">    <span class="n">open</span> <span class="o">=</span> <span class="s2">&#34;o&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">remove</span> <span class="o">=</span> <span class="s2">&#34;d&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">edit</span> <span class="o">=</span> <span class="s2">&#34;e&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">repl</span> <span class="o">=</span> <span class="s2">&#34;r&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">toggle</span> <span class="o">=</span> <span class="s2">&#34;t&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">  <span class="p">},</span>
+</span></span><span class="line"><span class="cl">  <span class="c1">-- Use this to override mappings for specific elements</span>
+</span></span><span class="line"><span class="cl">  <span class="n">element_mappings</span> <span class="o">=</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">-- Example:</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">-- stacks = {</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">--   open = &#34;&lt;CR&gt;&#34;,</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">--   expand = &#34;o&#34;,</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">-- }</span>
+</span></span><span class="line"><span class="cl">  <span class="p">},</span>
+</span></span><span class="line"><span class="cl">  <span class="c1">-- Expand lines larger than the window</span>
+</span></span><span class="line"><span class="cl">  <span class="c1">-- Requires &gt;= 0.7</span>
+</span></span><span class="line"><span class="cl">  <span class="n">expand_lines</span> <span class="o">=</span> <span class="n">vim.fn</span><span class="p">.</span><span class="n">has</span><span class="p">(</span><span class="s2">&#34;nvim-0.7&#34;</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">  <span class="c1">-- Layouts define sections of the screen to place windows.</span>
+</span></span><span class="line"><span class="cl">  <span class="c1">-- The position can be &#34;left&#34;, &#34;right&#34;, &#34;top&#34; or &#34;bottom&#34;.</span>
+</span></span><span class="line"><span class="cl">  <span class="c1">-- The size specifies the height/width depending on position. It can be an Int</span>
+</span></span><span class="line"><span class="cl">  <span class="c1">-- or a Float. Integer specifies height/width directly (i.e. 20 lines/columns) while</span>
+</span></span><span class="line"><span class="cl">  <span class="c1">-- Float value specifies percentage (i.e. 0.3 - 30% of available lines/columns)</span>
+</span></span><span class="line"><span class="cl">  <span class="c1">-- Elements are the elements shown in the layout (in order).</span>
+</span></span><span class="line"><span class="cl">  <span class="c1">-- Layouts are opened in order so that earlier layouts take priority in window sizing.</span>
+</span></span><span class="line"><span class="cl">  <span class="n">layouts</span> <span class="o">=</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="cl">      <span class="n">elements</span> <span class="o">=</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">      <span class="c1">-- Elements can be strings or table with id and size keys.</span>
+</span></span><span class="line"><span class="cl">        <span class="p">{</span> <span class="n">id</span> <span class="o">=</span> <span class="s2">&#34;scopes&#34;</span><span class="p">,</span> <span class="n">size</span> <span class="o">=</span> <span class="mf">0.25</span> <span class="p">},</span>
+</span></span><span class="line"><span class="cl">        <span class="s2">&#34;breakpoints&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">        <span class="s2">&#34;stacks&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">        <span class="s2">&#34;watches&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">      <span class="p">},</span>
+</span></span><span class="line"><span class="cl">      <span class="n">size</span> <span class="o">=</span> <span class="mi">40</span><span class="p">,</span> <span class="c1">-- 40 columns</span>
+</span></span><span class="line"><span class="cl">      <span class="n">position</span> <span class="o">=</span> <span class="s2">&#34;left&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="p">},</span>
+</span></span><span class="line"><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="cl">      <span class="n">elements</span> <span class="o">=</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="s2">&#34;repl&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">        <span class="s2">&#34;console&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">      <span class="p">},</span>
+</span></span><span class="line"><span class="cl">      <span class="n">size</span> <span class="o">=</span> <span class="mf">0.25</span><span class="p">,</span> <span class="c1">-- 25% of total lines</span>
+</span></span><span class="line"><span class="cl">      <span class="n">position</span> <span class="o">=</span> <span class="s2">&#34;bottom&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="p">},</span>
+</span></span><span class="line"><span class="cl">  <span class="p">},</span>
+</span></span><span class="line"><span class="cl">  <span class="n">controls</span> <span class="o">=</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">-- Requires Neovim nightly (or 0.8 when released)</span>
+</span></span><span class="line"><span class="cl">    <span class="n">enabled</span> <span class="o">=</span> <span class="kc">true</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">-- Display controls in this element</span>
+</span></span><span class="line"><span class="cl">    <span class="n">element</span> <span class="o">=</span> <span class="s2">&#34;repl&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">icons</span> <span class="o">=</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">      <span class="n">pause</span> <span class="o">=</span> <span class="s2">&#34;&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">      <span class="n">play</span> <span class="o">=</span> <span class="s2">&#34;&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">      <span class="n">step_into</span> <span class="o">=</span> <span class="s2">&#34;&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">      <span class="n">step_over</span> <span class="o">=</span> <span class="s2">&#34;&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">      <span class="n">step_out</span> <span class="o">=</span> <span class="s2">&#34;&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">      <span class="n">step_back</span> <span class="o">=</span> <span class="s2">&#34;&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">      <span class="n">run_last</span> <span class="o">=</span> <span class="s2">&#34;&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">      <span class="n">terminate</span> <span class="o">=</span> <span class="s2">&#34;&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="p">},</span>
+</span></span><span class="line"><span class="cl">  <span class="p">},</span>
+</span></span><span class="line"><span class="cl">  <span class="n">floating</span> <span class="o">=</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">max_height</span> <span class="o">=</span> <span class="kc">nil</span><span class="p">,</span> <span class="c1">-- These can be integers or a float between 0 and 1.</span>
+</span></span><span class="line"><span class="cl">    <span class="n">max_width</span> <span class="o">=</span> <span class="kc">nil</span><span class="p">,</span> <span class="c1">-- Floats will be treated as percentage of your screen.</span>
+</span></span><span class="line"><span class="cl">    <span class="n">border</span> <span class="o">=</span> <span class="s2">&#34;single&#34;</span><span class="p">,</span> <span class="c1">-- Border style. Can be &#34;single&#34;, &#34;double&#34; or &#34;rounded&#34;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">mappings</span> <span class="o">=</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">      <span class="n">close</span> <span class="o">=</span> <span class="p">{</span> <span class="s2">&#34;q&#34;</span><span class="p">,</span> <span class="s2">&#34;&lt;Esc&gt;&#34;</span> <span class="p">},</span>
+</span></span><span class="line"><span class="cl">    <span class="p">},</span>
+</span></span><span class="line"><span class="cl">  <span class="p">},</span>
+</span></span><span class="line"><span class="cl">  <span class="n">windows</span> <span class="o">=</span> <span class="p">{</span> <span class="n">indent</span> <span class="o">=</span> <span class="mi">1</span> <span class="p">},</span>
+</span></span><span class="line"><span class="cl">  <span class="n">render</span> <span class="o">=</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">max_type_length</span> <span class="o">=</span> <span class="kc">nil</span><span class="p">,</span> <span class="c1">-- Can be integer or nil.</span>
+</span></span><span class="line"><span class="cl">    <span class="n">max_value_lines</span> <span class="o">=</span> <span class="mi">100</span><span class="p">,</span> <span class="c1">-- Can be integer or nil.</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">})</span>
+</span></span></code></pre></div><p>首先最上面的 <code>icons</code> 表示，各个部分显示的图标，这里分别定义了展开的，合并的以及当前位置的图标信息，我们可以观察一下变量栏或者调用栈显示信息的左侧就可以看到这里定义的图标。
+<code>mappings</code> 代表的是部分窗口动作定义的快捷键。例如上面定义的 expand = { &ldquo;&lt;CR&gt;&rdquo;, &ldquo;&lt;2-LeftMouse&gt;&rdquo; }表示可以在待展开项上按下回车或者鼠标左键双击来展开。</p>
+<p><code>element_mappings</code>表示的是我们为某些窗口特意定制的一些快捷键。例如上面注释的是针对调用栈定义的快捷键。
+<code>layouts</code>代表布局，每个布局都有一个子<code>table</code>，而每个子<code>table</code>主要由 <code>elements</code>、<code>size</code>、<code>position</code>组成，它们分别代表采取该种布局的元素(也可以说是窗口)，窗口大小以及窗口的位置。窗口一般通过<code>id</code>来描述，每种窗口都有固定的ID，根据官方文档的描述，它支持这么几种窗口:</p>
+<ul>
+<li><code>scopes</code>显示全局或者当前局部变量，它支持的操作主要是 <code>edit</code>编辑变量的值、<code>expand</code>展开结构化的变量、<code>repl</code>将变量拷贝到<code>repl</code>窗口</li>
+<li><code>stacks</code>显示当前正在运行的线程以及它们对应的调用栈，它主要支持的操作是 <code>open</code> :运行代码到当前被选中的位置， <code>toggle</code>:打开或者关闭该窗口</li>
+<li><code>watches</code>显示我们需要追踪的变量，它支持的主要操作是 <code>edit</code>: 输入想要追踪的变量或者给对应的变量赋值。<code>expand</code>: 展开结构化的变量，<code>remove</code>:删除当前监视的变量，<code>repl</code>:将变量拷贝到<code>repl</code>窗口</li>
+<li><code>breakpoints</code>显示当前激活的断点。它支持的主要操作有 <code>open</code>:执行代码到当前选中的断点处, <code>toggle</code> :激活或者使当前断点无效</li>
+<li><code>repl</code>显示repl窗口</li>
+<li><code>console</code>显示控制台窗口
+这些窗口的这些操作的快捷键我们已经通过上方的 <code>mappings</code>做了定义了，只要保持光标在对应窗口然后按下快捷键就可以执行对应的窗口命令了。如果想要单独对窗口进行快捷键定义可以在<code>element_mappings</code> 中被注释的代码</li>
+</ul>
+<p><code>controls</code> 部分配置的是在repl窗口上方显示的那一堆调试按钮。由于我们定义了一些快捷键，这些按钮没太大的作用。这里我不需要它显示调试用的按键，所以我就在 <code>controls</code> 项中设置 <code>enabled = false</code> 禁用它。</p>
+<p><code>floating</code>、<code>window</code>、<code>render</code>则定义的是悬浮窗口样式和普通窗口的一些样式。这里就不深究了。</p>
+<p>下面是改造之后的配置</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-lua" data-lang="lua"><span class="line"><span class="cl"><span class="n">dapui.setup</span><span class="p">({</span>
+</span></span><span class="line"><span class="cl">    <span class="n">icons</span> <span class="o">=</span> <span class="p">{</span> <span class="n">expanded</span> <span class="o">=</span> <span class="s2">&#34;&#34;</span><span class="p">,</span> <span class="n">collapsed</span> <span class="o">=</span> <span class="s2">&#34;&#34;</span><span class="p">,</span> <span class="n">current_frame</span> <span class="o">=</span> <span class="s2">&#34;&#34;</span> <span class="p">},</span>
+</span></span><span class="line"><span class="cl">    <span class="n">mappings</span> <span class="o">=</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="c1">-- Use a table to apply multiple mappings</span>
+</span></span><span class="line"><span class="cl">        <span class="n">expand</span> <span class="o">=</span> <span class="p">{</span> <span class="s2">&#34;&lt;CR&gt;&#34;</span><span class="p">,</span> <span class="s2">&#34;&lt;2-LeftMouse&gt;&#34;</span> <span class="p">},</span>
+</span></span><span class="line"><span class="cl">        <span class="n">open</span> <span class="o">=</span> <span class="s2">&#34;o&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">        <span class="n">remove</span> <span class="o">=</span> <span class="s2">&#34;d&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">        <span class="n">edit</span> <span class="o">=</span> <span class="s2">&#34;e&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">        <span class="n">repl</span> <span class="o">=</span> <span class="s2">&#34;r&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">        <span class="n">toggle</span> <span class="o">=</span> <span class="s2">&#34;t&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="p">},</span>
+</span></span><span class="line"><span class="cl">    <span class="n">layouts</span> <span class="o">=</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="p">{</span>
+</span></span><span class="line"><span class="cl">            <span class="n">elements</span> <span class="o">=</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">                <span class="p">{</span>
+</span></span><span class="line"><span class="cl">                    <span class="n">id</span> <span class="o">=</span> <span class="s1">&#39;scopes&#39;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                    <span class="n">size</span> <span class="o">=</span> <span class="mf">0.35</span>
+</span></span><span class="line"><span class="cl">                <span class="p">},</span>
+</span></span><span class="line"><span class="cl">                <span class="p">{</span><span class="n">id</span> <span class="o">=</span> <span class="s2">&#34;stacks&#34;</span><span class="p">,</span> <span class="n">size</span> <span class="o">=</span> <span class="mf">0.35</span><span class="p">},</span>
+</span></span><span class="line"><span class="cl">                <span class="p">{</span><span class="n">id</span> <span class="o">=</span> <span class="s2">&#34;watches&#34;</span><span class="p">,</span> <span class="n">size</span> <span class="o">=</span> <span class="mf">0.15</span><span class="p">},</span>
+</span></span><span class="line"><span class="cl">                <span class="p">{</span><span class="n">id</span> <span class="o">=</span> <span class="s2">&#34;breakpoints&#34;</span><span class="p">,</span> <span class="n">size</span> <span class="o">=</span> <span class="mf">0.15</span><span class="p">},</span>
+</span></span><span class="line"><span class="cl">            <span class="p">},</span>
+</span></span><span class="line"><span class="cl">            <span class="n">size</span> <span class="o">=</span> <span class="mi">40</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">            <span class="n">position</span> <span class="o">=</span> <span class="s2">&#34;left&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">        <span class="p">},</span>
+</span></span><span class="line"><span class="cl">        <span class="p">{</span>
+</span></span><span class="line"><span class="cl">            <span class="n">elements</span> <span class="o">=</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">                <span class="s2">&#34;repl&#34;</span>
+</span></span><span class="line"><span class="cl">            <span class="p">},</span>
+</span></span><span class="line"><span class="cl">            <span class="n">size</span> <span class="o">=</span> <span class="mi">5</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">            <span class="n">position</span> <span class="o">=</span> <span class="s2">&#34;bottom&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">        <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="p">},</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="n">controls</span> <span class="o">=</span> <span class="p">{</span><span class="n">enabled</span> <span class="o">=</span> <span class="kc">false</span><span class="p">},</span>
+</span></span><span class="line"><span class="cl">    <span class="n">floating</span> <span class="o">=</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">max_height</span> <span class="o">=</span> <span class="kc">nil</span><span class="p">,</span> <span class="c1">-- These can be integers or a float between 0 and 1.</span>
+</span></span><span class="line"><span class="cl">        <span class="n">max_width</span> <span class="o">=</span> <span class="kc">nil</span><span class="p">,</span> <span class="c1">-- Floats will be treated as percentage of your screen.</span>
+</span></span><span class="line"><span class="cl">        <span class="n">border</span> <span class="o">=</span> <span class="s2">&#34;single&#34;</span><span class="p">,</span> <span class="c1">-- Border style. Can be &#34;single&#34;, &#34;double&#34; or &#34;rounded&#34;</span>
+</span></span><span class="line"><span class="cl">        <span class="n">mappings</span> <span class="o">=</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">            <span class="n">close</span> <span class="o">=</span> <span class="p">{</span> <span class="s2">&#34;q&#34;</span><span class="p">,</span> <span class="s2">&#34;&lt;Esc&gt;&#34;</span> <span class="p">},</span>
+</span></span><span class="line"><span class="cl">        <span class="p">},</span>
+</span></span><span class="line"><span class="cl">    <span class="p">},</span>
+</span></span><span class="line"><span class="cl">    <span class="n">windows</span> <span class="o">=</span> <span class="p">{</span> <span class="n">indent</span> <span class="o">=</span> <span class="mi">1</span> <span class="p">},</span>
+</span></span><span class="line"><span class="cl"><span class="p">})</span>
+</span></span></code></pre></div><p><code>repl</code> 窗口的主要命令如下:</p>
+<ul>
+<li><code>.exit</code>: 退出/关闭一个 repl 窗口</li>
+<li><code>.c/.continue</code>: 继续执行代码</li>
+<li><code>.n/.next</code>: 执行下一行代码</li>
+<li><code>.into</code>: 跳转到函数中继续执行</li>
+<li><code>.out</code>: 跳出函数</li>
+<li><code>.scopes</code>: 打印当前栈的一些变量信息</li>
+<li><code>.threads</code>: 打印线程信息</li>
+<li><code>.frames</code>: 打印当前线程的调用栈</li>
+<li><code>.capabilities</code>: 打印当前适配器实现的一些功能</li>
+<li><code>.p</code> 暂停当前运行的程序</li>
+</ul>
+<p>更多的命令可以通过在 <code>repl</code>窗口中输入 <code>.help</code>查看
+看了这么多无聊的文字描述，不知道小伙伴们有没有觉得头晕眼花呢？我们来通过实际的例子来看看如何应用这些内容来进行调试。</p>
+<h3 id="示例1调试单线程死循环">示例1：调试单线程死循环</h3>
+<p>假设有一段程序在不知不觉中被写成死循环了，程序无法正常执行下面的操作，我们以下面的程序为例</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-lua" data-lang="lua"><span class="line"><span class="cl"><span class="o">#</span><span class="n">include</span> <span class="o">&lt;</span><span class="n">stdio.h</span><span class="o">&gt;</span>
+</span></span><span class="line"><span class="cl"><span class="o">#</span><span class="n">include</span> <span class="o">&lt;</span><span class="n">unistd.h</span><span class="o">&gt;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">void</span> <span class="n">loop_forever</span><span class="p">(){</span>
+</span></span><span class="line"><span class="cl">    <span class="kr">for</span><span class="p">(</span><span class="n">unsigned</span> <span class="n">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">10</span><span class="p">;</span> <span class="n">i</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">;</span> <span class="c1">--i){</span>
+</span></span><span class="line"><span class="cl">        <span class="o">//</span> <span class="kr">do</span> <span class="n">something</span>
+</span></span><span class="line"><span class="cl">        <span class="n">sleep</span><span class="p">(</span><span class="mf">0.1</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">int</span> <span class="n">main</span> <span class="p">(</span><span class="n">int</span> <span class="n">argc</span><span class="p">,</span> <span class="n">char</span> <span class="o">*</span><span class="n">argv</span><span class="p">[])</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="o">//</span> <span class="kr">do</span> <span class="n">something</span>
+</span></span><span class="line"><span class="cl">    <span class="n">loop_forever</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">    <span class="n">printf</span><span class="p">(</span><span class="s2">&#34;do other things</span><span class="se">\n</span><span class="s2">&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="kr">return</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p>本来我们想的是它执行完函数 <code>loop_forever</code>之后会执行接下来的操作，但是我们死活看不到它执行后面的操作，这个时候我们意识到它可能在某个地方陷入死循环，无法出来了，假设前后都有大断的代码，无法快速定位到死循环的位置，该如何处理这种情况呢？</p>
+<p>我们先通过<code>&lt;F5&gt;</code>来执行操作，然后在 <code>repl</code> 中输入 <code>i</code> 进入插入模式，然后执行<code>.p</code> 中断当前程序执行。
+<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://img-blog.csdnimg.cn/5ef12bc71d494d73ae172e5624e49263.gif#pic_center"
+        data-srcset="https://img-blog.csdnimg.cn/5ef12bc71d494d73ae172e5624e49263.gif#pic_center, https://img-blog.csdnimg.cn/5ef12bc71d494d73ae172e5624e49263.gif#pic_center 1.5x, https://img-blog.csdnimg.cn/5ef12bc71d494d73ae172e5624e49263.gif#pic_center 2x"
+        data-sizes="auto"
+        alt="https://img-blog.csdnimg.cn/5ef12bc71d494d73ae172e5624e49263.gif#pic_center"
+        title="在这里插入图片描述" /></p>
+<p>此时程序已经断了下来，接着我们输入<code>.frames</code> 查看当前调用栈信息。
+<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://img-blog.csdnimg.cn/8428b9e386c5480fbeec38368499adcc.gif#pic_center"
+        data-srcset="https://img-blog.csdnimg.cn/8428b9e386c5480fbeec38368499adcc.gif#pic_center, https://img-blog.csdnimg.cn/8428b9e386c5480fbeec38368499adcc.gif#pic_center 1.5x, https://img-blog.csdnimg.cn/8428b9e386c5480fbeec38368499adcc.gif#pic_center 2x"
+        data-sizes="auto"
+        alt="https://img-blog.csdnimg.cn/8428b9e386c5480fbeec38368499adcc.gif#pic_center"
+        title="在这里插入图片描述" />
+我们发现此时程序停留在<code>loop_forever</code> 函数的 <code>sleep</code> 中，我们在栈中找到 <code>sleep</code> 的位置并按下回车，这个时候我们发现程序执行到了 <code>sleep()</code> 函数处了。这个时候我们在这里按下<code>&lt;F9&gt;</code>下一个断点，接着使用 <code>&lt;F5&gt;</code> 继续运行到断点位置停止，这个时候我们通过实时显示的 <code>i</code>值已经发现问题所在了。
+<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://img-blog.csdnimg.cn/bd909545a0224b83b634b8b925c18e86.gif#pic_center"
+        data-srcset="https://img-blog.csdnimg.cn/bd909545a0224b83b634b8b925c18e86.gif#pic_center, https://img-blog.csdnimg.cn/bd909545a0224b83b634b8b925c18e86.gif#pic_center 1.5x, https://img-blog.csdnimg.cn/bd909545a0224b83b634b8b925c18e86.gif#pic_center 2x"
+        data-sizes="auto"
+        alt="https://img-blog.csdnimg.cn/bd909545a0224b83b634b8b925c18e86.gif#pic_center"
+        title="在这里插入图片描述" />
+原来<code>i</code> 递减到<code>0</code>之后，继续递减，因为它是无符号数所以永远无法达成小于<code>0</code> 的条件。</p>
+<h3 id="示例2调试多线程死锁">示例2：调试多线程死锁</h3>
+<p>我们以下面一个多线程程序为例</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-lua" data-lang="lua"><span class="line"><span class="cl"><span class="o">#</span><span class="n">include</span> <span class="o">&lt;</span><span class="n">cstdio</span><span class="o">&gt;</span>
+</span></span><span class="line"><span class="cl"><span class="o">#</span><span class="n">include</span> <span class="o">&lt;</span><span class="n">thread</span><span class="o">&gt;</span>
+</span></span><span class="line"><span class="cl"><span class="o">#</span><span class="n">include</span> <span class="o">&lt;</span><span class="n">vector</span><span class="o">&gt;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">using</span> <span class="n">namespace</span> <span class="n">std</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="n">void</span> <span class="n">func</span><span class="p">(</span><span class="n">int</span> <span class="n">thread_id</span><span class="p">){</span>
+</span></span><span class="line"><span class="cl">    <span class="n">int</span> <span class="n">var</span> <span class="o">=</span> <span class="n">thread_id</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="kr">while</span><span class="p">(</span><span class="kc">true</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="n">int</span> <span class="n">main</span> <span class="p">(</span><span class="n">int</span> <span class="n">argc</span><span class="p">,</span> <span class="n">char</span> <span class="o">*</span><span class="n">argv</span><span class="p">[])</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">vector</span><span class="o">&lt;</span><span class="n">thread</span><span class="o">&gt;</span> <span class="n">vec</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="kr">for</span><span class="p">(</span><span class="n">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="mi">5</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">){</span>
+</span></span><span class="line"><span class="cl">        <span class="n">vec.push_back</span><span class="p">(</span><span class="n">thread</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="n">i</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="o">//</span> <span class="n">join</span>
+</span></span><span class="line"><span class="cl">    <span class="kr">for</span><span class="p">(</span><span class="n">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="mi">5</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">){</span>
+</span></span><span class="line"><span class="cl">        <span class="n">vec</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">join</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="kr">return</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p>因为使用了<code>c++</code> 相关的内容和 <code>thread</code> 库，因此编译的时候需要使用 <code>g++</code> 并且指定链接 <code>pthread</code> 库，我们采用 <code>g++ main.cpp -g -o main -lpthread</code> 来编译它</p>
+<p>我们还是按照之前的步骤，先按下 <code>.p</code>来暂停程序，这个时候我们发现它会提示我们需要暂停哪个线程，遗憾的是根据线程的id还没法判断具体哪个是子线程哪个是主线程。这里我们随便选一个暂停。
+<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://img-blog.csdnimg.cn/7030f725727f446e9b54946d1f003c63.gif#pic_center"
+        data-srcset="https://img-blog.csdnimg.cn/7030f725727f446e9b54946d1f003c63.gif#pic_center, https://img-blog.csdnimg.cn/7030f725727f446e9b54946d1f003c63.gif#pic_center 1.5x, https://img-blog.csdnimg.cn/7030f725727f446e9b54946d1f003c63.gif#pic_center 2x"
+        data-sizes="auto"
+        alt="https://img-blog.csdnimg.cn/7030f725727f446e9b54946d1f003c63.gif#pic_center"
+        title="在这里插入图片描述" />
+<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://img-blog.csdnimg.cn/a7f76cf505aa4d4289ade47d4f38ac61.gif#pic_center"
+        data-srcset="https://img-blog.csdnimg.cn/a7f76cf505aa4d4289ade47d4f38ac61.gif#pic_center, https://img-blog.csdnimg.cn/a7f76cf505aa4d4289ade47d4f38ac61.gif#pic_center 1.5x, https://img-blog.csdnimg.cn/a7f76cf505aa4d4289ade47d4f38ac61.gif#pic_center 2x"
+        data-sizes="auto"
+        alt="https://img-blog.csdnimg.cn/a7f76cf505aa4d4289ade47d4f38ac61.gif#pic_center"
+        title="在这里插入图片描述" />
+然后执行 <code>.threads</code>查看当前线程信息，在某个线程下使用回车键可以看到调用的函数栈。我们发现子线程卡在<code>while</code> 这句话，我们还是一样在卡主的位置按下回车跳转到对应代码位置，在此处下一个断点。然后我们在对应线程位置按下 <code>o</code> 命令来继续执行之前暂停的线程。这样就完美的找到了线程卡死的位置了。
+<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://img-blog.csdnimg.cn/25b2be2667124986bfb12a0e12ecf00f.gif#pic_center"
+        data-srcset="https://img-blog.csdnimg.cn/25b2be2667124986bfb12a0e12ecf00f.gif#pic_center, https://img-blog.csdnimg.cn/25b2be2667124986bfb12a0e12ecf00f.gif#pic_center 1.5x, https://img-blog.csdnimg.cn/25b2be2667124986bfb12a0e12ecf00f.gif#pic_center 2x"
+        data-sizes="auto"
+        alt="https://img-blog.csdnimg.cn/25b2be2667124986bfb12a0e12ecf00f.gif#pic_center"
+        title="在这里插入图片描述" />
+<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://img-blog.csdnimg.cn/0b3e3aefbc7741dbbeff1db8671a786e.gif#pic_center"
+        data-srcset="https://img-blog.csdnimg.cn/0b3e3aefbc7741dbbeff1db8671a786e.gif#pic_center, https://img-blog.csdnimg.cn/0b3e3aefbc7741dbbeff1db8671a786e.gif#pic_center 1.5x, https://img-blog.csdnimg.cn/0b3e3aefbc7741dbbeff1db8671a786e.gif#pic_center 2x"
+        data-sizes="auto"
+        alt="https://img-blog.csdnimg.cn/0b3e3aefbc7741dbbeff1db8671a786e.gif#pic_center"
+        title="在这里插入图片描述" />
+后面可以使用 <code>.c</code> 来继续执行所有被中断的线程</p>
+<h2 id="nvim-gdb-插件">nvim-gdb 插件</h2>
+<p>该插件提供了一种方式，可以直接在neovim中进入gdb的session。例如我们可以通过命令 <code>:GdbStart gdb -q a.out</code>来启动一个<code>gdb</code>会话，并且关联了一个 <code>a.out</code> 的程序。后续可以直接使用<code>gdb</code>相关的命令来启动调试这个程序。我们可以使用如下的代码来安装它</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-lua" data-lang="lua"><span class="line"><span class="cl"><span class="n">use</span> <span class="p">{</span><span class="s2">&#34;sakhnik/nvim-gdb&#34;</span><span class="p">,</span> <span class="n">run</span><span class="o">=</span><span class="s2">&#34;./install.sh&#34;</span><span class="p">}</span>
+</span></span></code></pre></div><p>我们先来试试效果，直接使用快捷键 <code>&lt;leader&gt;dd</code> 来加载一个程序进行调试。进入到<code>gdb</code>会话之后可以使用<code>gdb</code> 的命令。例如我们使用 <code>b main</code>来在 <code>main</code>函数的位置打一个断点，然后通过<code>r</code>来启动程序运行到断点处。接着可以使用 <code>n</code>来执行下一步或者使用 <code>c</code>来直接运行到下一个断点。最后可以使用 <code>q</code>退出
+<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://img-blog.csdnimg.cn/bcfe6c83c7a0460d80e761dae0ba1205.gif#pic_center"
+        data-srcset="https://img-blog.csdnimg.cn/bcfe6c83c7a0460d80e761dae0ba1205.gif#pic_center, https://img-blog.csdnimg.cn/bcfe6c83c7a0460d80e761dae0ba1205.gif#pic_center 1.5x, https://img-blog.csdnimg.cn/bcfe6c83c7a0460d80e761dae0ba1205.gif#pic_center 2x"
+        data-sizes="auto"
+        alt="https://img-blog.csdnimg.cn/bcfe6c83c7a0460d80e761dae0ba1205.gif#pic_center"
+        title="在这里插入图片描述" /></p>
+<h3 id="基础配置">基础配置</h3>
+<p>我们发现使用 <code>nvim-gdb</code> 插件的时候会在对应代码位置显示断点或者当前执行行。这里我们对它做一些配置，先统一使用<code>nvim-gdb</code>和 <code>nvim-dap</code>这两种情况下的显示信息。
+先创建一个新的配置文件为 <code>nvimgdb.lua</code>作为它的配置文件。
+因为它暂时还不支持<code>lua</code>的配置所以这里我们使用<code>vim</code>原生的写法。</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-lua" data-lang="lua"><span class="line"><span class="cl"><span class="n">vim.cmd</span><span class="p">(</span><span class="s">[[
+</span></span></span><span class="line"><span class="cl"><span class="s">    let g:nvimgdb_config_override = {
+</span></span></span><span class="line"><span class="cl"><span class="s">    \ &#39;sign_breakpoint&#39;: [&#39;&#39;],
+</span></span></span><span class="line"><span class="cl"><span class="s">    \ &#39;sign_current_line&#39;: &#39;&#39;,
+</span></span></span><span class="line"><span class="cl"><span class="s">    \ }
+</span></span></span><span class="line"><span class="cl"><span class="s">]]</span><span class="p">)</span>
+</span></span></code></pre></div><p>在这里定义了断点和执行到当前行的配置，这里只能统一图标，还无法做到完全像使用 dap那样显示。
+另外我们可以在 <code>nvimgdb_config_override</code> 这个变量中定义如下快捷键以保证在调试时拥有同样的体验</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-lua" data-lang="lua"><span class="line"><span class="cl">    <span class="err">\</span> <span class="s1">&#39;key_next&#39;</span><span class="p">:</span> <span class="s1">&#39;&lt;F10&gt;&#39;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="err">\</span> <span class="s1">&#39;key_step&#39;</span><span class="p">:</span> <span class="s1">&#39;&lt;F11&gt;&#39;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="err">\</span> <span class="s1">&#39;key_continue&#39;</span><span class="p">:</span> <span class="s1">&#39;&lt;F5&gt;&#39;</span><span class="p">,</span>
+</span></span></code></pre></div><p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://img-blog.csdnimg.cn/3f0ece524906468db0b8d8053134951f.gif#pic_center"
+        data-srcset="https://img-blog.csdnimg.cn/3f0ece524906468db0b8d8053134951f.gif#pic_center, https://img-blog.csdnimg.cn/3f0ece524906468db0b8d8053134951f.gif#pic_center 1.5x, https://img-blog.csdnimg.cn/3f0ece524906468db0b8d8053134951f.gif#pic_center 2x"
+        data-sizes="auto"
+        alt="https://img-blog.csdnimg.cn/3f0ece524906468db0b8d8053134951f.gif#pic_center"
+        title="在这里插入图片描述" />
+最后我们发现当我们输入文件名进行调试的时候，它会一直闪屏。这是因为它会不断根据我们输入的内容在文件系统中匹配合适的可执行文件，为了解决闪屏问题我们屏蔽它的这个特性，我们可以使用如下的配置来解决这个问题</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-lua" data-lang="lua"><span class="line"><span class="cl">    <span class="n">let</span> <span class="n">g</span><span class="p">:</span><span class="n">nvimgdb_use_find_executables</span> <span class="o">=</span> <span class="mi">0</span>
+</span></span><span class="line"><span class="cl">    <span class="n">let</span> <span class="n">g</span><span class="p">:</span><span class="n">nvimgdb_use_cmake_to_find_executables</span> <span class="o">=</span> <span class="mi">0</span>
+</span></span></code></pre></div><p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://img-blog.csdnimg.cn/5f0fec95ebff4bfd8218719855c43e7e.gif#pic_center"
+        data-srcset="https://img-blog.csdnimg.cn/5f0fec95ebff4bfd8218719855c43e7e.gif#pic_center, https://img-blog.csdnimg.cn/5f0fec95ebff4bfd8218719855c43e7e.gif#pic_center 1.5x, https://img-blog.csdnimg.cn/5f0fec95ebff4bfd8218719855c43e7e.gif#pic_center 2x"
+        data-sizes="auto"
+        alt="https://img-blog.csdnimg.cn/5f0fec95ebff4bfd8218719855c43e7e.gif#pic_center"
+        title="在这里插入图片描述" /></p>
+<h3 id="显示窗口的配置">显示窗口的配置</h3>
+<p>定义了显示形式，我们来定义显示的窗口，这里我让它显示常用的像调用栈，变量，以及watch窗口。我们先使用如下代码来将窗口分割为左右两个部分</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-lua" data-lang="lua"><span class="line"><span class="cl">    <span class="n">let</span> <span class="n">w</span><span class="p">:</span><span class="n">nvimgdb_termwin_command</span> <span class="o">=</span> <span class="s2">&#34;rightbelow vnew&#34;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">let</span> <span class="n">w</span><span class="p">:</span><span class="n">nvimgdb_codewin_command</span> <span class="o">=</span> <span class="s2">&#34;vnew&#34;</span>
+</span></span></code></pre></div><p>根据官方文档的描述，<code>nvimgdb_termwin_command</code> 是终端窗口，用来显示<code>repl</code> 相关信息并且与用户交互，后面我们可以对它进行切割用于显示其他信息。<code>nvimgdb_codewin_command</code> 是源代码窗口。这两句代码可以形成一个左右分屏的界面，左侧显示代码，右侧显示repl窗口。
+<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://img-blog.csdnimg.cn/cf6304a2eb1548c5a64fbd9549769e59.jpeg#pic_center"
+        data-srcset="https://img-blog.csdnimg.cn/cf6304a2eb1548c5a64fbd9549769e59.jpeg#pic_center, https://img-blog.csdnimg.cn/cf6304a2eb1548c5a64fbd9549769e59.jpeg#pic_center 1.5x, https://img-blog.csdnimg.cn/cf6304a2eb1548c5a64fbd9549769e59.jpeg#pic_center 2x"
+        data-sizes="auto"
+        alt="https://img-blog.csdnimg.cn/cf6304a2eb1548c5a64fbd9549769e59.jpeg#pic_center"
+        title="在这里插入图片描述" />
+在<code>gdb</code>成功加载之后，我们可以使用命令 <code>:GdbCreateWatch info locals</code>来创建一个显示当前变量的窗口。默认是新创建一个窗口来显示，但是我们可以在命令前加上 <code>belowright</code>来指定在右侧继续分屏，它会在右下角新建窗口来显示变量。需要查看其它窗口可以对应传入不同的参数，例如传入 <code>breakpoints</code>来显示所有断点信息。传入的参数就是gdb中接收的对应参数。</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://img-blog.csdnimg.cn/82f74701ffae468291eb6c7ab1cf92fc.gif#pic_center"
+        data-srcset="https://img-blog.csdnimg.cn/82f74701ffae468291eb6c7ab1cf92fc.gif#pic_center, https://img-blog.csdnimg.cn/82f74701ffae468291eb6c7ab1cf92fc.gif#pic_center 1.5x, https://img-blog.csdnimg.cn/82f74701ffae468291eb6c7ab1cf92fc.gif#pic_center 2x"
+        data-sizes="auto"
+        alt="https://img-blog.csdnimg.cn/82f74701ffae468291eb6c7ab1cf92fc.gif#pic_center"
+        title="在这里插入图片描述" /></p>
+<p>有了这些基础我们就可以对其进行配置了，我们要实现的目标就是当<code>gdb</code>成功加载的时候自动加载这些窗口。在<code>vim</code>中要实现自动化我们目前知道有两种方式，第一种使用自动命令，第二种使用插件配置中提供的回调函数。遗憾的是在这个插件中我没有找到回调函数，因此我们只能采用自动命令这种方法。根据官方的文档，我们主要使用这么两个事件——<code>NvimGdbStart</code>和 <code>NvimGdbCleanup</code>。它们一个是成功加载<code>gdb</code>的时候触发，一个是关闭<code>gdb</code>会话的时候触发。</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-lua" data-lang="lua"><span class="line"><span class="cl"><span class="n">vim.cmd</span><span class="p">(</span><span class="s">[[augroup GdbSession
+</span></span></span><span class="line"><span class="cl"><span class="s">autocmd!
+</span></span></span><span class="line"><span class="cl"><span class="s">autocmd User NvimGdbStart :lua StartGdbSession()
+</span></span></span><span class="line"><span class="cl"><span class="s">autocmd User NvimGdbCleanup :lua EndGdbSession()
+</span></span></span><span class="line"><span class="cl"><span class="s">augroup END]]</span><span class="p">)</span>
+</span></span></code></pre></div><p>在 <code>StartGdbSession</code> 函数中写入如下代码来完成窗口的配置</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-lua" data-lang="lua"><span class="line"><span class="cl"><span class="n">StartGdbSession</span> <span class="o">=</span> <span class="kr">function</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">    <span class="n">vim.api</span><span class="p">.</span><span class="n">nvim_command</span><span class="p">(</span><span class="s2">&#34;:belowright GdbCreateWatch backtrace&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="n">vim.api</span><span class="p">.</span><span class="n">nvim_command</span><span class="p">(</span><span class="s2">&#34;:wincmd h&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="n">vim.api</span><span class="p">.</span><span class="n">nvim_command</span><span class="p">(</span><span class="s2">&#34;:belowright GdbCreateWatch info locals&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="n">vim.api</span><span class="p">.</span><span class="n">nvim_command</span><span class="p">(</span><span class="s2">&#34;:set wrap&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="n">vim.api</span><span class="p">.</span><span class="n">nvim_command</span><span class="p">(</span><span class="s2">&#34;:wincmd k&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="kr">end</span>
+</span></span></code></pre></div><p>不知道各位小伙伴能不能理解这段代码是如何在分屏的。
+首先启动<code>gdb</code>的时候会将整个屏幕纵向分为两个部分，左侧为 <code>code</code>右侧为 <code>repl</code>窗口
+接着我们执行 <code>:belowright GdbCreateWatch backtrace</code> 它会在右下方创建一个窗口用来展示调用栈
+然后执行 <code>:wincmd h</code>来将光标移动到代码窗口上
+继续执行 <code>:belowright GdbCreateWatch info locals</code>它会在代码窗口的下方新增一个窗口用于显示变量的信息</p>
+<p>这样就将窗口分为4个部分了，左上部分显示代码，左下部分显示变量信息。右上部分是repl窗口，右下部分显示变量信息。
+最后我们通过 <code>:set wrap</code>设置窗口中自动换行，不然有些内容显示在一行不容易查看。通过 <code>:wincmd k</code>移动光标到 repl窗口。方便后续调试
+启动之后他的效果如下
+<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://img-blog.csdnimg.cn/4bce1d98eee445329eb605e3a4d05284.jpeg#pic_center"
+        data-srcset="https://img-blog.csdnimg.cn/4bce1d98eee445329eb605e3a4d05284.jpeg#pic_center, https://img-blog.csdnimg.cn/4bce1d98eee445329eb605e3a4d05284.jpeg#pic_center 1.5x, https://img-blog.csdnimg.cn/4bce1d98eee445329eb605e3a4d05284.jpeg#pic_center 2x"
+        data-sizes="auto"
+        alt="https://img-blog.csdnimg.cn/4bce1d98eee445329eb605e3a4d05284.jpeg#pic_center"
+        title="在这里插入图片描述" />
+最后我们在结束<code>gdb</code>的时候做一些收尾工作，关闭我们创建的窗口</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-lua" data-lang="lua"><span class="line"><span class="cl"><span class="n">EndGdbSession</span> <span class="o">=</span> <span class="kr">function</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">    <span class="n">vim.api</span><span class="p">.</span><span class="n">nvim_command</span><span class="p">(</span><span class="s2">&#34;:bdelete! backtrace info locals&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="kr">end</span>
+</span></span></code></pre></div><p>这里我是根据buffer的名称来进行删除。最后的效果如下
+<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://img-blog.csdnimg.cn/b960150728404941a02c5ff73e8a341a.gif#pic_center"
+        data-srcset="https://img-blog.csdnimg.cn/b960150728404941a02c5ff73e8a341a.gif#pic_center, https://img-blog.csdnimg.cn/b960150728404941a02c5ff73e8a341a.gif#pic_center 1.5x, https://img-blog.csdnimg.cn/b960150728404941a02c5ff73e8a341a.gif#pic_center 2x"
+        data-sizes="auto"
+        alt="https://img-blog.csdnimg.cn/b960150728404941a02c5ff73e8a341a.gif#pic_center"
+        title="在这里插入图片描述" /></p>
+<p>到此我们已经介绍了关于<code>dap</code> 的所有配置，至于其他语言相信各位小伙伴根据官方给出的示例可以独立完成配置，这里就不一一介绍了。</p>
+</div><div class="post-footer" id="post-footer">
+    <div class="post-info">
+        <div class="post-info-line">
+            <div class="post-info-mod">
+                <span>Updated on 2022-12-30</span>
+            </div></div>
+        <div class="post-info-line">
+            <div class="post-info-md"></div>
+            <div class="post-info-share">
+                <span><a href="javascript:void(0);" title="Share on Twitter" data-sharer="twitter" data-url="http://HaiLateBoy.github.io/posts/vim-config30/" data-title="从零开始配置vim(30)——DAP的其他配置" data-hashtags="vim,编辑工具,文本处理,lua,编辑器"><i class="fab fa-twitter fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Facebook" data-sharer="facebook" data-url="http://HaiLateBoy.github.io/posts/vim-config30/" data-hashtag="vim"><i class="fab fa-facebook-square fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Hacker News" data-sharer="hackernews" data-url="http://HaiLateBoy.github.io/posts/vim-config30/" data-title="从零开始配置vim(30)——DAP的其他配置"><i class="fab fa-hacker-news fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Line" data-sharer="line" data-url="http://HaiLateBoy.github.io/posts/vim-config30/" data-title="从零开始配置vim(30)——DAP的其他配置"><i data-svg-src="https://cdn.jsdelivr.net/npm/simple-icons@7.3.0/icons/line.svg" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on 微博" data-sharer="weibo" data-url="http://HaiLateBoy.github.io/posts/vim-config30/" data-title="从零开始配置vim(30)——DAP的其他配置"><i class="fab fa-weibo fa-fw" aria-hidden="true"></i></a></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="post-info-more">
+        <section class="post-tags"><i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/vim/">vim</a>,&nbsp;<a href="/tags/%E7%BC%96%E8%BE%91%E5%B7%A5%E5%85%B7/">编辑工具</a>,&nbsp;<a href="/tags/%E6%96%87%E6%9C%AC%E5%A4%84%E7%90%86/">文本处理</a>,&nbsp;<a href="/tags/lua/">lua</a>,&nbsp;<a href="/tags/%E7%BC%96%E8%BE%91%E5%99%A8/">编辑器</a></section>
+        <section>
+            <span><a href="javascript:void(0);" onclick="window.history.back();">Back</a></span>&nbsp;|&nbsp;<span><a href="/">Home</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav"><a href="/posts/work/" class="prev" rel="prev" title="换工作有感"><i class="fas fa-angle-left fa-fw" aria-hidden="true"></i>换工作有感</a>
+            <a href="/posts/2022-new-year-plan/" class="next" rel="next" title="2022年回顾与2023年展望">2022年回顾与2023年展望<i class="fas fa-angle-right fa-fw" aria-hidden="true"></i></a></div>
+</div>
+</article></div>
+            </main><footer class="footer">
+        <div class="footer-container"><div class="footer-line">Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener noreffer" title="Hugo 0.121.2">Hugo</a> | Theme - <a href="https://github.com/dillonzq/LoveIt" target="_blank" rel="noopener noreffer" title="LoveIt 0.2.11"><i class="far fa-kiss-wink-heart fa-fw" aria-hidden="true"></i> LoveIt</a>
+                </div><div class="footer-line" itemscope itemtype="http://schema.org/CreativeWork"><i class="far fa-copyright fa-fw" aria-hidden="true"></i><span itemprop="copyrightYear">2022 - 2024</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="https://www.masimaro.xyz" target="_blank">Masimaro</a></span></div>
+        </div>
+    </footer></div>
+
+        <div id="fixed-buttons"><a href="#" id="back-to-top" class="fixed-button" title="Back to Top">
+                <i class="fas fa-arrow-up fa-fw" aria-hidden="true"></i>
+            </a><a href="#" id="view-comments" class="fixed-button" title="View Comments">
+                <i class="fas fa-comment fa-fw" aria-hidden="true"></i>
+            </a>
+        </div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.css"><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/autocomplete.js@0.38.1/dist/autocomplete.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lunr@2.3.9/lunr.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lazysizes@5.3.2/lazysizes.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/clipboard@2.0.11/dist/clipboard.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/sharer.js@0.5.1/sharer.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/auto-render.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/copy-tex.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/mhchem.min.js"></script><script type="text/javascript">window.config={"code":{"copyTitle":"Copy to clipboard","maxShownLines":50},"comment":{},"math":{"delimiters":[{"display":true,"left":"$$","right":"$$"},{"display":true,"left":"\\[","right":"\\]"},{"display":true,"left":"\\begin{equation}","right":"\\end{equation}"},{"display":true,"left":"\\begin{equation*}","right":"\\end{equation*}"},{"display":true,"left":"\\begin{align}","right":"\\end{align}"},{"display":true,"left":"\\begin{align*}","right":"\\end{align*}"},{"display":true,"left":"\\begin{alignat}","right":"\\end{alignat}"},{"display":true,"left":"\\begin{alignat*}","right":"\\end{alignat*}"},{"display":true,"left":"\\begin{gather}","right":"\\end{gather}"},{"display":true,"left":"\\begin{CD}","right":"\\end{CD}"},{"display":false,"left":"$","right":"$"},{"display":false,"left":"\\(","right":"\\)"}],"strict":false},"search":{"highlightTag":"em","maxResultLength":10,"noResultsFound":"No results found","snippetLength":50}};</script><script type="text/javascript" src="/js/theme.min.js"></script></body>
+</html>

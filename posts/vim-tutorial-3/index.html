@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="robots" content="noodp" />
+        <title>vim 从嫌弃到依赖（2）——vim 模式 - Masimaro&#39;s blog</title><meta name="Description" content="这是我用于记录日常和学习的小站"><meta property="og:title" content="vim 从嫌弃到依赖（2）——vim 模式" />
+<meta property="og:description" content="在上一篇文章中我们获取到了neovim 并对它进行了基础配置。现在已经具备一般编辑器的基本功能了。让我们先学会如何使用vim基本功能进行编辑，后面再看如何进行配置，以达到某某IDE或者编辑器的效果" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://HaiLateBoy.github.io/posts/vim-tutorial-3/" /><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2022-04-12T22:02:46+00:00" />
+<meta property="article:modified_time" content="2022-04-12T22:02:46+00:00" /><meta property="og:site_name" content="Masimaro&#39;s blog" />
+
+<meta name="twitter:card" content="summary"/><meta name="twitter:title" content="vim 从嫌弃到依赖（2）——vim 模式"/>
+<meta name="twitter:description" content="在上一篇文章中我们获取到了neovim 并对它进行了基础配置。现在已经具备一般编辑器的基本功能了。让我们先学会如何使用vim基本功能进行编辑，后面再看如何进行配置，以达到某某IDE或者编辑器的效果"/>
+<meta name="application-name" content="My cool site">
+<meta name="apple-mobile-web-app-title" content="My cool site"><meta name="theme-color" content="#ffffff"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="manifest" href="/site.webmanifest"><link rel="canonical" href="http://HaiLateBoy.github.io/posts/vim-tutorial-3/" /><link rel="prev" href="http://HaiLateBoy.github.io/posts/vim-tutorial-2/" /><link rel="next" href="http://HaiLateBoy.github.io/posts/vim-tutorial-4/" /><link rel="stylesheet" href="/css/style.min.css"><link rel="preload" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css"></noscript><link rel="preload" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css"></noscript><script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "BlogPosting",
+        "headline": "vim 从嫌弃到依赖（2）——vim 模式",
+        "inLanguage": "zh-CN",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "http:\/\/HaiLateBoy.github.io\/posts\/vim-tutorial-3\/"
+        },"genre": "posts","keywords": "vim, 编辑工具, 文本处理","wordcount":  2705 ,
+        "url": "http:\/\/HaiLateBoy.github.io\/posts\/vim-tutorial-3\/","datePublished": "2022-04-12T22:02:46+00:00","dateModified": "2022-04-12T22:02:46+00:00","publisher": {
+            "@type": "Organization",
+            "name": ""},"author": {
+                "@type": "Person",
+                "name": "Masimaro"
+            },"description": ""
+    }
+    </script></head>
+    <body data-header-desktop="fixed" data-header-mobile="auto"><script type="text/javascript">(window.localStorage && localStorage.getItem('theme') ? localStorage.getItem('theme') === 'dark' : ('auto' === 'auto' ? window.matchMedia('(prefers-color-scheme: dark)').matches : 'auto' === 'dark')) && document.body.setAttribute('theme', 'dark');</script>
+
+        <div id="mask"></div><div class="wrapper"><header class="desktop" id="header-desktop">
+    <div class="header-wrapper">
+        <div class="header-title">
+            <a href="/" title="Masimaro&#39;s blog">My cool site</a>
+        </div>
+        <div class="menu">
+            <div class="menu-inner"><a class="menu-item" href="/posts/" title="文章列表"> 文章 </a><a class="menu-item" href="/tags/" title="标签"> 标签 </a><a class="menu-item" href="/categories/" title="分类"> 分类 </a><a class="menu-item" href="/about" title="关于本站"> 关于 </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-desktop">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-desktop" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-desktop" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-desktop">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </span><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                    <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+                </a></div>
+        </div>
+    </div>
+</header><header class="mobile" id="header-mobile">
+    <div class="header-container">
+        <div class="header-wrapper">
+            <div class="header-title">
+                <a href="/" title="Masimaro&#39;s blog">My cool site</a>
+            </div>
+            <div class="menu-toggle" id="menu-toggle-mobile">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+        <div class="menu" id="menu-mobile"><div class="search-wrapper">
+                    <div class="search mobile" id="search-mobile">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-mobile">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-mobile" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-mobile" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-mobile">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </div>
+                    <a href="javascript:void(0);" class="search-cancel" id="search-cancel-mobile">
+                        Cancel
+                    </a>
+                </div><a class="menu-item" href="/posts/" title="文章列表">文章</a><a class="menu-item" href="/tags/" title="标签">标签</a><a class="menu-item" href="/categories/" title="分类">分类</a><a class="menu-item" href="/about" title="关于本站">关于</a><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+            </a></div>
+    </div>
+</header><div class="search-dropdown desktop">
+        <div id="search-dropdown-desktop"></div>
+    </div>
+    <div class="search-dropdown mobile">
+        <div id="search-dropdown-mobile"></div>
+    </div><main class="main">
+                <div class="container"><div class="toc" id="toc-auto">
+            <h2 class="toc-title">Contents</h2>
+            <div class="toc-content" id="toc-content-auto"></div>
+        </div><article class="page single"><h1 class="single-title animate__animated animate__flipInX">vim 从嫌弃到依赖（2）——vim 模式</h1><div class="post-meta">
+            <div class="post-meta-line"><span class="post-author"><a href="https://www.masimaro.xyz" title="Author" target="_blank" rel="noopener noreffer author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Masimaro</a></span>&nbsp;<span class="post-category">included in <a href="/categories/vim/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>vim</a></span></div>
+            <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw" aria-hidden="true"></i>&nbsp;<time datetime="2022-04-12">2022-04-12</time>&nbsp;<i class="fas fa-pencil-alt fa-fw" aria-hidden="true"></i>&nbsp;2705 words&nbsp;
+                <i class="far fa-clock fa-fw" aria-hidden="true"></i>&nbsp;6 minutes&nbsp;</div>
+        </div><div class="details toc" id="toc-static"  data-kept="true">
+                <div class="details-summary toc-title">
+                    <span>Contents</span>
+                    <span><i class="details-icon fas fa-angle-right" aria-hidden="true"></i></span>
+                </div>
+                <div class="details-content toc-content" id="toc-content-static"><nav id="TableOfContents">
+  <ul>
+    <li><a href="#vim-为何高效">vim 为何高效</a></li>
+    <li><a href="#vim的几种模式">vim的几种模式</a></li>
+    <li><a href="#vim-移动光标的几种方式">vim 移动光标的几种方式</a></li>
+    <li><a href="#vim-基础操作之删除和替换">vim 基础操作之删除和替换</a></li>
+    <li><a href="#以行为单位的操作">以行为单位的操作</a></li>
+    <li><a href="#最后的总结">最后的总结</a></li>
+  </ul>
+</nav></div>
+            </div><div class="content" id="content"><p>在上一篇文章中我们获取到了neovim 并对它进行了基础配置。现在已经具备一般编辑器的基本功能了。让我们先学会如何使用vim基本功能进行编辑，后面再看如何进行配置，以达到某某IDE或者编辑器的效果</p>
+<h2 id="vim-为何高效">vim 为何高效</h2>
+<p>这里我们先聊聊vim为何高效。一般进行编辑工作，不管是使用Word，记事本，写PPT，对于文本的操作无外乎这么几种操作</p>
+<ul>
+<li>移动光标到指定位置</li>
+<li>输入</li>
+<li>删除</li>
+<li>替换(删除 + 输入)</li>
+</ul>
+<p>而vim之所以高效就是将这几个部分分解为几个模式，不同的模式针对这些场景进行了一些优化。下面是几个简单的示例</p>
+<ol>
+<li>
+<p>将多行文字合并为1行
+<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://img-blog.csdnimg.cn/43e224d17e5240339ef1b158f768cd79.gif#pic_center"
+        data-srcset="https://img-blog.csdnimg.cn/43e224d17e5240339ef1b158f768cd79.gif#pic_center, https://img-blog.csdnimg.cn/43e224d17e5240339ef1b158f768cd79.gif#pic_center 1.5x, https://img-blog.csdnimg.cn/43e224d17e5240339ef1b158f768cd79.gif#pic_center 2x"
+        data-sizes="auto"
+        alt="https://img-blog.csdnimg.cn/43e224d17e5240339ef1b158f768cd79.gif#pic_center"
+        title="合并多行为1行" /></p>
+</li>
+<li>
+<p>删除前5行
+<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://img-blog.csdnimg.cn/a8c34616d8524498900bc3189cddfb45.gif#pic_center"
+        data-srcset="https://img-blog.csdnimg.cn/a8c34616d8524498900bc3189cddfb45.gif#pic_center, https://img-blog.csdnimg.cn/a8c34616d8524498900bc3189cddfb45.gif#pic_center 1.5x, https://img-blog.csdnimg.cn/a8c34616d8524498900bc3189cddfb45.gif#pic_center 2x"
+        data-sizes="auto"
+        alt="https://img-blog.csdnimg.cn/a8c34616d8524498900bc3189cddfb45.gif#pic_center"
+        title="5dd删除前5行" /></p>
+</li>
+<li>
+<p>将每行后面的数字+1
+<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://img-blog.csdnimg.cn/ba28017bdaee4c41a4189e66d93dac54.gif#pic_center"
+        data-srcset="https://img-blog.csdnimg.cn/ba28017bdaee4c41a4189e66d93dac54.gif#pic_center, https://img-blog.csdnimg.cn/ba28017bdaee4c41a4189e66d93dac54.gif#pic_center 1.5x, https://img-blog.csdnimg.cn/ba28017bdaee4c41a4189e66d93dac54.gif#pic_center 2x"
+        data-sizes="auto"
+        alt="https://img-blog.csdnimg.cn/ba28017bdaee4c41a4189e66d93dac54.gif#pic_center"
+        title="使用宏更改文本" />
+这些操作先卖个关子，暂时不去管他们，接下来简单说说vim的几种模式，然后了解一下移动光标的一些命令，最后提供一个能描述vim操作逻辑的公式</p>
+</li>
+</ol>
+<h2 id="vim的几种模式">vim的几种模式</h2>
+<p>vim主要分为一下几个模式</p>
+<ul>
+<li>
+<p>普通模式 (normal mode)</p>
+<p>不出意外的话，在使用vim的时候大部分时间停留在普通模式下，并且很多操作都是在普通模式下完成的，例如上述的几个例子全都是在普通模式下完成的。移动光标、切换模式都是在普通模式下进行的</p>
+</li>
+<li>
+<p>插入模式 (insert mode)</p>
+<p>插入模式主要用来编辑文本，在该模式下输入的字符都会作为文本的一部分进行保存，在该模式下可以进行文本的编辑操作</p>
+</li>
+<li>
+<p>可视模式(visual mode)</p>
+<p>该模式主要用来选择一部分文本，实现的功能跟用鼠标选中一段文本一样，后续可以输入命令针对被选中的文本进行处理</p>
+</li>
+<li>
+<p>命令行模式(command mode)</p>
+<p>可以在普通模式和可视模式下输入 <code>:</code> 进入命令行模式，严格意义上来说，它并不是一个真正的模式。许多复杂的操作其实都可通过一个简单的命令来完成。在命令行中，我们可以执行 vim 自带的命令，也可以执行自定义的命令(例如很多插件都有一些自定义命令)。例如使用 <code>:w</code> 来将缓冲区中的内容写入一个文件中，或者使用<code>:q</code> 来退出vim。</p>
+</li>
+</ul>
+<h2 id="vim-移动光标的几种方式">vim 移动光标的几种方式</h2>
+<p>移动光标可以说是<code>vim</code> 中所有操作里面最基础的操作了。因为 删除， 输入 和 替换 这三个操作都是以光标所在位置为基础做的。可以说，高效的文本处理大多依赖于光标移动的效率，而如何高效的把光标移动到 “目标” 处是一个不小的学问。</p>
+<p>一般来说普通的编辑器移动光标的方式都是通过手去移动鼠标，通过鼠标来定位到光标要移动的位置，这么做并不高效。原因是在移动鼠标的过程中涉及到将手由键盘移开，将手放到鼠标上、找到对应位置然后移动光标，最后再将手由鼠标移动到光标上。这些动作不仅打断了键盘输入，同时也打断了我们输入的思路。要做到高效移动光标首要的就是手不要离开键盘（尽量不要大范围的移动手）。</p>
+<p><code>vim</code> 的普通模式完美的解决了这个问题，在普通模式下提供了丰富的操作来移动光标，下面列举一些常用的</p>
+<ul>
+<li>h: 向前移动一个字符</li>
+<li>l: 向后移动一个字符</li>
+<li>j: 向下移动一行</li>
+<li>k: 向上移动一行</li>
+<li>b: 向前移动一个单词</li>
+<li>w: 向后移动一个单词</li>
+<li>e: 移动光标到单词尾部</li>
+<li>^: 移动光标到行首第一个非空字符处</li>
+<li>$: 移动光标到行末最后一个非空字符处</li>
+<li>gg: 移动光标至文件首行的首个非空格字节</li>
+<li>G: 移动光标至整个文本最后一行的首个非空格字节()</li>
+<li>%: 移动光标到匹配括号的另一端</li>
+<li>0: 移动光标至行首</li>
+</ul>
+<p>说句题外话，<code>vim</code> 使用 <code>h j k l</code> 来代替 <code>← ↓ ↑ →</code> 主要是因为当年创建 <code>vi</code> 的时候键盘张这样</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://img-blog.csdnimg.cn/2b16ff8b48b64a2d8c9f4b1f2bc3589d.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAYWx1bHVrYQ==,size_20,color_FFFFFF,t_70,g_se,x_16#pic_center"
+        data-srcset="https://img-blog.csdnimg.cn/2b16ff8b48b64a2d8c9f4b1f2bc3589d.png?x-oss-process=image/watermark%2ctype_d3F5LXplbmhlaQ%2cshadow_50%2ctext_Q1NETiBAYWx1bHVrYQ==%2csize_20%2ccolor_FFFFFF%2ct_70%2cg_se%2cx_16#pic_center, https://img-blog.csdnimg.cn/2b16ff8b48b64a2d8c9f4b1f2bc3589d.png?x-oss-process=image/watermark%2ctype_d3F5LXplbmhlaQ%2cshadow_50%2ctext_Q1NETiBAYWx1bHVrYQ==%2csize_20%2ccolor_FFFFFF%2ct_70%2cg_se%2cx_16#pic_center 1.5x, https://img-blog.csdnimg.cn/2b16ff8b48b64a2d8c9f4b1f2bc3589d.png?x-oss-process=image/watermark%2ctype_d3F5LXplbmhlaQ%2cshadow_50%2ctext_Q1NETiBAYWx1bHVrYQ==%2csize_20%2ccolor_FFFFFF%2ct_70%2cg_se%2cx_16#pic_center 2x"
+        data-sizes="auto"
+        alt="https://img-blog.csdnimg.cn/2b16ff8b48b64a2d8c9f4b1f2bc3589d.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAYWx1bHVrYQ==,size_20,color_FFFFFF,t_70,g_se,x_16#pic_center"
+        title="hjkl 键盘" />
+如果仅仅使用上述介绍的内容进行移动光标，一次移动一个字符、一个单词、一行，这效率也太低了，无法处理需要大幅度跳转光标的需求。这里介绍一个公式</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="cl">数字 + 移动光标
+</span></span></code></pre></div><p>例如上述介绍的移动光标的方式都可以采用这个公式。前面的数字表示按同意的操作移动光标的次数，例如 <code>2w</code> 表示向后移动两个单词，<code>3j</code> 表示向下移动3行。</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://img-blog.csdnimg.cn/81301ece071a438fb3ec6e742083edf5.gif#pic_center"
+        data-srcset="https://img-blog.csdnimg.cn/81301ece071a438fb3ec6e742083edf5.gif#pic_center, https://img-blog.csdnimg.cn/81301ece071a438fb3ec6e742083edf5.gif#pic_center 1.5x, https://img-blog.csdnimg.cn/81301ece071a438fb3ec6e742083edf5.gif#pic_center 2x"
+        data-sizes="auto"
+        alt="https://img-blog.csdnimg.cn/81301ece071a438fb3ec6e742083edf5.gif#pic_center"
+        title="3j移动光标" />
+我们把这个公式总结为</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="cl">motion = [数字] + 移动光标
+</span></span></code></pre></div><p>上述公式可以理解为 motion就是定义了如何移动光标</p>
+<h2 id="vim-基础操作之删除和替换">vim 基础操作之删除和替换</h2>
+<p>移动光标之后，接下来应该就是进入输入模式进行输入操作，但是这里我们先不谈输入模式。其实在忽略在输入模式下的各种操作技巧，输入模式中剩下的就是输入各种字符完成输入操作，相对比较基础，这里先不谈它。我们先来说说在普通模式下的删除和替换操作。</p>
+<p>删除操作使用 <code>d</code>(你可以理解为英文单词 <code>delete</code> 的首字母)，替换操作使用 <code>c</code>(也就是 <code>change</code>)</p>
+<p>我们输入 <code>d</code> 或者 <code>c</code> 发现操作卡住了，其实这个时候vim在等用户输入对应的范围即 <code>motion</code> ，表示针对哪个范围的文本进行该操作，这里我们引入第二个公式</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="cl">operate = operator + motion
+</span></span></code></pre></div><p>公式可以理解为，一个操作等于我们想要多多大范围的文本进行何种操作。例如<code>cw</code> 表示针对一个单词进行替换操作，<code>d2w</code> 表示对光标后2个单词进行删除操作，这么写也比较符合我们平时使用的日常语言，例如 <code>d2w = delete 2 words</code> (删除两个单词)</p>
+<ul>
+<li>
+<p>示例： 使用 <code>c2w</code> 删除两个单词并进入插入模式
+<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://img-blog.csdnimg.cn/5a27db59417a4b0eb5b6fd12371ec707.gif#pic_center"
+        data-srcset="https://img-blog.csdnimg.cn/5a27db59417a4b0eb5b6fd12371ec707.gif#pic_center, https://img-blog.csdnimg.cn/5a27db59417a4b0eb5b6fd12371ec707.gif#pic_center 1.5x, https://img-blog.csdnimg.cn/5a27db59417a4b0eb5b6fd12371ec707.gif#pic_center 2x"
+        data-sizes="auto"
+        alt="https://img-blog.csdnimg.cn/5a27db59417a4b0eb5b6fd12371ec707.gif#pic_center"
+        title="c2w 修改两个字符" /></p>
+</li>
+<li>
+<p>示例： 使用 <code>d$</code> 删除光标后至行尾的所有内容
+<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://img-blog.csdnimg.cn/c0a76ab9d11d4dc2bad535cd56c0a126.gif#pic_center"
+        data-srcset="https://img-blog.csdnimg.cn/c0a76ab9d11d4dc2bad535cd56c0a126.gif#pic_center, https://img-blog.csdnimg.cn/c0a76ab9d11d4dc2bad535cd56c0a126.gif#pic_center 1.5x, https://img-blog.csdnimg.cn/c0a76ab9d11d4dc2bad535cd56c0a126.gif#pic_center 2x"
+        data-sizes="auto"
+        alt="https://img-blog.csdnimg.cn/c0a76ab9d11d4dc2bad535cd56c0a126.gif#pic_center"
+        title="d$删除当前至行尾所有字符" />
+其实类似 <code>d</code> 和 <code>c</code> 的操作还有很多，例如</p>
+</li>
+<li>
+<p>&gt;: 右缩进</p>
+</li>
+<li>
+<p>&lt;: 左缩进</p>
+</li>
+<li>
+<p>=: 自动缩进</p>
+</li>
+<li>
+<p>y: 赋值</p>
+</li>
+<li>
+<p>p: 粘贴</p>
+</li>
+<li>
+<p>gu: 变为小写</p>
+</li>
+<li>
+<p>gU: 变为大写</p>
+</li>
+<li>
+<p>g~: 反转大小写</p>
+</li>
+<li>
+<p>示例：使用<code>&gt;G</code> 将当前行至文件尾部的代码进行缩进
+<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://img-blog.csdnimg.cn/42c183c7409c4459890d6ddac11eef47.gif#pic_center"
+        data-srcset="https://img-blog.csdnimg.cn/42c183c7409c4459890d6ddac11eef47.gif#pic_center, https://img-blog.csdnimg.cn/42c183c7409c4459890d6ddac11eef47.gif#pic_center 1.5x, https://img-blog.csdnimg.cn/42c183c7409c4459890d6ddac11eef47.gif#pic_center 2x"
+        data-sizes="auto"
+        alt="https://img-blog.csdnimg.cn/42c183c7409c4459890d6ddac11eef47.gif#pic_center"
+        title="缩进代码" /></p>
+</li>
+</ul>
+<p>我们也可以在 <code>operator</code> 前添加数字，表示执行操作重复次数，这里我们的公式就可以进行改写</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="cl">operat = [数字] + operator + motion
+</span></span></code></pre></div><p>例如<code>2dw</code> 表示删除一个单词并将该操作执行两遍。它与前面演示的 <code>d2w</code> 能达到相同的操作，但是含义不同。<code>d2w</code> 表示一次删除两个字符。理解了这个，这里我提出一个简单的问题 <code>2d2w</code> 的等效操作是哪两个呢，欢迎评论区给出。</p>
+<h2 id="以行为单位的操作">以行为单位的操作</h2>
+<p>例如我们要删除一行，根据以上学习的内容可以想到使用 <code>dj</code> ,但是实际尝试的时候发现它删除了两行。我们还可以想到先使用 <code>0</code>将光标移动到行首,然后使用 <code>d$</code> 删除整行，但是会发现它会留下一个空白行。</p>
+<p>如果想针对行本身进行操作的话，需要将同样的操作同时按两下，即<code>dd</code> 表示删除一行,<code>&gt;&gt;</code> 表示缩进当前行。这里我们可以扩展一个公式</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="cl">operat = [数字] + 2 * operator
+</span></span></code></pre></div><p>即重复按下两次同样的操作命令表示针对行进行操作，前面加上数字表示重复多少次。举几个例子</p>
+<ul>
+<li><code>5dd</code> 删除5行</li>
+<li><code>4&gt;&gt;</code> 将4行代码进行缩进</li>
+<li><code>2cc</code> 更改接下来的两行，并进入插入模式</li>
+</ul>
+<h2 id="最后的总结">最后的总结</h2>
+<p>本篇到这里就结束了，最后做一下总结，我们提到几个公式</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="cl">motion = [数字] + 移动光标
+</span></span><span class="line"><span class="cl">operat = [数字] + operator + motion
+</span></span><span class="line"><span class="cl">operat = [数字] + 2 * operator
+</span></span></code></pre></div><p>根据这些公式我们可以根据具体情形自由发挥想象。它是vim的基础也是体现它高效的一个地方。</p>
+<p>另外还介绍了一些常用的移动光标的方式和常用的操作符，这里再次将他们列举出来以供查阅</p>
+<ul>
+<li>
+<p>几种常用motion</p>
+<table>
+<thead>
+<tr>
+<th>motion</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>h</td>
+<td>左移</td>
+</tr>
+<tr>
+<td>j</td>
+<td>下移</td>
+</tr>
+<tr>
+<td>k</td>
+<td>上移</td>
+</tr>
+<tr>
+<td>l</td>
+<td>右移动</td>
+</tr>
+<tr>
+<td>w</td>
+<td>向后移动一个词</td>
+</tr>
+<tr>
+<td>b</td>
+<td>向前移动一个词</td>
+</tr>
+<tr>
+<td>e</td>
+<td>移动光标至词末</td>
+</tr>
+<tr>
+<td>$</td>
+<td>移动光标至行末</td>
+</tr>
+<tr>
+<td>0</td>
+<td>移动光标至行首</td>
+</tr>
+<tr>
+<td>^</td>
+<td>移动光标至本行首个非空格字节</td>
+</tr>
+<tr>
+<td>gg</td>
+<td>移动光标至文件首行的首个非空格字节</td>
+</tr>
+<tr>
+<td>G</td>
+<td>移动光标至整个文本最后一行的首个非空格字节()</td>
+</tr>
+<tr>
+<td>%</td>
+<td>移动光标到匹配括号的另一端</td>
+</tr>
+</tbody>
+</table>
+</li>
+<li>
+<p>几种常用操作符</p>
+</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>operator</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>c</td>
+<td>修改，删除当前并切换到<code>insert mode</code></td>
+</tr>
+<tr>
+<td>d</td>
+<td>删除，该命令与motion配置使用，表示删除光标移动过的所有内容</td>
+</tr>
+<tr>
+<td>&gt;</td>
+<td>右缩进</td>
+</tr>
+<tr>
+<td>&lt;</td>
+<td>左缩进</td>
+</tr>
+<tr>
+<td>=</td>
+<td>自动缩进</td>
+</tr>
+<tr>
+<td>y</td>
+<td>赋值</td>
+</tr>
+<tr>
+<td>p</td>
+<td>粘贴</td>
+</tr>
+<tr>
+<td>gu</td>
+<td>变为小写</td>
+</tr>
+<tr>
+<td>gU</td>
+<td>变为大写</td>
+</tr>
+<tr>
+<td>g~</td>
+<td>反转大小写</td>
+</tr>
+</tbody>
+</table>
+<!-- raw HTML omitted --></div><div class="post-footer" id="post-footer">
+    <div class="post-info">
+        <div class="post-info-line">
+            <div class="post-info-mod">
+                <span>Updated on 2022-04-12</span>
+            </div></div>
+        <div class="post-info-line">
+            <div class="post-info-md"></div>
+            <div class="post-info-share">
+                <span><a href="javascript:void(0);" title="Share on Twitter" data-sharer="twitter" data-url="http://HaiLateBoy.github.io/posts/vim-tutorial-3/" data-title="vim 从嫌弃到依赖（2）——vim 模式" data-hashtags="vim,编辑工具,文本处理"><i class="fab fa-twitter fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Facebook" data-sharer="facebook" data-url="http://HaiLateBoy.github.io/posts/vim-tutorial-3/" data-hashtag="vim"><i class="fab fa-facebook-square fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Hacker News" data-sharer="hackernews" data-url="http://HaiLateBoy.github.io/posts/vim-tutorial-3/" data-title="vim 从嫌弃到依赖（2）——vim 模式"><i class="fab fa-hacker-news fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Line" data-sharer="line" data-url="http://HaiLateBoy.github.io/posts/vim-tutorial-3/" data-title="vim 从嫌弃到依赖（2）——vim 模式"><i data-svg-src="https://cdn.jsdelivr.net/npm/simple-icons@7.3.0/icons/line.svg" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on 微博" data-sharer="weibo" data-url="http://HaiLateBoy.github.io/posts/vim-tutorial-3/" data-title="vim 从嫌弃到依赖（2）——vim 模式"><i class="fab fa-weibo fa-fw" aria-hidden="true"></i></a></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="post-info-more">
+        <section class="post-tags"><i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/vim/">vim</a>,&nbsp;<a href="/tags/%E7%BC%96%E8%BE%91%E5%B7%A5%E5%85%B7/">编辑工具</a>,&nbsp;<a href="/tags/%E6%96%87%E6%9C%AC%E5%A4%84%E7%90%86/">文本处理</a></section>
+        <section>
+            <span><a href="javascript:void(0);" onclick="window.history.back();">Back</a></span>&nbsp;|&nbsp;<span><a href="/">Home</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav"><a href="/posts/vim-tutorial-2/" class="prev" rel="prev" title="安装和定位vimrc"><i class="fas fa-angle-left fa-fw" aria-hidden="true"></i>安装和定位vimrc</a>
+            <a href="/posts/vim-tutorial-4/" class="next" rel="next" title="vim 从嫌弃到依赖(3)——vim 普通模式">vim 从嫌弃到依赖(3)——vim 普通模式<i class="fas fa-angle-right fa-fw" aria-hidden="true"></i></a></div>
+</div>
+</article></div>
+            </main><footer class="footer">
+        <div class="footer-container"><div class="footer-line">Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener noreffer" title="Hugo 0.121.2">Hugo</a> | Theme - <a href="https://github.com/dillonzq/LoveIt" target="_blank" rel="noopener noreffer" title="LoveIt 0.2.11"><i class="far fa-kiss-wink-heart fa-fw" aria-hidden="true"></i> LoveIt</a>
+                </div><div class="footer-line" itemscope itemtype="http://schema.org/CreativeWork"><i class="far fa-copyright fa-fw" aria-hidden="true"></i><span itemprop="copyrightYear">2022 - 2024</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="https://www.masimaro.xyz" target="_blank">Masimaro</a></span></div>
+        </div>
+    </footer></div>
+
+        <div id="fixed-buttons"><a href="#" id="back-to-top" class="fixed-button" title="Back to Top">
+                <i class="fas fa-arrow-up fa-fw" aria-hidden="true"></i>
+            </a><a href="#" id="view-comments" class="fixed-button" title="View Comments">
+                <i class="fas fa-comment fa-fw" aria-hidden="true"></i>
+            </a>
+        </div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.css"><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/autocomplete.js@0.38.1/dist/autocomplete.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lunr@2.3.9/lunr.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lazysizes@5.3.2/lazysizes.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/clipboard@2.0.11/dist/clipboard.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/sharer.js@0.5.1/sharer.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/auto-render.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/copy-tex.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/mhchem.min.js"></script><script type="text/javascript">window.config={"code":{"copyTitle":"Copy to clipboard","maxShownLines":50},"comment":{},"math":{"delimiters":[{"display":true,"left":"$$","right":"$$"},{"display":true,"left":"\\[","right":"\\]"},{"display":true,"left":"\\begin{equation}","right":"\\end{equation}"},{"display":true,"left":"\\begin{equation*}","right":"\\end{equation*}"},{"display":true,"left":"\\begin{align}","right":"\\end{align}"},{"display":true,"left":"\\begin{align*}","right":"\\end{align*}"},{"display":true,"left":"\\begin{alignat}","right":"\\end{alignat}"},{"display":true,"left":"\\begin{alignat*}","right":"\\end{alignat*}"},{"display":true,"left":"\\begin{gather}","right":"\\end{gather}"},{"display":true,"left":"\\begin{CD}","right":"\\end{CD}"},{"display":false,"left":"$","right":"$"},{"display":false,"left":"\\(","right":"\\)"}],"strict":false},"search":{"highlightTag":"em","maxResultLength":10,"noResultsFound":"No results found","snippetLength":50}};</script><script type="text/javascript" src="/js/theme.min.js"></script></body>
+</html>

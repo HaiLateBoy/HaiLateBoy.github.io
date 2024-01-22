@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="robots" content="noodp" />
+        <title>从零开始配置 vim(3)—— 键盘映射进阶 - Masimaro&#39;s blog</title><meta name="Description" content="这是我用于记录日常和学习的小站"><meta property="og:title" content="从零开始配置 vim(3)—— 键盘映射进阶" />
+<meta property="og:description" content="严格意义上来说，快捷键的绑定应该是键盘映射，将某些键映射为另一些键。 在上篇我们介绍了基本的键盘映射操作，知道了如何 :map、:imap、:v" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://HaiLateBoy.github.io/posts/vim-config3/" /><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2022-07-13T11:38:13+08:00" />
+<meta property="article:modified_time" content="2022-07-13T11:38:13+08:00" /><meta property="og:site_name" content="Masimaro&#39;s blog" />
+
+<meta name="twitter:card" content="summary"/><meta name="twitter:title" content="从零开始配置 vim(3)—— 键盘映射进阶"/>
+<meta name="twitter:description" content="严格意义上来说，快捷键的绑定应该是键盘映射，将某些键映射为另一些键。 在上篇我们介绍了基本的键盘映射操作，知道了如何 :map、:imap、:v"/>
+<meta name="application-name" content="My cool site">
+<meta name="apple-mobile-web-app-title" content="My cool site"><meta name="theme-color" content="#ffffff"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="manifest" href="/site.webmanifest"><link rel="canonical" href="http://HaiLateBoy.github.io/posts/vim-config3/" /><link rel="prev" href="http://HaiLateBoy.github.io/posts/vim-config2/" /><link rel="next" href="http://HaiLateBoy.github.io/posts/vim-config4/" /><link rel="stylesheet" href="/css/style.min.css"><link rel="preload" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css"></noscript><link rel="preload" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css"></noscript><script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "BlogPosting",
+        "headline": "从零开始配置 vim(3)—— 键盘映射进阶",
+        "inLanguage": "zh-CN",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "http:\/\/HaiLateBoy.github.io\/posts\/vim-config3\/"
+        },"genre": "posts","keywords": "vim, 编辑工具, 文本处理, lua, 编辑器","wordcount":  2640 ,
+        "url": "http:\/\/HaiLateBoy.github.io\/posts\/vim-config3\/","datePublished": "2022-07-13T11:38:13+08:00","dateModified": "2022-07-13T11:38:13+08:00","publisher": {
+            "@type": "Organization",
+            "name": ""},"author": {
+                "@type": "Person",
+                "name": "Masimaro"
+            },"description": ""
+    }
+    </script></head>
+    <body data-header-desktop="fixed" data-header-mobile="auto"><script type="text/javascript">(window.localStorage && localStorage.getItem('theme') ? localStorage.getItem('theme') === 'dark' : ('auto' === 'auto' ? window.matchMedia('(prefers-color-scheme: dark)').matches : 'auto' === 'dark')) && document.body.setAttribute('theme', 'dark');</script>
+
+        <div id="mask"></div><div class="wrapper"><header class="desktop" id="header-desktop">
+    <div class="header-wrapper">
+        <div class="header-title">
+            <a href="/" title="Masimaro&#39;s blog">My cool site</a>
+        </div>
+        <div class="menu">
+            <div class="menu-inner"><a class="menu-item" href="/posts/" title="文章列表"> 文章 </a><a class="menu-item" href="/tags/" title="标签"> 标签 </a><a class="menu-item" href="/categories/" title="分类"> 分类 </a><a class="menu-item" href="/about" title="关于本站"> 关于 </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-desktop">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-desktop" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-desktop" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-desktop">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </span><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                    <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+                </a></div>
+        </div>
+    </div>
+</header><header class="mobile" id="header-mobile">
+    <div class="header-container">
+        <div class="header-wrapper">
+            <div class="header-title">
+                <a href="/" title="Masimaro&#39;s blog">My cool site</a>
+            </div>
+            <div class="menu-toggle" id="menu-toggle-mobile">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+        <div class="menu" id="menu-mobile"><div class="search-wrapper">
+                    <div class="search mobile" id="search-mobile">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-mobile">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-mobile" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-mobile" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-mobile">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </div>
+                    <a href="javascript:void(0);" class="search-cancel" id="search-cancel-mobile">
+                        Cancel
+                    </a>
+                </div><a class="menu-item" href="/posts/" title="文章列表">文章</a><a class="menu-item" href="/tags/" title="标签">标签</a><a class="menu-item" href="/categories/" title="分类">分类</a><a class="menu-item" href="/about" title="关于本站">关于</a><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+            </a></div>
+    </div>
+</header><div class="search-dropdown desktop">
+        <div id="search-dropdown-desktop"></div>
+    </div>
+    <div class="search-dropdown mobile">
+        <div id="search-dropdown-mobile"></div>
+    </div><main class="main">
+                <div class="container"><div class="toc" id="toc-auto">
+            <h2 class="toc-title">Contents</h2>
+            <div class="toc-content" id="toc-content-auto"></div>
+        </div><article class="page single"><h1 class="single-title animate__animated animate__flipInX">从零开始配置 vim(3)—— 键盘映射进阶</h1><div class="post-meta">
+            <div class="post-meta-line"><span class="post-author"><a href="https://www.masimaro.xyz" title="Author" target="_blank" rel="noopener noreffer author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Masimaro</a></span>&nbsp;<span class="post-category">included in <a href="/categories/vim-%E9%85%8D%E7%BD%AE/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>vim 配置</a></span></div>
+            <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw" aria-hidden="true"></i>&nbsp;<time datetime="2022-07-13">2022-07-13</time>&nbsp;<i class="fas fa-pencil-alt fa-fw" aria-hidden="true"></i>&nbsp;2640 words&nbsp;
+                <i class="far fa-clock fa-fw" aria-hidden="true"></i>&nbsp;6 minutes&nbsp;</div>
+        </div><div class="details toc" id="toc-static"  data-kept="true">
+                <div class="details-summary toc-title">
+                    <span>Contents</span>
+                    <span><i class="details-icon fas fa-angle-right" aria-hidden="true"></i></span>
+                </div>
+                <div class="details-content toc-content" id="toc-content-static"><nav id="TableOfContents">
+  <ul>
+    <li><a href="#映射的递归问题">映射的递归问题</a></li>
+    <li><a href="#lua-配置">lua 配置</a></li>
+    <li><a href="#映射leader-键">映射leader 键</a></li>
+  </ul>
+</nav></div>
+            </div><div class="content" id="content"><p>严格意义上来说，快捷键的绑定应该是键盘映射，将某些键映射为另一些键。</p>
+<p>在上篇我们介绍了基本的键盘映射操作，知道了如何 :map、:imap、:vmap、:nmap这些命令来映射键盘快捷键。它们很方便，也很简单，但是有一个致命的缺点。他们是递归的，我们先来讨论什么是递归</p>
+<h2 id="映射的递归问题">映射的递归问题</h2>
+<p>让我们先来执行下面的命令</p>
+<pre tabindex="0"><code class="language-vimscript" data-lang="vimscript">:nmap jj J
+:nmap J j
+</code></pre><p>这里我们原本是想 jj来实现 J的功能，更加快速的实现合并行的功能，但是我们按下之后发现，它只是将光标移动到下一行了。这并不是我们想要的。到底发生什么了呢？</p>
+<p>因为这些命令是递归的。如何理解递归呢？我们以函数的思想来考虑，每定义一个快捷键，就相当于定义了一个函数。并且在新定义的函数中调用老函数。依照这个思路我们来分析一下上述两个命令产生的结果：</p>
+<ol>
+<li>首先定义了一个名为 jj的函数，它的函数代码为 J()</li>
+<li>然后我们定义了一个名为 J的函数，它的代码定义为 j()</li>
+<li>我们执行 jj函数的时候，它在函数内部调用 J()，J函数内部调用 j()。因此它表现出来的最终效果就是 jj等效与 j。</li>
+</ol>
+<p>这些映射产生的伪代码如下:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="kt">void</span> <span class="nf">J</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">j</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kt">void</span> <span class="nf">jj</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">J</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p>我们在调用 <code>jj</code> 这个函数的时候就相当于在调用 <code>j</code></p>
+<p>有点绕是不是呢。为了讲述这个问题，我们再来看这么一个例子</p>
+<pre tabindex="0"><code class="language-vimscript" data-lang="vimscript">:nmap dd o&lt;esc&gt;kddj
+</code></pre><p>我们来分析一下它的本意：</p>
+<ul>
+<li>首先使用 o在光标所在行之下插入一行</li>
+<li>退回到普通模式，并且让光标向上移动一行</li>
+<li>删除光标所在行</li>
+<li>移动到下一行，也就是刚刚的插入行</li>
+</ul>
+<p>看起来这个命令的作用是清除本行，但是vim并没有这么做，只有按下 <code>&lt;C-c&gt;</code>才能停下来，而且vim中多出了许多空白行。
+<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://img-blog.csdnimg.cn/c4ee6ab05bf64d58a82f7f4f6e735f63.gif#pic_center"
+        data-srcset="https://img-blog.csdnimg.cn/c4ee6ab05bf64d58a82f7f4f6e735f63.gif#pic_center, https://img-blog.csdnimg.cn/c4ee6ab05bf64d58a82f7f4f6e735f63.gif#pic_center 1.5x, https://img-blog.csdnimg.cn/c4ee6ab05bf64d58a82f7f4f6e735f63.gif#pic_center 2x"
+        data-sizes="auto"
+        alt="https://img-blog.csdnimg.cn/c4ee6ab05bf64d58a82f7f4f6e735f63.gif#pic_center"
+        title="在这里插入图片描述" />
+依照上述分析思路，我们可以对这个命令的执行结果写出如下的伪代码</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="kt">void</span> <span class="nf">dd</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">o</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">    <span class="n">esc</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">    <span class="n">k</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">    <span class="n">dd</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">    <span class="n">j</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p>从上述的代码看出这个映射会陷入无限循环，或者叫死递归。我们只能使用 <code>&lt;Ctrl +c&gt;</code>来终止。</p>
+<p>在正式进入下一步之前让我们先删除这个映射。我们可以使用 <code>:nunmpa</code> 来删除一条快捷键映射，输入 <code>:nunmap dd</code> 来终止上述出错的映射。之前介绍的那些映射命令都有 <code>un</code> 系列的命令，例如 <code>map</code> 对应 <code>unmap</code>，<code>imap</code> 对应 <code>iunmap</code> 。</p>
+<p>我们从上面的几个例子应该看出来了， 之前介绍的函数好用是好用，但是会形成递归。在上述代码中还算是比较好找，如果我们配置文件大了，不同插件有自己的映射，而我们也会定义一堆自己的映射，这个时候出问题就难查了。</p>
+<p>为了解决这个问题，vim提供了一系列的 <code>nore</code> 开头的函数。它相比于之前介绍的函数来说，是非递归的。之前每个命令对应的非递归版本如下:</p>
+<ul>
+<li>nmap 对应 nnoremap</li>
+<li>imap 对应 inorempap</li>
+<li>vmap 对应 vnoremap</li>
+<li>cmap 对应 cnoremap</li>
+</ul>
+<p>相信各位应该看出来了，我们在原来命令的基础之上添加了 <code>nore</code> 作为非递归版本。我们来做一个试验</p>
+<pre tabindex="0"><code class="language-vimscript" data-lang="vimscript">:nmap x dd
+:nnoremap \ x
+</code></pre><p>我们输入 <code>\</code> 发现它只删除了一个单词，即使用 <code>:nnoremap</code> 只保留了 <code>\</code> 作为 <code>x</code> 操作符的作用，而斩断了之前 <code>x</code> 被映射为 <code>dd</code> 的操作。</p>
+<p>那么我们何时该使用递归版本，何时使用非递归版本呢？答案是在任何时候，永远使用非递归版本，现在就请各位小伙伴忘掉非递归版本把。现在多敲几个单词将来会省去大量排错时间。</p>
+<h2 id="lua-配置">lua 配置</h2>
+<p>到此位置我们学会了怎么使用 <code>:map</code> 系列的命令定义快捷键，同时也知道什么是快捷键之间的递归和非递归。可以说掌握了关于 <code>vimscript</code> 定义快捷键的基本方法。那么如何跟 <code>lua</code> 对应呢？</p>
+<p>neovim 定义了一系列的函数帮助我们定义、获取和删除快捷键</p>
+<ul>
+<li>vim.api.nvim_set_keymap: 设置快捷键</li>
+<li>vim.api.nvim_get_keymap: 获取快捷键</li>
+<li>vim.api.nvim_del_keymap: 删除快捷键</li>
+</ul>
+<p>我们可以通过帮助文档查到 <code>vim.api.nvim_set_keymap</code> 的定义如下:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-lua" data-lang="lua"><span class="line"><span class="cl"><span class="n">nvim_set_keymap</span><span class="p">({</span><span class="n">mode</span><span class="p">},</span> <span class="p">{</span><span class="n">lhs</span><span class="p">},</span> <span class="p">{</span><span class="n">rhs</span><span class="p">},</span> <span class="p">{</span><span class="o">*</span><span class="n">opts</span><span class="p">})</span>
+</span></span></code></pre></div><p><code>mode</code> 是一个字符串，对应着一个模式，即我们之前说的可视模式、插入模式或者普通模式，下面是各个模式对应的字符串名称 。</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">字符串</th>
+<th style="text-align:left">模式</th>
+<th style="text-align:left">对应的vim 命令</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">&quot;&quot;</td>
+<td style="text-align:left">所有模式</td>
+<td style="text-align:left">:map</td>
+</tr>
+<tr>
+<td style="text-align:left">&ldquo;n&rdquo;</td>
+<td style="text-align:left">普通模式</td>
+<td style="text-align:left">:nmap</td>
+</tr>
+<tr>
+<td style="text-align:left">&ldquo;v&rdquo;</td>
+<td style="text-align:left">可视模式</td>
+<td style="text-align:left">:vmap</td>
+</tr>
+<tr>
+<td style="text-align:left">&ldquo;i&rdquo;</td>
+<td style="text-align:left">插入模式</td>
+<td style="text-align:left">:imap</td>
+</tr>
+<tr>
+<td style="text-align:left">&ldquo;s&rdquo;</td>
+<td style="text-align:left">选择模式</td>
+<td style="text-align:left">:smap</td>
+</tr>
+<tr>
+<td style="text-align:left">&ldquo;c&rdquo;</td>
+<td style="text-align:left">命令模式</td>
+<td style="text-align:left">:cmap</td>
+</tr>
+</tbody>
+</table>
+<p><code>lhs</code> 对应着一个键位，即我们想映射的键位，如果传入空字符串，相当于通过 <code>:map传入 &lt;NOP&gt;</code>。表示将要禁用这个键
+<code>rhs</code> 对应着将要执行的命令，是 <code>:map</code> 的第二个参数
+<code>opts</code> 代表映射的其他属性，主要是一个表，你可以暂时理解为一个字典。比如可以使用 <code>noremap</code> 表示禁止递归，使用 <code>silent</code> 表示执行命令时不回显内容</p>
+<p>例如我们在配置文件中定义</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-lua" data-lang="lua"><span class="line"><span class="cl"><span class="n">vim.api</span><span class="p">.</span><span class="n">nvim_set_keymap</span><span class="p">(</span><span class="s2">&#34;n&#34;</span><span class="p">,</span> <span class="s2">&#34;&lt;space&gt;&#34;</span><span class="p">,</span> <span class="s2">&#34;/nvim&lt;CR&gt;&#34;</span><span class="p">,</span> <span class="p">{</span><span class="n">noremap</span> <span class="o">=</span> <span class="kc">true</span><span class="p">,</span> <span class="n">silent</span> <span class="o">=</span> <span class="kc">false</span><span class="p">})</span>
+</span></span></code></pre></div><p>通过这段代码，我们将 空格键映射为在文件中查找 <code>nvim</code> 字符。因为 <code>silent</code> 设置的是 <code>false</code> 因此我们在按下空格键之后在<code>vim</code> 的左下角会看到 <code>/nvim</code> 的字样
+<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://img-blog.csdnimg.cn/35e267e0f56f4d1e9bfee0f0bdd92dd5.gif#pic_center"
+        data-srcset="https://img-blog.csdnimg.cn/35e267e0f56f4d1e9bfee0f0bdd92dd5.gif#pic_center, https://img-blog.csdnimg.cn/35e267e0f56f4d1e9bfee0f0bdd92dd5.gif#pic_center 1.5x, https://img-blog.csdnimg.cn/35e267e0f56f4d1e9bfee0f0bdd92dd5.gif#pic_center 2x"
+        data-sizes="auto"
+        alt="https://img-blog.csdnimg.cn/35e267e0f56f4d1e9bfee0f0bdd92dd5.gif#pic_center"
+        title="在这里插入图片描述" />
+我们可以通过设置 <code>silent = true</code>来取消这个回显。</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-lua" data-lang="lua"><span class="line"><span class="cl"><span class="n">vim.api</span><span class="p">.</span><span class="n">nvim_set_keymap</span><span class="p">(</span><span class="s2">&#34;n&#34;</span><span class="p">,</span> <span class="s2">&#34;&lt;space&gt;&#34;</span><span class="p">,</span> <span class="s2">&#34;/nvim&lt;CR&gt;&#34;</span><span class="p">,</span> <span class="p">{</span><span class="n">norema</span><span class="o">=</span><span class="kc">true</span><span class="p">,</span> <span class="n">silent</span> <span class="o">=</span> <span class="kc">true</span><span class="p">});</span>
+</span></span></code></pre></div><p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://img-blog.csdnimg.cn/45a687ac1376407eb8e5d4080ede2373.gif#pic_center"
+        data-srcset="https://img-blog.csdnimg.cn/45a687ac1376407eb8e5d4080ede2373.gif#pic_center, https://img-blog.csdnimg.cn/45a687ac1376407eb8e5d4080ede2373.gif#pic_center 1.5x, https://img-blog.csdnimg.cn/45a687ac1376407eb8e5d4080ede2373.gif#pic_center 2x"
+        data-sizes="auto"
+        alt="https://img-blog.csdnimg.cn/45a687ac1376407eb8e5d4080ede2373.gif#pic_center"
+        title="在这里插入图片描述" /></p>
+<h2 id="映射leader-键">映射leader 键</h2>
+<p>常见的映射主要出现在普通模式下，普通模式下的很多按键都有其特殊用途，而且还大多挺常用的，想来想去不怎么使用，而且位置好按的也就 <code>&lt;space&gt;</code>、<code>H</code>、<code>L</code>、<code>D</code> 这些了，将他们进行映射，映射到常用功能，减轻我们的按键负担是再好不过了。但是我们常用功能又那么多，特别是装了插件之后的。这些键完全不够使用的。</p>
+<p>这个时候我们要延续 <code>emacs</code> 或者其他软件的思路了，一个键不够就两个键，比如使用下面的映射</p>
+<pre tabindex="0"><code class="language-vimscript" data-lang="vimscript">:noremap -d dd
+:noremap -c ddO
+</code></pre><p>这意味着我们可以使用一个键作为前缀，后面接其他字符，将他们作为一个整体来映射一个功能。多按一个键而已，比你输入整个命令要轻松多了。</p>
+<p>这就引入一个新的思路了，我们可以统一定义一个键作为前缀键，后面添加一些字符来整体进行映射。当然我们可以手工这么做，每次需要多个按键的时候的就手动写上 <code>-</code> 或者其他的。但是后期我发现 <code>-</code> 并不容易按到，我觉得 <code>&lt;space&gt;</code> 或者 ,更容易按到，要进行修改，那么修改的量就太大了。</p>
+<p><code>vim</code> 中有一个被称之为 <code>leader</code> 键的东西来解决这个问题，我们可以提前定义一个 <code>leader</code> ，在映射的时候使用  <code>&lt;leader&gt;</code> 来代表对应的前缀键。例如，先设置 <code>leader</code> 为 <code>&lt;space&gt;</code> 后面再定义 <code>&lt;leader&gt;d</code> 作为 <code>dd</code>，后面可以很方便的修改 <code>&lt;space&gt;d</code> 这个映射为 <code>,d</code>，只需要修改 <code>leader</code> 键的定义。</p>
+<p>可以使用 <code>:let mapleader = &lt;space&gt;</code> 来定义 <code>leader</code> 键为空格。这里你可以定义成你喜欢的键，我平时喜欢用空格，因为它比较大，平时也在大拇指的位置，方便按。</p>
+<p>然后我们可以使用 <code>:noremap &lt;leader&gt;d dd</code> 来定义映射</p>
+<p>如何在 <code>lua</code> 中定义 <code>leader</code> 键呢？
+从上面的 <code>vimscript</code> 代码中可以看到 <code>mapleader</code> 是用 <code>let</code> 关键字来设置的，一般 <code>let</code> 是用来设置变量的。<code>lua</code> 中自定义变量可以直接定义，但是 <code>mapleader</code> 明显是<code>vim</code> 自带的变量。跟设置选项类似，<code>neovim</code> 提供了两种访问 <code>vim</code> 内部变量的方式，一种是使用函数，一种是使用 元访问器。</p>
+<p>跟变量有关的函数主要有:</p>
+<ul>
+<li><code>vim.api.nvim_set_var()</code>：设置全局变量的值</li>
+<li><code>vim.api.nvim_get_var()</code>：获取全局变量</li>
+<li><code>vim.api.nvim_del_var()</code>：删除全局变量</li>
+</ul>
+<p>当然使用元访问器会更加简便，对应的元访问器为 <code>vim.g</code>。所以这里我们可以使用 <code>vim.g.mapleader = &quot; &quot;</code> 来设置</p>
+<p>到此我们已经学会了关于映射的所有初级的内容，现在已经可以完成大部分的配置工作了。至于在定义快捷键的时候是使用 leader键还是使用多个普通键，看具体场景和各位小伙伴的使用习惯了。这里我就不给建议了，一切以方便好按为主。</p>
+</div><div class="post-footer" id="post-footer">
+    <div class="post-info">
+        <div class="post-info-line">
+            <div class="post-info-mod">
+                <span>Updated on 2022-07-13</span>
+            </div></div>
+        <div class="post-info-line">
+            <div class="post-info-md"></div>
+            <div class="post-info-share">
+                <span><a href="javascript:void(0);" title="Share on Twitter" data-sharer="twitter" data-url="http://HaiLateBoy.github.io/posts/vim-config3/" data-title="从零开始配置 vim(3)—— 键盘映射进阶" data-hashtags="vim,编辑工具,文本处理,lua,编辑器"><i class="fab fa-twitter fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Facebook" data-sharer="facebook" data-url="http://HaiLateBoy.github.io/posts/vim-config3/" data-hashtag="vim"><i class="fab fa-facebook-square fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Hacker News" data-sharer="hackernews" data-url="http://HaiLateBoy.github.io/posts/vim-config3/" data-title="从零开始配置 vim(3)—— 键盘映射进阶"><i class="fab fa-hacker-news fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Line" data-sharer="line" data-url="http://HaiLateBoy.github.io/posts/vim-config3/" data-title="从零开始配置 vim(3)—— 键盘映射进阶"><i data-svg-src="https://cdn.jsdelivr.net/npm/simple-icons@7.3.0/icons/line.svg" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on 微博" data-sharer="weibo" data-url="http://HaiLateBoy.github.io/posts/vim-config3/" data-title="从零开始配置 vim(3)—— 键盘映射进阶"><i class="fab fa-weibo fa-fw" aria-hidden="true"></i></a></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="post-info-more">
+        <section class="post-tags"><i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/vim/">vim</a>,&nbsp;<a href="/tags/%E7%BC%96%E8%BE%91%E5%B7%A5%E5%85%B7/">编辑工具</a>,&nbsp;<a href="/tags/%E6%96%87%E6%9C%AC%E5%A4%84%E7%90%86/">文本处理</a>,&nbsp;<a href="/tags/lua/">lua</a>,&nbsp;<a href="/tags/%E7%BC%96%E8%BE%91%E5%99%A8/">编辑器</a></section>
+        <section>
+            <span><a href="javascript:void(0);" onclick="window.history.back();">Back</a></span>&nbsp;|&nbsp;<span><a href="/">Home</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav"><a href="/posts/vim-config2/" class="prev" rel="prev" title="从零开始匹配vim(2)——快捷键绑定"><i class="fas fa-angle-left fa-fw" aria-hidden="true"></i>从零开始匹配vim(2)——快捷键绑定</a>
+            <a href="/posts/vim-config4/" class="next" rel="next" title="从零开始配置 vim(4)——键盘映射的一些技巧">从零开始配置 vim(4)——键盘映射的一些技巧<i class="fas fa-angle-right fa-fw" aria-hidden="true"></i></a></div>
+</div>
+</article></div>
+            </main><footer class="footer">
+        <div class="footer-container"><div class="footer-line">Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener noreffer" title="Hugo 0.121.2">Hugo</a> | Theme - <a href="https://github.com/dillonzq/LoveIt" target="_blank" rel="noopener noreffer" title="LoveIt 0.2.11"><i class="far fa-kiss-wink-heart fa-fw" aria-hidden="true"></i> LoveIt</a>
+                </div><div class="footer-line" itemscope itemtype="http://schema.org/CreativeWork"><i class="far fa-copyright fa-fw" aria-hidden="true"></i><span itemprop="copyrightYear">2022 - 2024</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="https://www.masimaro.xyz" target="_blank">Masimaro</a></span></div>
+        </div>
+    </footer></div>
+
+        <div id="fixed-buttons"><a href="#" id="back-to-top" class="fixed-button" title="Back to Top">
+                <i class="fas fa-arrow-up fa-fw" aria-hidden="true"></i>
+            </a><a href="#" id="view-comments" class="fixed-button" title="View Comments">
+                <i class="fas fa-comment fa-fw" aria-hidden="true"></i>
+            </a>
+        </div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.css"><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/autocomplete.js@0.38.1/dist/autocomplete.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lunr@2.3.9/lunr.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lazysizes@5.3.2/lazysizes.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/clipboard@2.0.11/dist/clipboard.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/sharer.js@0.5.1/sharer.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/auto-render.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/copy-tex.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/mhchem.min.js"></script><script type="text/javascript">window.config={"code":{"copyTitle":"Copy to clipboard","maxShownLines":50},"comment":{},"math":{"delimiters":[{"display":true,"left":"$$","right":"$$"},{"display":true,"left":"\\[","right":"\\]"},{"display":true,"left":"\\begin{equation}","right":"\\end{equation}"},{"display":true,"left":"\\begin{equation*}","right":"\\end{equation*}"},{"display":true,"left":"\\begin{align}","right":"\\end{align}"},{"display":true,"left":"\\begin{align*}","right":"\\end{align*}"},{"display":true,"left":"\\begin{alignat}","right":"\\end{alignat}"},{"display":true,"left":"\\begin{alignat*}","right":"\\end{alignat*}"},{"display":true,"left":"\\begin{gather}","right":"\\end{gather}"},{"display":true,"left":"\\begin{CD}","right":"\\end{CD}"},{"display":false,"left":"$","right":"$"},{"display":false,"left":"\\(","right":"\\)"}],"strict":false},"search":{"highlightTag":"em","maxResultLength":10,"noResultsFound":"No results found","snippetLength":50}};</script><script type="text/javascript" src="/js/theme.min.js"></script></body>
+</html>

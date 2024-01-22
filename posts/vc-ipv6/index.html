@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="robots" content="noodp" />
+        <title>VC&#43;&#43; IPv6的支持 - Masimaro&#39;s blog</title><meta name="Description" content="这是我用于记录日常和学习的小站"><meta property="og:title" content="VC&#43;&#43; IPv6的支持" />
+<meta property="og:description" content="最近根据项目需要，要在产品中添加对IpV6的支持，因此研究了一下IPV6的相关内容，Ipv6 与原来最直观的改变就是地址结构的改变，IP地址由" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://HaiLateBoy.github.io/posts/vc-ipv6/" /><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2018-11-24T16:05:51+00:00" />
+<meta property="article:modified_time" content="2018-11-24T16:05:51+00:00" /><meta property="og:site_name" content="Masimaro&#39;s blog" />
+
+<meta name="twitter:card" content="summary"/><meta name="twitter:title" content="VC&#43;&#43; IPv6的支持"/>
+<meta name="twitter:description" content="最近根据项目需要，要在产品中添加对IpV6的支持，因此研究了一下IPV6的相关内容，Ipv6 与原来最直观的改变就是地址结构的改变，IP地址由"/>
+<meta name="application-name" content="My cool site">
+<meta name="apple-mobile-web-app-title" content="My cool site"><meta name="theme-color" content="#ffffff"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="manifest" href="/site.webmanifest"><link rel="canonical" href="http://HaiLateBoy.github.io/posts/vc-ipv6/" /><link rel="prev" href="http://HaiLateBoy.github.io/posts/html-css/" /><link rel="next" href="http://HaiLateBoy.github.io/posts/2019-new-year-plan/" /><link rel="stylesheet" href="/css/style.min.css"><link rel="preload" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css"></noscript><link rel="preload" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css"></noscript><script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "BlogPosting",
+        "headline": "VC++ IPv6的支持",
+        "inLanguage": "zh-CN",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "http:\/\/HaiLateBoy.github.io\/posts\/vc-ipv6\/"
+        },"genre": "posts","keywords": "VC, SOCKET, IPv6","wordcount":  4039 ,
+        "url": "http:\/\/HaiLateBoy.github.io\/posts\/vc-ipv6\/","datePublished": "2018-11-24T16:05:51+00:00","dateModified": "2018-11-24T16:05:51+00:00","publisher": {
+            "@type": "Organization",
+            "name": ""},"author": {
+                "@type": "Person",
+                "name": "Masimaro"
+            },"description": ""
+    }
+    </script></head>
+    <body data-header-desktop="fixed" data-header-mobile="auto"><script type="text/javascript">(window.localStorage && localStorage.getItem('theme') ? localStorage.getItem('theme') === 'dark' : ('auto' === 'auto' ? window.matchMedia('(prefers-color-scheme: dark)').matches : 'auto' === 'dark')) && document.body.setAttribute('theme', 'dark');</script>
+
+        <div id="mask"></div><div class="wrapper"><header class="desktop" id="header-desktop">
+    <div class="header-wrapper">
+        <div class="header-title">
+            <a href="/" title="Masimaro&#39;s blog">My cool site</a>
+        </div>
+        <div class="menu">
+            <div class="menu-inner"><a class="menu-item" href="/posts/" title="文章列表"> 文章 </a><a class="menu-item" href="/tags/" title="标签"> 标签 </a><a class="menu-item" href="/categories/" title="分类"> 分类 </a><a class="menu-item" href="/about" title="关于本站"> 关于 </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-desktop">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-desktop" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-desktop" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-desktop">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </span><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                    <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+                </a></div>
+        </div>
+    </div>
+</header><header class="mobile" id="header-mobile">
+    <div class="header-container">
+        <div class="header-wrapper">
+            <div class="header-title">
+                <a href="/" title="Masimaro&#39;s blog">My cool site</a>
+            </div>
+            <div class="menu-toggle" id="menu-toggle-mobile">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+        <div class="menu" id="menu-mobile"><div class="search-wrapper">
+                    <div class="search mobile" id="search-mobile">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-mobile">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-mobile" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-mobile" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-mobile">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </div>
+                    <a href="javascript:void(0);" class="search-cancel" id="search-cancel-mobile">
+                        Cancel
+                    </a>
+                </div><a class="menu-item" href="/posts/" title="文章列表">文章</a><a class="menu-item" href="/tags/" title="标签">标签</a><a class="menu-item" href="/categories/" title="分类">分类</a><a class="menu-item" href="/about" title="关于本站">关于</a><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+            </a></div>
+    </div>
+</header><div class="search-dropdown desktop">
+        <div id="search-dropdown-desktop"></div>
+    </div>
+    <div class="search-dropdown mobile">
+        <div id="search-dropdown-mobile"></div>
+    </div><main class="main">
+                <div class="container"><div class="toc" id="toc-auto">
+            <h2 class="toc-title">Contents</h2>
+            <div class="toc-content" id="toc-content-auto"></div>
+        </div><article class="page single"><h1 class="single-title animate__animated animate__flipInX">VC++ IPv6的支持</h1><div class="post-meta">
+            <div class="post-meta-line"><span class="post-author"><a href="https://www.masimaro.xyz" title="Author" target="_blank" rel="noopener noreffer author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Masimaro</a></span>&nbsp;<span class="post-category">included in <a href="/categories/windows-%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>Windows 网络编程</a></span></div>
+            <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw" aria-hidden="true"></i>&nbsp;<time datetime="2018-11-24">2018-11-24</time>&nbsp;<i class="fas fa-pencil-alt fa-fw" aria-hidden="true"></i>&nbsp;4039 words&nbsp;
+                <i class="far fa-clock fa-fw" aria-hidden="true"></i>&nbsp;9 minutes&nbsp;</div>
+        </div><div class="details toc" id="toc-static"  data-kept="true">
+                <div class="details-summary toc-title">
+                    <span>Contents</span>
+                    <span><i class="details-icon fas fa-angle-right" aria-hidden="true"></i></span>
+                </div>
+                <div class="details-content toc-content" id="toc-content-static"><nav id="TableOfContents">
+  <ul>
+    <li><a href="#修改地址结构">修改地址结构</a></li>
+    <li><a href="#使用兼容函数">使用兼容函数</a>
+      <ul>
+        <li><a href="#wsaconnectbyname函数">WSAConnectByName函数:</a></li>
+        <li><a href="#wsaconnectbylist">WSAConnectByList</a></li>
+        <li><a href="#getaddrinfo">getaddrinfo</a></li>
+      </ul>
+    </li>
+    <li><a href="#针对硬编码的情况">针对硬编码的情况</a></li>
+    <li><a href="#几个例子">几个例子</a></li>
+    <li><a href="#vc中各种地址结构">VC中各种地址结构</a>
+      <ul>
+        <li><a href="#sockadd_in-与sockaddr_in结构">SOCKADD_IN 与sockaddr_in结构</a></li>
+        <li><a href="#sockaddr-sockaddr结构">sockaddr SOCKADDR结构</a></li>
+        <li><a href="#sockaddr_in6">sockaddr_in6</a></li>
+        <li><a href="#sockaddr_storage">sockaddr_storage</a></li>
+        <li><a href="#各种地址之间的转化">各种地址之间的转化</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav></div>
+            </div><div class="content" id="content"><p>最近根据项目需要，要在产品中添加对IpV6的支持，因此研究了一下IPV6的相关内容，Ipv6 与原来最直观的改变就是地址结构的改变，IP地址由原来的32位扩展为128，这样原来的地址结构肯定就不够用了，根据微软的官方文档，只需要对原来的代码做稍许改变就可以适应ipv6。</p>
+<!-- raw HTML omitted -->
+<h2 id="修改地址结构">修改地址结构</h2>
+<p><a href="https://docs.microsoft.com/zh-cn/windows/desktop/WinSock/ipv6-guide-for-windows-sockets-applications-2" target="_blank" rel="noopener noreffer ">Windows Socket2 针对Ipv6的官方描述</a></p>
+<p>根据微软官方的说法，要做到支持Ipv6首先要做的就是将原来的<code>SOCKADDR_IN</code>等地址结构替换为<code>SOCKADDR_STORAGE</code> 该结构的定义如下:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="k">typedef</span> <span class="k">struct</span> <span class="nc">sockaddr_storage</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">	<span class="kt">short</span> <span class="n">ss_family</span><span class="p">;</span>  
+</span></span><span class="line"><span class="cl">	<span class="kt">char</span> <span class="n">__ss_pad1</span><span class="p">[</span><span class="n">_SS_PAD1SIZE</span><span class="p">];</span>  
+</span></span><span class="line"><span class="cl">	<span class="kr">__int64</span> <span class="n">__ss_align</span><span class="p">;</span>  
+</span></span><span class="line"><span class="cl">	<span class="kt">char</span> <span class="n">__ss_pad2</span><span class="p">[</span><span class="n">_SS_PAD2SIZE</span><span class="p">];</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span> <span class="n">SOCKADDR_STORAGE</span><span class="p">,</span>  <span class="o">*</span><span class="n">PSOCKADDR_STORAGE</span><span class="p">;</span>
+</span></span></code></pre></div><ul>
+<li>ss_family：代表的是地址家族，IP协议一般是<code>AF_INET</code>, 但是如果是IPV6的地址这个参数需要设置为 <code>AF_INET6</code>。</li>
+</ul>
+<p>后面的成员都是作为保留字段，或者说作为填充结构大小的字段，这个结构兼容了IPV6与IPV4的地址结构，跟以前的<code>SOCKADDR_IN</code>结构不同，我们现在不能直接从<code>SOCKADDR_STORAGE</code>结构中获取IP地址了。也没有办法直接往结构中填写IP地址。</p>
+<h2 id="使用兼容函数">使用兼容函数</h2>
+<p>除了地址结构的改变，还需要改变某些函数，有的函数是只支持Ipv4的，我们需要将这些函数改为即兼容的函数，根据官方的介绍，这些兼容函数主要是下面几个:</p>
+<ul>
+<li>WSAConnectByName : 可以直接通过主机名建立一个连接</li>
+<li>WSAConnectByList: 从一组主机名中建立一个连接</li>
+<li>getaddrinfo: 类似于gethostbyname, 但是gethostbyname只支持IPV4所以一般用这个函数来代替</li>
+<li>GetAdaptersAddresses: 这个函数用来代替原来的GetAdaptersInfo</li>
+</ul>
+<h3 id="wsaconnectbyname函数">WSAConnectByName函数:</h3>
+<p>函数原型如下:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="n">BOOL</span> <span class="n">PASCAL</span> <span class="nf">WSAConnectByName</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">  <span class="n">__in</span>     <span class="n">SOCKET</span> <span class="n">s</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">  <span class="n">__in</span>     <span class="n">LPSTR</span> <span class="n">nodename</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">  <span class="n">__in</span>     <span class="n">LPSTR</span> <span class="n">servicename</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">  <span class="n">__inout</span>  <span class="n">LPDWORD</span> <span class="n">LocalAddressLength</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">  <span class="n">__out</span>    <span class="n">LPSOCKADDR</span> <span class="n">LocalAddress</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">  <span class="n">__inout</span>  <span class="n">LPDWORD</span> <span class="n">RemoteAddressLength</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">  <span class="n">__out</span>    <span class="n">LPSOCKADDR</span> <span class="n">RemoteAddress</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">  <span class="n">__in</span>     <span class="k">const</span> <span class="k">struct</span> <span class="nc">timeval</span><span class="o">*</span> <span class="n">timeout</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">           <span class="n">LPWSAOVERLAPPED</span> <span class="n">Reserved</span>
+</span></span><span class="line"><span class="cl"><span class="p">);</span>
+</span></span></code></pre></div><ul>
+<li>s: 该参数为一个新创建的未绑定，未与其他主机建立连接的SOCKET，后续会采用这个socket来进行收发包的操作</li>
+<li>nodename: 主机名，或者主机的IP地址的字符串</li>
+<li>servicename: 服务名称，也可以是对应的端口号的字符串，传入服务名时需要传入那些知名的服务，比如HTTP、FTP等等， 其实这个字段本身就是需要传入端口的，传入服务名，最后函数会根据服务名称转化为这些服务的默认端口</li>
+<li>LocalAddressLength, LocalAddress， 返回当前地址结构，与长度</li>
+<li>RemoteAddressLength, RemoteAddress，返回远程主机的地址结构，与长度</li>
+<li>timeout: 超时值</li>
+<li>Reserved: 重叠IO结构</li>
+</ul>
+<p>为了使函数能够支持Ipv6，需要在调用前使用<code>setsockopt</code>函数对socket做相关设置，设置的代码如下:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="n">iResult</span> <span class="o">=</span> <span class="n">setsockopt</span><span class="p">(</span><span class="n">ConnSocket</span><span class="p">,</span> <span class="n">IPPROTO_IPV6</span><span class="p">,</span> <span class="n">IPV6_V6ONLY</span><span class="p">,</span> <span class="p">(</span><span class="kt">char</span><span class="o">*</span><span class="p">)</span><span class="o">&amp;</span><span class="n">ipv6only</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">ipv6only</span><span class="p">)</span> <span class="p">);</span>
+</span></span></code></pre></div><p>调用函数的例子如下(该实例为微软官方的例子):</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="n">SOCKET</span> <span class="nf">OpenAndConnect</span><span class="p">(</span><span class="n">LPWSTR</span> <span class="n">NodeName</span><span class="p">,</span> <span class="n">LPWSTR</span> <span class="n">PortName</span><span class="p">)</span> 
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">SOCKET</span> <span class="n">ConnSocket</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">DWORD</span> <span class="n">ipv6only</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">int</span> <span class="n">iResult</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">BOOL</span> <span class="n">bSuccess</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">SOCKADDR_STORAGE</span> <span class="n">LocalAddr</span> <span class="o">=</span> <span class="p">{</span><span class="mi">0</span><span class="p">};</span>
+</span></span><span class="line"><span class="cl">    <span class="n">SOCKADDR_STORAGE</span> <span class="n">RemoteAddr</span> <span class="o">=</span> <span class="p">{</span><span class="mi">0</span><span class="p">};</span>
+</span></span><span class="line"><span class="cl">    <span class="n">DWORD</span> <span class="n">dwLocalAddr</span> <span class="o">=</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">LocalAddr</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">DWORD</span> <span class="n">dwRemoteAddr</span> <span class="o">=</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">RemoteAddr</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  
+</span></span><span class="line"><span class="cl">    <span class="n">ConnSocket</span> <span class="o">=</span> <span class="n">socket</span><span class="p">(</span><span class="n">AF_INET6</span><span class="p">,</span> <span class="n">SOCK_STREAM</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="p">(</span><span class="n">ConnSocket</span> <span class="o">==</span> <span class="n">INVALID_SOCKET</span><span class="p">){</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="n">INVALID_SOCKET</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="n">iResult</span> <span class="o">=</span> <span class="n">setsockopt</span><span class="p">(</span><span class="n">ConnSocket</span><span class="p">,</span> <span class="n">IPPROTO_IPV6</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">        <span class="n">IPV6_V6ONLY</span><span class="p">,</span> <span class="p">(</span><span class="kt">char</span><span class="o">*</span><span class="p">)</span><span class="o">&amp;</span><span class="n">ipv6only</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">ipv6only</span><span class="p">)</span> <span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="p">(</span><span class="n">iResult</span> <span class="o">==</span> <span class="n">SOCKET_ERROR</span><span class="p">){</span>
+</span></span><span class="line"><span class="cl">        <span class="n">closesocket</span><span class="p">(</span><span class="n">ConnSocket</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="n">INVALID_SOCKET</span><span class="p">;</span>       
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="n">bSuccess</span> <span class="o">=</span> <span class="n">WSAConnectByName</span><span class="p">(</span><span class="n">ConnSocket</span><span class="p">,</span> <span class="n">NodeName</span><span class="p">,</span> 
+</span></span><span class="line"><span class="cl">            <span class="n">PortName</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">dwLocalAddr</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">            <span class="p">(</span><span class="n">SOCKADDR</span><span class="o">*</span><span class="p">)</span><span class="o">&amp;</span><span class="n">LocalAddr</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">            <span class="o">&amp;</span><span class="n">dwRemoteAddr</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">            <span class="p">(</span><span class="n">SOCKADDR</span><span class="o">*</span><span class="p">)</span><span class="o">&amp;</span><span class="n">RemoteAddr</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">            <span class="nb">NULL</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">            <span class="nb">NULL</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="p">(</span><span class="n">bSuccess</span><span class="p">){</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="n">ConnSocket</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="n">INVALID_SOCKET</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><h3 id="wsaconnectbylist">WSAConnectByList</h3>
+<p>该函数从传入的一组hostname中选取一个建立连接，函数内部会调用WSAConnectByName，它的原型，使用方式与WSAConnectByName类似，这里就不再给出具体的原型以及调用方法了。</p>
+<h3 id="getaddrinfo">getaddrinfo</h3>
+<p>该函数的作用与gethostbyname类似，但是它可以同时支持获取V4、V6的地址结构，函数原型如下:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="kt">int</span> <span class="nf">getaddrinfo</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">  <span class="k">const</span> <span class="kt">char</span> <span class="n">FAR</span><span class="o">*</span> <span class="n">nodename</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">  <span class="k">const</span> <span class="kt">char</span> <span class="n">FAR</span><span class="o">*</span> <span class="n">servname</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">  <span class="k">const</span> <span class="k">struct</span> <span class="nc">addrinfo</span> <span class="n">FAR</span><span class="o">*</span> <span class="n">hints</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">  <span class="k">struct</span> <span class="nc">addrinfo</span> <span class="n">FAR</span><span class="o">*</span> <span class="n">FAR</span><span class="o">*</span> <span class="n">res</span>
+</span></span><span class="line"><span class="cl"><span class="p">);</span>
+</span></span></code></pre></div><ul>
+<li>nodename: 主机名或者IP地址的字符串</li>
+<li>servname: 知名服务的名称或者端口的字符串</li>
+<li>hints：一个地址结构，该结构规定了应该如何进行地址转化。</li>
+<li>res：与gethostbyname类似，它也是返回一个地址结构的链表。后续只需要遍历这个链表即可。</li>
+</ul>
+<p>使用的实例如下:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="kt">char</span> <span class="n">szServer</span><span class="p">[]</span> <span class="o">=</span> <span class="s">&#34;www.baidu.com&#34;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="kt">char</span> <span class="n">szPort</span><span class="p">[]</span> <span class="o">=</span> <span class="s">&#34;80&#34;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="n">addrinfo</span> <span class="n">hints</span> <span class="o">=</span> <span class="p">{</span><span class="mi">0</span><span class="p">};</span>
+</span></span><span class="line"><span class="cl"><span class="k">struct</span> <span class="nc">addrinfo</span><span class="o">*</span> <span class="n">ai</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="n">getaddrinfo</span><span class="p">(</span><span class="n">szServer</span><span class="p">,</span> <span class="n">szPort</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">ai</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="k">while</span> <span class="p">(</span><span class="nb">NULL</span> <span class="o">!=</span> <span class="n">ai</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="n">SOCKET</span> <span class="n">sConnect</span> <span class="o">=</span> <span class="n">socket</span><span class="p">(</span><span class="n">ai</span><span class="o">-&gt;</span><span class="n">ai_family</span><span class="p">,</span> <span class="n">SOCK_STREAM</span><span class="p">,</span> <span class="n">ai</span><span class="o">-&gt;</span><span class="n">ai_protocol</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="n">connect</span><span class="p">(</span><span class="n">sConnect</span><span class="p">,</span> <span class="n">ai</span><span class="o">-&gt;</span><span class="n">ai_addr</span><span class="p">,</span> <span class="n">ai</span><span class="o">-&gt;</span><span class="n">ai_addrlen</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="n">shutdown</span><span class="p">(</span><span class="n">sConnect</span><span class="p">,</span> <span class="n">SD_BOTH</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="n">closesocket</span><span class="p">(</span><span class="n">sConnect</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="n">ai</span> <span class="o">=</span> <span class="n">ai</span><span class="o">-&gt;</span><span class="n">ai_next</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">freeaddrinfo</span><span class="p">(</span><span class="n">ai</span><span class="p">);</span> <span class="c1">//最后别忘了释放链表
+</span></span></span></code></pre></div><h2 id="针对硬编码的情况">针对硬编码的情况</h2>
+<p>针对这种情况一般是修改硬编码，如果希望你的应用程序即支持IPV6也支持IPV4，那么就需要去掉这些硬编码的部分。微软提供了一个工具叫&quot;Checkv4.exe&quot; 这个工具一般是放到VS的安装目录中，作为工具一起安装到本机了，如果没有可以去官网下载。
+工具的使用也非常简单</p>
+<pre tabindex="0"><code>checkv4.exe 对应的.h或者.cpp 文件
+</code></pre><p>这样它会给出哪些代码需要进行修改，甚至会给出修改意见，我们只要根据它的提示修改代码即可。</p>
+<h2 id="几个例子">几个例子</h2>
+<p>因为IPV6 不能再像V4那样直接往地址结构中填写IP了，因此在IPV6的场合需要大量使用getaddrinfo函数，来根据具体的IP字符串或者根据主机名来自动获取地址信息，然后根据地址信息直接调用connect即可，下面是微软的例子</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="kt">int</span> <span class="nf">ResolveName</span><span class="p">(</span><span class="kt">char</span> <span class="o">*</span><span class="n">Server</span><span class="p">,</span> <span class="kt">char</span> <span class="o">*</span><span class="n">PortName</span><span class="p">,</span> <span class="kt">int</span> <span class="n">Family</span><span class="p">,</span> <span class="kt">int</span> <span class="n">SocketType</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="kt">int</span> <span class="n">iResult</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="n">ADDRINFO</span> <span class="o">*</span><span class="n">AddrInfo</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">ADDRINFO</span> <span class="o">*</span><span class="n">AI</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">ADDRINFO</span> <span class="n">Hints</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="n">memset</span><span class="p">(</span><span class="o">&amp;</span><span class="n">Hints</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">Hints</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">    <span class="n">Hints</span><span class="p">.</span><span class="n">ai_family</span> <span class="o">=</span> <span class="n">Family</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">Hints</span><span class="p">.</span><span class="n">ai_socktype</span> <span class="o">=</span> <span class="n">SocketType</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">iResult</span> <span class="o">=</span> <span class="n">getaddrinfo</span><span class="p">(</span><span class="n">Server</span><span class="p">,</span> <span class="n">PortName</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">Hints</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">AddrInfo</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="p">(</span><span class="n">iResult</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">printf</span><span class="p">(</span><span class="s">&#34;Cannot resolve address [%s] and port [%s], error %d: %s</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">               <span class="n">Server</span><span class="p">,</span> <span class="n">PortName</span><span class="p">,</span> <span class="n">WSAGetLastError</span><span class="p">(),</span> <span class="n">gai_strerror</span><span class="p">(</span><span class="n">iResult</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="n">SOCKET_ERROR</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">	
+</span></span><span class="line"><span class="cl">	<span class="k">if</span><span class="p">(</span><span class="nb">NULL</span> <span class="o">!=</span> <span class="n">AddrInfo</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">	<span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="n">SOCKET</span> <span class="n">sConnect</span> <span class="o">=</span> <span class="n">socket</span><span class="p">(</span><span class="n">AddrInfo</span><span class="o">-&gt;</span><span class="n">ai_family</span><span class="p">,</span> <span class="n">SOCK_STREAM</span><span class="p">,</span> <span class="n">AddrInfo</span><span class="o">-&gt;</span><span class="n">ai_protocol</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">		<span class="n">connect</span><span class="p">(</span><span class="n">sConnect</span><span class="p">,</span> <span class="n">AddrInfo</span><span class="o">-&gt;</span><span class="n">ai_addr</span><span class="p">,</span> <span class="n">AddrInfo</span><span class="o">-&gt;</span><span class="n">ai_addrlen</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">		
+</span></span><span class="line"><span class="cl">		<span class="n">shutdown</span><span class="p">(</span><span class="n">sConnect</span><span class="p">,</span> <span class="n">SD_BOTH</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">		<span class="n">closesocket</span><span class="p">(</span><span class="n">sConnect</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="cl">	<span class="n">freeaddrinfo</span><span class="p">(</span><span class="n">AddrInfo</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p>这个例子需要传入额外的family参数来规定它使用何种地址结构，但是如果我只有一个主机名，而且事先并不知道需要使用何种IP协议来进行通信，这种情况下又该如何呢？
+针对服务端，不存在这个问题，服务端是我们自己的代码，具体使用IPV6还是IPV4这个实现是可以确定的，因此可以采用跟上面类似的写法:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="n">BOOL</span> <span class="nf">Create</span><span class="p">(</span><span class="kt">int</span> <span class="n">af_family</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">	<span class="c1">//这里不建议使用IPPROTO_IP 或者IPPROTO_IPV6，使用TCP或者UDP可能会好点，因为它们是建立在IP协议之上的
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="c1">//当然,具体情况具体分析
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="n">s</span> <span class="o">=</span> <span class="n">socket</span><span class="p">(</span><span class="n">af_family</span><span class="p">,</span> <span class="n">SOCK_STREAM</span><span class="p">,</span> <span class="n">IPPROTO_TCP</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">BOOL</span> <span class="nf">Bind</span><span class="p">(</span><span class="kt">int</span> <span class="n">family</span><span class="p">,</span> <span class="n">UINT</span> <span class="n">nPort</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">	<span class="n">addrinfo</span> <span class="n">hins</span> <span class="o">=</span> <span class="p">{</span><span class="mi">0</span><span class="p">};</span>
+</span></span><span class="line"><span class="cl">	<span class="n">hins</span><span class="p">.</span><span class="n">ai_family</span> <span class="o">=</span> <span class="n">family</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">hins</span><span class="p">.</span><span class="n">ai_flags</span> <span class="o">=</span> <span class="n">AI_PASSIVE</span><span class="p">;</span> <span class="cm">/* For wildcard IP address */</span>
+</span></span><span class="line"><span class="cl">	<span class="n">hins</span><span class="p">.</span><span class="n">ai_protocol</span> <span class="o">=</span> <span class="n">IPPROTO_TCP</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">hins</span><span class="p">.</span><span class="n">ai_socktype</span> <span class="o">=</span> <span class="n">SOCK_STREAM</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="n">addrinfo</span> <span class="o">*</span><span class="n">lpAddr</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">CString</span> <span class="n">csPort</span> <span class="o">=</span> <span class="s">&#34;&#34;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">csPort</span><span class="p">.</span><span class="n">Format</span><span class="p">(</span><span class="s">&#34;%u&#34;</span><span class="p">,</span> <span class="n">nPort</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="k">if</span> <span class="p">(</span><span class="mi">0</span> <span class="o">!=</span> <span class="n">getaddrinfo</span><span class="p">(</span><span class="nb">NULL</span><span class="p">,</span> <span class="n">csPort</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">hins</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">lpAddr</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl">	<span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="n">closesocket</span><span class="p">(</span><span class="n">s</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">		<span class="k">return</span> <span class="n">FALSE</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="kt">int</span> <span class="n">nRes</span> <span class="o">=</span> <span class="n">bind</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">lpAddr</span><span class="o">-&gt;</span><span class="n">ai_addr</span><span class="p">,</span> <span class="n">lpAddr</span><span class="o">-&gt;</span><span class="n">ai_addrlen</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="n">freeaddrinfo</span><span class="p">(</span><span class="n">lpAddr</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="k">if</span><span class="p">(</span><span class="n">nRes</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">		<span class="k">return</span> <span class="n">TRUE</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="k">return</span> <span class="n">FALSE</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">//监听，以及后面的收发包并没有区分V4和V6，因此这里不再给出跟他们相关的代码
+</span></span></span></code></pre></div><p>针对服务端，我们自然没办法事先知道它使用的IP协议的版本，因此传入af_family参数在这里不再适用，我们可以利用getaddrinfo函数根据服务端的主机名或者端口号来提前获取它的地址信息，这里我们可以封装一个函数</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="kt">int</span> <span class="nf">GetAF_FamilyByHost</span><span class="p">(</span><span class="n">LPCTSTR</span> <span class="n">lpHost</span><span class="p">,</span> <span class="kt">int</span> <span class="n">nPort</span><span class="p">,</span> <span class="kt">int</span> <span class="n">SocketType</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">	<span class="n">addrinfo</span> <span class="n">hins</span> <span class="o">=</span> <span class="p">{</span><span class="mi">0</span><span class="p">};</span>
+</span></span><span class="line"><span class="cl">	<span class="n">addrinfo</span> <span class="o">*</span><span class="n">lpAddr</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">hins</span><span class="p">.</span><span class="n">ai_family</span> <span class="o">=</span> <span class="n">AF_UNSPEC</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">hins</span><span class="p">.</span><span class="n">ai_socktype</span> <span class="o">=</span> <span class="n">SOCK_STREAM</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">hins</span><span class="p">.</span><span class="n">ai_protocol</span> <span class="o">=</span> <span class="n">IPPROTO_TCP</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">CString</span> <span class="n">csPort</span> <span class="o">=</span> <span class="s">&#34;&#34;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">csPort</span><span class="p">.</span><span class="n">Format</span><span class="p">(</span><span class="s">&#34;%u&#34;</span><span class="p">,</span> <span class="n">nPort</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="kt">int</span> <span class="n">af</span> <span class="o">=</span> <span class="n">AF_UNSPEC</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="kt">char</span> <span class="n">host</span><span class="p">[</span><span class="n">MAX_HOSTNAME_LEN</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#34;&#34;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="k">if</span> <span class="p">(</span><span class="n">lpHost</span> <span class="o">==</span> <span class="nb">NULL</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">	<span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="n">gethostname</span><span class="p">(</span><span class="n">host</span><span class="p">,</span> <span class="n">MAX_HOSTNAME_LEN</span><span class="p">);</span><span class="c1">// 如果为NULL 则获取本机的IP地址信息
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="p">}</span><span class="k">else</span>
+</span></span><span class="line"><span class="cl">	<span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="n">strcpy_s</span><span class="p">(</span><span class="n">host</span><span class="p">,</span> <span class="n">MAX_HOSTNAME_LEN</span><span class="p">,</span> <span class="n">lpHost</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="k">if</span><span class="p">(</span><span class="mi">0</span> <span class="o">!=</span> <span class="n">getaddrinfo</span><span class="p">(</span><span class="n">host</span><span class="p">,</span> <span class="n">csPort</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">hins</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">lpAddr</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl">	<span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="k">return</span> <span class="n">af</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="n">af</span> <span class="o">=</span> <span class="n">lpAddr</span><span class="o">-&gt;</span><span class="n">ai_family</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">freeaddrinfo</span><span class="p">(</span><span class="n">lpAddr</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="k">return</span> <span class="n">af</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p>有了地址家族信息，后面的代码即可以根据地址家族信息来分别处理IP协议的不同版本，也可以使用上述服务端的思路，直接使用getaddrinfo函数得到的addrinfo结构中地址信息，下面给出第二种思路的部分代码:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="k">if</span><span class="p">(</span><span class="mi">0</span> <span class="o">!=</span> <span class="n">getaddrinfo</span><span class="p">(</span><span class="n">host</span><span class="p">,</span> <span class="n">csPort</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">hins</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">lpAddr</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">	<span class="n">connect</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">lpAddr</span><span class="o">-&gt;</span><span class="n">ai_addr</span><span class="p">,</span> <span class="n">lpAddr</span><span class="o">-&gt;</span><span class="n">ai_addrlen</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p>当然，也可以使用前面提到的 <code>WSAConnectByName</code> 函数，不过它需要针对IPV6来进行特殊的处理，需要事先知道服务端的IP协议的版本。</p>
+<h2 id="vc中各种地址结构">VC中各种地址结构</h2>
+<p>在学习网络编程中，一个重要的概念就是IP地址，而巴克利套接字中提供了好几种结构体来表示地址结构，微软针对WinSock2 又提供了一些新的结构体，有的时候众多的结构体让人眼花缭乱，在这我根据自己的理解简单的回顾一下这些常见的结构</p>
+<h3 id="sockadd_in-与sockaddr_in结构">SOCKADD_IN 与sockaddr_in结构</h3>
+<p>在Winsock2 中这二者是等价的， 它们的定义如下:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="k">struct</span> <span class="nc">sockaddr_in</span><span class="p">{</span>
+</span></span><span class="line"><span class="cl">   <span class="kt">short</span> <span class="n">sin_family</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">   <span class="kt">unsigned</span> <span class="kt">short</span> <span class="n">sin_port</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">   <span class="k">struct</span> <span class="nc">in_addr</span> <span class="n">sin_addr</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">   <span class="kt">char</span> <span class="n">sin_zero</span><span class="p">[</span><span class="mi">8</span><span class="p">];</span>
+</span></span><span class="line"><span class="cl"><span class="p">};</span>
+</span></span></code></pre></div><ul>
+<li>sin_family: 地址协议家族</li>
+<li>sin_port：端口号</li>
+<li>sin_addr: 表示ip地址的结构</li>
+<li>sin_zero: 用于与sockaddr 结构体的大小对齐，这个数组里面为全0</li>
+</ul>
+<p>in_addr 结构如下:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="k">struct</span> <span class="nc">in_addr</span> <span class="p">{</span> 
+</span></span><span class="line"><span class="cl">	<span class="k">union</span> <span class="p">{</span> 
+</span></span><span class="line"><span class="cl">		<span class="k">struct</span><span class="p">{</span> 
+</span></span><span class="line"><span class="cl">			<span class="kt">unsigned</span> <span class="kt">char</span> <span class="n">s_b1</span><span class="p">,</span> 
+</span></span><span class="line"><span class="cl">			<span class="n">s_b2</span><span class="p">,</span> 
+</span></span><span class="line"><span class="cl">			<span class="n">s_b3</span><span class="p">,</span> 
+</span></span><span class="line"><span class="cl">			<span class="n">s_b4</span><span class="p">;</span> 
+</span></span><span class="line"><span class="cl">		<span class="p">}</span> <span class="n">S_un_b</span><span class="p">;</span> 
+</span></span><span class="line"><span class="cl">		
+</span></span><span class="line"><span class="cl">		<span class="k">struct</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">			<span class="kt">unsigned</span> <span class="kt">short</span> <span class="n">s_w1</span><span class="p">,</span> <span class="n">s_w2</span><span class="p">;</span> 
+</span></span><span class="line"><span class="cl">		<span class="p">}</span> <span class="n">S_un_w</span><span class="p">;</span> 
+</span></span><span class="line"><span class="cl">		
+</span></span><span class="line"><span class="cl">		<span class="kt">unsigned</span> <span class="kt">long</span> <span class="n">S_addr</span><span class="p">;</span> 
+</span></span><span class="line"><span class="cl">	<span class="p">}</span> <span class="n">S_un</span><span class="p">;</span> 
+</span></span><span class="line"><span class="cl"><span class="p">};</span> 
+</span></span></code></pre></div><p>这个结构是一个公用体，占4个字节，从本质上将IP地址仅仅是一个占4个字节的无符号整型数据，为了方便读写才会采用点分十进制的方式。
+仔细观察这个结构会发现，它其实定义了IP地址的几种表现形式，我们可以将IP地址以一个字节一个字节的方式拆开来看，也可以以两个字型数据的形式拆开，也可以简单的看做一个无符号长整型。
+当然在写入的时候按照这几种方式写入，为了方便写入IP地址，微软定义了一个宏:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="cp">#define s_addr  S_un.S_addr
+</span></span></span></code></pre></div><p>因此在填入IP地址的时候可以简单的使用这个宏来给S_addr这个共用体成员赋值</p>
+<p>一般像bind、connect等函数需要传入地址结构，它们需要的结构为sockaddr，但是为了方便都会传入SOCKADDR_IN结构</p>
+<h3 id="sockaddr-sockaddr结构">sockaddr SOCKADDR结构</h3>
+<p>这两个结构也是等价的，它们的定义如下
+struct sockaddr {
+unsigned short sa_family;
+char sa_data[14];
+};</p>
+<p>从结构上看它占16个字节与 SOCKADDR_IN大小相同，而且第一个成员都是地址家族的相关信息，后面都是存储的具体的IPV4的地址，因此它们是可以转化的，
+为了方便一般是使用SOCKADDR_IN来保存IP地址，然后在需要填入SOCKADDR的时候强制转化即可。</p>
+<h3 id="sockaddr_in6">sockaddr_in6</h3>
+<p>该结构类似于sockaddr_in，只不过它表示的是IPV6的地址信息，在使用上，由于IPV6是128的地址占16个字节，而sockaddr_in 中表示地址的部分只有4个字节，
+所以它与之前的两个是不能转化的，在使用IPV6的时候需要特殊的处理，一般不直接填写IP而是直接根据IP的字符串或者主机名来连接。</p>
+<h3 id="sockaddr_storage">sockaddr_storage</h3>
+<p>这是一个通用的地址结构，既可以用来存储IPV4地址也可以存储IPV6的地址，这个地址结构在前面已经说过了，这里就不再详细解释了。</p>
+<h3 id="各种地址之间的转化">各种地址之间的转化</h3>
+<p>一般我们只使用从SOCKADDR_IN到sockaddr结构的转化，而且仔细观察socket函数族发现只需要从其他结构中得到sockaddr结构，而并不需要从sockaddr转化为其他结构，因此这里重点放在如何转化为sockaddr结构</p>
+<ol>
+<li>从SOCKADDR_IN到sockaddr只需要强制类型转化即可</li>
+<li>从addrinfo结构中只需要调用其成员即可</li>
+<li>从SOCKADDR_STORAGE结构到sockaddr只需要强制转化即可。</li>
+</ol>
+<p>其实在使用上更常用的是将字符串的IP转化为对应的数值，针对IPV4有我们常见的<code>inet_addr</code>、<code>inet_ntoa</code> 函数,它们都是在ipv4中使用的，
+针对v6一般使用<code>inet_pton</code>,<code>inet_ntop</code>来转化，它们两个分别对应于<code>inet_addr</code>、<code>inet_ntoa</code>。但是在WinSock中更常用的是<code>WSAAddressToString</code> 与 <code>WSAStringToAddress</code></p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="n">INT</span> <span class="nf">WSAAddressToString</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">  <span class="n">LPSOCKADDR</span> <span class="n">lpsaAddress</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">  <span class="n">DWORD</span> <span class="n">dwAddressLength</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">  <span class="n">LPWSAPROTOCOL_INFO</span> <span class="n">lpProtocolInfo</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">  <span class="n">OUT</span> <span class="n">LPTSTR</span> <span class="n">lpszAddressString</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">  <span class="n">IN</span> <span class="n">OUT</span> <span class="n">LPDWORD</span> <span class="n">lpdwAddressStringLength</span>
+</span></span><span class="line"><span class="cl"><span class="p">);</span>
+</span></span></code></pre></div><ul>
+<li>lpsaAddress: ip地址</li>
+<li>dwAddressLength: 地址结构的长度</li>
+<li>lpProtocolInfo: 协议信息的结构体，这个结构一般给NULL</li>
+<li>lpszAddressString：目标字符串的缓冲</li>
+<li>lpdwAddressStringLength:字符串的长度</li>
+</ul>
+<p>而WSAStringToAddress定义与使用与它类似，这里就不再说明了。</p>
+<!-- raw HTML omitted -->
+</div><div class="post-footer" id="post-footer">
+    <div class="post-info">
+        <div class="post-info-line">
+            <div class="post-info-mod">
+                <span>Updated on 2018-11-24</span>
+            </div></div>
+        <div class="post-info-line">
+            <div class="post-info-md"></div>
+            <div class="post-info-share">
+                <span><a href="javascript:void(0);" title="Share on Twitter" data-sharer="twitter" data-url="http://HaiLateBoy.github.io/posts/vc-ipv6/" data-title="VC&#43;&#43; IPv6的支持" data-hashtags="VC,SOCKET,IPv6"><i class="fab fa-twitter fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Facebook" data-sharer="facebook" data-url="http://HaiLateBoy.github.io/posts/vc-ipv6/" data-hashtag="VC"><i class="fab fa-facebook-square fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Hacker News" data-sharer="hackernews" data-url="http://HaiLateBoy.github.io/posts/vc-ipv6/" data-title="VC&#43;&#43; IPv6的支持"><i class="fab fa-hacker-news fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Line" data-sharer="line" data-url="http://HaiLateBoy.github.io/posts/vc-ipv6/" data-title="VC&#43;&#43; IPv6的支持"><i data-svg-src="https://cdn.jsdelivr.net/npm/simple-icons@7.3.0/icons/line.svg" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on 微博" data-sharer="weibo" data-url="http://HaiLateBoy.github.io/posts/vc-ipv6/" data-title="VC&#43;&#43; IPv6的支持"><i class="fab fa-weibo fa-fw" aria-hidden="true"></i></a></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="post-info-more">
+        <section class="post-tags"><i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/vc/">VC</a>,&nbsp;<a href="/tags/socket/">SOCKET</a>,&nbsp;<a href="/tags/ipv6/">IPv6</a></section>
+        <section>
+            <span><a href="javascript:void(0);" onclick="window.history.back();">Back</a></span>&nbsp;|&nbsp;<span><a href="/">Home</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav"><a href="/posts/html-css/" class="prev" rel="prev" title="从项目中学习HTML&#43;CSS"><i class="fas fa-angle-left fa-fw" aria-hidden="true"></i>从项目中学习HTML+CSS</a>
+            <a href="/posts/2019-new-year-plan/" class="next" rel="next" title="2018总结与2019规划">2018总结与2019规划<i class="fas fa-angle-right fa-fw" aria-hidden="true"></i></a></div>
+</div>
+</article></div>
+            </main><footer class="footer">
+        <div class="footer-container"><div class="footer-line">Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener noreffer" title="Hugo 0.121.2">Hugo</a> | Theme - <a href="https://github.com/dillonzq/LoveIt" target="_blank" rel="noopener noreffer" title="LoveIt 0.2.11"><i class="far fa-kiss-wink-heart fa-fw" aria-hidden="true"></i> LoveIt</a>
+                </div><div class="footer-line" itemscope itemtype="http://schema.org/CreativeWork"><i class="far fa-copyright fa-fw" aria-hidden="true"></i><span itemprop="copyrightYear">2022 - 2024</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="https://www.masimaro.xyz" target="_blank">Masimaro</a></span></div>
+        </div>
+    </footer></div>
+
+        <div id="fixed-buttons"><a href="#" id="back-to-top" class="fixed-button" title="Back to Top">
+                <i class="fas fa-arrow-up fa-fw" aria-hidden="true"></i>
+            </a><a href="#" id="view-comments" class="fixed-button" title="View Comments">
+                <i class="fas fa-comment fa-fw" aria-hidden="true"></i>
+            </a>
+        </div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.css"><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/autocomplete.js@0.38.1/dist/autocomplete.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lunr@2.3.9/lunr.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lazysizes@5.3.2/lazysizes.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/clipboard@2.0.11/dist/clipboard.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/sharer.js@0.5.1/sharer.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/auto-render.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/copy-tex.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/mhchem.min.js"></script><script type="text/javascript">window.config={"code":{"copyTitle":"Copy to clipboard","maxShownLines":50},"comment":{},"math":{"delimiters":[{"display":true,"left":"$$","right":"$$"},{"display":true,"left":"\\[","right":"\\]"},{"display":true,"left":"\\begin{equation}","right":"\\end{equation}"},{"display":true,"left":"\\begin{equation*}","right":"\\end{equation*}"},{"display":true,"left":"\\begin{align}","right":"\\end{align}"},{"display":true,"left":"\\begin{align*}","right":"\\end{align*}"},{"display":true,"left":"\\begin{alignat}","right":"\\end{alignat}"},{"display":true,"left":"\\begin{alignat*}","right":"\\end{alignat*}"},{"display":true,"left":"\\begin{gather}","right":"\\end{gather}"},{"display":true,"left":"\\begin{CD}","right":"\\end{CD}"},{"display":false,"left":"$","right":"$"},{"display":false,"left":"\\(","right":"\\)"}],"strict":false},"search":{"highlightTag":"em","maxResultLength":10,"noResultsFound":"No results found","snippetLength":50}};</script><script type="text/javascript" src="/js/theme.min.js"></script></body>
+</html>

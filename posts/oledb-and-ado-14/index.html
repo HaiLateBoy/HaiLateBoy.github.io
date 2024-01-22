@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="robots" content="noodp" />
+        <title>OLEDB 简单数据查找定位和错误处理 - Masimaro&#39;s blog</title><meta name="Description" content="这是我用于记录日常和学习的小站"><meta property="og:title" content="OLEDB 简单数据查找定位和错误处理" />
+<meta property="og:description" content="在数据库查询中，我们主要使用的SQL语句，但是之前也说过，SQL语句需要经历解释执行的步骤，这样就会拖慢程序的运行速度，针对一些具体的简单查" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://HaiLateBoy.github.io/posts/oledb-and-ado-14/" /><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2018-05-11T19:48:37+00:00" />
+<meta property="article:modified_time" content="2018-05-11T19:48:37+00:00" /><meta property="og:site_name" content="Masimaro&#39;s blog" />
+
+<meta name="twitter:card" content="summary"/><meta name="twitter:title" content="OLEDB 简单数据查找定位和错误处理"/>
+<meta name="twitter:description" content="在数据库查询中，我们主要使用的SQL语句，但是之前也说过，SQL语句需要经历解释执行的步骤，这样就会拖慢程序的运行速度，针对一些具体的简单查"/>
+<meta name="application-name" content="My cool site">
+<meta name="apple-mobile-web-app-title" content="My cool site"><meta name="theme-color" content="#ffffff"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="manifest" href="/site.webmanifest"><link rel="canonical" href="http://HaiLateBoy.github.io/posts/oledb-and-ado-14/" /><link rel="prev" href="http://HaiLateBoy.github.io/posts/private/" /><link rel="next" href="http://HaiLateBoy.github.io/posts/oledb-and-ado-15/" /><link rel="stylesheet" href="/css/style.min.css"><link rel="preload" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css"></noscript><link rel="preload" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css"></noscript><script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "BlogPosting",
+        "headline": "OLEDB 简单数据查找定位和错误处理",
+        "inLanguage": "zh-CN",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "http:\/\/HaiLateBoy.github.io\/posts\/oledb-and-ado-14\/"
+        },"genre": "posts","keywords": "OLEDB, 数据库编程, VC\u002b\u002b, 数据库, IRowsetFind接口, 错误处理","wordcount":  3173 ,
+        "url": "http:\/\/HaiLateBoy.github.io\/posts\/oledb-and-ado-14\/","datePublished": "2018-05-11T19:48:37+00:00","dateModified": "2018-05-11T19:48:37+00:00","publisher": {
+            "@type": "Organization",
+            "name": ""},"author": {
+                "@type": "Person",
+                "name": "Masimaro"
+            },"description": ""
+    }
+    </script></head>
+    <body data-header-desktop="fixed" data-header-mobile="auto"><script type="text/javascript">(window.localStorage && localStorage.getItem('theme') ? localStorage.getItem('theme') === 'dark' : ('auto' === 'auto' ? window.matchMedia('(prefers-color-scheme: dark)').matches : 'auto' === 'dark')) && document.body.setAttribute('theme', 'dark');</script>
+
+        <div id="mask"></div><div class="wrapper"><header class="desktop" id="header-desktop">
+    <div class="header-wrapper">
+        <div class="header-title">
+            <a href="/" title="Masimaro&#39;s blog">My cool site</a>
+        </div>
+        <div class="menu">
+            <div class="menu-inner"><a class="menu-item" href="/posts/" title="文章列表"> 文章 </a><a class="menu-item" href="/tags/" title="标签"> 标签 </a><a class="menu-item" href="/categories/" title="分类"> 分类 </a><a class="menu-item" href="/about" title="关于本站"> 关于 </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-desktop">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-desktop" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-desktop" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-desktop">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </span><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                    <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+                </a></div>
+        </div>
+    </div>
+</header><header class="mobile" id="header-mobile">
+    <div class="header-container">
+        <div class="header-wrapper">
+            <div class="header-title">
+                <a href="/" title="Masimaro&#39;s blog">My cool site</a>
+            </div>
+            <div class="menu-toggle" id="menu-toggle-mobile">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+        <div class="menu" id="menu-mobile"><div class="search-wrapper">
+                    <div class="search mobile" id="search-mobile">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-mobile">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-mobile" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-mobile" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-mobile">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </div>
+                    <a href="javascript:void(0);" class="search-cancel" id="search-cancel-mobile">
+                        Cancel
+                    </a>
+                </div><a class="menu-item" href="/posts/" title="文章列表">文章</a><a class="menu-item" href="/tags/" title="标签">标签</a><a class="menu-item" href="/categories/" title="分类">分类</a><a class="menu-item" href="/about" title="关于本站">关于</a><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+            </a></div>
+    </div>
+</header><div class="search-dropdown desktop">
+        <div id="search-dropdown-desktop"></div>
+    </div>
+    <div class="search-dropdown mobile">
+        <div id="search-dropdown-mobile"></div>
+    </div><main class="main">
+                <div class="container"><div class="toc" id="toc-auto">
+            <h2 class="toc-title">Contents</h2>
+            <div class="toc-content" id="toc-content-auto"></div>
+        </div><article class="page single"><h1 class="single-title animate__animated animate__flipInX">OLEDB 简单数据查找定位和错误处理</h1><div class="post-meta">
+            <div class="post-meta-line"><span class="post-author"><a href="https://www.masimaro.xyz" title="Author" target="_blank" rel="noopener noreffer author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Masimaro</a></span>&nbsp;<span class="post-category">included in <a href="/categories/windows-%E6%95%B0%E6%8D%AE%E5%BA%93%E7%BC%96%E7%A8%8B/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>windows 数据库编程</a></span></div>
+            <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw" aria-hidden="true"></i>&nbsp;<time datetime="2018-05-11">2018-05-11</time>&nbsp;<i class="fas fa-pencil-alt fa-fw" aria-hidden="true"></i>&nbsp;3173 words&nbsp;
+                <i class="far fa-clock fa-fw" aria-hidden="true"></i>&nbsp;7 minutes&nbsp;</div>
+        </div><div class="details toc" id="toc-static"  data-kept="true">
+                <div class="details-summary toc-title">
+                    <span>Contents</span>
+                    <span><i class="details-icon fas fa-angle-right" aria-hidden="true"></i></span>
+                </div>
+                <div class="details-content toc-content" id="toc-content-static"><nav id="TableOfContents">
+  <ul>
+    <li><a href="#简单数据查询和定位">简单数据查询和定位</a></li>
+    <li><a href="#错误处理">错误处理</a>
+      <ul>
+        <li><a href="#ierrorinfo接口">IErrorInfo接口</a></li>
+        <li><a href="#ierrorrecords接口">IErrorRecords接口</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav></div>
+            </div><div class="content" id="content"><p>在数据库查询中，我们主要使用的SQL语句，但是之前也说过，SQL语句需要经历解释执行的步骤，这样就会拖慢程序的运行速度，针对一些具体的简单查询，比如根据用户ID从用户表中查询用户具体信息，像这样的简单查询OLEDB提供了专门的查询接口。使用该接口可以很大程度上提升程序性能。
+另外在之前的代码中，只是简单的通过HRESULT这个返回值来判断是否成功，针对错误没有具体的处理，但是OLEDB提供了自己的处理机制，这篇博文主要来介绍这两种情况下的处理方式</p>
+<!-- raw HTML omitted -->
+<h2 id="简单数据查询和定位">简单数据查询和定位</h2>
+<p>它的使用方法与之前的简单读取结果集类似，主要经历如下几部</p>
+<ol>
+<li>绑定需要在查询中做条件的几列（绑定的方式与之前的相同）</li>
+<li>分配一段内存，给定对应的条件值</li>
+<li>循环调用IRowsetFind接口的FindNextRow方法，传入对应的结果集、条件、条件值的缓冲，接收函数返回的新的结果集指针</li>
+<li>使用常规方法访问结果集</li>
+</ol>
+<p>FindNextRow函数的定义如下：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="n">HRESULT</span> <span class="nf">FindNextRow</span> <span class="p">(</span>
+</span></span><span class="line"><span class="cl">   <span class="n">HCHAPTER</span>            <span class="n">hChapter</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">   <span class="n">HACCESSOR</span>           <span class="n">hAccessor</span><span class="p">,</span> <span class="c1">//绑定查询条件的访问器，用于OLEDB组件访问用户传进来的条件
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>   <span class="kt">void</span>               <span class="o">*</span><span class="n">pFindValue</span><span class="p">,</span> <span class="c1">//之前的内存缓冲
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>   <span class="n">DBCOMPAREOP</span>         <span class="n">CompareOp</span><span class="p">,</span> <span class="c1">// 查询条件，主要有：DBCOMPAREOPS_EQ、DBCOMPAREOPS_NE、DBCOMPAREOPS_LT等等，具体的请参看MSDN
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>   <span class="n">DBBKMARK</span>            <span class="n">cbBookmark</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">   <span class="k">const</span> <span class="n">BYTE</span>         <span class="o">*</span><span class="n">pBookmark</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">   <span class="n">DBROWOFFSET</span>         <span class="n">lRowsOffset</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">   <span class="n">DBROWCOUNT</span>          <span class="n">cRows</span><span class="p">,</span> <span class="c1">//一次返回的行数
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>   <span class="n">DBCOUNTITEM</span>        <span class="o">*</span><span class="n">pcRowsObtained</span><span class="p">,</span> <span class="c1">//真实返回的行
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>   <span class="n">HROW</span>              <span class="o">**</span><span class="n">prghRows</span><span class="p">);</span> <span class="c1">//返回的行访问器的句柄数组
+</span></span></span></code></pre></div><p>下面是一个具体的例子:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="n">HRESULT</span> <span class="n">hRes</span> <span class="o">=</span> <span class="n">pIRowset</span><span class="o">-&gt;</span><span class="n">QueryInterface</span><span class="p">(</span><span class="n">IID_IRowsetFind</span><span class="p">,</span> <span class="p">(</span><span class="kt">void</span><span class="o">**</span><span class="p">)</span><span class="o">&amp;</span><span class="n">pIRowsetFind</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="n">COM_SUCCESS</span><span class="p">(</span><span class="n">hRes</span><span class="p">,</span> <span class="n">_T</span><span class="p">(</span><span class="s">&#34;查询接口IRowsetFind失败，错误码为:%08x</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">),</span> <span class="n">hRes</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="n">hRes</span> <span class="o">=</span> <span class="n">pIRowset</span><span class="o">-&gt;</span><span class="n">QueryInterface</span><span class="p">(</span><span class="n">IID_IColumnsInfo</span><span class="p">,</span> <span class="p">(</span><span class="kt">void</span><span class="o">**</span><span class="p">)</span><span class="o">&amp;</span><span class="n">pIColumnsInfo</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="n">COM_SUCCESS</span><span class="p">(</span><span class="n">hRes</span><span class="p">,</span> <span class="n">_T</span><span class="p">(</span><span class="s">&#34;查询接口IColumnInfo失败，错误码为:%08x</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">),</span> <span class="n">hRes</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="n">hRes</span> <span class="o">=</span> <span class="n">pIRowset</span><span class="o">-&gt;</span><span class="n">QueryInterface</span><span class="p">(</span><span class="n">IID_IAccessor</span><span class="p">,</span> <span class="p">(</span><span class="kt">void</span><span class="o">**</span><span class="p">)</span><span class="o">&amp;</span><span class="n">pIAccessor</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="n">COM_SUCCESS</span><span class="p">(</span><span class="n">hRes</span><span class="p">,</span> <span class="n">_T</span><span class="p">(</span><span class="s">&#34;查询接口IAccessor失败，错误码为:%08x</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">),</span> <span class="n">hRes</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="n">hRes</span> <span class="o">=</span> <span class="n">pIColumnsInfo</span><span class="o">-&gt;</span><span class="n">GetColumnInfo</span><span class="p">(</span><span class="o">&amp;</span><span class="n">cColumns</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">rgColumnsInfo</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">lpColumnsName</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="n">COM_SUCCESS</span><span class="p">(</span><span class="n">hRes</span><span class="p">,</span> <span class="n">_T</span><span class="p">(</span><span class="s">&#34;查询列信息失败，错误码为:%08x</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">),</span> <span class="n">hRes</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">rgQueryBinding</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">bPrecision</span> <span class="o">=</span> <span class="n">rgColumnsInfo</span><span class="p">[</span><span class="mi">1</span><span class="p">].</span><span class="n">bPrecision</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="n">rgQueryBinding</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">bScale</span> <span class="o">=</span> <span class="n">rgColumnsInfo</span><span class="p">[</span><span class="mi">1</span><span class="p">].</span><span class="n">bScale</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="n">rgQueryBinding</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">cbMaxLen</span> <span class="o">=</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">ULONG</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="n">rgQueryBinding</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">dwMemOwner</span> <span class="o">=</span> <span class="n">DBMEMOWNER_CLIENTOWNED</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="n">rgQueryBinding</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">dwPart</span> <span class="o">=</span> <span class="n">DBPART_STATUS</span> <span class="o">|</span> <span class="n">DBPART_LENGTH</span> <span class="o">|</span> <span class="n">DBPART_VALUE</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="n">rgQueryBinding</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">eParamIO</span> <span class="o">=</span> <span class="n">DBPARAMIO_NOTPARAM</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="n">rgQueryBinding</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">iOrdinal</span> <span class="o">=</span> <span class="mi">4</span><span class="p">;</span> <span class="c1">//绑定第4列，也就是表中的所属行政区编号列
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="n">rgQueryBinding</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">obStatus</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="n">rgQueryBinding</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">obLength</span> <span class="o">=</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">DBSTATUS</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="n">rgQueryBinding</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">obValue</span> <span class="o">=</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">DBSTATUS</span><span class="p">)</span> <span class="o">+</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">ULONG</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="n">rgQueryBinding</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">wType</span> <span class="o">=</span> <span class="n">DBTYPE_I4</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">hRes</span> <span class="o">=</span> <span class="n">pIAccessor</span><span class="o">-&gt;</span><span class="n">CreateAccessor</span><span class="p">(</span><span class="n">DBACCESSOR_ROWDATA</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">rgQueryBinding</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">hQueryAccessor</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="n">COM_SUCCESS</span><span class="p">(</span><span class="n">hRes</span><span class="p">,</span> <span class="n">_T</span><span class="p">(</span><span class="s">&#34;创建访问器失败，错误码为:%08x</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">),</span> <span class="n">hRes</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="n">pQueryBuff</span> <span class="o">=</span> <span class="n">COM_ALLOC</span><span class="p">(</span><span class="kt">void</span><span class="p">,</span> <span class="n">rgQueryBinding</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">obValue</span> <span class="o">+</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">ULONG</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl"><span class="o">*</span><span class="p">(</span><span class="n">DBSTATUS</span><span class="o">*</span><span class="p">)((</span><span class="n">LPBYTE</span><span class="p">)</span><span class="n">pQueryBuff</span> <span class="o">+</span> <span class="n">rgQueryBinding</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">obValue</span><span class="p">)</span> <span class="o">=</span> <span class="n">DBSTATUS_S_OK</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="o">*</span><span class="p">(</span><span class="n">ULONG</span><span class="o">*</span><span class="p">)((</span><span class="n">LPBYTE</span><span class="p">)</span><span class="n">pQueryBuff</span> <span class="o">+</span> <span class="n">rgQueryBinding</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">obLength</span><span class="p">)</span> <span class="o">=</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">ULONG</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="o">*</span><span class="p">(</span><span class="n">ULONG</span><span class="o">*</span><span class="p">)((</span><span class="n">LPBYTE</span><span class="p">)</span><span class="n">pQueryBuff</span> <span class="o">+</span> <span class="n">rgQueryBinding</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">obValue</span><span class="p">)</span> <span class="o">=</span> <span class="n">uId</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">hRes</span> <span class="o">=</span> <span class="n">pIRowsetFind</span><span class="o">-&gt;</span><span class="n">FindNextRow</span><span class="p">(</span><span class="n">DB_NULL_HCHAPTER</span><span class="p">,</span> <span class="n">hQueryAccessor</span><span class="p">,</span> <span class="n">pQueryBuff</span><span class="p">,</span> <span class="n">DBCOMPAREOPS_EQ</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">cRowsObtained</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">rgShowRows</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="n">COM_SUCCESS</span><span class="p">(</span><span class="n">hRes</span><span class="p">,</span> <span class="n">_T</span><span class="p">(</span><span class="s">&#34;查询结果集失败，错误码为:%08x</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">),</span> <span class="n">hRes</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="n">bRet</span> <span class="o">=</span> <span class="n">ReadRows</span><span class="p">(</span><span class="n">cColumns</span><span class="p">,</span> <span class="n">rgColumnsInfo</span><span class="p">,</span> <span class="n">cRowsObtained</span><span class="p">,</span> <span class="n">rgShowRows</span><span class="p">,</span> <span class="n">pIRowset</span><span class="p">);</span>
+</span></span></code></pre></div><p>这段代码首先获取到对应列的列信息，然后根据这个列信息进行动态绑定，在这里我们绑定第4列，也就是之前行政区表的所属行政区编号列，接着针对这个绑定创建访问器，并分配缓冲存储对应的条件值，最后调用FindNextRow返回查询到的新的结果集，并调用对应的函数读取返回的结果集
+上面的代码并不复杂，从FindNextRow的第4个参数的值来看，它只能支持简单的大于小于等于等等操作，像sql语句中的模糊查询，多表查询，联合查询等等它是不能胜任的，因此说它只是一个简单查询，它在某些简单场合下可以节省性能，但是对于复杂的业务逻辑中SQL语句仍然是不二的选择</p>
+<h2 id="错误处理">错误处理</h2>
+<p>在windows中定义了丰富的错误处理代码和错误处理方式，几乎每种类型的程序都有自己的一套处理方式，比如Win32 API中的GetLastError，WinSock中的WSAGetLastError, 其实在OLEDB中有它自己的处理方式。
+COM中可以使用GetErrorInfo函数得到一个错误的信息的接口，IErrorInfo,进一步可以根据该接口的对应函数可以得到具体的错误信息。</p>
+<h3 id="ierrorinfo接口">IErrorInfo接口</h3>
+<p>IErrorInfo 有时候自身包含一些出错信息，可以直接读取。IErrorInfo有时候只有一条错误信息，有时候是一个树形结构的错误信息通过调用QueryInterface函数查询错误对象的IErrorRecords接口来判定错误信息是否还有详细的子记录。如果有子记录。如果能得到IErrorRecords接口,就调用IErrorRecords::GetRecordCount获得错误信息记录个数,接着循环调用IErrorRecords::GetErrorInfo又取得子记录的IErrorInfo接口,并获取错误信息
+若没有子错误记录,那么直接调用IErrorInfo::GetDescription得到错误描述信息,调用IErrorInfo::GetSource得到错误来源信息
+以上所述IErrorInfo接口是COM定义的标准接口,IErrorRecords是OLEDB专门定义的错误信息记录接口。</p>
+<h3 id="ierrorrecords接口">IErrorRecords接口</h3>
+<p>其实IErrorRecords接口除了能获取子记录的IErrorInfo接口外还有一个重要的功能。调用接口的GetBasicErrorInfo方法可以得到一个指定索引错误记录的基本错误信息结构体ERRORINFO。
+该结构的定义如下：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="k">typedef</span> <span class="k">struct</span> <span class="nc">tagERRORINFO</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">   <span class="n">HRESULT</span>   <span class="n">hrError</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">   <span class="n">DWORD</span>     <span class="n">dwMinor</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">   <span class="n">CLSID</span>     <span class="n">clsid</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">   <span class="n">IID</span>       <span class="n">iid</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">   <span class="n">DISPID</span>    <span class="n">dispid</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span> <span class="n">ERRORINFO</span><span class="p">;</span>
+</span></span></code></pre></div><p>根据这个结构可以得到指定错误的具体信息，有点类似于FormatMessage格式化错误码，得到错误码对应的错误提示信息。
+另外可以调用接口的GetCustomErrorObject给定一个错误码，得到一个具体的错误对象，一般在OLEDB中这个对象是ISQLErrorInfo接口
+这两个函数的第一个参数是一个编号，这个编号一般是第几个IErrorRecords中错误信息的编号。
+下面是一个具体的例子</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="n">LPOLESTR</span> <span class="n">lpSQL</span> <span class="o">=</span> <span class="n">OLESTR</span><span class="p">(</span><span class="s">&#34;select * where aa26;select * from aa26 where, aac031;&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="n">HRESULT</span> <span class="n">hRes</span> <span class="o">=</span><span class="n">pIOpenRowset</span><span class="o">-&gt;</span><span class="n">QueryInterface</span><span class="p">(</span><span class="n">IID_IDBCreateCommand</span><span class="p">,</span> <span class="p">(</span><span class="kt">void</span><span class="o">**</span><span class="p">)</span><span class="o">&amp;</span><span class="n">pIDBCreateCommand</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="n">COM_SUCCESS</span><span class="p">(</span><span class="n">hRes</span><span class="p">,</span> <span class="n">_T</span><span class="p">(</span><span class="s">&#34;查询接口IDBCreateCommand失败，错误码为:%08x</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">),</span> <span class="n">hRes</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="n">LPOLESTR</span> <span class="n">lpErrorInfo</span> <span class="o">=</span> <span class="p">(</span><span class="n">LPOLESTR</span><span class="p">)</span><span class="n">CoTaskMemAlloc</span><span class="p">(</span><span class="mi">1024</span> <span class="o">*</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">WCHAR</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">	<span class="n">hRes</span> <span class="o">=</span> <span class="n">pIDBCreateCommand</span><span class="o">-&gt;</span><span class="n">CreateCommand</span><span class="p">(</span><span class="nb">NULL</span><span class="p">,</span> <span class="n">IID_ICommandText</span><span class="p">,</span> <span class="p">(</span><span class="n">IUnknown</span><span class="o">**</span><span class="p">)</span><span class="o">&amp;</span><span class="n">pICommandText</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="n">COM_SUCCESS</span><span class="p">(</span><span class="n">hRes</span><span class="p">,</span> <span class="n">_T</span><span class="p">(</span><span class="s">&#34;创建接口ICommandText失败，错误码为:%08x</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">),</span> <span class="n">hRes</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="n">pICommandText</span><span class="o">-&gt;</span><span class="n">SetCommandText</span><span class="p">(</span><span class="n">DBGUID_DEFAULT</span><span class="p">,</span> <span class="n">lpSQL</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="n">hRes</span> <span class="o">=</span> <span class="n">pICommandText</span><span class="o">-&gt;</span><span class="n">Execute</span><span class="p">(</span><span class="nb">NULL</span><span class="p">,</span> <span class="n">IID_IRowset</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">,</span> <span class="p">(</span><span class="n">IUnknown</span><span class="o">**</span><span class="p">)</span><span class="o">&amp;</span><span class="n">pIRowset</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="k">if</span> <span class="p">(</span><span class="n">FAILED</span><span class="p">(</span><span class="n">hRes</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl">	<span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="n">GetErrorInfo</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">pIErrorInfo</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">		<span class="n">HRESULT</span> <span class="n">hr</span> <span class="o">=</span> <span class="n">pIErrorInfo</span><span class="o">-&gt;</span><span class="n">QueryInterface</span><span class="p">(</span><span class="n">IID_IErrorRecords</span><span class="p">,</span> <span class="p">(</span><span class="kt">void</span><span class="o">**</span><span class="p">)</span><span class="o">&amp;</span><span class="n">pIErrorRecords</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">		<span class="k">if</span> <span class="p">(</span><span class="n">SUCCEEDED</span><span class="p">(</span><span class="n">hr</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl">		<span class="p">{</span>
+</span></span><span class="line"><span class="cl">			<span class="n">ULONG</span> <span class="n">uRecordes</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">			<span class="n">hr</span> <span class="o">=</span> <span class="n">pIErrorRecords</span><span class="o">-&gt;</span><span class="n">GetRecordCount</span><span class="p">(</span><span class="o">&amp;</span><span class="n">uRecordes</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">			<span class="n">COM_SUCCESS</span><span class="p">(</span><span class="n">hr</span><span class="p">,</span> <span class="n">_T</span><span class="p">(</span><span class="s">&#34;获取错误集个数失败,错误码为:%08x</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">),</span> <span class="n">hr</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">			<span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">uRecordes</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">			<span class="p">{</span>
+</span></span><span class="line"><span class="cl">				<span class="n">ReadErrorRecords</span><span class="p">(</span><span class="n">lpErrorInfo</span><span class="p">,</span> <span class="mi">1024</span> <span class="o">*</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">WCHAR</span><span class="p">),</span> <span class="n">hRes</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">pIErrorRecords</span><span class="p">,</span> <span class="n">lpSQL</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">				<span class="n">COM_PRINTF</span><span class="p">(</span><span class="n">_T</span><span class="p">(</span><span class="s">&#34;%s&#34;</span><span class="p">),</span> <span class="n">lpErrorInfo</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">			<span class="p">}</span>
+</span></span><span class="line"><span class="cl">		<span class="p">}</span><span class="k">else</span>
+</span></span><span class="line"><span class="cl">		<span class="p">{</span>
+</span></span><span class="line"><span class="cl">			<span class="n">ReadErrorInfo</span><span class="p">(</span><span class="n">lpErrorInfo</span><span class="p">,</span> <span class="mi">1024</span> <span class="o">*</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">WCHAR</span><span class="p">),</span> <span class="n">hRes</span><span class="p">,</span> <span class="n">pIErrorInfo</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">			<span class="n">COM_PRINTF</span><span class="p">(</span><span class="n">_T</span><span class="p">(</span><span class="s">&#34;%s&#34;</span><span class="p">),</span> <span class="n">lpErrorInfo</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">		<span class="p">}</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span></code></pre></div><p>在上述例子中，我们故意传入一个错误的SQL语句，让其出错，然后通过GetErrorInfo函数获取一个错误的IErrorInfo接口，尝试查询IErrorRecords，如果有那么在循环中遍历它的子集，并且得到每个子集的详细错误信息。否则直接调用函数ReadErrorInfo获取错误的具体信息</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="n">BOOL</span> <span class="nf">ReadErrorRecords</span><span class="p">(</span><span class="n">LPOLESTR</span> <span class="o">&amp;</span><span class="n">lpErrorInfo</span><span class="p">,</span> <span class="n">DWORD</span> <span class="n">dwSize</span><span class="p">,</span> <span class="n">HRESULT</span> <span class="n">hErrRes</span><span class="p">,</span> <span class="n">ULONG</span> <span class="n">uRecordIndex</span><span class="p">,</span> <span class="n">IErrorRecords</span> <span class="o">*</span><span class="n">pIErrorRecords</span><span class="p">,</span> <span class="n">LPWSTR</span> <span class="n">lpSql</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">	<span class="n">ERRORINFO</span> <span class="n">ErrorInfo</span> <span class="o">=</span> <span class="p">{</span><span class="mi">0</span><span class="p">};</span>
+</span></span><span class="line"><span class="cl">	<span class="k">static</span> <span class="n">LCID</span> <span class="n">lcid</span> <span class="o">=</span> <span class="n">GetUserDefaultLCID</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">	<span class="n">HRESULT</span> <span class="n">hRes</span> <span class="o">=</span> <span class="n">pIErrorRecords</span><span class="o">-&gt;</span><span class="n">GetBasicErrorInfo</span><span class="p">(</span><span class="n">uRecordIndex</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">ErrorInfo</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="n">COM_CHECK_HR</span><span class="p">(</span><span class="n">hRes</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="n">hRes</span> <span class="o">=</span> <span class="n">pIErrorRecords</span><span class="o">-&gt;</span><span class="n">GetErrorInfo</span><span class="p">(</span><span class="n">uRecordIndex</span><span class="p">,</span> <span class="n">lcid</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">pIErrorInfo</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="n">COM_CHECK_HR</span><span class="p">(</span><span class="n">hRes</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="n">hRes</span> <span class="o">=</span> <span class="n">pIErrorInfo</span><span class="o">-&gt;</span><span class="n">GetDescription</span><span class="p">(</span><span class="o">&amp;</span><span class="n">pstrDescription</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="n">COM_CHECK_HR</span><span class="p">(</span><span class="n">hRes</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="n">hRes</span> <span class="o">=</span> <span class="n">pIErrorInfo</span><span class="o">-&gt;</span><span class="n">GetSource</span><span class="p">(</span><span class="o">&amp;</span><span class="n">pstrSource</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="n">COM_CHECK_HR</span><span class="p">(</span><span class="n">hRes</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="k">if</span> <span class="p">(</span><span class="n">ReadSQLError</span><span class="p">(</span><span class="o">&amp;</span><span class="n">bstrSQLErrorInfo</span><span class="p">,</span> <span class="n">pIErrorRecords</span><span class="p">,</span> <span class="n">uRecordIndex</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl">	<span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="n">StringCchPrintf</span><span class="p">(</span><span class="n">lpErrorInfo</span><span class="p">,</span> <span class="n">dwSize</span><span class="p">,</span> <span class="n">_T</span><span class="p">(</span><span class="s">&#34;</span><span class="se">\n</span><span class="s">(%s)</span><span class="se">\n</span><span class="s">错误信息:  HRESULT=0x%08X</span><span class="se">\n</span><span class="s">描述: %s</span><span class="se">\n</span><span class="s">SQL错误信息: %s</span><span class="se">\n</span><span class="s">来源: %s&#34;</span><span class="p">),</span> <span class="n">lpSql</span><span class="p">,</span> <span class="n">ErrorInfo</span><span class="p">.</span><span class="n">hrError</span><span class="p">,</span> <span class="n">pstrDescription</span><span class="p">,</span> <span class="n">bstrSQLErrorInfo</span><span class="p">,</span> <span class="n">pstrSource</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span><span class="k">else</span>
+</span></span><span class="line"><span class="cl">	<span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="n">StringCchPrintf</span><span class="p">(</span><span class="n">lpErrorInfo</span><span class="p">,</span> <span class="n">dwSize</span><span class="p">,</span> <span class="n">_T</span><span class="p">(</span><span class="s">&#34;</span><span class="se">\n</span><span class="s">(%s)</span><span class="se">\n</span><span class="s">错误信息:  HRESULT=0x%08X</span><span class="se">\n</span><span class="s">描述: %s</span><span class="se">\n</span><span class="s">来源: %s&#34;</span><span class="p">),</span> <span class="n">lpSql</span><span class="p">,</span> <span class="n">ErrorInfo</span><span class="p">.</span><span class="n">hrError</span><span class="p">,</span> <span class="n">pstrDescription</span><span class="p">,</span> <span class="n">pstrSource</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p>该函数用于显示错误子集的信息，在函数中首先调用IErrorRecords接口的GetBasicErrorInfo函数传入子集的编号，获取子集的基本信息，然后再调用IErrorRecords接口的GetErrorInfo方法获取子集的IErrorInfo接口，接着调用IErrorInfo接口的相应函数获取错误的详细信息，在这个里面我们调用了另外一个自定义函数ReadSQLError，尝试获取在执行SQL语句时的错误,然后进行相关的输出。函数的部分代码如下：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="n">BOOL</span> <span class="nf">ReadSQLError</span><span class="p">(</span><span class="n">BSTR</span> <span class="o">*</span><span class="n">pbstrSQL</span><span class="p">,</span> <span class="n">IErrorRecords</span> <span class="o">*</span><span class="n">pIErrorRecords</span><span class="p">,</span> <span class="n">DWORD</span> <span class="n">dwRecordIndex</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">	<span class="n">HRESULT</span> <span class="n">hRes</span> <span class="o">=</span> <span class="n">pIErrorRecords</span><span class="o">-&gt;</span><span class="n">GetCustomErrorObject</span><span class="p">(</span><span class="n">dwRecordIndex</span><span class="p">,</span> <span class="n">IID_ISQLErrorInfo</span><span class="p">,</span> <span class="p">(</span><span class="n">IUnknown</span><span class="o">**</span><span class="p">)</span><span class="o">&amp;</span><span class="n">pISQLErrorInfo</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="n">hRes</span> <span class="o">=</span> <span class="n">pISQLErrorInfo</span><span class="o">-&gt;</span><span class="n">GetSQLInfo</span><span class="p">(</span><span class="n">pbstrSQL</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">lNativeErrror</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p>这个函数就简单的调用了IErrorRecords接口的GetCustomErrorObject方法传入子集的编号，获取到ISQLErrorInfo接口，最后调用ISQLErrorInfo接口的GetSQLInfo方法获取执行SQL语句时的错误。
+至于函数ReadErrorInfo，它的代码十分简单，就只是ReadErrorRecords函数中关于IErrorInfo处理的部分代码而已，在这就不在说明</p>
+<p>最后放上这两个例子的详细代码地址
+<a href="https://gitee.com/masimaro/codes/tcesnrul0g2yi76bam5dj19#RowsetFind" target="_blank" rel="noopener noreffer ">RowsetFind</a>
+<a href="https://gitee.com/masimaro/codes/tcesnrul0g2yi76bam5dj19#ErrorHandler" target="_blank" rel="noopener noreffer ">ErrorHandler</a></p>
+<!-- raw HTML omitted -->
+</div><div class="post-footer" id="post-footer">
+    <div class="post-info">
+        <div class="post-info-line">
+            <div class="post-info-mod">
+                <span>Updated on 2018-05-11</span>
+            </div></div>
+        <div class="post-info-line">
+            <div class="post-info-md"></div>
+            <div class="post-info-share">
+                <span><a href="javascript:void(0);" title="Share on Twitter" data-sharer="twitter" data-url="http://HaiLateBoy.github.io/posts/oledb-and-ado-14/" data-title="OLEDB 简单数据查找定位和错误处理" data-hashtags="OLEDB,数据库编程,VC&#43;&#43;,数据库,IRowsetFind接口,错误处理"><i class="fab fa-twitter fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Facebook" data-sharer="facebook" data-url="http://HaiLateBoy.github.io/posts/oledb-and-ado-14/" data-hashtag="OLEDB"><i class="fab fa-facebook-square fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Hacker News" data-sharer="hackernews" data-url="http://HaiLateBoy.github.io/posts/oledb-and-ado-14/" data-title="OLEDB 简单数据查找定位和错误处理"><i class="fab fa-hacker-news fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Line" data-sharer="line" data-url="http://HaiLateBoy.github.io/posts/oledb-and-ado-14/" data-title="OLEDB 简单数据查找定位和错误处理"><i data-svg-src="https://cdn.jsdelivr.net/npm/simple-icons@7.3.0/icons/line.svg" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on 微博" data-sharer="weibo" data-url="http://HaiLateBoy.github.io/posts/oledb-and-ado-14/" data-title="OLEDB 简单数据查找定位和错误处理"><i class="fab fa-weibo fa-fw" aria-hidden="true"></i></a></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="post-info-more">
+        <section class="post-tags"><i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/oledb/">OLEDB</a>,&nbsp;<a href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93%E7%BC%96%E7%A8%8B/">数据库编程</a>,&nbsp;<a href="/tags/vc&#43;&#43;/">VC&#43;&#43;</a>,&nbsp;<a href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93/">数据库</a>,&nbsp;<a href="/tags/irowsetfind%E6%8E%A5%E5%8F%A3/">IRowsetFind接口</a>,&nbsp;<a href="/tags/%E9%94%99%E8%AF%AF%E5%A4%84%E7%90%86/">错误处理</a></section>
+        <section>
+            <span><a href="javascript:void(0);" onclick="window.history.back();">Back</a></span>&nbsp;|&nbsp;<span><a href="/">Home</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav"><a href="/posts/private/" class="prev" rel="prev" title="FB、Goole等平台隐私政策"><i class="fas fa-angle-left fa-fw" aria-hidden="true"></i>FB、Goole等平台隐私政策</a>
+            <a href="/posts/oledb-and-ado-15/" class="next" rel="next" title="OLEDB事务">OLEDB事务<i class="fas fa-angle-right fa-fw" aria-hidden="true"></i></a></div>
+</div>
+</article></div>
+            </main><footer class="footer">
+        <div class="footer-container"><div class="footer-line">Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener noreffer" title="Hugo 0.121.2">Hugo</a> | Theme - <a href="https://github.com/dillonzq/LoveIt" target="_blank" rel="noopener noreffer" title="LoveIt 0.2.11"><i class="far fa-kiss-wink-heart fa-fw" aria-hidden="true"></i> LoveIt</a>
+                </div><div class="footer-line" itemscope itemtype="http://schema.org/CreativeWork"><i class="far fa-copyright fa-fw" aria-hidden="true"></i><span itemprop="copyrightYear">2022 - 2024</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="https://www.masimaro.xyz" target="_blank">Masimaro</a></span></div>
+        </div>
+    </footer></div>
+
+        <div id="fixed-buttons"><a href="#" id="back-to-top" class="fixed-button" title="Back to Top">
+                <i class="fas fa-arrow-up fa-fw" aria-hidden="true"></i>
+            </a><a href="#" id="view-comments" class="fixed-button" title="View Comments">
+                <i class="fas fa-comment fa-fw" aria-hidden="true"></i>
+            </a>
+        </div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.css"><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/autocomplete.js@0.38.1/dist/autocomplete.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lunr@2.3.9/lunr.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lazysizes@5.3.2/lazysizes.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/clipboard@2.0.11/dist/clipboard.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/sharer.js@0.5.1/sharer.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/auto-render.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/copy-tex.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/mhchem.min.js"></script><script type="text/javascript">window.config={"code":{"copyTitle":"Copy to clipboard","maxShownLines":50},"comment":{},"math":{"delimiters":[{"display":true,"left":"$$","right":"$$"},{"display":true,"left":"\\[","right":"\\]"},{"display":true,"left":"\\begin{equation}","right":"\\end{equation}"},{"display":true,"left":"\\begin{equation*}","right":"\\end{equation*}"},{"display":true,"left":"\\begin{align}","right":"\\end{align}"},{"display":true,"left":"\\begin{align*}","right":"\\end{align*}"},{"display":true,"left":"\\begin{alignat}","right":"\\end{alignat}"},{"display":true,"left":"\\begin{alignat*}","right":"\\end{alignat*}"},{"display":true,"left":"\\begin{gather}","right":"\\end{gather}"},{"display":true,"left":"\\begin{CD}","right":"\\end{CD}"},{"display":false,"left":"$","right":"$"},{"display":false,"left":"\\(","right":"\\)"}],"strict":false},"search":{"highlightTag":"em","maxResultLength":10,"noResultsFound":"No results found","snippetLength":50}};</script><script type="text/javascript" src="/js/theme.min.js"></script></body>
+</html>

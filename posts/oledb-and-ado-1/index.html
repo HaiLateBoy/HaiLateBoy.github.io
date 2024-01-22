@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="robots" content="noodp" />
+        <title>Windows数据库编程接口简介 - Masimaro&#39;s blog</title><meta name="Description" content="这是我用于记录日常和学习的小站"><meta property="og:title" content="Windows数据库编程接口简介" />
+<meta property="og:description" content="数据库是计算机中一种专门管理数据资源的系统，目前几乎所有软件都需要与数据库打交道（包括操作系统，比如Windows上的注册表其实也是一种数据库），有些软件更是以数据库为核心因此掌握数据库系统的使用方法以及数据库系统编程接口的使用方法是程序员非常重要的基本技能之一。所以我花了一定的时间学习了在Windows平台上使用COM接口的方式操作数据库。这段时间我会将自己学习过程中掌握的知识和其中的一些坑都发布出来，供个人参考，也方便他人学习" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://HaiLateBoy.github.io/posts/oledb-and-ado-1/" /><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2018-01-06T17:04:13+00:00" />
+<meta property="article:modified_time" content="2018-01-06T17:04:13+00:00" /><meta property="og:site_name" content="Masimaro&#39;s blog" />
+
+<meta name="twitter:card" content="summary"/><meta name="twitter:title" content="Windows数据库编程接口简介"/>
+<meta name="twitter:description" content="数据库是计算机中一种专门管理数据资源的系统，目前几乎所有软件都需要与数据库打交道（包括操作系统，比如Windows上的注册表其实也是一种数据库），有些软件更是以数据库为核心因此掌握数据库系统的使用方法以及数据库系统编程接口的使用方法是程序员非常重要的基本技能之一。所以我花了一定的时间学习了在Windows平台上使用COM接口的方式操作数据库。这段时间我会将自己学习过程中掌握的知识和其中的一些坑都发布出来，供个人参考，也方便他人学习"/>
+<meta name="application-name" content="My cool site">
+<meta name="apple-mobile-web-app-title" content="My cool site"><meta name="theme-color" content="#ffffff"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="manifest" href="/site.webmanifest"><link rel="canonical" href="http://HaiLateBoy.github.io/posts/oledb-and-ado-1/" /><link rel="prev" href="http://HaiLateBoy.github.io/posts/c-switch-if/" /><link rel="next" href="http://HaiLateBoy.github.io/posts/add-baidushare/" /><link rel="stylesheet" href="/css/style.min.css"><link rel="preload" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css"></noscript><link rel="preload" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css"></noscript><script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "BlogPosting",
+        "headline": "Windows数据库编程接口简介",
+        "inLanguage": "zh-CN",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "http:\/\/HaiLateBoy.github.io\/posts\/oledb-and-ado-1\/"
+        },"genre": "posts","keywords": "OLEDB, 数据库编程, VC\u002b\u002b, 数据库","wordcount":  1369 ,
+        "url": "http:\/\/HaiLateBoy.github.io\/posts\/oledb-and-ado-1\/","datePublished": "2018-01-06T17:04:13+00:00","dateModified": "2018-01-06T17:04:13+00:00","publisher": {
+            "@type": "Organization",
+            "name": ""},"author": {
+                "@type": "Person",
+                "name": "Masimaro"
+            },"description": ""
+    }
+    </script></head>
+    <body data-header-desktop="fixed" data-header-mobile="auto"><script type="text/javascript">(window.localStorage && localStorage.getItem('theme') ? localStorage.getItem('theme') === 'dark' : ('auto' === 'auto' ? window.matchMedia('(prefers-color-scheme: dark)').matches : 'auto' === 'dark')) && document.body.setAttribute('theme', 'dark');</script>
+
+        <div id="mask"></div><div class="wrapper"><header class="desktop" id="header-desktop">
+    <div class="header-wrapper">
+        <div class="header-title">
+            <a href="/" title="Masimaro&#39;s blog">My cool site</a>
+        </div>
+        <div class="menu">
+            <div class="menu-inner"><a class="menu-item" href="/posts/" title="文章列表"> 文章 </a><a class="menu-item" href="/tags/" title="标签"> 标签 </a><a class="menu-item" href="/categories/" title="分类"> 分类 </a><a class="menu-item" href="/about" title="关于本站"> 关于 </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-desktop">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-desktop" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-desktop" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-desktop">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </span><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                    <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+                </a></div>
+        </div>
+    </div>
+</header><header class="mobile" id="header-mobile">
+    <div class="header-container">
+        <div class="header-wrapper">
+            <div class="header-title">
+                <a href="/" title="Masimaro&#39;s blog">My cool site</a>
+            </div>
+            <div class="menu-toggle" id="menu-toggle-mobile">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+        <div class="menu" id="menu-mobile"><div class="search-wrapper">
+                    <div class="search mobile" id="search-mobile">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-mobile">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-mobile" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-mobile" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-mobile">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </div>
+                    <a href="javascript:void(0);" class="search-cancel" id="search-cancel-mobile">
+                        Cancel
+                    </a>
+                </div><a class="menu-item" href="/posts/" title="文章列表">文章</a><a class="menu-item" href="/tags/" title="标签">标签</a><a class="menu-item" href="/categories/" title="分类">分类</a><a class="menu-item" href="/about" title="关于本站">关于</a><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+            </a></div>
+    </div>
+</header><div class="search-dropdown desktop">
+        <div id="search-dropdown-desktop"></div>
+    </div>
+    <div class="search-dropdown mobile">
+        <div id="search-dropdown-mobile"></div>
+    </div><main class="main">
+                <div class="container"><div class="toc" id="toc-auto">
+            <h2 class="toc-title">Contents</h2>
+            <div class="toc-content" id="toc-content-auto"></div>
+        </div><article class="page single"><h1 class="single-title animate__animated animate__flipInX">Windows数据库编程接口简介</h1><div class="post-meta">
+            <div class="post-meta-line"><span class="post-author"><a href="https://www.masimaro.xyz" title="Author" target="_blank" rel="noopener noreffer author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Masimaro</a></span>&nbsp;<span class="post-category">included in <a href="/categories/windows-%E6%95%B0%E6%8D%AE%E5%BA%93%E7%BC%96%E7%A8%8B/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>windows 数据库编程</a></span></div>
+            <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw" aria-hidden="true"></i>&nbsp;<time datetime="2018-01-06">2018-01-06</time>&nbsp;<i class="fas fa-pencil-alt fa-fw" aria-hidden="true"></i>&nbsp;1369 words&nbsp;
+                <i class="far fa-clock fa-fw" aria-hidden="true"></i>&nbsp;3 minutes&nbsp;</div>
+        </div><div class="details toc" id="toc-static"  data-kept="true">
+                <div class="details-summary toc-title">
+                    <span>Contents</span>
+                    <span><i class="details-icon fas fa-angle-right" aria-hidden="true"></i></span>
+                </div>
+                <div class="details-content toc-content" id="toc-content-static"><nav id="TableOfContents"></nav></div>
+            </div><div class="content" id="content"><p>数据库是计算机中一种专门管理数据资源的系统，目前几乎所有软件都需要与数据库打交道（包括操作系统，比如Windows上的注册表其实也是一种数据库），有些软件更是以数据库为核心因此掌握数据库系统的使用方法以及数据库系统编程接口的使用方法是程序员非常重要的基本技能之一。所以我花了一定的时间学习了在Windows平台上使用COM接口的方式操作数据库。这段时间我会将自己学习过程中掌握的知识和其中的一些坑都发布出来，供个人参考，也方便他人学习</p>
+<p>现在常见的DBMS主要有ORACLE、Sybase、Informix、DB2、Sql Server、Access、Visual Foxpro、MySql。由于目前我主要是在学习Windows平台上的编程技巧，所以这系列的内容将会以Windows平台为主，所以数据库选择了Sql Server，编程接口主要是ADO和OELDB.</p>
+<h1 id="windows平台常见的数据库编程组件">Windows平台常见的数据库编程组件</h1>
+<p>目前Windows平台上主要使用的是ODBC、DAO、RDO、ADO、ADO.NET、OLEDB。
+其他的数据库编程接口由于被微软弃用或者使用人数较少，等等原因我并没有关心他们，目前主要学习的是OLEDB和ADO编程。由于ADO是针对OLEDB进行的在封装的ActiveX控件，掌握了OLEDB，再学习ADO就没有什么难度了，所以我将重点放在OLEDB上，而对于ADO只会简单的进行简单的步骤说明。</p>
+<h1 id="oledb的基本概念">OLEDB的基本概念</h1>
+<ol>
+<li>数据提供者和数据消费者：在OLEDB中将接口两端的软件分别称为数据提供者（一般指数据库这一端，着重与数据的组织存储）和数据消费者（指应用程序这一端，着重与数据库数据的展示与使用）。OELDB是一种针对两头的编程接口，它为数据提供者和消费者分别准备了一组接口，数据提供者主要实现一些接口，用于将数据库中的数据输出到应用程序或者根据应用程序的指令完成数据的操作，而数据消费者主要使用其中提供的编程接口，实现数据的获取或者更新等操作。（我觉得他们二者之间的关系就像是有一套标准的COM接口，一个负责调用，一个负责实现）从本质上说，OLEDB其实就是一个标准的数据库与应用系统间的数据标准交换接口，它的好处就是高效，通用和灵活。</li>
+<li>数据源：一般来讲数据源可以理解为数据提供者或者理解为各个DBMS，但是在ADO中，数据源可以是文本文件，excel或者xml文件</li>
+</ol>
+<h1 id="msdac简介">MSDAC简介</h1>
+<p>MSDAC（Microsoft Data Access Components）微软数据库访问组件，目前MSDAC上主要有ADO、OLEDB、ODBC
+在Windows的MSDN中提供了完整的MSDAC帮助文档，在MSDN中，选择“目录”&ndash;&gt;&ldquo;Win32和COM开发&rdquo;&ndash;&gt;&ldquo;Data Access And Storage&rdquo;&ndash;&gt;&ldquo;Windows Data Access Components SDK&quot;中。它的下层目录就是各种组件的详细文档，它的整体结构如下:
+<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="/oledb-and-ado-1/SDK.PNG"
+        data-srcset="/oledb-and-ado-1/SDK.PNG, /oledb-and-ado-1/SDK.PNG 1.5x, /oledb-and-ado-1/SDK.PNG 2x"
+        data-sizes="auto"
+        alt="/oledb-and-ado-1/SDK.PNG"
+        title="SDK帮助文档" /></p>
+<h1 id="oledb编程的基本思路">OLEDB编程的基本思路</h1>
+<p>OLEDB编程的基本步骤如下：
+<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="/oledb-and-ado-1/OLEDB.png"
+        data-srcset="/oledb-and-ado-1/OLEDB.png, /oledb-and-ado-1/OLEDB.png 1.5x, /oledb-and-ado-1/OLEDB.png 2x"
+        data-sizes="auto"
+        alt="/oledb-and-ado-1/OLEDB.png"
+        title="OLEDB编程步骤" /></p>
+<ol>
+<li>首先创建数据源对象，指定链接数据库的相关属性，链接到数据库</li>
+<li>接着创建会话对象</li>
+<li>根据回话对象创建出Command对象</li>
+<li>利用Command对象执行SQL语句，并返回结果集对象</li>
+<li>读取结果集对象中的数据，并输出</li>
+<li>最后关闭所有对象接口，关闭数据库连接
+这些东西在后面的内容中会一一进行详细的说明，这篇博文就这样只开个头。</li>
+</ol></div><div class="post-footer" id="post-footer">
+    <div class="post-info">
+        <div class="post-info-line">
+            <div class="post-info-mod">
+                <span>Updated on 2018-01-06</span>
+            </div></div>
+        <div class="post-info-line">
+            <div class="post-info-md"></div>
+            <div class="post-info-share">
+                <span><a href="javascript:void(0);" title="Share on Twitter" data-sharer="twitter" data-url="http://HaiLateBoy.github.io/posts/oledb-and-ado-1/" data-title="Windows数据库编程接口简介" data-hashtags="OLEDB,数据库编程,VC&#43;&#43;,数据库"><i class="fab fa-twitter fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Facebook" data-sharer="facebook" data-url="http://HaiLateBoy.github.io/posts/oledb-and-ado-1/" data-hashtag="OLEDB"><i class="fab fa-facebook-square fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Hacker News" data-sharer="hackernews" data-url="http://HaiLateBoy.github.io/posts/oledb-and-ado-1/" data-title="Windows数据库编程接口简介"><i class="fab fa-hacker-news fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Line" data-sharer="line" data-url="http://HaiLateBoy.github.io/posts/oledb-and-ado-1/" data-title="Windows数据库编程接口简介"><i data-svg-src="https://cdn.jsdelivr.net/npm/simple-icons@7.3.0/icons/line.svg" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on 微博" data-sharer="weibo" data-url="http://HaiLateBoy.github.io/posts/oledb-and-ado-1/" data-title="Windows数据库编程接口简介"><i class="fab fa-weibo fa-fw" aria-hidden="true"></i></a></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="post-info-more">
+        <section class="post-tags"><i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/oledb/">OLEDB</a>,&nbsp;<a href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93%E7%BC%96%E7%A8%8B/">数据库编程</a>,&nbsp;<a href="/tags/vc&#43;&#43;/">VC&#43;&#43;</a>,&nbsp;<a href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93/">数据库</a></section>
+        <section>
+            <span><a href="javascript:void(0);" onclick="window.history.back();">Back</a></span>&nbsp;|&nbsp;<span><a href="/">Home</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav"><a href="/posts/c-switch-if/" class="prev" rel="prev" title="C语言if、switch原理"><i class="fas fa-angle-left fa-fw" aria-hidden="true"></i>C语言if、switch原理</a>
+            <a href="/posts/add-baidushare/" class="next" rel="next" title="hexo next主题为博客添加分享功能">hexo next主题为博客添加分享功能<i class="fas fa-angle-right fa-fw" aria-hidden="true"></i></a></div>
+</div>
+</article></div>
+            </main><footer class="footer">
+        <div class="footer-container"><div class="footer-line">Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener noreffer" title="Hugo 0.121.2">Hugo</a> | Theme - <a href="https://github.com/dillonzq/LoveIt" target="_blank" rel="noopener noreffer" title="LoveIt 0.2.11"><i class="far fa-kiss-wink-heart fa-fw" aria-hidden="true"></i> LoveIt</a>
+                </div><div class="footer-line" itemscope itemtype="http://schema.org/CreativeWork"><i class="far fa-copyright fa-fw" aria-hidden="true"></i><span itemprop="copyrightYear">2022 - 2024</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="https://www.masimaro.xyz" target="_blank">Masimaro</a></span></div>
+        </div>
+    </footer></div>
+
+        <div id="fixed-buttons"><a href="#" id="back-to-top" class="fixed-button" title="Back to Top">
+                <i class="fas fa-arrow-up fa-fw" aria-hidden="true"></i>
+            </a><a href="#" id="view-comments" class="fixed-button" title="View Comments">
+                <i class="fas fa-comment fa-fw" aria-hidden="true"></i>
+            </a>
+        </div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.css"><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/autocomplete.js@0.38.1/dist/autocomplete.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lunr@2.3.9/lunr.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lazysizes@5.3.2/lazysizes.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/clipboard@2.0.11/dist/clipboard.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/sharer.js@0.5.1/sharer.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/auto-render.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/copy-tex.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/mhchem.min.js"></script><script type="text/javascript">window.config={"code":{"copyTitle":"Copy to clipboard","maxShownLines":50},"comment":{},"math":{"delimiters":[{"display":true,"left":"$$","right":"$$"},{"display":true,"left":"\\[","right":"\\]"},{"display":true,"left":"\\begin{equation}","right":"\\end{equation}"},{"display":true,"left":"\\begin{equation*}","right":"\\end{equation*}"},{"display":true,"left":"\\begin{align}","right":"\\end{align}"},{"display":true,"left":"\\begin{align*}","right":"\\end{align*}"},{"display":true,"left":"\\begin{alignat}","right":"\\end{alignat}"},{"display":true,"left":"\\begin{alignat*}","right":"\\end{alignat*}"},{"display":true,"left":"\\begin{gather}","right":"\\end{gather}"},{"display":true,"left":"\\begin{CD}","right":"\\end{CD}"},{"display":false,"left":"$","right":"$"},{"display":false,"left":"\\(","right":"\\)"}],"strict":false},"search":{"highlightTag":"em","maxResultLength":10,"noResultsFound":"No results found","snippetLength":50}};</script><script type="text/javascript" src="/js/theme.min.js"></script></body>
+</html>

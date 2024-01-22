@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="robots" content="noodp" />
+        <title>VC 在调用main函数之前的操作 - Masimaro&#39;s blog</title><meta name="Description" content="这是我用于记录日常和学习的小站"><meta property="og:title" content="VC 在调用main函数之前的操作" />
+<meta property="og:description" content="在C/C&#43;&#43;语言中规定，程序是从main函数开始，也就是C/C&#43;&#43;语言中以main函数作为程序的入口，但是操作系统是如何加载这个main函数" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://HaiLateBoy.github.io/posts/post-before-call-main/" /><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2018-09-16T10:36:23+00:00" />
+<meta property="article:modified_time" content="2018-09-16T10:36:23+00:00" /><meta property="og:site_name" content="Masimaro&#39;s blog" />
+
+<meta name="twitter:card" content="summary"/><meta name="twitter:title" content="VC 在调用main函数之前的操作"/>
+<meta name="twitter:description" content="在C/C&#43;&#43;语言中规定，程序是从main函数开始，也就是C/C&#43;&#43;语言中以main函数作为程序的入口，但是操作系统是如何加载这个main函数"/>
+<meta name="application-name" content="My cool site">
+<meta name="apple-mobile-web-app-title" content="My cool site"><meta name="theme-color" content="#ffffff"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="manifest" href="/site.webmanifest"><link rel="canonical" href="http://HaiLateBoy.github.io/posts/post-before-call-main/" /><link rel="prev" href="http://HaiLateBoy.github.io/posts/code-inject/" /><link rel="next" href="http://HaiLateBoy.github.io/posts/xampp-mysql-configure/" /><link rel="stylesheet" href="/css/style.min.css"><link rel="preload" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css"></noscript><link rel="preload" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css"></noscript><script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "BlogPosting",
+        "headline": "VC 在调用main函数之前的操作",
+        "inLanguage": "zh-CN",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "http:\/\/HaiLateBoy.github.io\/posts\/post-before-call-main\/"
+        },"genre": "posts","keywords": "VC\u002b\u002b, 反汇编, C\u002b\u002b实现原理","wordcount":  1837 ,
+        "url": "http:\/\/HaiLateBoy.github.io\/posts\/post-before-call-main\/","datePublished": "2018-09-16T10:36:23+00:00","dateModified": "2018-09-16T10:36:23+00:00","publisher": {
+            "@type": "Organization",
+            "name": ""},"author": {
+                "@type": "Person",
+                "name": "Masimaro"
+            },"description": ""
+    }
+    </script></head>
+    <body data-header-desktop="fixed" data-header-mobile="auto"><script type="text/javascript">(window.localStorage && localStorage.getItem('theme') ? localStorage.getItem('theme') === 'dark' : ('auto' === 'auto' ? window.matchMedia('(prefers-color-scheme: dark)').matches : 'auto' === 'dark')) && document.body.setAttribute('theme', 'dark');</script>
+
+        <div id="mask"></div><div class="wrapper"><header class="desktop" id="header-desktop">
+    <div class="header-wrapper">
+        <div class="header-title">
+            <a href="/" title="Masimaro&#39;s blog">My cool site</a>
+        </div>
+        <div class="menu">
+            <div class="menu-inner"><a class="menu-item" href="/posts/" title="文章列表"> 文章 </a><a class="menu-item" href="/tags/" title="标签"> 标签 </a><a class="menu-item" href="/categories/" title="分类"> 分类 </a><a class="menu-item" href="/about" title="关于本站"> 关于 </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-desktop">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-desktop" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-desktop" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-desktop">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </span><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                    <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+                </a></div>
+        </div>
+    </div>
+</header><header class="mobile" id="header-mobile">
+    <div class="header-container">
+        <div class="header-wrapper">
+            <div class="header-title">
+                <a href="/" title="Masimaro&#39;s blog">My cool site</a>
+            </div>
+            <div class="menu-toggle" id="menu-toggle-mobile">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+        <div class="menu" id="menu-mobile"><div class="search-wrapper">
+                    <div class="search mobile" id="search-mobile">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-mobile">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-mobile" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-mobile" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-mobile">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </div>
+                    <a href="javascript:void(0);" class="search-cancel" id="search-cancel-mobile">
+                        Cancel
+                    </a>
+                </div><a class="menu-item" href="/posts/" title="文章列表">文章</a><a class="menu-item" href="/tags/" title="标签">标签</a><a class="menu-item" href="/categories/" title="分类">分类</a><a class="menu-item" href="/about" title="关于本站">关于</a><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+            </a></div>
+    </div>
+</header><div class="search-dropdown desktop">
+        <div id="search-dropdown-desktop"></div>
+    </div>
+    <div class="search-dropdown mobile">
+        <div id="search-dropdown-mobile"></div>
+    </div><main class="main">
+                <div class="container"><div class="toc" id="toc-auto">
+            <h2 class="toc-title">Contents</h2>
+            <div class="toc-content" id="toc-content-auto"></div>
+        </div><article class="page single"><h1 class="single-title animate__animated animate__flipInX">VC 在调用main函数之前的操作</h1><div class="post-meta">
+            <div class="post-meta-line"><span class="post-author"><a href="https://www.masimaro.xyz" title="Author" target="_blank" rel="noopener noreffer author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Masimaro</a></span>&nbsp;<span class="post-category">included in <a href="/categories/vc++%E5%8F%8D%E6%B1%87%E7%BC%96%E5%88%86%E6%9E%90/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>VC++反汇编分析</a></span></div>
+            <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw" aria-hidden="true"></i>&nbsp;<time datetime="2018-09-16">2018-09-16</time>&nbsp;<i class="fas fa-pencil-alt fa-fw" aria-hidden="true"></i>&nbsp;1837 words&nbsp;
+                <i class="far fa-clock fa-fw" aria-hidden="true"></i>&nbsp;4 minutes&nbsp;</div>
+        </div><div class="details toc" id="toc-static"  data-kept="true">
+                <div class="details-summary toc-title">
+                    <span>Contents</span>
+                    <span><i class="details-icon fas fa-angle-right" aria-hidden="true"></i></span>
+                </div>
+                <div class="details-content toc-content" id="toc-content-static"><nav id="TableOfContents"></nav></div>
+            </div><div class="content" id="content"><p>在C/C++语言中规定，程序是从main函数开始，也就是C/C++语言中以main函数作为程序的入口，但是操作系统是如何加载这个main函数的呢，程序真正的入口是否是main函数呢？本文主要围绕这个主题，通过逆向的方式来探讨这个问题。本文的所有环境都是在xp上的，IDE主要使用IDA 与 VC++ 6.0。为何不选更高版本的编译器，为何不在Windows 7或者更高版本的Windows上实验呢？我觉得主要是VC6更能体现程序的原始行为，想一些更高版本的VS 它可能会做一些优化与检查，从而造成反汇编生成的代码过于复杂不利于学习，当逆向的功力更深之后肯定得去分析新版本VS 生成的代码，至于现在，我的水平不够只能看看VC6 生成的代码</p>
+<!-- raw HTML omitted -->
+<p>首先通过VC 6编写这么一个简单的程序</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;stdio.h&gt;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;windows.h&gt;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;tchar.h&gt;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp"></span>
+</span></span><span class="line"><span class="cl"><span class="kt">int</span> <span class="nf">main</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">	<span class="kt">wchar_t</span> <span class="n">str</span><span class="p">[]</span> <span class="o">=</span> <span class="sa">L</span><span class="s">&#34;hello world&#34;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">size_t</span> <span class="n">s</span> <span class="o">=</span> <span class="n">wcslen</span><span class="p">(</span><span class="n">str</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p>通过单步调试，打开VC6 的调用堆栈界面，发现在调用main函数之前还调用了mainCRTStartup 函数:
+<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="/post-before-call-main/callstack.png"
+        data-srcset="/post-before-call-main/callstack.png, /post-before-call-main/callstack.png 1.5x, /post-before-call-main/callstack.png 2x"
+        data-sizes="auto"
+        alt="/post-before-call-main/callstack.png"
+        title="调用堆栈" />
+在VC6 的反汇编窗口中好像不太好找到mainCRTStartup函数的代码，因此在这里改用IDA pro来打开生成的exe，在IDA的 export窗口中双击 mainCRTStartup 函数，代码就会跳转到函数对应的位置。
+<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="/post-before-call-main/get_mainCRTStartup.png"
+        data-srcset="/post-before-call-main/get_mainCRTStartup.png, /post-before-call-main/get_mainCRTStartup.png 1.5x, /post-before-call-main/get_mainCRTStartup.png 2x"
+        data-sizes="auto"
+        alt="/post-before-call-main/get_mainCRTStartup.png"
+        title="找到mainCRTStartup 函数代码" />
+它的代码比较长，刚开始也是进行函数的堆栈初始化操作，这个初始化主要是保存原始的ebp，保存重要寄存器的值，并且改变ESP的指针值初始化函数堆栈，这些就不详细说明了，感兴趣的可以去看看我之前写的关于函数反汇编分析的内容：
+<a href="http://masimaroweb.com/c-function-principle.html" target="_blank" rel="noopener noreffer ">C函数原理</a></p>
+<p>在初始化完成之后，它有这样的汇编代码</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-asm" data-lang="asm"><span class="line"><span class="cl"><span class="nl">.text:</span><span class="err">004010</span><span class="nf">EA</span>                 <span class="no">push</span>    <span class="no">offset</span> <span class="no">__except_handler3</span>
+</span></span><span class="line"><span class="cl"><span class="nl">.text:</span><span class="err">004010</span><span class="nf">EF</span>                 <span class="no">mov</span>     <span class="no">eax</span><span class="p">,</span> <span class="no">large</span> <span class="no">fs</span><span class="p">:</span><span class="mi">0</span>
+</span></span><span class="line"><span class="cl"><span class="nl">.text:</span><span class="err">004010</span><span class="nf">F5</span>                 <span class="no">push</span>    <span class="no">eax</span>
+</span></span><span class="line"><span class="cl"><span class="nl">.text:</span><span class="err">004010</span><span class="nf">F6</span>                 <span class="no">mov</span>     <span class="no">large</span> <span class="no">fs</span><span class="p">:</span><span class="mi">0</span><span class="p">,</span> <span class="no">esp</span>
+</span></span></code></pre></div><p>这段代码主要是用来注册主线程的的异常处理函数的，为什么它这里的4行代码就可以设置线程的异常处理函数呢？这得从SEH的结构说起。</p>
+<p>每个线程都有自己的SEH链，当发生异常的时候会调用链中存储的处理函数，然后根据处理函数的返回来确定是继续运行原先的代码，还是停止程序还是继续将异常传递下去。这个链表信息保存在每个线程的NT_TIB结构中，这个结构每个线程都有，用来记录当前线程的相关内容，以便在进行线程切换的时候做数据备份和恢复。当然不是所有的线程数据都保存在这个结构中，它只保留部分。该结构的定义如下:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="k">typedef</span> <span class="k">struct</span> <span class="nc">_NT_TIB</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">     <span class="n">PEXCEPTION_REGISTRATION_RECORD</span> <span class="n">ExceptionList</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">     <span class="n">PVOID</span> <span class="n">StackBase</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">     <span class="n">PVOID</span> <span class="n">StackLimit</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">     <span class="n">PVOID</span> <span class="n">SubSystemTib</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">     <span class="k">union</span>
+</span></span><span class="line"><span class="cl">     <span class="p">{</span>
+</span></span><span class="line"><span class="cl">          <span class="n">PVOID</span> <span class="n">FiberData</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">          <span class="n">ULONG</span> <span class="n">Version</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">     <span class="p">};</span>
+</span></span><span class="line"><span class="cl">     <span class="n">PVOID</span> <span class="n">ArbitraryUserPointer</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">     <span class="n">PNT_TIB</span> <span class="n">Self</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span> <span class="n">NT_TIB</span><span class="p">,</span> <span class="o">*</span><span class="n">PNT_TIB</span><span class="p">;</span>
+</span></span></code></pre></div><p>这个结构的第一个参数是一个异常处理链的链表头指针，链表结构的定义如下:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="k">typedef</span> <span class="k">struct</span> <span class="nc">_EXCEPTION_REGISTRATION_RECORD</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">     <span class="n">PEXCEPTION_REGISTRATION_RECORD</span> <span class="n">Next</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">     <span class="n">PEXCEPTION_DISPOSITION</span> <span class="n">Handler</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span> <span class="n">EXCEPTION_REGISTRATION_RECORD</span><span class="p">,</span> <span class="o">*</span><span class="n">PEXCEPTION_REGISTRATION_RECORD</span><span class="p">;</span>
+</span></span></code></pre></div><p>这个结构很简单的定义了一个链表，第一个成员是指向下一个节点的指针，第二个参数是一个异常处理函数的指针，当发生异常的时候会去调用这个函数。而这个链表的头指针被存到fs寄存器中</p>
+<p>知道了这点之后再来看这段代码，首先将异常函数入栈，然后将之前的链表头指针入栈，这样就组成了一个EXCEPTION_REGISTRATION_RECORD结构的节点而这个节点的指针现在就是ESP中保存的值，之后再将链表的头指针更新，也就是最后一句对fs的重新赋值，这是一个典型的使用头插法新增链表节点的操作。通过这样的几句代码就向主线程中注入了一个新的异常处理函数。</p>
+<p>之后就是进行各种初始化的操作，调用GetVersion 获取版本号，调用 __heap_init 函数初始化C运行时的堆栈，这个函数后面有一个 esp + 4的操作，这里可以看出这个函数是由调用者来做堆栈平衡的，也就是说它并不是Windows提供的api函数（API函数一般都是stdcall的方式调用，并且命名采用驼峰的方式命名）。调用GetCommandLineA函数获取命令行参数，调用 GetEnvironmentStringsA 函数获取系统环境变量，最后有这么几句话:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="p">.</span><span class="nl">text</span><span class="p">:</span><span class="mo">004011</span><span class="n">B0</span>                 <span class="n">mov</span>     <span class="n">edx</span><span class="p">,</span> <span class="n">__environ</span>
+</span></span><span class="line"><span class="cl"><span class="p">.</span><span class="nl">text</span><span class="p">:</span><span class="mo">004011</span><span class="n">B6</span>                 <span class="n">push</span>    <span class="n">edx</span>             <span class="p">;</span> <span class="n">envp</span>
+</span></span><span class="line"><span class="cl"><span class="p">.</span><span class="nl">text</span><span class="p">:</span><span class="mo">004011</span><span class="n">B7</span>                 <span class="n">mov</span>     <span class="n">eax</span><span class="p">,</span> <span class="n">___argv</span>
+</span></span><span class="line"><span class="cl"><span class="p">.</span><span class="nl">text</span><span class="p">:</span><span class="mo">004011</span><span class="n">BC</span>                 <span class="n">push</span>    <span class="n">eax</span>             <span class="p">;</span> <span class="n">argv</span>
+</span></span><span class="line"><span class="cl"><span class="p">.</span><span class="nl">text</span><span class="p">:</span><span class="mo">004011</span><span class="n">BD</span>                 <span class="n">mov</span>     <span class="n">ecx</span><span class="p">,</span> <span class="n">___argc</span>
+</span></span><span class="line"><span class="cl"><span class="p">.</span><span class="nl">text</span><span class="p">:</span><span class="mo">004011</span><span class="n">C3</span>                 <span class="n">push</span>    <span class="n">ecx</span>             <span class="p">;</span> <span class="n">argc</span>
+</span></span><span class="line"><span class="cl"><span class="p">.</span><span class="nl">text</span><span class="p">:</span><span class="mo">004011</span><span class="n">C4</span>                 <span class="n">call</span>    <span class="n">_main_0</span>
+</span></span></code></pre></div><p>这段代码将环境变量、命令行参数和参数个数作为参数传入main函数中。 在C语言中规定了main函数的三种形式，但是从这段代码上看，不管使用哪种形式，这三个参数都会被传入，程序员使用哪种形式的main函数并不影响在VC环境在调用main函数时的传参。只是我们代码中不使用这些变量罢了。</p>
+<p>到此，这篇博文简单的介绍了下在调用main函数之前执行的相关操作，这些汇编代码其实很容易理解，只是在注册异常的代码有点难懂。最后总结一下在调用main函数之前的相关操作</p>
+<ol>
+<li>注册异常处理函数</li>
+<li>调用GetVersion 获取版本信息</li>
+<li>调用函数 __heap_init初始化堆栈</li>
+<li>调用 __ioinit函数初始化啊IO环境，这个函数主要在初始化控制台信息，在未调用这个函数之前是不能进行printf的</li>
+<li>调用 GetCommandLineA函数获取命令行参数</li>
+<li>调用 GetEnvironmentStringsA 函数获取环境变量</li>
+<li>调用main函数</li>
+</ol>
+<!-- raw HTML omitted -->
+</div><div class="post-footer" id="post-footer">
+    <div class="post-info">
+        <div class="post-info-line">
+            <div class="post-info-mod">
+                <span>Updated on 2018-09-16</span>
+            </div></div>
+        <div class="post-info-line">
+            <div class="post-info-md"></div>
+            <div class="post-info-share">
+                <span><a href="javascript:void(0);" title="Share on Twitter" data-sharer="twitter" data-url="http://HaiLateBoy.github.io/posts/post-before-call-main/" data-title="VC 在调用main函数之前的操作" data-hashtags="VC&#43;&#43;,反汇编,C&#43;&#43;实现原理"><i class="fab fa-twitter fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Facebook" data-sharer="facebook" data-url="http://HaiLateBoy.github.io/posts/post-before-call-main/" data-hashtag="VC&#43;&#43;"><i class="fab fa-facebook-square fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Hacker News" data-sharer="hackernews" data-url="http://HaiLateBoy.github.io/posts/post-before-call-main/" data-title="VC 在调用main函数之前的操作"><i class="fab fa-hacker-news fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Line" data-sharer="line" data-url="http://HaiLateBoy.github.io/posts/post-before-call-main/" data-title="VC 在调用main函数之前的操作"><i data-svg-src="https://cdn.jsdelivr.net/npm/simple-icons@7.3.0/icons/line.svg" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on 微博" data-sharer="weibo" data-url="http://HaiLateBoy.github.io/posts/post-before-call-main/" data-title="VC 在调用main函数之前的操作"><i class="fab fa-weibo fa-fw" aria-hidden="true"></i></a></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="post-info-more">
+        <section class="post-tags"><i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/vc&#43;&#43;/">VC&#43;&#43;</a>,&nbsp;<a href="/tags/%E5%8F%8D%E6%B1%87%E7%BC%96/">反汇编</a>,&nbsp;<a href="/tags/c&#43;&#43;%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86/">C&#43;&#43;实现原理</a></section>
+        <section>
+            <span><a href="javascript:void(0);" onclick="window.history.back();">Back</a></span>&nbsp;|&nbsp;<span><a href="/">Home</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav"><a href="/posts/code-inject/" class="prev" rel="prev" title="Windows下的代码注入"><i class="fas fa-angle-left fa-fw" aria-hidden="true"></i>Windows下的代码注入</a>
+            <a href="/posts/xampp-mysql-configure/" class="next" rel="next" title="xampp 中 mysql的相关配置">xampp 中 mysql的相关配置<i class="fas fa-angle-right fa-fw" aria-hidden="true"></i></a></div>
+</div>
+</article></div>
+            </main><footer class="footer">
+        <div class="footer-container"><div class="footer-line">Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener noreffer" title="Hugo 0.121.2">Hugo</a> | Theme - <a href="https://github.com/dillonzq/LoveIt" target="_blank" rel="noopener noreffer" title="LoveIt 0.2.11"><i class="far fa-kiss-wink-heart fa-fw" aria-hidden="true"></i> LoveIt</a>
+                </div><div class="footer-line" itemscope itemtype="http://schema.org/CreativeWork"><i class="far fa-copyright fa-fw" aria-hidden="true"></i><span itemprop="copyrightYear">2022 - 2024</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="https://www.masimaro.xyz" target="_blank">Masimaro</a></span></div>
+        </div>
+    </footer></div>
+
+        <div id="fixed-buttons"><a href="#" id="back-to-top" class="fixed-button" title="Back to Top">
+                <i class="fas fa-arrow-up fa-fw" aria-hidden="true"></i>
+            </a><a href="#" id="view-comments" class="fixed-button" title="View Comments">
+                <i class="fas fa-comment fa-fw" aria-hidden="true"></i>
+            </a>
+        </div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.css"><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/autocomplete.js@0.38.1/dist/autocomplete.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lunr@2.3.9/lunr.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lazysizes@5.3.2/lazysizes.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/clipboard@2.0.11/dist/clipboard.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/sharer.js@0.5.1/sharer.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/auto-render.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/copy-tex.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/mhchem.min.js"></script><script type="text/javascript">window.config={"code":{"copyTitle":"Copy to clipboard","maxShownLines":50},"comment":{},"math":{"delimiters":[{"display":true,"left":"$$","right":"$$"},{"display":true,"left":"\\[","right":"\\]"},{"display":true,"left":"\\begin{equation}","right":"\\end{equation}"},{"display":true,"left":"\\begin{equation*}","right":"\\end{equation*}"},{"display":true,"left":"\\begin{align}","right":"\\end{align}"},{"display":true,"left":"\\begin{align*}","right":"\\end{align*}"},{"display":true,"left":"\\begin{alignat}","right":"\\end{alignat}"},{"display":true,"left":"\\begin{alignat*}","right":"\\end{alignat*}"},{"display":true,"left":"\\begin{gather}","right":"\\end{gather}"},{"display":true,"left":"\\begin{CD}","right":"\\end{CD}"},{"display":false,"left":"$","right":"$"},{"display":false,"left":"\\(","right":"\\)"}],"strict":false},"search":{"highlightTag":"em","maxResultLength":10,"noResultsFound":"No results found","snippetLength":50}};</script><script type="text/javascript" src="/js/theme.min.js"></script></body>
+</html>

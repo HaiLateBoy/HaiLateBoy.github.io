@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="robots" content="noodp" />
+        <title>IO库 - Masimaro&#39;s blog</title><meta name="Description" content="这是我用于记录日常和学习的小站"><meta property="og:title" content="IO库" />
+<meta property="og:description" content="c&#43;&#43; 语言中不直接处理输入和输出，而是通过一族定义在标准库中的类型来处理IO，这些类型支持从设备读取数据、向设备写入数据的IO操作。设备可以是文" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://HaiLateBoy.github.io/posts/cpp-base-7/" /><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2021-04-04T13:41:11+00:00" />
+<meta property="article:modified_time" content="2021-04-04T13:41:11+00:00" /><meta property="og:site_name" content="Masimaro&#39;s blog" />
+
+<meta name="twitter:card" content="summary"/><meta name="twitter:title" content="IO库"/>
+<meta name="twitter:description" content="c&#43;&#43; 语言中不直接处理输入和输出，而是通过一族定义在标准库中的类型来处理IO，这些类型支持从设备读取数据、向设备写入数据的IO操作。设备可以是文"/>
+<meta name="application-name" content="My cool site">
+<meta name="apple-mobile-web-app-title" content="My cool site"><meta name="theme-color" content="#ffffff"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="manifest" href="/site.webmanifest"><link rel="canonical" href="http://HaiLateBoy.github.io/posts/cpp-base-7/" /><link rel="prev" href="http://HaiLateBoy.github.io/posts/cpp-base-6/" /><link rel="next" href="http://HaiLateBoy.github.io/posts/cpp-base-8/" /><link rel="stylesheet" href="/css/style.min.css"><link rel="preload" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css"></noscript><link rel="preload" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css"></noscript><script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "BlogPosting",
+        "headline": "IO库",
+        "inLanguage": "zh-CN",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "http:\/\/HaiLateBoy.github.io\/posts\/cpp-base-7\/"
+        },"genre": "posts","keywords": "C\u002b\u002b, 语法, 基础, c\u002b\u002b11","wordcount":  1905 ,
+        "url": "http:\/\/HaiLateBoy.github.io\/posts\/cpp-base-7\/","datePublished": "2021-04-04T13:41:11+00:00","dateModified": "2021-04-04T13:41:11+00:00","publisher": {
+            "@type": "Organization",
+            "name": ""},"author": {
+                "@type": "Person",
+                "name": "Masimaro"
+            },"description": ""
+    }
+    </script></head>
+    <body data-header-desktop="fixed" data-header-mobile="auto"><script type="text/javascript">(window.localStorage && localStorage.getItem('theme') ? localStorage.getItem('theme') === 'dark' : ('auto' === 'auto' ? window.matchMedia('(prefers-color-scheme: dark)').matches : 'auto' === 'dark')) && document.body.setAttribute('theme', 'dark');</script>
+
+        <div id="mask"></div><div class="wrapper"><header class="desktop" id="header-desktop">
+    <div class="header-wrapper">
+        <div class="header-title">
+            <a href="/" title="Masimaro&#39;s blog">My cool site</a>
+        </div>
+        <div class="menu">
+            <div class="menu-inner"><a class="menu-item" href="/posts/" title="文章列表"> 文章 </a><a class="menu-item" href="/tags/" title="标签"> 标签 </a><a class="menu-item" href="/categories/" title="分类"> 分类 </a><a class="menu-item" href="/about" title="关于本站"> 关于 </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-desktop">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-desktop" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-desktop" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-desktop">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </span><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                    <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+                </a></div>
+        </div>
+    </div>
+</header><header class="mobile" id="header-mobile">
+    <div class="header-container">
+        <div class="header-wrapper">
+            <div class="header-title">
+                <a href="/" title="Masimaro&#39;s blog">My cool site</a>
+            </div>
+            <div class="menu-toggle" id="menu-toggle-mobile">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+        <div class="menu" id="menu-mobile"><div class="search-wrapper">
+                    <div class="search mobile" id="search-mobile">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-mobile">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-mobile" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-mobile" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-mobile">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </div>
+                    <a href="javascript:void(0);" class="search-cancel" id="search-cancel-mobile">
+                        Cancel
+                    </a>
+                </div><a class="menu-item" href="/posts/" title="文章列表">文章</a><a class="menu-item" href="/tags/" title="标签">标签</a><a class="menu-item" href="/categories/" title="分类">分类</a><a class="menu-item" href="/about" title="关于本站">关于</a><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+            </a></div>
+    </div>
+</header><div class="search-dropdown desktop">
+        <div id="search-dropdown-desktop"></div>
+    </div>
+    <div class="search-dropdown mobile">
+        <div id="search-dropdown-mobile"></div>
+    </div><main class="main">
+                <div class="container"><div class="toc" id="toc-auto">
+            <h2 class="toc-title">Contents</h2>
+            <div class="toc-content" id="toc-content-auto"></div>
+        </div><article class="page single"><h1 class="single-title animate__animated animate__flipInX">IO库</h1><div class="post-meta">
+            <div class="post-meta-line"><span class="post-author"><a href="https://www.masimaro.xyz" title="Author" target="_blank" rel="noopener noreffer author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Masimaro</a></span>&nbsp;<span class="post-category">included in <a href="/categories/c++/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>C++</a></span></div>
+            <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw" aria-hidden="true"></i>&nbsp;<time datetime="2021-04-04">2021-04-04</time>&nbsp;<i class="fas fa-pencil-alt fa-fw" aria-hidden="true"></i>&nbsp;1905 words&nbsp;
+                <i class="far fa-clock fa-fw" aria-hidden="true"></i>&nbsp;4 minutes&nbsp;</div>
+        </div><div class="details toc" id="toc-static"  data-kept="true">
+                <div class="details-summary toc-title">
+                    <span>Contents</span>
+                    <span><i class="details-icon fas fa-angle-right" aria-hidden="true"></i></span>
+                </div>
+                <div class="details-content toc-content" id="toc-content-static"><nav id="TableOfContents">
+  <ul>
+    <li><a href="#io库">IO库</a>
+      <ul>
+        <li><a href="#io类">IO类</a></li>
+      </ul>
+    </li>
+    <li><a href="#文件io">文件IO</a></li>
+    <li><a href="#string-流">string 流</a></li>
+  </ul>
+</nav></div>
+            </div><div class="content" id="content"><p>c++ 语言中不直接处理输入和输出，而是通过一族定义在标准库中的类型来处理IO，这些类型支持从设备读取数据、向设备写入数据的IO操作。设备可以是文件、控制台窗口等。还有一些IO运行内存IO，即可以从string中读写数据。</p>
+<!-- raw HTML omitted -->
+<h2 id="io库">IO库</h2>
+<h3 id="io类">IO类</h3>
+<p>最开始接触的c++ 中的io是我们从控制台接受输入的istream和输出到控制台中的ostream。除了基本的istream和ostream以外标准库中还定义了如下的基本类型</p>
+<p>iostream 用于读写流的基本类型</p>
+<ol>
+<li>istream、wistream: 从流读取数据</li>
+<li>ostream、wostream: 向流写入数据</li>
+<li>iostream、wiostream：从流中读写数据</li>
+</ol>
+<p>fstream 定义了读写命名文件的类型</p>
+<ol>
+<li>ifstream、wifstream: 从文件中读写数据</li>
+<li>ofstream、wofstream: 向文件中写入数据</li>
+<li>fstream、wfstream: 读写文件</li>
+</ol>
+<p>sstream 定义了读写内存string对象的类型</p>
+<ol>
+<li>istringstream、iwstringstream: 从string中读取数据</li>
+<li>ostringstream、owstringstream: 向string中写入数据</li>
+<li>stringstream、wstringstream: 读写string</li>
+</ol>
+<p>其中带w的都是款字节版本</p>
+<p>无法对io对象进行拷贝或者赋值、因此在函数中无法返回IO类型也无法传递IO类型，只能使用IO类型的引用</p>
+<p>读写一个IO对象会改变其状态，所以在函数中传递和返回IO的对象不能是const的</p>
+<p>一个流如果发生错误，其上后续的IO操作都会失败。只有当一个IO流处于无错误状态时，我们才能从它读取数据。因此代码通常应该在使用一个流之前检查它是否处于良好状态，确定一个流对象的状态最简单的方式是将它作为一个条件来使用。</p>
+<p>作为条件使用只能告诉我们流是否有效，而无法告诉我们具体发生了什么。IO库定义了一组与机器无关的iostate类型，这个类型中使用二进制位来表示每种状态。目前定义了4种错误类型：</p>
+<ol>
+<li>badbit: 流崩溃</li>
+<li>failbit: IO操作失败</li>
+<li>eofbit: 流到达了文件结束位置</li>
+<li>goodbit: 流未处于错误状态</li>
+</ol>
+<p>在实际使用时可以将具体值与这些预定义的值做位与运算，得到具体的原因</p>
+<p>流对象的rstate 成员返回当前流的状态，setstate用来设置流状态。clear不带参用来清理所有错误标志位。clear的带参版本接受一个iostate值，表示流的新状态</p>
+<p>io操作比较耗时，所以操作系统为了效率会提供缓冲机制。输入输出并不是立即执行的，操作系统提供了一个缓冲区，在适当的实际会使用缓冲区的数据，统一执行输入输出操作。导致刷新的原因有很多：</p>
+<ol>
+<li>程序正常结束，在main函数执行return时，会进行刷新操作</li>
+<li>缓冲区满时，会进行换新操作</li>
+<li>程序中使用操作符例如endl来显式的刷新缓冲区</li>
+<li>输出操作结束后，使用操作符unitbuf 设置流的内部状态来清空缓冲区，默认情况下cerr 是设置了unitbuf 的，因此cerr的内容都是实时刷新的</li>
+<li>一个输出流被关联到另一个输出流。当读写被关联到另一个流时，关联到的流的缓冲区会被刷新</li>
+</ol>
+<p>除了使用endl、flush、ends 都可以来刷新缓冲区。endl在刷新的同时会插入换行符，flush则不添加任何字符，ends会添加一个空字符</p>
+<p>如果想在每次输出后都刷新缓冲区，可以使用unitbuf 操作符，它告诉流，每次执行写操作之后都进行一个flush操作</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">unitbuf</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">nounitbuf</span><span class="p">;</span>
+</span></span></code></pre></div><p>如果程序崩溃，缓冲区是不会被刷新的</p>
+<p>标准库是将cin和cout关联到一起了，所以每次执行cin都会导致cout的缓冲区被刷新</p>
+<p>可以使用tie 方法将自身关联到另一个流上。
+tie 带参数的版本，需要传入一个指向ostream 的指针，将自己关联到这个ostream中
+tie 不带参数的版本用来查询自身关联到了哪个输出流上，返回对应输出流的指针，如果未被关联，则返回空指针
+每个输入流最多只能关联到一个输出流，但是多个输入流可以关联到同一个ostream</p>
+<h2 id="文件io">文件IO</h2>
+<p>当我们要读写一个文件时可以使用文件流对象</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="n">ifstream</span> <span class="nf">in</span><span class="p">(</span><span class="n">ifile</span><span class="p">);</span> <span class="c1">//传入文件名，构造一个ifstream 并打开文件
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="n">ofstream</span> <span class="n">out</span><span class="p">;</span> <span class="c1">//定义一个文件输出流，这个流不关联到任何文件
+</span></span></span></code></pre></div><p>当我们定义了空的文件流对象后可以使用open函数将对象和文件关联起来。可以手动调用close函数关闭文件。也可以在fstream对象被销毁时由它的构造函数自动调用close</p>
+<p>每个流都有一个关联的文件模式，用来指出该如何使用文件</p>
+<ol>
+<li>in: 以读的方式打开</li>
+<li>out: 以写的方式打开</li>
+<li>app: 每次写操作前均定位到文件尾部</li>
+<li>ate: 每次打开文件后立即定位到文件尾部</li>
+<li>trunc: 截断文件</li>
+<li>binary：以二进制的形式打开文件</li>
+</ol>
+<h2 id="string-流">string 流</h2>
+<p>当我们的某些工作是对文本进行处理，而其他一些工作是处理行内的单词时通常可以使用 istringstream</p>
+<p>即要在一行字符串中取出单个单词时可以使用字符串流</p>
+<!-- raw HTML omitted -->
+</div><div class="post-footer" id="post-footer">
+    <div class="post-info">
+        <div class="post-info-line">
+            <div class="post-info-mod">
+                <span>Updated on 2021-04-04</span>
+            </div></div>
+        <div class="post-info-line">
+            <div class="post-info-md"></div>
+            <div class="post-info-share">
+                <span><a href="javascript:void(0);" title="Share on Twitter" data-sharer="twitter" data-url="http://HaiLateBoy.github.io/posts/cpp-base-7/" data-title="IO库" data-hashtags="C&#43;&#43;,语法,基础,c&#43;&#43;11"><i class="fab fa-twitter fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Facebook" data-sharer="facebook" data-url="http://HaiLateBoy.github.io/posts/cpp-base-7/" data-hashtag="C&#43;&#43;"><i class="fab fa-facebook-square fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Hacker News" data-sharer="hackernews" data-url="http://HaiLateBoy.github.io/posts/cpp-base-7/" data-title="IO库"><i class="fab fa-hacker-news fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Line" data-sharer="line" data-url="http://HaiLateBoy.github.io/posts/cpp-base-7/" data-title="IO库"><i data-svg-src="https://cdn.jsdelivr.net/npm/simple-icons@7.3.0/icons/line.svg" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on 微博" data-sharer="weibo" data-url="http://HaiLateBoy.github.io/posts/cpp-base-7/" data-title="IO库"><i class="fab fa-weibo fa-fw" aria-hidden="true"></i></a></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="post-info-more">
+        <section class="post-tags"><i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/c&#43;&#43;/">C&#43;&#43;</a>,&nbsp;<a href="/tags/%E8%AF%AD%E6%B3%95/">语法</a>,&nbsp;<a href="/tags/%E5%9F%BA%E7%A1%80/">基础</a>,&nbsp;<a href="/tags/c&#43;&#43;11/">c&#43;&#43;11</a></section>
+        <section>
+            <span><a href="javascript:void(0);" onclick="window.history.back();">Back</a></span>&nbsp;|&nbsp;<span><a href="/">Home</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav"><a href="/posts/cpp-base-6/" class="prev" rel="prev" title="类"><i class="fas fa-angle-left fa-fw" aria-hidden="true"></i>类</a>
+            <a href="/posts/cpp-base-8/" class="next" rel="next" title="顺序容器">顺序容器<i class="fas fa-angle-right fa-fw" aria-hidden="true"></i></a></div>
+</div>
+</article></div>
+            </main><footer class="footer">
+        <div class="footer-container"><div class="footer-line">Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener noreffer" title="Hugo 0.121.2">Hugo</a> | Theme - <a href="https://github.com/dillonzq/LoveIt" target="_blank" rel="noopener noreffer" title="LoveIt 0.2.11"><i class="far fa-kiss-wink-heart fa-fw" aria-hidden="true"></i> LoveIt</a>
+                </div><div class="footer-line" itemscope itemtype="http://schema.org/CreativeWork"><i class="far fa-copyright fa-fw" aria-hidden="true"></i><span itemprop="copyrightYear">2022 - 2024</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="https://www.masimaro.xyz" target="_blank">Masimaro</a></span></div>
+        </div>
+    </footer></div>
+
+        <div id="fixed-buttons"><a href="#" id="back-to-top" class="fixed-button" title="Back to Top">
+                <i class="fas fa-arrow-up fa-fw" aria-hidden="true"></i>
+            </a><a href="#" id="view-comments" class="fixed-button" title="View Comments">
+                <i class="fas fa-comment fa-fw" aria-hidden="true"></i>
+            </a>
+        </div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.css"><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/autocomplete.js@0.38.1/dist/autocomplete.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lunr@2.3.9/lunr.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lazysizes@5.3.2/lazysizes.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/clipboard@2.0.11/dist/clipboard.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/sharer.js@0.5.1/sharer.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/auto-render.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/copy-tex.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/mhchem.min.js"></script><script type="text/javascript">window.config={"code":{"copyTitle":"Copy to clipboard","maxShownLines":50},"comment":{},"math":{"delimiters":[{"display":true,"left":"$$","right":"$$"},{"display":true,"left":"\\[","right":"\\]"},{"display":true,"left":"\\begin{equation}","right":"\\end{equation}"},{"display":true,"left":"\\begin{equation*}","right":"\\end{equation*}"},{"display":true,"left":"\\begin{align}","right":"\\end{align}"},{"display":true,"left":"\\begin{align*}","right":"\\end{align*}"},{"display":true,"left":"\\begin{alignat}","right":"\\end{alignat}"},{"display":true,"left":"\\begin{alignat*}","right":"\\end{alignat*}"},{"display":true,"left":"\\begin{gather}","right":"\\end{gather}"},{"display":true,"left":"\\begin{CD}","right":"\\end{CD}"},{"display":false,"left":"$","right":"$"},{"display":false,"left":"\\(","right":"\\)"}],"strict":false},"search":{"highlightTag":"em","maxResultLength":10,"noResultsFound":"No results found","snippetLength":50}};</script><script type="text/javascript" src="/js/theme.min.js"></script></body>
+</html>

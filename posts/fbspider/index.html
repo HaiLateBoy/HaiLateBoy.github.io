@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="robots" content="noodp" />
+        <title>Facebook 爬虫 - Masimaro&#39;s blog</title><meta name="Description" content="这是我用于记录日常和学习的小站"><meta property="og:title" content="Facebook 爬虫" />
+<meta property="og:description" content="初次接触到scrapy是公司要求编写一个能够解析JavaScript的爬虫爬取链接的时候听过过，当时我当时觉得它并不适合这个项目所以放弃这个" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://HaiLateBoy.github.io/posts/fbspider/" /><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2018-06-02T09:42:06+00:00" />
+<meta property="article:modified_time" content="2018-06-02T09:42:06+00:00" /><meta property="og:site_name" content="Masimaro&#39;s blog" />
+
+<meta name="twitter:card" content="summary"/><meta name="twitter:title" content="Facebook 爬虫"/>
+<meta name="twitter:description" content="初次接触到scrapy是公司要求编写一个能够解析JavaScript的爬虫爬取链接的时候听过过，当时我当时觉得它并不适合这个项目所以放弃这个"/>
+<meta name="application-name" content="My cool site">
+<meta name="apple-mobile-web-app-title" content="My cool site"><meta name="theme-color" content="#ffffff"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="manifest" href="/site.webmanifest"><link rel="canonical" href="http://HaiLateBoy.github.io/posts/fbspider/" /><link rel="prev" href="http://HaiLateBoy.github.io/posts/oledb-and-ado-16/" /><link rel="next" href="http://HaiLateBoy.github.io/posts/winsock-wsaasyncselect/" /><link rel="stylesheet" href="/css/style.min.css"><link rel="preload" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css"></noscript><link rel="preload" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css"></noscript><script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "BlogPosting",
+        "headline": "Facebook 爬虫",
+        "inLanguage": "zh-CN",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "http:\/\/HaiLateBoy.github.io\/posts\/fbspider\/"
+        },"genre": "posts","keywords": "python3, facebook, scrapy, splash, 爬虫","wordcount":  8119 ,
+        "url": "http:\/\/HaiLateBoy.github.io\/posts\/fbspider\/","datePublished": "2018-06-02T09:42:06+00:00","dateModified": "2018-06-02T09:42:06+00:00","publisher": {
+            "@type": "Organization",
+            "name": ""},"author": {
+                "@type": "Person",
+                "name": "Masimaro"
+            },"description": ""
+    }
+    </script></head>
+    <body data-header-desktop="fixed" data-header-mobile="auto"><script type="text/javascript">(window.localStorage && localStorage.getItem('theme') ? localStorage.getItem('theme') === 'dark' : ('auto' === 'auto' ? window.matchMedia('(prefers-color-scheme: dark)').matches : 'auto' === 'dark')) && document.body.setAttribute('theme', 'dark');</script>
+
+        <div id="mask"></div><div class="wrapper"><header class="desktop" id="header-desktop">
+    <div class="header-wrapper">
+        <div class="header-title">
+            <a href="/" title="Masimaro&#39;s blog">My cool site</a>
+        </div>
+        <div class="menu">
+            <div class="menu-inner"><a class="menu-item" href="/posts/" title="文章列表"> 文章 </a><a class="menu-item" href="/tags/" title="标签"> 标签 </a><a class="menu-item" href="/categories/" title="分类"> 分类 </a><a class="menu-item" href="/about" title="关于本站"> 关于 </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-desktop">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-desktop" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-desktop" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-desktop">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </span><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                    <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+                </a></div>
+        </div>
+    </div>
+</header><header class="mobile" id="header-mobile">
+    <div class="header-container">
+        <div class="header-wrapper">
+            <div class="header-title">
+                <a href="/" title="Masimaro&#39;s blog">My cool site</a>
+            </div>
+            <div class="menu-toggle" id="menu-toggle-mobile">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+        <div class="menu" id="menu-mobile"><div class="search-wrapper">
+                    <div class="search mobile" id="search-mobile">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-mobile">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-mobile" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-mobile" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-mobile">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </div>
+                    <a href="javascript:void(0);" class="search-cancel" id="search-cancel-mobile">
+                        Cancel
+                    </a>
+                </div><a class="menu-item" href="/posts/" title="文章列表">文章</a><a class="menu-item" href="/tags/" title="标签">标签</a><a class="menu-item" href="/categories/" title="分类">分类</a><a class="menu-item" href="/about" title="关于本站">关于</a><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+            </a></div>
+    </div>
+</header><div class="search-dropdown desktop">
+        <div id="search-dropdown-desktop"></div>
+    </div>
+    <div class="search-dropdown mobile">
+        <div id="search-dropdown-mobile"></div>
+    </div><main class="main">
+                <div class="container"><div class="toc" id="toc-auto">
+            <h2 class="toc-title">Contents</h2>
+            <div class="toc-content" id="toc-content-auto"></div>
+        </div><article class="page single"><h1 class="single-title animate__animated animate__flipInX">Facebook 爬虫</h1><div class="post-meta">
+            <div class="post-meta-line"><span class="post-author"><a href="https://www.masimaro.xyz" title="Author" target="_blank" rel="noopener noreffer author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Masimaro</a></span>&nbsp;<span class="post-category">included in <a href="/categories/python/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>python</a></span></div>
+            <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw" aria-hidden="true"></i>&nbsp;<time datetime="2018-06-02">2018-06-02</time>&nbsp;<i class="fas fa-pencil-alt fa-fw" aria-hidden="true"></i>&nbsp;8119 words&nbsp;
+                <i class="far fa-clock fa-fw" aria-hidden="true"></i>&nbsp;17 minutes&nbsp;</div>
+        </div><div class="details toc" id="toc-static"  data-kept="true">
+                <div class="details-summary toc-title">
+                    <span>Contents</span>
+                    <span><i class="details-icon fas fa-angle-right" aria-hidden="true"></i></span>
+                </div>
+                <div class="details-content toc-content" id="toc-content-static"><nav id="TableOfContents">
+  <ul>
+    <li><a href="#需求">需求</a></li>
+    <li><a href="#设计与实现">设计与实现</a>
+      <ul>
+        <li><a href="#用户登录">用户登录</a></li>
+        <li><a href="#代理">代理</a></li>
+        <li><a href="#使爬虫保持登录状态">使爬虫保持登录状态</a></li>
+        <li><a href="#获取用户主页面">获取用户主页面</a></li>
+        <li><a href="#获取时间线信息">获取时间线信息</a></li>
+        <li><a href="#获取公共主页的发帖信息">获取公共主页的发帖信息</a></li>
+        <li><a href="#获取好友信息">获取好友信息</a></li>
+      </ul>
+    </li>
+    <li><a href="#反爬虫的相关操作">反爬虫的相关操作</a>
+      <ul>
+        <li><a href="#减少并发数设置发包的延时">减少并发数，设置发包的延时</a></li>
+        <li><a href="#设置代理池">设置代理池</a></li>
+        <li><a href="#设置ua">设置UA</a></li>
+        <li><a href="#设置多用户登录">设置多用户登录</a></li>
+        <li><a href="#设置splashreuqests函数的等待时间">设置SplashReuqests函数的等待时间</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav></div>
+            </div><div class="content" id="content"><p>初次接触到scrapy是公司要求编写一个能够解析JavaScript的爬虫爬取链接的时候听过过，当时我当时觉得它并不适合这个项目所以放弃这个方案，时隔一年多公司有了爬取Facebook用户信息的需求，这样才让我正式接触并使用到scrapy</p>
+<!-- raw HTML omitted -->
+<h2 id="需求">需求</h2>
+<ol>
+<li>首先从文件或者数据库导入第一批用户做为顶层用户，并爬取顶层用户好友的发帖信息包括其中的图片</li>
+<li>将第一步中爬取到的用户好友作为第二层用户并爬取它们的发帖信息和好友信息</li>
+<li>将第二层用户中爬到的好友作为第三层用户并爬取它们的好友信息</li>
+</ol>
+<p>也就是说不断爬取用户的好友和它的发帖信息直到第三层为止</p>
+<p>根据这个需求首先来确定相关方案</p>
+<ol>
+<li>爬虫框架使用scrapy + splash：Facebook中大量采用异步加载，如果简单收发包必定很多内容是解析不到的，因此这里需要一个JavaScript渲染引擎，这个引擎可以使用selenium + chrome(handless) 这套，但是根据网上一位老哥的博客我知道了splash这种东西，在做相关比较之后我选择了使用splash，主要的理由有以下几点:</li>
+</ol>
+<blockquote>
+<p>a. 与selenium比较起来，它的官方文档更为全面<!-- raw HTML omitted -->
+b. 支持异步的方式，这个可以与scrapy的异步回调方式完美结合并充分发挥性能<!-- raw HTML omitted -->
+c. 它提供了一套与scrapy结合的封装库，可以像scrapy直接yield request对象即可，使用方式与scrapy类似降低了学习成本<!-- raw HTML omitted -->
+d. 它提供了lua脚本的方式可以很方便的操作浏览器对象<!-- raw HTML omitted -->
+e. 跨平台。相比于使用chrome作为渲染工具，它可以直接执行在Linux平台<!-- raw HTML omitted --></p>
+</blockquote>
+<p><strong>在scrapy中使用splash时可以安装对应的封装库scrapy_splash,这个库的安装配置以及使用网上基本都有详细的讲解内容，这里就不再提了</strong></p>
+<p>当然它也有缺点，但是这并不在讨论之中，至于具体如何选择就是一个见仁见智的问题了
+2. 开发语言: python3 ，python在开发爬虫方面有独特的优势，这个就不用我多说了，弄过爬虫的朋友都知道
+3. 开发工具 pycharm， JB的pycharm几乎是Python IDE的首选</p>
+<h2 id="设计与实现">设计与实现</h2>
+<p>这里可能涉及到商业秘密，毕竟是签过保密协议的，所以在这部分我不会放出完整的代码，只会提供一个思路然后给出部分关键代码以供参考。这里我想根据我遇到的问题，以问题的方式来讲述这个项目，毕竟对于爬虫、框架这些东西大家都很熟再来讲这些也没有多大意思了</p>
+<h3 id="用户登录">用户登录</h3>
+<p>在浏览器中操作的时候发现，如果是游客（也就是未登陆状态）的时候，当我们浏览相关用户的时间线时会得到下面这个界面
+<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="/fbspider/request_login.png"
+        data-srcset="/fbspider/request_login.png, /fbspider/request_login.png 1.5x, /fbspider/request_login.png 2x"
+        data-sizes="auto"
+        alt="/fbspider/request_login.png"
+        title="未登录情况下查看用户信息" />
+在未登录的情况下查看用户信息的时候会弹出一个界面需要登录或者注册。因此从这里来看爬虫的第一个任务就应该是登录
+登录的时候scrapy提供了一个form_response的方法可以很方便的填写表单并提交，但是我发现用这种方式只能在返回的response对象中的request.headers里面找到cookie的字符串，而由于splash需要我们传入cookie的字典形式，这里我没有找到什么很好的办法，只能是采用splash 提供的方法。
+Facebook中登录页面为https://www.facebook/login。因此我重载爬虫的start_requests方法，提交一个针对这个登录页面url的请求。这个页面不涉及到渲染问题自然就使用Requests对象</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="k">def</span> <span class="nf">start_requests</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">#开启爬取之前先登录</span>
+</span></span><span class="line"><span class="cl">    <span class="k">yield</span> <span class="n">Request</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">        <span class="n">url</span><span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">login_url</span><span class="p">,</span> <span class="c1"># https://www.facebook.com/login</span>
+</span></span><span class="line"><span class="cl">        <span class="n">callback</span><span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">login</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="p">)</span>
+</span></span></code></pre></div><p>当它请求的页面返回时触发login方法，在这个方法中我们提供了一个lua脚本自动填写用户名密码，然后提交请求，并最终返回成功的cookie</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="k">yield</span> <span class="n">SplashFormRequest</span><span class="o">.</span><span class="n">from_response</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">    <span class="n">response</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">login_url</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">formdata</span><span class="o">=</span><span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="s2">&#34;email&#34;</span><span class="p">:</span><span class="n">user</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">        <span class="s2">&#34;pass&#34;</span><span class="p">:</span> <span class="n">password</span>
+</span></span><span class="line"><span class="cl">    <span class="p">},</span>
+</span></span><span class="line"><span class="cl">    <span class="n">endpoint</span><span class="o">=</span><span class="s2">&#34;execute&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">args</span><span class="o">=</span><span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="s2">&#34;wait&#34;</span><span class="p">:</span> <span class="mi">30</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">        <span class="s2">&#34;lua_source&#34;</span><span class="p">:</span> <span class="n">lua_script</span><span class="p">,</span> <span class="c1">#这个参数是一个lua脚本的字符串</span>
+</span></span><span class="line"><span class="cl">        <span class="s2">&#34;user_name&#34;</span> <span class="p">:</span> <span class="n">user</span><span class="p">,</span>  <span class="c1">#user和password将会作为参数传入到lua脚本中</span>
+</span></span><span class="line"><span class="cl">        <span class="s2">&#34;user_passwd&#34;</span> <span class="p">:</span> <span class="n">password</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="p">},</span>
+</span></span><span class="line"><span class="cl">    <span class="n">callback</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">after_login</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">errback</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">error_parse</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl"><span class="p">)</span>
+</span></span></code></pre></div><p>这里我们使用splash来发送请求包，这里我们主要向lua脚本中传入用户名和密码,下面是lua脚本的相关内容</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-lua" data-lang="lua"><span class="line"><span class="cl"><span class="kr">function</span> <span class="nf">main</span><span class="p">(</span><span class="n">splash</span><span class="p">,</span> <span class="n">args</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="kd">local</span> <span class="n">ok</span><span class="p">,</span> <span class="n">reason</span> <span class="o">=</span> <span class="n">splash</span><span class="p">:</span><span class="n">go</span><span class="p">(</span><span class="n">args.url</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="n">user_name</span> <span class="o">=</span> <span class="n">args.user_name</span>
+</span></span><span class="line"><span class="cl">    <span class="n">user_passwd</span> <span class="o">=</span> <span class="n">args.user_passwd</span>
+</span></span><span class="line"><span class="cl">    <span class="n">user_text</span> <span class="o">=</span> <span class="n">splash</span><span class="p">:</span><span class="n">select</span><span class="p">(</span><span class="s2">&#34;#email&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="n">pass_text</span> <span class="o">=</span> <span class="n">splash</span><span class="p">:</span><span class="n">select</span><span class="p">(</span><span class="s2">&#34;#pass&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="n">login_btn</span> <span class="o">=</span> <span class="n">splash</span><span class="p">:</span><span class="n">select</span><span class="p">(</span><span class="s2">&#34;#loginbutton&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="kr">if</span> <span class="p">(</span><span class="n">user_text</span> <span class="ow">and</span> <span class="n">pass_text</span> <span class="ow">and</span> <span class="n">login_btn</span><span class="p">)</span> <span class="kr">then</span>
+</span></span><span class="line"><span class="cl">        <span class="n">user_text</span><span class="p">:</span><span class="n">send_text</span><span class="p">(</span><span class="n">user_name</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="n">pass_text</span><span class="p">:</span><span class="n">send_text</span><span class="p">(</span><span class="n">user_passwd</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="n">login_btn</span><span class="p">:</span><span class="n">mouse_click</span><span class="p">({})</span>
+</span></span><span class="line"><span class="cl">    <span class="kr">end</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="n">splash</span><span class="p">:</span><span class="n">wait</span><span class="p">(</span><span class="n">math.random</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">10</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl">    <span class="kr">return</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">url</span> <span class="o">=</span> <span class="n">splash</span><span class="p">:</span><span class="n">url</span><span class="p">(),</span>
+</span></span><span class="line"><span class="cl">        <span class="n">cookies</span> <span class="o">=</span> <span class="n">splash</span><span class="p">:</span><span class="n">get_cookies</span><span class="p">(),</span>
+</span></span><span class="line"><span class="cl">        <span class="n">headers</span> <span class="o">=</span> <span class="n">splash.args</span><span class="p">.</span><span class="n">headers</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">      <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="kr">end</span>
+</span></span></code></pre></div><p>根据相关资料，SplashRequest 函数中的参数将会以lua table的形式被传入到splash形参中，而函数的args参数中的内容以 table的形式被传入到形参args中，所以这里要获取到用户名和密码只需要从args里面取即可
+上述lua代码首先请求对应的登录界面（我觉得这里应该不用请求，而直接使用response，但是这是我在写这篇文章的时候想到的还没有验证）,然后通过css选择器找到填写用户名，密码的输入框和提交按钮。然后填写相关内容，最后点击按钮进行登录，然后等待一定时间，这里一定要等待以便Facebook服务器验证并跳转到对应的链接，最后我们是通过链接来判断是否登录成功。最后返回当前页面的url，cookie和对应的头信息
+在浏览器中执行登录操作的时候发现如果是新用户（没有填写相关信息用户）会跳转到www.facebook.com/?sk=welcome这个页面要求用户填入一定的信息，而老用户则会跳转到www.facebook.com 这个url，这个页面会显示用户关注的好友动态。因此在程序中我也根据跳转的新页面是否是这两个页面来进行判断是否登录成功的.登录成功后将脚本返回的cookie保存，<strong>脚本返回的信息在scrapy的response.data中作为字典的形式保存</strong></p>
+<h3 id="代理">代理</h3>
+<p>由于众所周知的原因，Facebook对于国内来说是一个404的站点，国内用户想要访问必须提供一个代理。
+在scrapy中代理可以设置在对应的下载中间件中，在下载中间件的process_request函数中设置<code>request.meta[&quot;proxy&quot;] = proxy</code>
+但是这种方式针对splash时就不管用了，我找了很多资料发现可以在lua脚本中设置，每次在执行之前都需要相同的代码来设置代理，因此我们可以采用下面的模板</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-lua" data-lang="lua"><span class="line"><span class="cl"><span class="kr">function</span> <span class="nf">main</span><span class="p">(</span><span class="n">splash</span><span class="p">,</span> <span class="n">args</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="n">splash</span><span class="p">:</span><span class="n">on_request</span><span class="p">(</span><span class="kr">function</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="n">request</span><span class="p">:</span><span class="n">set_proxy</span><span class="p">{</span>
+</span></span><span class="line"><span class="cl">            <span class="n">host</span> <span class="o">=</span> <span class="s1">&#39;0.0.0.0&#39;</span><span class="p">,</span> <span class="c1">--代理服务器的IP</span>
+</span></span><span class="line"><span class="cl">            <span class="n">port</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="c1">--代理服务器的端口</span>
+</span></span><span class="line"><span class="cl">            <span class="n">username</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="c1">--登录的用户名和密码</span>
+</span></span><span class="line"><span class="cl">            <span class="n">password</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">            <span class="n">type</span> <span class="o">=</span> <span class="s2">&#34;http&#34;</span><span class="p">,</span> <span class="c1">-- 代理的协议，根据官网的说法目前只支持http和ss5 ，目前就这个项目来说http就够了</span>
+</span></span><span class="line"><span class="cl">          <span class="p">}</span>
+</span></span><span class="line"><span class="cl">		 <span class="kr">end</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">     <span class="c1">--do something</span>
+</span></span><span class="line"><span class="cl"><span class="kr">end</span>
+</span></span></code></pre></div><p>每次执行含有这段代码的脚本时首先执行on_request函数设置代理的相关信息，然后执行splash:go函数时就可以使用上面的配置访问对应站点了</p>
+<h3 id="使爬虫保持登录状态">使爬虫保持登录状态</h3>
+<p>根据splash的官方文档的说明，splash其实可以看做一个干净的浏览器，就好像我们在使用浏览器每次请求一个新页面的时候同时清理了里面的缓存一样，它不会保存之前的任何状态，所以这里的cookie只能每次在发包的同时给它设置上，好在splash给了相应的方法来设置和获取它，下面是关于cookie的模板</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-lua" data-lang="lua"><span class="line"><span class="cl"><span class="kd">local</span> <span class="n">cookies</span> <span class="o">=</span> <span class="n">splash</span><span class="p">:</span><span class="n">get_cookies</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="c1">-- ... do something ...</span>
+</span></span><span class="line"><span class="cl"><span class="n">splash</span><span class="p">:</span><span class="n">init_cookies</span><span class="p">(</span><span class="n">cookies</span><span class="p">)</span>  <span class="c1">-- restore cookies</span>
+</span></span></code></pre></div><p>至此我们的lua脚本的模板就变成了这样</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-lua" data-lang="lua"><span class="line"><span class="cl"><span class="kr">function</span> <span class="nf">main</span><span class="p">(</span><span class="n">splash</span><span class="p">,</span> <span class="n">args</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="n">splash</span><span class="p">:</span><span class="n">init_cookies</span><span class="p">(</span><span class="n">splash.cookies</span><span class="p">)</span> <span class="c1">-- 这个cookie是通过SplashRequest函数的cookies参数传入的</span>
+</span></span><span class="line"><span class="cl">    <span class="n">splash</span><span class="p">:</span><span class="n">on_request</span><span class="p">(</span><span class="kr">function</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="n">request</span><span class="p">:</span><span class="n">set_proxy</span><span class="p">{</span>
+</span></span><span class="line"><span class="cl">            <span class="n">host</span> <span class="o">=</span> <span class="s1">&#39;0.0.0.0&#39;</span><span class="p">,</span> <span class="c1">--代理服务器的IP</span>
+</span></span><span class="line"><span class="cl">            <span class="n">port</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="c1">--代理服务器的端口</span>
+</span></span><span class="line"><span class="cl">            <span class="n">username</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="c1">--登录的用户名和密码</span>
+</span></span><span class="line"><span class="cl">            <span class="n">password</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">            <span class="n">type</span> <span class="o">=</span> <span class="s2">&#34;http&#34;</span><span class="p">,</span> <span class="c1">-- 代理的协议，根据官网的说法目前只支持http和ss5 ，目前就这个项目来说http就够了</span>
+</span></span><span class="line"><span class="cl">          <span class="p">}</span>
+</span></span><span class="line"><span class="cl">		 <span class="kr">end</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">     <span class="c1">--do something</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">     <span class="kr">return</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">       <span class="n">cookie</span> <span class="o">=</span> <span class="n">splash</span><span class="p">:</span><span class="n">get_cookies</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">     <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="kr">end</span>
+</span></span></code></pre></div><h3 id="获取用户主页面">获取用户主页面</h3>
+<p>我们在Facebook随便点击一个用户进入它的主页面，查看url如下
+<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="/fbspider/page1.png"
+        data-srcset="/fbspider/page1.png, /fbspider/page1.png 1.5x, /fbspider/page1.png 2x"
+        data-sizes="auto"
+        alt="/fbspider/page1.png"
+        title="英文名称" /></p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="/fbspider/page2.png"
+        data-srcset="/fbspider/page2.png, /fbspider/page2.png 1.5x, /fbspider/page2.png 2x"
+        data-sizes="auto"
+        alt="/fbspider/page2.png"
+        title="中文名称" />
+可以看到针对用户名为英文的情况，它简单的将英文名作为二级目录，只不过将空格换成了点，而针对不为英文的用户，它以profile作为二级目录，并且后面带上一个参数id，这个ID就是用户的ID。其实根据后面我自己的实验不管上面的哪种用户都可以通过这个ID访问到，我们可以组成一个url:https://www.facebook.com/[id] 来访问用户首页，因此项目中要求提供的外部导入用户名必须是英文或者是ID，以便能直接通过url拼接的方式来获取用户首页
+除了这个区别之外，还有一种称之为公共主页的页面，比如下面是特朗普的公共主页
+<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="./fbspider/page3.png"
+        data-srcset="./fbspider/page3.png, ./fbspider/page3.png 1.5x, ./fbspider/page3.png 2x"
+        data-sizes="auto"
+        alt="./fbspider/page3.png"
+        title="川普主页" />
+对于公共主页来说它没有好友信息，没有时间线，因此针对这种页面的信息的解析可能需要别的方法。而光从url、id、和页面内容来看很难区分，而我在查找获取Facebook用户ID的相关内容的时候碰巧找到了它的区分方法，公共主页的HTML代码中只有一个page_id和profile_id，而个人的只有profile_id 其中用户ID就是这个profile_id
+比如下面分别是一个个人主页和公共主页搜索page_id的结果
+<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="/fbspider/page_id1.png"
+        data-srcset="/fbspider/page_id1.png, /fbspider/page_id1.png 1.5x, /fbspider/page_id1.png 2x"
+        data-sizes="auto"
+        alt="/fbspider/page_id1.png"
+        title="个人主页page_id搜索结果" /></p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="/fbspider/page_id2.png"
+        data-srcset="/fbspider/page_id2.png, /fbspider/page_id2.png 1.5x, /fbspider/page_id2.png 2x"
+        data-sizes="auto"
+        alt="/fbspider/page_id2.png"
+        title="公共主页page_id搜索结果" />
+从上面的结果来看个人用户中page_id 只会出现在注释中，这是用浏览器请求的结果，其实在实际使用爬虫爬取到的结果中是搜不到这个id的,我们可以根据这个特性来区分，并且获取这两种主页的ID</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="k">def</span> <span class="nf">_get_user_info</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">html</span><span class="p">,</span> <span class="n">url</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">    <span class="n">key</span> <span class="o">=</span> <span class="s2">&#34;page_id=(\d+)&#34;</span> <span class="c1"># 使用正则表达式获取page_id后面的id值</span>
+</span></span><span class="line"><span class="cl">    <span class="c1"># page_id 只会出现在公共主页上，所以根据page_id来判断页面类型</span>
+</span></span><span class="line"><span class="cl">      <span class="n">pattern</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">      <span class="n">it</span> <span class="o">=</span> <span class="n">pattern</span><span class="o">.</span><span class="n">finditer</span><span class="p">(</span><span class="n">html</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">      <span class="n">user_type</span> <span class="o">=</span> <span class="mi">0</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">      <span class="k">try</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">          <span class="n">it</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">it</span><span class="p">)</span> <span class="c1">#如果未找到这个地方会报StopIteration异常</span>
+</span></span><span class="line"><span class="cl">          <span class="n">user_type</span> <span class="o">=</span> <span class="n">TopUser</span><span class="o">.</span><span class="n">PUBLIC_PAGE</span> <span class="c1"># 公共主页</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">      <span class="k">except</span> <span class="ne">StopIteration</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">          <span class="c1"># 未找到page_id 此时视为个人主页</span>
+</span></span><span class="line"><span class="cl">          <span class="n">key</span> <span class="o">=</span> <span class="s2">&#34;profile_id=(\d+)&#34;</span> <span class="c1">#个人主页的id是profile_id的值</span>
+</span></span><span class="line"><span class="cl">          <span class="n">pattern</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">          <span class="n">it</span> <span class="o">=</span> <span class="n">pattern</span><span class="o">.</span><span class="n">finditer</span><span class="p">(</span><span class="n">html</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">          <span class="k">try</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">              <span class="n">it</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">it</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">              <span class="n">user_type</span> <span class="o">=</span> <span class="n">TopUser</span><span class="o">.</span><span class="n">PRIVATE_PAGE</span>
+</span></span><span class="line"><span class="cl">          <span class="k">except</span> <span class="ne">StopIteration</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">              <span class="c1"># 两个都没找到，此时视为页面错误，返回错误，爬虫停止</span>
+</span></span><span class="line"><span class="cl">              <span class="k">pass</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">      <span class="c1">#TODO:解析对应的用户信息，这里主要解析用户id和页面类型</span>
+</span></span></code></pre></div><h3 id="获取时间线信息">获取时间线信息</h3>
+<p>Facebook的用户时间线是通过异步加载的方式来进行的，我使用Chrome分析过它发送的异步请求，发现它里面是经过了加密的，因此不能通过解析它的响应包来获取相关信息，但是我们有splash这一大杀器，它就是一个浏览器，一般在加载更多信息的时候都会执行下来操作，所以说这里我们只要模拟这个下拉的操作就可以了,要操作这个浏览器当然是使用lua脚本了，下面是对应的lua脚本</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-lua" data-lang="lua"><span class="line"><span class="cl"><span class="kr">function</span> <span class="nf">main</span><span class="p">(</span><span class="n">splash</span><span class="p">,</span> <span class="n">args</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">--前面是设置cookie和代理的操作</span>
+</span></span><span class="line"><span class="cl">    <span class="kd">local</span> <span class="n">ok</span><span class="p">,</span> <span class="n">reason</span> <span class="o">=</span> <span class="n">splash</span><span class="p">:</span><span class="n">go</span><span class="p">(</span><span class="n">args.url</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="n">splash</span><span class="p">:</span><span class="n">wait</span><span class="p">(</span><span class="n">math.random</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">10</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl">    <span class="n">html</span>  <span class="o">=</span> <span class="n">splash</span><span class="p">:</span><span class="n">html</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">    <span class="n">old_html</span> <span class="o">=</span> <span class="s2">&#34;&#34;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">flush_times</span> <span class="o">=</span> <span class="n">args.flush_times</span> <span class="c1">--这里是下拉次数，就好像操作浏览器一样每次下拉就会加载新的内容</span>
+</span></span><span class="line"><span class="cl">    <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="kr">while</span><span class="p">(</span><span class="n">html</span> <span class="o">~=</span> <span class="n">old_html</span><span class="p">)</span> <span class="c1">-- 当下拉得到的新页面与原来的相同，就认为它已经没有新的内容了，此时就返回</span>
+</span></span><span class="line"><span class="cl">    <span class="kr">do</span>
+</span></span><span class="line"><span class="cl">        <span class="n">old_html</span> <span class="o">=</span> <span class="n">html</span>
+</span></span><span class="line"><span class="cl">  	    <span class="n">splash</span><span class="p">:</span><span class="n">runjs</span><span class="p">(</span><span class="s">[[window.scrollTo(0, document.body.scrollHeight)]]</span><span class="p">)</span> <span class="c1">-- 执行js下拉页面</span>
+</span></span><span class="line"><span class="cl">		    <span class="n">splash</span><span class="p">:</span><span class="n">wait</span><span class="p">(</span><span class="n">math.random</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">))</span> <span class="c1">-- 这里一定要等待，否则可能会来不及加载，根据我的实验只要大于1s就可以得到下拉加载的新内容，可能具体值需要根据不同的网络环境</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">		    <span class="kr">if</span> <span class="p">(</span><span class="n">flush_times</span> <span class="o">~=</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">i</span> <span class="o">==</span> <span class="n">flush_times</span><span class="p">)</span> <span class="kr">then</span> <span class="c1">-- 当达到设置下拉上限并且不为0时推出，这里下拉次数为0表示一直下拉直到没有新内容</span>
+</span></span><span class="line"><span class="cl">		        <span class="n">print</span><span class="p">(</span><span class="s2">&#34;即将退出循环&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">  	           <span class="kr">break</span>
+</span></span><span class="line"><span class="cl">  	        <span class="kr">end</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">        <span class="n">html</span> <span class="o">=</span> <span class="n">splash</span><span class="p">:</span><span class="n">html</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">  	    <span class="n">i</span> <span class="o">=</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span>
+</span></span><span class="line"><span class="cl">    <span class="kr">end</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kr">return</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">html</span> <span class="o">=</span> <span class="n">splash</span><span class="p">:</span><span class="n">html</span><span class="p">(),</span>
+</span></span><span class="line"><span class="cl">    <span class="n">cookies</span> <span class="o">=</span> <span class="n">splash</span><span class="p">:</span><span class="n">get_cookies</span><span class="p">(),</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p>上面的代码中，首先请求时间线的界面,然后获取相关的设置，主要是下拉次数。<!-- raw HTML omitted -->
+<strong>注意这里的下拉次数要根据超时值来设置，根据splash的官方文档，每个请求都有一个超时值，大于这个超时值会直接返回504 的错误这个时候就什么都得不到了，所以这里理想情况下是可以一直下拉的，但是由于有超时值的存在，必须给定一个下拉次数。我们可以在启动splash 的时候通过参数&ndash;wait-timeout给定。</strong>
+然后根据这个参数的设置一直下拉，直到没有更新或者达到最大下来次数。<!-- raw HTML omitted -->
+<strong>这个也有问题，如果网络不好或者其他情况导致没有加载出来，就认为它已经没有新内容了，这样会导致爬取内容不全</strong></p>
+<p>这样我们就获取到了用户的时间线信息，具体的内容的解析就不再多说了，需要提醒一点的是，用户发帖中包含图片时分为三种情况，单个图片，多个图片（多个图片一般就被叫做albums——相册或者图集），简单的更新头像；这三种情况下页面的对应结构不同所以需要分情况，而且当时间线中包含视频的时候情况又不同</p>
+<h3 id="获取公共主页的发帖信息">获取公共主页的发帖信息</h3>
+<p>公共主页中没有时间线，所以它的解析与个人主页的不同，好在Facebook提供了一种叫做图谱API的东西可以很方便的就可以获取到发帖信息。既然有这种API，为什么不用它获取个人用户信息呢？其实我也想用，就是要针对个人使用API就必须获取用户本人的确认，也就是要用户登录你的爬虫，然后授权给你，这自然是不可能的，所以针对个人用户只能简单的通过模拟浏览器的方式来解析HTML页面
+要使用Facebook的 API首先要获取一个access_token. 常规思路是先去去开发者平台注册一个开发者账号并建立一个应用。然后获取应用的token。但是我发现一般的应用Token 在获取公共主页的时候也存在一个授权的问题，好在Facebook提供了一个api的测试平台，而平台中提供了一个graph explore token，这个token可以不用授权，但是它只有一个小时的有效期，所以要使用API，首先就是从这个测试平台获取到这token。Facebook并没有提供任何有效方法来获取这个token，这个时候自然又要使用传统的方式，通过splash请求这个url，然后解析HTML获取对应token。
+针对这个问题，我处理的步骤如下：</p>
+<ol>
+<li>根据上一步获取到的页面类型，如果是公共页面，则先请求https://developers.facebook.com/tools/explorer/这个url，在登录状态下（前提是你的对应账号是Facebook的开发者账号）,它会自动生成一个测试用的access_token就像下面这样
+<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="/fbspider/developer.png"
+        data-srcset="/fbspider/developer.png, /fbspider/developer.png 1.5x, /fbspider/developer.png 2x"
+        data-sizes="auto"
+        alt="/fbspider/developer.png"
+        title="API测试平台页面" />
+输入框中就是token</li>
+<li>从该页面中获取到对应的token, 并调用对应的API获取公共主页的发帖信息，这里主要调用posts 并获取它的链接、ID、具体信息、图片、创建时间和编辑者 这些信息，具体的API文档参考Facebook官方文档，这里就不再介绍他们了</li>
+</ol>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="k">def</span> <span class="nf">get_access_token</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">response</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">    <span class="n">sel</span> <span class="o">=</span> <span class="n">Selector</span><span class="p">(</span><span class="n">response</span><span class="o">=</span><span class="n">response</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="n">access_token</span> <span class="o">=</span> <span class="n">sel</span><span class="o">.</span><span class="n">xpath</span><span class="p">(</span><span class="s1">&#39;//label[@class=&#34;_2toh _36wp _55r1 _58ak&#34;]/input[@class=&#34;_58al&#34;]//@value&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">extract_first</span><span class="p">()</span> <span class="c1">#获取到token的值</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="c1">#拼接API</span>
+</span></span><span class="line"><span class="cl">    <span class="n">api</span> <span class="o">=</span> <span class="n">urljoin</span><span class="p">(</span><span class="s2">&#34;https://graph.facebook.com/v3.0&#34;</span><span class="p">,</span> <span class="n">response</span><span class="o">.</span><span class="n">meta</span><span class="p">[</span><span class="s2">&#34;user_id&#34;</span><span class="p">])</span>
+</span></span><span class="line"><span class="cl">    <span class="n">api</span> <span class="o">=</span> <span class="n">api</span> <span class="o">+</span> <span class="s2">&#34;/posts&#34;</span> <span class="o">+</span> <span class="s2">&#34;?access_token=&#34;</span> <span class="o">+</span> <span class="n">access_token</span> <span class="o">+</span> <span class="s2">&#34;&amp;fields=link,id,message,full_picture,parent_id,created_time&#34;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">yield</span> <span class="n">Request</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">        <span class="n">url</span><span class="o">=</span><span class="n">api</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">        <span class="n">callback</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_get_public_posts</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">        <span class="n">errback</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">error_parse</span>
+</span></span><span class="line"><span class="cl">    <span class="p">)</span>
+</span></span></code></pre></div><p>API返回的信息是以json格式返回的，下面是使用posts返回的一个例子，这里只是作为一个例子，请求返回的内容与项目中可能并不一样，但是并不影响针对它的分析</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-json" data-lang="json"><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="nt">&#34;data&#34;</span><span class="p">:</span> <span class="p">[</span>
+</span></span><span class="line"><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="cl">      <span class="nt">&#34;created_time&#34;</span><span class="p">:</span> <span class="s2">&#34;2018-06-01T22:30:00+0000&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">      <span class="nt">&#34;message&#34;</span><span class="p">:</span> <span class="s2">&#34;Congratulations to our contest winners, Joseph and Dana! It’s always a pleasure to meet the people who make our MOVEMENT possible. Thank you!&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">      <span class="nt">&#34;id&#34;</span><span class="p">:</span> <span class="s2">&#34;153080620724_10161074525735725&#34;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">},</span>
+</span></span><span class="line"><span class="cl">  <span class="p">],</span>
+</span></span><span class="line"><span class="cl">  <span class="nt">&#34;paging&#34;</span><span class="p">:</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">&#34;cursors&#34;</span><span class="p">:</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">      <span class="nt">&#34;before&#34;</span><span class="p">:</span> <span class="s2">&#34;Q2c4U1pXNTBYM0YxWlhKNVgzTjBiM0o1WDJsa0R5QXhOVE13T0RBMk1qQTNNalE2T0RBeU9UTTROekExTURBek9UVTBNakkwTnc4TVlYQnBYM04wYjNKNVgybGtEeDR4TlRNd09EQTJNakEzTWpSZAk1UQXhOakV3TnpRMU1qVTNNelUzTWpVUEJIUnBiV1VHV3hISTZABRT0ZD&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">      <span class="nt">&#34;after&#34;</span><span class="p">:</span> <span class="s2">&#34;Q2c4U1pXNTBYM0YxWlhKNVgzTjBiM0o1WDJsa0R5QXhOVE13T0RBMk1qQTNNalE2T0RFMk9UZA3pOemN4TkRrMU1EWXpNVFEwTlE4TVlYQnBYM04wYjNKNVgybGtEeDR4TlRNd09EQTJNakEzTWpSZAk1UQXhOakV3TkRZANE1UazBNekEzTWpVUEJIUnBiV1VHV3dyV0FRRT0ZD&#34;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">},</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">&#34;next&#34;</span><span class="p">:</span> <span class="s2">&#34;https://graph.facebook.com/v3.0/153080620724/posts?access_token=EAACEdEose0cBAMo5MUmbhGNfJlCGcrZArh7RBiCeSbwpqUq84tyEOs3HvO5KWoOtkWERRgkZBFjvOCb1DQ3go7PywUrA43SdJTqjeyjs5p2w3UanCFm0jxiE4Dt91A4qcGQYo9iobrLVrtCL0bdoNdkicQb6izFzxZBx0sPVauofQMLZCEFNLNcFqfkAinPWtSVeUQRxjQZDZD&amp;pretty=0&amp;limit=25&amp;after=Q2c4U1pXNTBYM0YxWlhKNVgzTjBiM0o1WDJsa0R5QXhOVE13T0RBMk1qQTNNalE2T0RFMk9UZA3pOemN4TkRrMU1EWXpNVFEwTlE4TVlYQnBYM04wYjNKNVgybGtEeDR4TlRNd09EQTJNakEzTWpSZAk1UQXhOakV3TkRZANE1UazBNekEzTWpVUEJIUnBiV1VHV3dyV0FRRT0ZD&#34;</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p>这个json主要分为两个部分一个是data，包含的是具体发帖的相关信息，另一个是paging，这个值里面包含了几个游标,其中next表示下一页的请求地址，我们只要判断出json中存在这个next就循环向这个next对应的url发包，当返回的json中不存在这个next时就标明已经到了最后一页。此时就解析了所有的发帖
+下面是具体的代码</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="k">def</span> <span class="nf">_get_public_posts</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">response</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">        <span class="n">rep_json</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">text</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="n">data</span> <span class="o">=</span> <span class="n">rep_json</span><span class="p">[</span><span class="s2">&#34;data&#34;</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">        <span class="n">post_user</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">meta</span><span class="p">[</span><span class="s2">&#34;user&#34;</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">        <span class="k">for</span> <span class="n">post</span> <span class="ow">in</span> <span class="n">data</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">            <span class="k">try</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">                <span class="n">item</span> <span class="o">=</span> <span class="n">FbspiderItem</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">                <span class="n">item</span><span class="p">[</span><span class="s2">&#34;post_id&#34;</span><span class="p">]</span> <span class="o">=</span> <span class="n">post</span><span class="p">[</span><span class="s2">&#34;id&#34;</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">                <span class="n">item</span><span class="p">[</span><span class="s2">&#34;post_user&#34;</span><span class="p">]</span> <span class="o">=</span> <span class="n">post_user</span>
+</span></span><span class="line"><span class="cl">                <span class="n">item</span><span class="p">[</span><span class="s2">&#34;post_message&#34;</span><span class="p">]</span> <span class="o">=</span> <span class="n">post</span><span class="p">[</span><span class="s2">&#34;message&#34;</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">                <span class="n">item</span><span class="p">[</span><span class="s2">&#34;post_time&#34;</span><span class="p">]</span> <span class="o">=</span> <span class="n">post</span><span class="p">[</span><span class="s2">&#34;created_time&#34;</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">                <span class="n">item</span><span class="p">[</span><span class="s2">&#34;post_link&#34;</span><span class="p">]</span> <span class="o">=</span> <span class="n">post</span><span class="p">[</span><span class="s2">&#34;link&#34;</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">                <span class="k">yield</span> <span class="n">item</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">                <span class="c1">#存储图片的信息</span>
+</span></span><span class="line"><span class="cl">                <span class="n">item</span> <span class="o">=</span> <span class="n">FBPostImgItem</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">                <span class="n">item</span><span class="p">[</span><span class="s2">&#34;post_id&#34;</span><span class="p">]</span> <span class="o">=</span> <span class="n">post</span><span class="p">[</span><span class="s2">&#34;id&#34;</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">                <span class="n">item</span><span class="p">[</span><span class="s2">&#34;img_url&#34;</span><span class="p">]</span> <span class="o">=</span> <span class="n">post</span><span class="p">[</span><span class="s2">&#34;full_picture&#34;</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">                <span class="k">yield</span>  <span class="n">item</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">            <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span> <span class="c1"># 暂时不处理未找到帖子内容的情况</span>
+</span></span><span class="line"><span class="cl">                <span class="k">continue</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">        <span class="k">if</span> <span class="s2">&#34;paging&#34;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">rep_json</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">            <span class="k">return</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">        <span class="n">paging</span> <span class="o">=</span> <span class="n">rep_json</span><span class="p">[</span><span class="s2">&#34;paging&#34;</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">        <span class="k">if</span> <span class="s2">&#34;next&#34;</span> <span class="ow">in</span> <span class="n">paging</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">            <span class="n">api</span> <span class="o">=</span> <span class="n">paging</span><span class="p">[</span><span class="s2">&#34;next&#34;</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">            <span class="k">yield</span> <span class="n">Request</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">                <span class="n">url</span> <span class="o">=</span> <span class="n">api</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                <span class="n">callback</span><span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_public_posts</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                <span class="n">meta</span><span class="o">=</span><span class="p">{</span><span class="s2">&#34;user&#34;</span> <span class="p">:</span> <span class="n">post_user</span><span class="p">},</span>
+</span></span><span class="line"><span class="cl">            <span class="p">)</span>
+</span></span></code></pre></div><h3 id="获取好友信息">获取好友信息</h3>
+<p>获取好友的信息也需要采用模拟浏览器的方式，首先在用户页面上查找是否有好友的链接可以供点击，如果没有说明没有开放权限，当存在这个链接并点进去之后，可能并没有好友项，比如下面这样
+<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="/fbspider/friends.png"
+        data-srcset="/fbspider/friends.png, /fbspider/friends.png 1.5x, /fbspider/friends.png 2x"
+        data-sizes="auto"
+        alt="/fbspider/friends.png"
+        title="不存在好友" />
+或者另外的情况，所以这里判断是否有好友信息需要两步，第一步是上面部分有好友这一栏，第二步是点进去之后在下面一栏中有全部好友这项内容。
+同样即使有好友，它也不会一次加载完毕，这里也用到下拉的相关操作。部分代码如下:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-lua" data-lang="lua"><span class="line"><span class="cl"><span class="kr">function</span> <span class="nf">main</span><span class="p">(</span><span class="n">splash</span><span class="p">,</span> <span class="n">args</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">-- 设置cookie和代理</span>
+</span></span><span class="line"><span class="cl">    <span class="kd">local</span> <span class="n">ok</span><span class="p">,</span> <span class="n">reason</span> <span class="o">=</span> <span class="n">splash</span><span class="p">:</span><span class="n">go</span><span class="p">(</span><span class="n">args.url</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="n">splash</span><span class="p">:</span><span class="n">wait</span><span class="p">(</span><span class="n">math.random</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">10</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl">    <span class="n">friend_btn</span> <span class="o">=</span> <span class="n">splash</span><span class="p">:</span><span class="n">select</span><span class="p">(</span><span class="s2">&#34;a[data-tab-key= &#39;friends&#39;]&#34;</span><span class="p">)</span> <span class="c1">--查找最上面那栏中是否有好友这个链接</span>
+</span></span><span class="line"><span class="cl">    <span class="kr">if</span> <span class="p">(</span><span class="n">friend_btn</span><span class="p">)</span> <span class="kr">then</span>
+</span></span><span class="line"><span class="cl">        <span class="n">friend_btn</span><span class="p">:</span><span class="n">mouse_click</span><span class="p">({})</span> <span class="c1">--点击进入好友页面</span>
+</span></span><span class="line"><span class="cl">        <span class="n">splash</span><span class="p">:</span><span class="n">wait</span><span class="p">(</span><span class="n">math.random</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">10</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl">    <span class="kr">else</span>
+</span></span><span class="line"><span class="cl">        <span class="kr">return</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">            <span class="n">hasFriend</span> <span class="o">=</span> <span class="kc">false</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">            <span class="n">cookie</span> <span class="o">=</span> <span class="n">splash</span><span class="p">:</span><span class="n">get_cookies</span><span class="p">(),</span>
+</span></span><span class="line"><span class="cl">        <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="kr">end</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="kr">return</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">hasFriend</span> <span class="o">=</span> <span class="kc">true</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">        <span class="n">html</span> <span class="o">=</span> <span class="n">splash</span><span class="p">:</span><span class="n">html</span><span class="p">(),</span>
+</span></span><span class="line"><span class="cl">        <span class="n">cookie</span> <span class="o">=</span> <span class="n">splash</span><span class="p">:</span><span class="n">get_cookies</span><span class="p">(),</span>
+</span></span><span class="line"><span class="cl">        <span class="n">url</span> <span class="o">=</span> <span class="n">splash</span><span class="p">:</span><span class="n">url</span><span class="p">(),</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="kr">end</span>
+</span></span></code></pre></div><p>执行完上述代码后,再分析是否有对应的好友信息,有的话就下拉刷新页面获取更多好友信息</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="c1">#当上面的代码执行完后进入这个函数</span>
+</span></span><span class="line"><span class="cl"><span class="k">def</span> <span class="nf">_get_friends_page</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">response</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">        <span class="n">hasFriend</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s2">&#34;hasFriend&#34;</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">        <span class="k">if</span> <span class="ow">not</span> <span class="n">hasFriend</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">            <span class="nb">print</span><span class="p">(</span><span class="s2">&#34;用户[</span><span class="si">%s</span><span class="s2">]未开放好友查询权限&#34;</span> <span class="o">%</span> <span class="n">response</span><span class="o">.</span><span class="n">meta</span><span class="p">[</span><span class="s2">&#34;name&#34;</span><span class="p">])</span>
+</span></span><span class="line"><span class="cl">            <span class="k">return</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">        <span class="n">html</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s2">&#34;html&#34;</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">        <span class="n">sel</span> <span class="o">=</span> <span class="n">Selector</span><span class="p">(</span><span class="n">response</span> <span class="o">=</span> <span class="n">response</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="n">friends</span> <span class="o">=</span> <span class="n">sel</span><span class="o">.</span><span class="n">xpath</span><span class="p">(</span><span class="s2">&#34;//a[@name=&#39;全部好友&#39;]&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="k">if</span> <span class="n">friends</span> <span class="o">==</span> <span class="p">[]:</span>
+</span></span><span class="line"><span class="cl">            <span class="nb">print</span><span class="p">(</span><span class="s2">&#34;用户[</span><span class="si">%s</span><span class="s2">]未开放好友查询权限&#34;</span> <span class="o">%</span> <span class="n">response</span><span class="o">.</span><span class="n">meta</span><span class="p">[</span><span class="s2">&#34;name&#34;</span><span class="p">])</span>
+</span></span><span class="line"><span class="cl">            <span class="k">return</span>
+</span></span><span class="line"><span class="cl">        <span class="c1">#获取代理，拼接对应的lua脚本</span>
+</span></span><span class="line"><span class="cl">        <span class="k">yield</span> <span class="n">SplashRequest</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">            <span class="n">url</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s2">&#34;url&#34;</span><span class="p">],</span>
+</span></span><span class="line"><span class="cl">            <span class="n">callback</span><span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parse_friends</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">            <span class="n">endpoint</span><span class="o">=</span><span class="s2">&#34;execute&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">            <span class="n">cookies</span><span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cookie</span><span class="p">),</span>
+</span></span><span class="line"><span class="cl">            <span class="n">meta</span><span class="o">=</span> <span class="p">{</span><span class="s2">&#34;level&#34;</span> <span class="p">:</span> <span class="n">response</span><span class="o">.</span><span class="n">meta</span><span class="p">[</span><span class="s2">&#34;level&#34;</span><span class="p">],</span> <span class="s2">&#34;name&#34;</span> <span class="p">:</span> <span class="n">response</span><span class="o">.</span><span class="n">meta</span><span class="p">[</span><span class="s2">&#34;name&#34;</span><span class="p">]},</span>
+</span></span><span class="line"><span class="cl">            <span class="n">args</span><span class="o">=</span><span class="p">{</span>
+</span></span><span class="line"><span class="cl">                <span class="s2">&#34;wait&#34;</span> <span class="p">:</span> <span class="mi">30</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                <span class="s2">&#34;lua_source&#34;</span> <span class="p">:</span> <span class="n">lua_script</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">            <span class="p">}</span>
+</span></span><span class="line"><span class="cl">        <span class="p">)</span>
+</span></span></code></pre></div><p>当下拉结束之后就是解析页面获取页面中的好友信息了，在解析的时候发现，当点击某个好友进入它的主页面时，页面的链接为 <code>https://www.facebook.com/profile.php?id=100011359746168&amp;fref=pb&amp;hc_location=friends_tab</code>这个时候就会产生一种想法，这个id是不是就是用户id呢？我用这个id来直接访问用户主页行不行呢？经过我的实验，这个想法是对的，是可行的，因此对于好友这层用户我们可以直接拿到它的ID，不用向前面一样根据名称来拼接,下面是解析好友信息的部分代码</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="k">def</span> <span class="nf">parse_friends</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">response</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">        <span class="n">sel</span> <span class="o">=</span> <span class="n">Selector</span><span class="p">(</span><span class="n">response</span> <span class="o">=</span> <span class="n">response</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="n">friends</span> <span class="o">=</span> <span class="n">sel</span><span class="o">.</span><span class="n">xpath</span><span class="p">(</span><span class="s2">&#34;//li[@class=&#39;_698&#39;]//div[@class=&#39;fsl fwb fcb&#39;]//a&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">        <span class="c1">#拼接lua脚本</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">        <span class="k">for</span> <span class="n">friend</span> <span class="ow">in</span> <span class="n">friends</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">            <span class="n">url</span> <span class="o">=</span> <span class="n">friend</span><span class="o">.</span><span class="n">xpath</span><span class="p">(</span><span class="s2">&#34;.//@href&#34;</span><span class="p">)</span><span class="o">.</span><span class="n">extract_first</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">            <span class="n">name</span> <span class="o">=</span> <span class="n">friend</span><span class="o">.</span><span class="n">xpath</span><span class="p">(</span><span class="s2">&#34;.//text()&#34;</span><span class="p">)</span><span class="o">.</span><span class="n">extract_first</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">            <span class="c1">#记录当前好友关系</span>
+</span></span><span class="line"><span class="cl">            <span class="n">friend_item</span> <span class="o">=</span> <span class="n">FBUserItem</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">            <span class="n">friend_item</span><span class="p">[</span><span class="s2">&#34;user_name&#34;</span><span class="p">]</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">meta</span><span class="p">[</span><span class="s2">&#34;name&#34;</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">            <span class="n">friend_item</span><span class="p">[</span><span class="s2">&#34;friend_name&#34;</span><span class="p">]</span> <span class="o">=</span> <span class="n">name</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">            <span class="nb">print</span><span class="p">(</span><span class="s2">&#34;提取到好友信息</span><span class="si">%s</span><span class="s2"> : </span><span class="si">%s</span><span class="s2">&#34;</span> <span class="o">%</span> <span class="p">(</span><span class="n">friend_item</span><span class="p">[</span><span class="s2">&#34;user_name&#34;</span><span class="p">],</span> <span class="n">friend_item</span><span class="p">[</span><span class="s2">&#34;friend_name&#34;</span><span class="p">]))</span>
+</span></span><span class="line"><span class="cl">            <span class="k">yield</span> <span class="n">friend_item</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">            <span class="c1">#这里再次提交请求主要是为了获取好友的好友，以及获取好友发的帖子</span>
+</span></span><span class="line"><span class="cl">            <span class="c1">#其实也可以在这个请求执行完成之后解析用户主页面得到用户的ID等信息</span>
+</span></span><span class="line"><span class="cl">            <span class="k">yield</span> <span class="n">SplashRequest</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">                <span class="n">url</span> <span class="o">=</span> <span class="n">url</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                <span class="n">endpoint</span><span class="o">=</span><span class="s2">&#34;execute&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                <span class="n">callback</span><span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parse_main_page</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                <span class="n">meta</span><span class="o">=</span><span class="p">{</span><span class="s2">&#34;name&#34;</span> <span class="p">:</span> <span class="n">name</span><span class="p">,</span> <span class="s2">&#34;level&#34;</span> <span class="p">:</span> <span class="n">level</span><span class="p">},</span>
+</span></span><span class="line"><span class="cl">                <span class="n">cookies</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cookie</span><span class="p">),</span> <span class="c1"># 从cookie池中随机取出一个cookie</span>
+</span></span><span class="line"><span class="cl">                <span class="n">args</span><span class="o">=</span><span class="p">{</span>
+</span></span><span class="line"><span class="cl">                    <span class="s2">&#34;wait&#34;</span><span class="p">:</span> <span class="mi">30</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                    <span class="s2">&#34;lua_source&#34;</span><span class="p">:</span> <span class="n">lua_script</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                <span class="p">}</span>
+</span></span><span class="line"><span class="cl">            <span class="p">)</span>
+</span></span></code></pre></div><h2 id="反爬虫的相关操作">反爬虫的相关操作</h2>
+<p>针对爬虫程序来说最头疼的就是有的站点在反爬虫这块做的太好了，Facebook就是这样的一个站点，我的测试账号在执行程序的时候被封过无数次。为了防止被封我主要采取了这样几个措施</p>
+<h3 id="减少并发数设置发包的延时">减少并发数，设置发包的延时</h3>
+<p>这些内容主要在scrapy的配置文件中控制</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="n">DOWNLOAD_DELAY</span> <span class="o">=</span> <span class="mi">5</span> <span class="c1"># 发包延时</span>
+</span></span><span class="line"><span class="cl"><span class="n">CONCURRENT_REQUESTS</span> <span class="o">=</span> <span class="mi">16</span> <span class="c1"># 最大并发数</span>
+</span></span></code></pre></div><h3 id="设置代理池">设置代理池</h3>
+<p>代理池的设置通过下载中间件的process_request函数来设置，设置的相关代码如下:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="k">def</span> <span class="nf">process_request</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">spider</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">proxies</span> <span class="o">!=</span> <span class="p">[]:</span>
+</span></span><span class="line"><span class="cl">        <span class="n">proxy</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">proxies</span><span class="p">)</span> <span class="c1"># self.proxies 是一个含有多个代理的列表,从中随机取一个</span>
+</span></span><span class="line"><span class="cl">        <span class="nb">print</span><span class="p">(</span><span class="s2">&#34;启用代理:</span><span class="si">%s</span><span class="s2">&#34;</span> <span class="o">%</span> <span class="n">proxy</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="k">if</span> <span class="s2">&#34;splash&#34;</span> <span class="ow">in</span> <span class="n">request</span><span class="o">.</span><span class="n">meta</span><span class="p">:</span> <span class="c1">#判断是否是一个splash请求</span>
+</span></span><span class="line"><span class="cl">            <span class="n">request</span><span class="o">.</span><span class="n">meta</span><span class="p">[</span><span class="s1">&#39;splash&#39;</span><span class="p">][</span><span class="s1">&#39;args&#39;</span><span class="p">][</span><span class="s1">&#39;proxy&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">proxy</span><span class="c1"># 设置splash代理</span>
+</span></span><span class="line"><span class="cl">        <span class="k">else</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">            <span class="n">request</span><span class="o">.</span><span class="n">meta</span><span class="p">[</span><span class="s2">&#34;proxy&#34;</span><span class="p">]</span> <span class="o">=</span> <span class="n">proxy</span> <span class="c1">#设置scrapy的代理</span>
+</span></span></code></pre></div><p>这里虽然判断了是否为一个splash，但是针对splash的请求，这种设置方式无效，需要采用之前介绍的方式在LUA脚本中设置，而随机设置的方法就是在一组代理中随机选择一个传入对应的LUA脚本中</p>
+<h3 id="设置ua">设置UA</h3>
+<p>在下载中间件的process_request函数中来设置，设置的方法与设置代理的方法类似</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">RotateUserAgentMiddleware</span><span class="p">(</span><span class="n">UserAgentMiddleware</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">user_agent</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">        <span class="bp">self</span><span class="o">.</span><span class="n">user_agent</span> <span class="o">=</span> <span class="n">user_agent</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">def</span> <span class="nf">process_request</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">spider</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">        <span class="n">ua</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">user_agent_list</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="k">if</span> <span class="n">ua</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">            <span class="nb">print</span><span class="p">(</span><span class="s2">&#34;启用UA ：</span><span class="si">%s</span><span class="s2">&#34;</span> <span class="o">%</span> <span class="n">ua</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">            <span class="n">request</span><span class="o">.</span><span class="n">headers</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;User-Agent&#39;</span><span class="p">,</span> <span class="n">ua</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="n">user_agent_list</span> <span class="o">=</span> <span class="p">[</span>
+</span></span><span class="line"><span class="cl">        <span class="s2">&#34;Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.1 (KHTML, like Gecko) Chrome/22.0.1207.1 Safari/537.1&#34;</span>
+</span></span><span class="line"><span class="cl">        <span class="s2">&#34;Mozilla/5.0 (X11; CrOS i686 2268.111.0) AppleWebKit/536.11 (KHTML, like Gecko) Chrome/20.0.1132.57 Safari/536.11&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">        <span class="s2">&#34;Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/536.6 (KHTML, like Gecko) Chrome/20.0.1092.0 Safari/536.6&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">        <span class="s2">&#34;Mozilla/5.0 (Windows NT 6.2) AppleWebKit/536.6 (KHTML, like Gecko) Chrome/20.0.1090.0 Safari/536.6&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">        <span class="s2">&#34;Mozilla/5.0 (Windows NT 6.2; WOW64) AppleWebKit/537.1 (KHTML, like Gecko) Chrome/19.77.34.5 Safari/537.1&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">        <span class="s2">&#34;Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/536.5 (KHTML, like Gecko) Chrome/19.0.1084.9 Safari/536.5&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">        <span class="s2">&#34;Mozilla/5.0 (Windows NT 6.0) AppleWebKit/536.5 (KHTML, like Gecko) Chrome/19.0.1084.36 Safari/536.5&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">        <span class="s2">&#34;Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/536.3 (KHTML, like Gecko) Chrome/19.0.1063.0 Safari/536.3&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">        <span class="s2">&#34;Mozilla/5.0 (Windows NT 5.1) AppleWebKit/536.3 (KHTML, like Gecko) Chrome/19.0.1063.0 Safari/536.3&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">        <span class="s2">&#34;Mozilla/5.0 (Macintosh; Intel Mac OS X 10_8_0) AppleWebKit/536.3 (KHTML, like Gecko) Chrome/19.0.1063.0 Safari/536.3&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">        <span class="s2">&#34;Mozilla/5.0 (Windows NT 6.2) AppleWebKit/536.3 (KHTML, like Gecko) Chrome/19.0.1062.0 Safari/536.3&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">        <span class="s2">&#34;Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/536.3 (KHTML, like Gecko) Chrome/19.0.1062.0 Safari/536.3&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">        <span class="s2">&#34;Mozilla/5.0 (Windows NT 6.2) AppleWebKit/536.3 (KHTML, like Gecko) Chrome/19.0.1061.1 Safari/536.3&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">        <span class="s2">&#34;Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/536.3 (KHTML, like Gecko) Chrome/19.0.1061.1 Safari/536.3&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">        <span class="s2">&#34;Mozilla/5.0 (Windows NT 6.1) AppleWebKit/536.3 (KHTML, like Gecko) Chrome/19.0.1061.1 Safari/536.3&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">        <span class="s2">&#34;Mozilla/5.0 (Windows NT 6.2) AppleWebKit/536.3 (KHTML, like Gecko) Chrome/19.0.1061.0 Safari/536.3&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">        <span class="s2">&#34;Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/535.24 (KHTML, like Gecko) Chrome/19.0.1055.1 Safari/535.24&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">        <span class="s2">&#34;Mozilla/5.0 (Windows NT 6.2; WOW64) AppleWebKit/535.24 (KHTML, like Gecko) Chrome/19.0.1055.1 Safari/535.24&#34;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">]</span>
+</span></span></code></pre></div><h3 id="设置多用户登录">设置多用户登录</h3>
+<p>这里我设置了多个登录用户，通过从用户的登录cookie池中随机选取一个作为请求的cookie，在爬虫开始位置导入多个用户的用户名和密码信息，依次登录，登录成功后保存用户cookie到列表，后面每次发包前随机选取一个cookie</p>
+<h3 id="设置splashreuqests函数的等待时间">设置SplashReuqests函数的等待时间</h3>
+<p>就像前面代码中每个SplashRequest函数的args参数中总会带有 一个wait的键值，这个表示每次接到请求后等待的时长，加上这个是为了减慢爬虫运行速度防止由于发包过快导致账号被封</p>
+<p>至此，我已将之前涉及到的所有问题基本上都提到了，很多地方我自认为处理的不是很完美，但是写出来的内容勉强够用。
+这个爬虫项目我最大的收获就是知道了splash这个好用的东西，可惜的是它并没有中文的文档，所以像我这样刚过四级的人读起来还是有点吃力的。所以为了方便他人学习，以及提高我的英文水平我决定乘着这段时间我有空闲我想翻译它的官方文档。目前项目刚刚开始，地址为:<a href="https://splash-cn-doc.readthedocs.io/zh_CN/latest/" target="_blank" rel="noopener noreffer ">splash中文文档</a>
+PS: 不知道这个项目取这个名字会不会涉及到虚假宣传或者版权什么的，如果涉及到这些我会立马改名</p>
+<p>最后的最后列举出项目中参考的文档，在整个项目中参考的文档实在太多，不会一一列举，这里只列举我印象最深的一些</p>
+<ol>
+<li><a href="https://blog.csdn.net/chinwuforwork/article/details/77725959" target="_blank" rel="noopener noreffer ">回归爬虫，拥抱scrapy&amp;splash。抓facebook public post like、comment、share</a></li>
+<li><a href="https://splash.readthedocs.io/en/stable/" target="_blank" rel="noopener noreffer ">Splash官方文档</a></li>
+<li><a href="http://scrapy-chs.readthedocs.io/zh_CN/0.24/index.html" target="_blank" rel="noopener noreffer ">Scrapy文档</a></li>
+<li><a href="https://github.com/scrapy-plugins/scrapy-splash" target="_blank" rel="noopener noreffer ">scrapy_splash项目文档</a></li>
+</ol>
+<!-- raw HTML omitted -->
+</div><div class="post-footer" id="post-footer">
+    <div class="post-info">
+        <div class="post-info-line">
+            <div class="post-info-mod">
+                <span>Updated on 2018-06-02</span>
+            </div></div>
+        <div class="post-info-line">
+            <div class="post-info-md"></div>
+            <div class="post-info-share">
+                <span><a href="javascript:void(0);" title="Share on Twitter" data-sharer="twitter" data-url="http://HaiLateBoy.github.io/posts/fbspider/" data-title="Facebook 爬虫" data-hashtags="python3,facebook,scrapy,splash,爬虫"><i class="fab fa-twitter fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Facebook" data-sharer="facebook" data-url="http://HaiLateBoy.github.io/posts/fbspider/" data-hashtag="python3"><i class="fab fa-facebook-square fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Hacker News" data-sharer="hackernews" data-url="http://HaiLateBoy.github.io/posts/fbspider/" data-title="Facebook 爬虫"><i class="fab fa-hacker-news fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Line" data-sharer="line" data-url="http://HaiLateBoy.github.io/posts/fbspider/" data-title="Facebook 爬虫"><i data-svg-src="https://cdn.jsdelivr.net/npm/simple-icons@7.3.0/icons/line.svg" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on 微博" data-sharer="weibo" data-url="http://HaiLateBoy.github.io/posts/fbspider/" data-title="Facebook 爬虫"><i class="fab fa-weibo fa-fw" aria-hidden="true"></i></a></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="post-info-more">
+        <section class="post-tags"><i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/python3/">python3</a>,&nbsp;<a href="/tags/facebook/">facebook</a>,&nbsp;<a href="/tags/scrapy/">scrapy</a>,&nbsp;<a href="/tags/splash/">splash</a>,&nbsp;<a href="/tags/%E7%88%AC%E8%99%AB/">爬虫</a></section>
+        <section>
+            <span><a href="javascript:void(0);" onclick="window.history.back();">Back</a></span>&nbsp;|&nbsp;<span><a href="/">Home</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav"><a href="/posts/oledb-and-ado-16/" class="prev" rel="prev" title="ATL模板库中的OLEDB与ADO"><i class="fas fa-angle-left fa-fw" aria-hidden="true"></i>ATL模板库中的OLEDB与ADO</a>
+            <a href="/posts/winsock-wsaasyncselect/" class="next" rel="next" title="WSAAsyncSelect 消息模型">WSAAsyncSelect 消息模型<i class="fas fa-angle-right fa-fw" aria-hidden="true"></i></a></div>
+</div>
+</article></div>
+            </main><footer class="footer">
+        <div class="footer-container"><div class="footer-line">Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener noreffer" title="Hugo 0.121.2">Hugo</a> | Theme - <a href="https://github.com/dillonzq/LoveIt" target="_blank" rel="noopener noreffer" title="LoveIt 0.2.11"><i class="far fa-kiss-wink-heart fa-fw" aria-hidden="true"></i> LoveIt</a>
+                </div><div class="footer-line" itemscope itemtype="http://schema.org/CreativeWork"><i class="far fa-copyright fa-fw" aria-hidden="true"></i><span itemprop="copyrightYear">2022 - 2024</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="https://www.masimaro.xyz" target="_blank">Masimaro</a></span></div>
+        </div>
+    </footer></div>
+
+        <div id="fixed-buttons"><a href="#" id="back-to-top" class="fixed-button" title="Back to Top">
+                <i class="fas fa-arrow-up fa-fw" aria-hidden="true"></i>
+            </a><a href="#" id="view-comments" class="fixed-button" title="View Comments">
+                <i class="fas fa-comment fa-fw" aria-hidden="true"></i>
+            </a>
+        </div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.css"><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/autocomplete.js@0.38.1/dist/autocomplete.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lunr@2.3.9/lunr.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lazysizes@5.3.2/lazysizes.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/clipboard@2.0.11/dist/clipboard.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/sharer.js@0.5.1/sharer.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/auto-render.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/copy-tex.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/mhchem.min.js"></script><script type="text/javascript">window.config={"code":{"copyTitle":"Copy to clipboard","maxShownLines":50},"comment":{},"math":{"delimiters":[{"display":true,"left":"$$","right":"$$"},{"display":true,"left":"\\[","right":"\\]"},{"display":true,"left":"\\begin{equation}","right":"\\end{equation}"},{"display":true,"left":"\\begin{equation*}","right":"\\end{equation*}"},{"display":true,"left":"\\begin{align}","right":"\\end{align}"},{"display":true,"left":"\\begin{align*}","right":"\\end{align*}"},{"display":true,"left":"\\begin{alignat}","right":"\\end{alignat}"},{"display":true,"left":"\\begin{alignat*}","right":"\\end{alignat*}"},{"display":true,"left":"\\begin{gather}","right":"\\end{gather}"},{"display":true,"left":"\\begin{CD}","right":"\\end{CD}"},{"display":false,"left":"$","right":"$"},{"display":false,"left":"\\(","right":"\\)"}],"strict":false},"search":{"highlightTag":"em","maxResultLength":10,"noResultsFound":"No results found","snippetLength":50}};</script><script type="text/javascript" src="/js/theme.min.js"></script></body>
+</html>
