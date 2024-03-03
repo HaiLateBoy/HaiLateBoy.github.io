@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="robots" content="noodp" />
+        <title>PDF标准详解（一）——PDF文档结构 - Masimaro&#39;s blog</title><meta name="Description" content="这是我用于记录日常和学习的小站"><meta property="og:title" content="PDF标准详解（一）——PDF文档结构" />
+<meta property="og:description" content="已经很久没有写博客记录自己学到的一些东西了。但是在过去一年的时间中自己确实又学到了一些东西。一直攒着没有系统化成一篇篇的文章，所以今年的博客" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://HaiLateBoy.github.io/posts/pdf-reference-1/" /><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2024-03-03T15:16:36+08:00" />
+<meta property="article:modified_time" content="2024-03-03T15:20:39+08:00" /><meta property="og:site_name" content="Masimaro&#39;s blog" />
+
+<meta name="twitter:card" content="summary"/><meta name="twitter:title" content="PDF标准详解（一）——PDF文档结构"/>
+<meta name="twitter:description" content="已经很久没有写博客记录自己学到的一些东西了。但是在过去一年的时间中自己确实又学到了一些东西。一直攒着没有系统化成一篇篇的文章，所以今年的博客"/>
+<meta name="application-name" content="My cool site">
+<meta name="apple-mobile-web-app-title" content="My cool site"><meta name="theme-color" content="#ffffff"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="manifest" href="/site.webmanifest"><link rel="canonical" href="http://HaiLateBoy.github.io/posts/pdf-reference-1/" /><link rel="prev" href="http://HaiLateBoy.github.io/posts/2024-new-year-plan/" /><link rel="stylesheet" href="/css/style.min.css"><link rel="preload" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css"></noscript><link rel="preload" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css"></noscript><script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "BlogPosting",
+        "headline": "PDF标准详解（一）——PDF文档结构",
+        "inLanguage": "zh-CN",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "http:\/\/HaiLateBoy.github.io\/posts\/pdf-reference-1\/"
+        },"genre": "posts","keywords": "PDF","wordcount":  3218 ,
+        "url": "http:\/\/HaiLateBoy.github.io\/posts\/pdf-reference-1\/","datePublished": "2024-03-03T15:16:36+08:00","dateModified": "2024-03-03T15:20:39+08:00","publisher": {
+            "@type": "Organization",
+            "name": ""},"author": {
+                "@type": "Person",
+                "name": "Masimaro"
+            },"description": ""
+    }
+    </script></head>
+    <body data-header-desktop="fixed" data-header-mobile="auto"><script type="text/javascript">(window.localStorage && localStorage.getItem('theme') ? localStorage.getItem('theme') === 'dark' : ('auto' === 'auto' ? window.matchMedia('(prefers-color-scheme: dark)').matches : 'auto' === 'dark')) && document.body.setAttribute('theme', 'dark');</script>
+
+        <div id="mask"></div><div class="wrapper"><header class="desktop" id="header-desktop">
+    <div class="header-wrapper">
+        <div class="header-title">
+            <a href="/" title="Masimaro&#39;s blog">My cool site</a>
+        </div>
+        <div class="menu">
+            <div class="menu-inner"><a class="menu-item" href="/posts/" title="文章列表"> 文章 </a><a class="menu-item" href="/tags/" title="标签"> 标签 </a><a class="menu-item" href="/categories/" title="分类"> 分类 </a><a class="menu-item" href="/about" title="关于本站"> 关于 </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-desktop">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-desktop" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-desktop" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-desktop">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </span><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                    <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+                </a></div>
+        </div>
+    </div>
+</header><header class="mobile" id="header-mobile">
+    <div class="header-container">
+        <div class="header-wrapper">
+            <div class="header-title">
+                <a href="/" title="Masimaro&#39;s blog">My cool site</a>
+            </div>
+            <div class="menu-toggle" id="menu-toggle-mobile">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+        <div class="menu" id="menu-mobile"><div class="search-wrapper">
+                    <div class="search mobile" id="search-mobile">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-mobile">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-mobile" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-mobile" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-mobile">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </div>
+                    <a href="javascript:void(0);" class="search-cancel" id="search-cancel-mobile">
+                        Cancel
+                    </a>
+                </div><a class="menu-item" href="/posts/" title="文章列表">文章</a><a class="menu-item" href="/tags/" title="标签">标签</a><a class="menu-item" href="/categories/" title="分类">分类</a><a class="menu-item" href="/about" title="关于本站">关于</a><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+            </a></div>
+    </div>
+</header><div class="search-dropdown desktop">
+        <div id="search-dropdown-desktop"></div>
+    </div>
+    <div class="search-dropdown mobile">
+        <div id="search-dropdown-mobile"></div>
+    </div><main class="main">
+                <div class="container"><div class="toc" id="toc-auto">
+            <h2 class="toc-title">Contents</h2>
+            <div class="toc-content" id="toc-content-auto"></div>
+        </div><article class="page single"><h1 class="single-title animate__animated animate__flipInX">PDF标准详解（一）——PDF文档结构</h1><div class="post-meta">
+            <div class="post-meta-line"><span class="post-author"><a href="https://www.masimaro.xyz" title="Author" target="_blank" rel="noopener noreffer author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Masimaro</a></span>&nbsp;<span class="post-category">included in <a href="/categories/pdf-%E7%9B%B8%E5%85%B3%E6%8A%80%E6%9C%AF/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>PDF 相关技术</a></span></div>
+            <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw" aria-hidden="true"></i>&nbsp;<time datetime="2024-03-03">2024-03-03</time>&nbsp;<i class="fas fa-pencil-alt fa-fw" aria-hidden="true"></i>&nbsp;3218 words&nbsp;
+                <i class="far fa-clock fa-fw" aria-hidden="true"></i>&nbsp;7 minutes&nbsp;</div>
+        </div><div class="details toc" id="toc-static"  data-kept="true">
+                <div class="details-summary toc-title">
+                    <span>Contents</span>
+                    <span><i class="details-icon fas fa-angle-right" aria-hidden="true"></i></span>
+                </div>
+                <div class="details-content toc-content" id="toc-content-static"><nav id="TableOfContents">
+  <ul>
+    <li><a href="#pdf简介">PDF简介</a></li>
+    <li><a href="#pdf的文档结构">PDF的文档结构</a></li>
+    <li><a href="#pdf文件的逻辑结构">PDF文件的逻辑结构</a></li>
+    <li><a href="#pdf版的hello-world">PDF版的Hello World</a>
+      <ul>
+        <li><a href="#主要对象">主要对象</a></li>
+        <li><a href="#pdf文档一般的读取过程">PDF文档一般的读取过程</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav></div>
+            </div><div class="content" id="content"><p>已经很久没有写博客记录自己学到的一些东西了。但是在过去一年的时间中自己确实又学到了一些东西。一直攒着没有系统化成一篇篇的文章，所以今年的博客打算也是以去年学到的一系列内容为主。通过之前Vim系列教程的启发，我发现还是写一些系列文章对自己的帮助最大。它能最大化自己的学习成果，并强迫自己深入了解一些内容。所以今年我想还是以系列文章为主，如果中间有需要穿插一些bug处理或者语言特性相关的，可能也会有这方面的内容吧。</p>
+<p>好了，废话就到这里，下面开始正式介绍PDF相关的内容</p>
+<h2 id="pdf简介">PDF简介</h2>
+<p>PDF的全称是 Portable document format(可移植文档格式)，是描述打印页面的世界领先语言。最早于1990年代由Adobe Systems创造。早期是Adobe专有格式，直到2008年作为开放标准发布。后续经过一系列的发展，目前已经发展到了2.0版本，由于PDF完全向后兼容，并且大部分都是向前兼容的，因此，这里不打算固定在某个具体的版本，而是介绍一些PDF通用的标准和规则。</p>
+<h2 id="pdf的文档结构">PDF的文档结构</h2>
+<p>PDF主要由四个部分构成，文件头、文件体、交叉引用表以及文件尾
+文件头将文件标识为PDF并给出它的版本号，例如</p>
+<pre tabindex="0"><code>%PDF-1.0    % PDF 版本号为 1.0 的文件头
+</code></pre><p>文件体是PDF文档的主体内容，主要由对象组成，它规定了页面信息和页面内容元素等信息</p>
+<p>交叉引用表给出了每个对象距离文件首部的地址偏移，这样在解析PDF的时候就不用从头到尾解析每个对象，而是根据需要通过交叉引用表来寻址到具体的对象地址，只单独解析某个对象，提高了解析效率</p>
+<p>文件尾给出交叉引用表的位置并且以</p>
+<pre tabindex="0"><code>%%EOF
+</code></pre><p>作为结尾</p>
+<h2 id="pdf文件的逻辑结构">PDF文件的逻辑结构</h2>
+<p>一个标准的PDF文档需要在文件体中包含下列元素对象：</p>
+<ol>
+<li>根节点元素，类似于xml的根节点，它是整个文档的根节点对象</li>
+<li>Pages对象，它包含了PDF文档的页面信息，一般通过它来定义整个PDF文档有多少页</li>
+<li>Page 页面对象，它用来描述每个具体的页</li>
+<li>Page Content 对象，它来描述每个具体页中都有哪些对象，一般是一个字节流用来表示将在页面中显示哪些内容</li>
+<li>Page Resource 对象，它是内容的资源字典，供Content对象引用，资源包括字体、画刷、画笔等等</li>
+<li>trailer 字典，可以将它看作pdf文档对象的入口，通过它我们可以知道当前PDF文档的一些具体信息，例如根节点的位置，交叉引用表的大小</li>
+</ol>
+<p>它们之间的关系如下图：
+<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://img-blog.csdnimg.cn/direct/828aa252470749938ba10161d62263ae.png#pic_center"
+        data-srcset="https://img-blog.csdnimg.cn/direct/828aa252470749938ba10161d62263ae.png#pic_center, https://img-blog.csdnimg.cn/direct/828aa252470749938ba10161d62263ae.png#pic_center 1.5x, https://img-blog.csdnimg.cn/direct/828aa252470749938ba10161d62263ae.png#pic_center 2x"
+        data-sizes="auto"
+        alt="https://img-blog.csdnimg.cn/direct/828aa252470749938ba10161d62263ae.png#pic_center"
+        title="在这里插入图片描述" /></p>
+<h2 id="pdf版的hello-world">PDF版的Hello World</h2>
+<p>说了这么多，我们来试试来自己编辑一个hello world文档，首先建立一个文本文件，将后缀改为<code>.PDF</code>  。
+我们先写上文件头：</p>
+<pre tabindex="0"><code>%PDF-1.0    % PDF 版本号为 1.0 的文件头
+</code></pre><h3 id="主要对象">主要对象</h3>
+<p>我们按照之前的分析的PDF文档中需要包含的对象，来逐一定义
+首先给出Pages节点的定义</p>
+<pre tabindex="0"><code>1 0 obj % 对象1
+&lt;&lt; /Type /Pages     % 这是一个页面列表
+   /Count 1         % 只有一页
+   /Kids [2 0 R]    % 页面对象编号列表。这里只是对象2
+&gt;&gt;
+endobj  % 对象1结束
+</code></pre><p>对象的内容我们在后续会专门介绍，所以这里不需要额外关注它的语法，这里只需要知道</p>
+<pre tabindex="0"><code>1 0 obj
+</code></pre><p>定义了一个对象1，后续通过1 这个编号可以找到这个对象。这个对象中定义了他的类型是 <code>Pages</code>表示它是一个pages对象，<code>/Count</code>表示整个PDF文档只有一页，<code>Kids</code>是一个数组，表示每一页的页面对象，这里它只有一个页面对象，就是对象2</p>
+<p>接着我们定义页面对象</p>
+<pre tabindex="0"><code>2 0 obj
+&lt;&lt; /Type /Page              % 这是一个页面
+   /MediaBox [0 0 612 792]  % 纸张尺寸为美国信肖像（612点x792点）
+   /Resources 3 0 R         % 对象3的资源引用
+   /Contents [4 0 R]        % 图形内容在对象4中
+&gt;&gt;
+endobj
+</code></pre><p>页面对象中我们定义了页面纸张的大小，单位是磅。因为PDF是可移植文档，它需要在不同设备上显示同样的内容，这里不能使用像素，如果使用像素，在同样尺寸的显示器上如果显示器的像素分辨率不同，那么显示的结果将会不同。所以这里一般使用磅作为单位。</p>
+<p>同时在页面对象中定义了页面中将要使用的资源以及将要显示的内容</p>
+<p>接着我们来定义资源对象</p>
+<pre tabindex="0"><code>3 0 obj
+&lt;&lt; /Font  % 字体字典
+     &lt;&lt; /F0  % 只有一种字体，称为/F0
+          &lt;&lt; /Type /Font  % 这三行引用了内置字体Times Italic
+            /BaseFont /Times-Italic
+            /Subtype /Type1 &gt;&gt;
+     &gt;&gt;
+&gt;&gt;
+endobj
+</code></pre><p>资源对象中，我们定义了一个字体资源，字体为 <code>Times Italic</code>，并且定义了这种字体资源的名称为 F0, 后面可以通过F0 这个名称来直接引用这个字体</p>
+<p>然后我们来定义页面内容对象</p>
+<pre tabindex="0"><code>4 0 obj     % 页面内容流
+&lt;&lt; &gt;&gt;
+stream      % 流的开始
+1. 0. 0. 1. 50. 700. cm % 位置在（50,700）
+BT  % 开始文本块
+ /F0 36. Tf         % 在36pt选择/F0字体
+ (Hello, World!) Tj % 放置文本字符串
+ET  % 结束文本块
+endstream   % 流结束
+endobj
+</code></pre><p>通过stream来定义一个流对象，在这个流对象中，我们定义它在页面的 (50, 700) 坐标位置显示字符，显示字符内容通过后面的 <code>(Hello, World!) Tj</code>来定义，并且定义了字符采用F0 字体，也就是上面定义的<code>Times-Italic</code>字体</p>
+<p>页面相关的内容我们已经定义完了，接着我们需要定义一些结构相关的对象，方便PDF解析器找到并解析页面内容。</p>
+<p>我们来定义根节点</p>
+<pre tabindex="0"><code>5 0 obj
+&lt;&lt; /Type /Catalog %文件目录
+   /Pages 1 0 R   %参考页面列表
+&gt;&gt;
+endobj
+</code></pre><p>根节点包含了一个Pages定义，通过根节点就可以找到Pages节点</p>
+<p>接着我们来定义交叉引用表</p>
+<pre tabindex="0"><code>xref %这里我们跳过了交叉引用表的开始
+0 6
+</code></pre><p>交叉引用表包含一些偏移地址信息，我们单纯的通过文本文档很难计算各个对象的偏移，所以这里我们只给出文档中对象数量为6，具体的地址我们先不给出，这样PDF解析器也能解析出各个对象</p>
+<p>之前我们给出了5个对象的定义，但是交叉引用表的条目却是6，这是因为交叉引用表的第一条一般是一个没有什么用处的，有效的对象从第二条定义开始。</p>
+<p>下面给出 Trailer 字典的定义</p>
+<pre tabindex="0"><code>trailer
+&lt;&lt; /Size 6 %交叉引用表的行数
+   /Root 5 0 R % 参考文档目录
+&gt;&gt;
+</code></pre><p>Trailer 字典以 <code>trailer</code>关键字开始。条目下面包括了交叉引用表的行数以及根节点的对象</p>
+<p>最后我们给出交叉引用表在PDF文档中的偏移，由于交叉引用表的内容为空，所以这里我们直接给0</p>
+<pre tabindex="0"><code>startxref
+0			%xref表开始的字节偏移量，这里设置成0
+</code></pre><p>最后我们以</p>
+<pre tabindex="0"><code>%%EOF
+</code></pre><p>结尾来表示整个PDF文档结束</p>
+<p>到这里我们已经得到了一个PDF阅读器可以打开的PDF文档。我们使用PDF阅读器可以得到如下的页面
+<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://img-blog.csdnimg.cn/direct/476521a6ba014e6db0d535588b263e42.png#pic_center"
+        data-srcset="https://img-blog.csdnimg.cn/direct/476521a6ba014e6db0d535588b263e42.png#pic_center, https://img-blog.csdnimg.cn/direct/476521a6ba014e6db0d535588b263e42.png#pic_center 1.5x, https://img-blog.csdnimg.cn/direct/476521a6ba014e6db0d535588b263e42.png#pic_center 2x"
+        data-sizes="auto"
+        alt="https://img-blog.csdnimg.cn/direct/476521a6ba014e6db0d535588b263e42.png#pic_center"
+        title="在这里插入图片描述" /></p>
+<h3 id="pdf文档一般的读取过程">PDF文档一般的读取过程</h3>
+<p>不知道各位小伙伴们是否能看懂上面 Hello World 文档的定义。下面我们通过一个完整的 <code>PDF</code>文档来将上面所有定义的对象串起来，希望各位能对PDF文档有一个完整的认识。我们不用纠结各个部分的写法，以及为什么要这么写，只需要明白各个对象的功能即可。具体对象定义相关的语法和每个对象的详细解释将会在后面一系列文章中给出，相信那个时候再来看这个 Hello Word 文档一定会有一个更清晰的认识。</p>
+<p>再说明文档读取的过程前，我们先使用一些工具来补全这个文档，这里使用 <code>pdftk</code> 工具。可以在<a href="https://www.pdflabs.com/tools/pdftk-the-pdf-toolkit/" target="_blank" rel="noopener noreffer ">这里</a> 进行下载，完成之后，使用如下命令进行补全</p>
+<pre tabindex="0"><code>pdftk hello.pdf output hello-full.pdf
+</code></pre><p>成功后会得到如下内容</p>
+<pre tabindex="0"><code>%PDF-1.0
+%忏嫌
+1 0 obj 
+&lt;&lt;
+/Kids [2 0 R]
+/Count 1
+/Type /Pages
+&gt;&gt;
+endobj 
+2 0 obj 
+&lt;&lt;
+/Resources 3 0 R
+/MediaBox [0 0 612 792]
+/Contents [4 0 R]
+/Type /Page
+&gt;&gt;
+endobj 
+3 0 obj 
+&lt;&lt;
+/Font 
+&lt;&lt;
+/F0 
+&lt;&lt;
+/BaseFont /Times-Italic
+/Subtype /Type1
+/Type /Font
+&gt;&gt;
+&gt;&gt;
+&gt;&gt;
+endobj 
+4 0 obj 
+&lt;&lt;
+/Length 202
+&gt;&gt;
+stream
+% 娴佺殑寮€濮?
+1. 0. 0. 1. 50. 700. cm % 浣嶇疆鍦紙50,700锛?
+BT  % 寮€濮嬫枃鏈潡
+ /F0 36. Tf         % 鍦?6pt閫夋嫨/F0瀛椾綋
+ (Hello, World!) Tj % 鏀剧疆鏂囨湰瀛楃涓?
+ET  % 缁撴潫鏂囨湰鍧?
+
+endstream 
+endobj 
+5 0 obj 
+&lt;&lt;
+/Pages 1 0 R
+/Type /Catalog
+&gt;&gt;
+endobj xref
+0 6
+0000000000 65535 f 
+0000000015 00000 n 
+0000000074 00000 n 
+0000000168 00000 n 
+0000000267 00000 n 
+0000000523 00000 n 
+trailer
+
+&lt;&lt;
+/Root 5 0 R
+/Size 6
+&gt;&gt;
+startxref
+573
+%%EOF
+</code></pre><p>这个我将整个PDF文档都粘贴了出来，从这里我们可以看到，它已经为我们补全了交叉引用表。下面通过整个文档来说明一般读取过程</p>
+<ol>
+<li>PDF解析程序，先通过文件头来确定是否是PDF文件，并且得到PDF文件的版本</li>
+<li>在文件末尾找到%%EOF 关键子，确定文件尾。接着向上查找到 startxref 关键字，该关键字后面将会给出交叉引用表的偏移，通过这个偏移地址可以找到交叉引用表</li>
+<li>接着查找trailer关键字，通过trailer关键字可以得到文档的一些信息，这里关键的是得到 Root 节点的对象。</li>
+<li>根据交叉引用表可以很块定位到Root 节点对象，也就是对象5</li>
+<li>根据Root 对象中的 Pages属性可以找到Pages对象，也就是PDF页面信息对象</li>
+<li>根据Pages对象中的Kids 数组，可以找到PDF包含的所有页面对象，这个文档只有一个页面对象</li>
+<li>找到Page 对象后可以根据 Resources 和Contents属性可以找到页面内容和页面引用的资源。例如该文档就可以使用<code>Times-Italic</code>字体显示 <code>hello world</code>字符串</li>
+</ol>
+</div><div class="post-footer" id="post-footer">
+    <div class="post-info">
+        <div class="post-info-line">
+            <div class="post-info-mod">
+                <span>Updated on 2024-03-03</span>
+            </div></div>
+        <div class="post-info-line">
+            <div class="post-info-md"></div>
+            <div class="post-info-share">
+                <span><a href="javascript:void(0);" title="Share on Twitter" data-sharer="twitter" data-url="http://HaiLateBoy.github.io/posts/pdf-reference-1/" data-title="PDF标准详解（一）——PDF文档结构" data-hashtags="PDF"><i class="fab fa-twitter fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Facebook" data-sharer="facebook" data-url="http://HaiLateBoy.github.io/posts/pdf-reference-1/" data-hashtag="PDF"><i class="fab fa-facebook-square fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Hacker News" data-sharer="hackernews" data-url="http://HaiLateBoy.github.io/posts/pdf-reference-1/" data-title="PDF标准详解（一）——PDF文档结构"><i class="fab fa-hacker-news fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Line" data-sharer="line" data-url="http://HaiLateBoy.github.io/posts/pdf-reference-1/" data-title="PDF标准详解（一）——PDF文档结构"><i data-svg-src="https://cdn.jsdelivr.net/npm/simple-icons@7.3.0/icons/line.svg" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on 微博" data-sharer="weibo" data-url="http://HaiLateBoy.github.io/posts/pdf-reference-1/" data-title="PDF标准详解（一）——PDF文档结构"><i class="fab fa-weibo fa-fw" aria-hidden="true"></i></a></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="post-info-more">
+        <section class="post-tags"><i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/pdf/">PDF</a></section>
+        <section>
+            <span><a href="javascript:void(0);" onclick="window.history.back();">Back</a></span>&nbsp;|&nbsp;<span><a href="/">Home</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav"><a href="/posts/2024-new-year-plan/" class="prev" rel="prev" title="2023 年度回顾与2024 年展望"><i class="fas fa-angle-left fa-fw" aria-hidden="true"></i>2023 年度回顾与2024 年展望</a></div>
+</div>
+</article></div>
+            </main><footer class="footer">
+        <div class="footer-container"><div class="footer-line">Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener noreffer" title="Hugo 0.121.2">Hugo</a> | Theme - <a href="https://github.com/dillonzq/LoveIt" target="_blank" rel="noopener noreffer" title="LoveIt 0.2.11"><i class="far fa-kiss-wink-heart fa-fw" aria-hidden="true"></i> LoveIt</a>
+                </div><div class="footer-line" itemscope itemtype="http://schema.org/CreativeWork"><i class="far fa-copyright fa-fw" aria-hidden="true"></i><span itemprop="copyrightYear">2022 - 2024</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="https://www.masimaro.xyz" target="_blank">Masimaro</a></span></div>
+        </div>
+    </footer></div>
+
+        <div id="fixed-buttons"><a href="#" id="back-to-top" class="fixed-button" title="Back to Top">
+                <i class="fas fa-arrow-up fa-fw" aria-hidden="true"></i>
+            </a><a href="#" id="view-comments" class="fixed-button" title="View Comments">
+                <i class="fas fa-comment fa-fw" aria-hidden="true"></i>
+            </a>
+        </div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.css"><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/autocomplete.js@0.38.1/dist/autocomplete.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lunr@2.3.9/lunr.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lazysizes@5.3.2/lazysizes.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/clipboard@2.0.11/dist/clipboard.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/sharer.js@0.5.1/sharer.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/auto-render.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/copy-tex.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/mhchem.min.js"></script><script type="text/javascript">window.config={"code":{"copyTitle":"Copy to clipboard","maxShownLines":50},"comment":{},"math":{"delimiters":[{"display":true,"left":"$$","right":"$$"},{"display":true,"left":"\\[","right":"\\]"},{"display":true,"left":"\\begin{equation}","right":"\\end{equation}"},{"display":true,"left":"\\begin{equation*}","right":"\\end{equation*}"},{"display":true,"left":"\\begin{align}","right":"\\end{align}"},{"display":true,"left":"\\begin{align*}","right":"\\end{align*}"},{"display":true,"left":"\\begin{alignat}","right":"\\end{alignat}"},{"display":true,"left":"\\begin{alignat*}","right":"\\end{alignat*}"},{"display":true,"left":"\\begin{gather}","right":"\\end{gather}"},{"display":true,"left":"\\begin{CD}","right":"\\end{CD}"},{"display":false,"left":"$","right":"$"},{"display":false,"left":"\\(","right":"\\)"}],"strict":false},"search":{"highlightTag":"em","maxResultLength":10,"noResultsFound":"No results found","snippetLength":50}};</script><script type="text/javascript" src="/js/theme.min.js"></script></body>
+</html>
