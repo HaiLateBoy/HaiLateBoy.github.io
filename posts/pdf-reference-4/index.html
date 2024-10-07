@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="robots" content="noodp" />
+        <title>PDF标准详解（四）——图形操作符 - Masimaro&#39;s blog</title><meta name="Description" content="这是我用于记录日常和学习的小站"><meta property="og:title" content="PDF标准详解（四）——图形操作符" />
+<meta property="og:description" content="上一节，我们了解了PDF中cm操作符，它是定义变换矩阵的。同时也了解到re是创建一个矩阵的。上一节也说过，它用来构建一个路径，具体什么是路径" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://HaiLateBoy.github.io/posts/pdf-reference-4/" /><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2024-10-07T21:59:01+08:00" />
+<meta property="article:modified_time" content="2024-10-07T22:05:16+08:00" /><meta property="og:site_name" content="Masimaro&#39;s blog" />
+
+<meta name="twitter:card" content="summary"/><meta name="twitter:title" content="PDF标准详解（四）——图形操作符"/>
+<meta name="twitter:description" content="上一节，我们了解了PDF中cm操作符，它是定义变换矩阵的。同时也了解到re是创建一个矩阵的。上一节也说过，它用来构建一个路径，具体什么是路径"/>
+<meta name="application-name" content="My cool site">
+<meta name="apple-mobile-web-app-title" content="My cool site"><meta name="theme-color" content="#ffffff"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="manifest" href="/site.webmanifest"><link rel="canonical" href="http://HaiLateBoy.github.io/posts/pdf-reference-4/" /><link rel="prev" href="http://HaiLateBoy.github.io/posts/pdf-reference-3/" /><link rel="next" href="http://HaiLateBoy.github.io/posts/pdf-reference-5/" /><link rel="stylesheet" href="/css/style.min.css"><link rel="preload" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css"></noscript><link rel="preload" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css"></noscript><script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "BlogPosting",
+        "headline": "PDF标准详解（四）——图形操作符",
+        "inLanguage": "zh-CN",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "http:\/\/HaiLateBoy.github.io\/posts\/pdf-reference-4\/"
+        },"genre": "posts","keywords": "PDF","wordcount":  3235 ,
+        "url": "http:\/\/HaiLateBoy.github.io\/posts\/pdf-reference-4\/","datePublished": "2024-10-07T21:59:01+08:00","dateModified": "2024-10-07T22:05:16+08:00","publisher": {
+            "@type": "Organization",
+            "name": ""},"author": {
+                "@type": "Person",
+                "name": "Masimaro"
+            },"description": ""
+    }
+    </script></head>
+    <body data-header-desktop="fixed" data-header-mobile="auto"><script type="text/javascript">(window.localStorage && localStorage.getItem('theme') ? localStorage.getItem('theme') === 'dark' : ('auto' === 'auto' ? window.matchMedia('(prefers-color-scheme: dark)').matches : 'auto' === 'dark')) && document.body.setAttribute('theme', 'dark');</script>
+
+        <div id="mask"></div><div class="wrapper"><header class="desktop" id="header-desktop">
+    <div class="header-wrapper">
+        <div class="header-title">
+            <a href="/" title="Masimaro&#39;s blog">My cool site</a>
+        </div>
+        <div class="menu">
+            <div class="menu-inner"><a class="menu-item" href="/posts/" title="文章列表"> 文章 </a><a class="menu-item" href="/tags/" title="标签"> 标签 </a><a class="menu-item" href="/categories/" title="分类"> 分类 </a><a class="menu-item" href="/about" title="关于本站"> 关于 </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-desktop">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-desktop" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-desktop" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-desktop">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </span><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                    <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+                </a></div>
+        </div>
+    </div>
+</header><header class="mobile" id="header-mobile">
+    <div class="header-container">
+        <div class="header-wrapper">
+            <div class="header-title">
+                <a href="/" title="Masimaro&#39;s blog">My cool site</a>
+            </div>
+            <div class="menu-toggle" id="menu-toggle-mobile">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+        <div class="menu" id="menu-mobile"><div class="search-wrapper">
+                    <div class="search mobile" id="search-mobile">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-mobile">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-mobile" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-mobile" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-mobile">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </div>
+                    <a href="javascript:void(0);" class="search-cancel" id="search-cancel-mobile">
+                        Cancel
+                    </a>
+                </div><a class="menu-item" href="/posts/" title="文章列表">文章</a><a class="menu-item" href="/tags/" title="标签">标签</a><a class="menu-item" href="/categories/" title="分类">分类</a><a class="menu-item" href="/about" title="关于本站">关于</a><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+            </a></div>
+    </div>
+</header><div class="search-dropdown desktop">
+        <div id="search-dropdown-desktop"></div>
+    </div>
+    <div class="search-dropdown mobile">
+        <div id="search-dropdown-mobile"></div>
+    </div><main class="main">
+                <div class="container"><div class="toc" id="toc-auto">
+            <h2 class="toc-title">Contents</h2>
+            <div class="toc-content" id="toc-content-auto"></div>
+        </div><article class="page single"><h1 class="single-title animate__animated animate__flipInX">PDF标准详解（四）——图形操作符</h1><div class="post-meta">
+            <div class="post-meta-line"><span class="post-author"><a href="https://www.masimaro.xyz" title="Author" target="_blank" rel="noopener noreffer author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Masimaro</a></span>&nbsp;<span class="post-category">included in <a href="/categories/pdf-%E7%9B%B8%E5%85%B3%E6%8A%80%E6%9C%AF/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>PDF 相关技术</a></span></div>
+            <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw" aria-hidden="true"></i>&nbsp;<time datetime="2024-10-07">2024-10-07</time>&nbsp;<i class="fas fa-pencil-alt fa-fw" aria-hidden="true"></i>&nbsp;3235 words&nbsp;
+                <i class="far fa-clock fa-fw" aria-hidden="true"></i>&nbsp;7 minutes&nbsp;</div>
+        </div><div class="details toc" id="toc-static"  data-kept="true">
+                <div class="details-summary toc-title">
+                    <span>Contents</span>
+                    <span><i class="details-icon fas fa-angle-right" aria-hidden="true"></i></span>
+                </div>
+                <div class="details-content toc-content" id="toc-content-static"><nav id="TableOfContents">
+  <ul>
+    <li><a href="#路径">路径</a>
+      <ul>
+        <li><a href="#路径构建操作符">路径构建操作符</a></li>
+        <li><a href="#路径显示操作符">路径显示操作符</a></li>
+        <li><a href="#描边与填充操作">描边与填充操作</a></li>
+        <li><a href="#非0缠绕规则和奇偶绕组规则">非0缠绕规则和奇偶绕组规则</a></li>
+        <li><a href="#定义裁剪区域">定义裁剪区域</a></li>
+      </ul>
+    </li>
+    <li><a href="#总结">总结</a></li>
+  </ul>
+</nav></div>
+            </div><div class="content" id="content"><p>上一节，我们了解了PDF中cm操作符，它是定义变换矩阵的。同时也了解到re是创建一个矩阵的。上一节也说过，它用来构建一个路径，具体什么是路径，路径有什么作用呢？这些将在本节给出解释</p>
+<p>图形操作符是用来在pdf中构建内容并输出到相关设备上进行显示的。pdf中我们能看到的内容几乎都是由图形操作构成的。PDF中主要有6中图形操作符：</p>
+<ol>
+<li>图形状态操作符（Graphics state operator）：CTM当前变换矩阵、 current color、 current clipping path。</li>
+<li>路径构造操作符（Path construction operators）：线的轨迹,，各种图形。</li>
+<li>绘制路径操作符（Path-painting operators）：填充， 描边， 或定义一个剪切区域。</li>
+<li>其他绘图操作符（自我描述图形对象）： 图像(image)，shading。</li>
+<li>文本操作符（Text operator）：从字体（代表文本字符的字面/版式（TYPE-FACES）的描述）中选择，显示字符字形字符操作，例如前面显示hello，world 用到的Tj 操作符</li>
+<li>标记内容操作符（Marked-content Operator）： Layers</li>
+</ol>
+<p>这一次我们主要介绍前两个，后面的等后续慢慢介绍</p>
+<h2 id="路径">路径</h2>
+<h3 id="路径构建操作符">路径构建操作符</h3>
+<p>路径对象主要由直线、矩形框(re)、3次贝塞尔曲线构成。</p>
+<p>对于直线来说，我们需要先使用m(moveto) 来将画笔移动到指定位置，然后使用l(lineto) 来表示将画笔移动到某一个点。例如有下面的例子</p>
+<pre tabindex="0"><code>3 0 obj     % 页面内容流
+&lt;&lt; &gt;&gt;
+stream      % 流的开始
+400 400 m 100 100 l s
+endstream   % 流结束
+endobj
+</code></pre><p>这里我们定义了一个从 (400, 400) 到(100, 100) 的直线。在画直线的时候，m只能有一个，作为起点，而l可以有多个，每有一个l都表示从画笔的上一个点画一条直线到新的位置。例如我们可以模拟一个画一个矩形</p>
+<pre tabindex="0"><code>3 0 obj     % 页面内容流
+&lt;&lt; &gt;&gt;
+stream      % 流的开始
+400 400 m 100 100 l s
+100 100 m 300 100 l 300 300 l 100 300 l  100 100 l S
+endstream   % 流结束
+endobj
+</code></pre><p>矩形的例子比较简单，这里就不给出了。我们只需要指定起点坐标并且加上长宽最后用re 操作符作为结束符即可构建</p>
+<p>对于贝塞尔曲线来说，我们需要4个点来画出一条曲线，它们的位置如下图所示
+<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://i-blog.csdnimg.cn/blog_migrate/f7935ac22d5af0698b5847987ee921fa.jpeg#pic_center"
+        data-srcset="https://i-blog.csdnimg.cn/blog_migrate/f7935ac22d5af0698b5847987ee921fa.jpeg#pic_center, https://i-blog.csdnimg.cn/blog_migrate/f7935ac22d5af0698b5847987ee921fa.jpeg#pic_center 1.5x, https://i-blog.csdnimg.cn/blog_migrate/f7935ac22d5af0698b5847987ee921fa.jpeg#pic_center 2x"
+        data-sizes="auto"
+        alt="https://i-blog.csdnimg.cn/blog_migrate/f7935ac22d5af0698b5847987ee921fa.jpeg#pic_center"
+        title="在这里插入图片描述" />
+我们需要一个起始和结束位置的点，并且加上两个控制点共同组成一条贝塞尔曲线。
+贝塞尔曲线我们使用c来作为操作符，在构建的时候需要使用m来规定起始位置的坐标，然后再跟上上图p1, p2, p3 的坐标来控制曲线。例如下面的例子</p>
+<pre tabindex="0"><code>3 0 obj     % 页面内容流
+&lt;&lt; &gt;&gt;
+stream      % 流的开始
+100 100 m 200 300 300 400 400 200 c S
+endstream   % 流结束
+endobj
+</code></pre><p>这样我们构建了一条如下图所示的曲线
+<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://i-blog.csdnimg.cn/blog_migrate/dd4b931112e8c944e6df48d3fee2b8b5.png#pic_center"
+        data-srcset="https://i-blog.csdnimg.cn/blog_migrate/dd4b931112e8c944e6df48d3fee2b8b5.png#pic_center, https://i-blog.csdnimg.cn/blog_migrate/dd4b931112e8c944e6df48d3fee2b8b5.png#pic_center 1.5x, https://i-blog.csdnimg.cn/blog_migrate/dd4b931112e8c944e6df48d3fee2b8b5.png#pic_center 2x"
+        data-sizes="auto"
+        alt="https://i-blog.csdnimg.cn/blog_migrate/dd4b931112e8c944e6df48d3fee2b8b5.png#pic_center"
+        title="在这里插入图片描述" />
+我们对上面出现的操作符做一个总结</p>
+<table>
+<thead>
+<tr>
+<th>操作符</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>m</td>
+<td>设置点的起始位置(moveto)</td>
+</tr>
+<tr>
+<td>l</td>
+<td>从当前位置构建一条直线到对应位置 (lineto)</td>
+</tr>
+<tr>
+<td>re</td>
+<td>构建矩形路径</td>
+</tr>
+<tr>
+<td>c</td>
+<td>构建贝塞尔曲线</td>
+</tr>
+</tbody>
+</table>
+<h3 id="路径显示操作符">路径显示操作符</h3>
+<p>上述操作符只能构建一个路径，而这个路径究竟该如何显示，用作何种用途，需要另外给出操作，如果仅仅构建路径，那么页面上是不会有任何显示的，例如上述的内容流，我们稍微做一下更改，去掉最后的<code>S</code> 操作符，我们可以发现之前显示的内容现在不显示了</p>
+<pre tabindex="0"><code>3 0 obj     % 页面内容流
+&lt;&lt; &gt;&gt;
+stream      % 流的开始
+100 100 m 200 300 300 400 400 200 c % 只构建路径，而不对路径做任何操作，页面不会有路径的内容
+endstream   % 流结束
+endobj
+</code></pre><p>想要显示路径，我们需要使用 <code>S</code> 操作符。上面的路径，我们在最后加上<code>S</code> 就能显示出图形了。</p>
+<p>另外我们可以使用h操作符来构建一个闭合的路径，它是在原来图形的基础之上，使用一条直线将起始点到终点的两个点连接起来构成要给封闭的区间。例如上面使用直线画矩形的例子，我们可以删掉最后一个<code>l</code> 操作符，并使用<code>h</code> 闭合，照样能形成矩形</p>
+<pre tabindex="0"><code>3 0 obj     % 页面内容流
+&lt;&lt; &gt;&gt;
+stream      % 流的开始
+400 400 m 100 100 l s
+100 100 m 300 100 l 300 300 l 100 300 l h S 
+endstream   % 流结束
+endobj
+</code></pre><p>去掉<code>h</code> 我们将得到一个开口的矩形。这个读者可以自行尝试，这里就不给出结果了。</p>
+<p>对于上面的贝塞尔曲线的例子</p>
+<pre tabindex="0"><code>3 0 obj     % 页面内容流
+&lt;&lt; &gt;&gt;
+stream      % 流的开始
+100 100 m 200 300 300 400 400 200 c h S
+endstream   % 流结束
+endobj
+</code></pre><p>加上<code>h</code> 之后将得到下面的结果
+<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://i-blog.csdnimg.cn/blog_migrate/8360a490df68f48791191dabd34a6ec4.png#pic_center"
+        data-srcset="https://i-blog.csdnimg.cn/blog_migrate/8360a490df68f48791191dabd34a6ec4.png#pic_center, https://i-blog.csdnimg.cn/blog_migrate/8360a490df68f48791191dabd34a6ec4.png#pic_center 1.5x, https://i-blog.csdnimg.cn/blog_migrate/8360a490df68f48791191dabd34a6ec4.png#pic_center 2x"
+        data-sizes="auto"
+        alt="https://i-blog.csdnimg.cn/blog_migrate/8360a490df68f48791191dabd34a6ec4.png#pic_center"
+        title="在这里插入图片描述" /></p>
+<h3 id="描边与填充操作">描边与填充操作</h3>
+<p>这里我们采用S对路径勾画出了边框，也就是描边路径，它对应的英文单词是stroke，我们也可以使用f 或者F(fill)来对路径构成的封闭区间进行填充。默认采用黑色进行填充。</p>
+<pre tabindex="0"><code>3 0 obj     % 页面内容流
+&lt;&lt; &gt;&gt;
+stream      % 流的开始
+100 100 m 200 300 300 400 400 200 c h f
+endstream   % 流结束
+endobj
+</code></pre><p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://i-blog.csdnimg.cn/direct/e63a5744a02a4cb3b6e86812f428130a.png#pic_center"
+        data-srcset="https://i-blog.csdnimg.cn/direct/e63a5744a02a4cb3b6e86812f428130a.png#pic_center, https://i-blog.csdnimg.cn/direct/e63a5744a02a4cb3b6e86812f428130a.png#pic_center 1.5x, https://i-blog.csdnimg.cn/direct/e63a5744a02a4cb3b6e86812f428130a.png#pic_center 2x"
+        data-sizes="auto"
+        alt="https://i-blog.csdnimg.cn/direct/e63a5744a02a4cb3b6e86812f428130a.png#pic_center"
+        title="在这里插入图片描述" />
+当然也可以提前指定画刷颜色，这个我们在后面介绍颜色空间的时候再介绍如何定义画刷和画笔。</p>
+<p>另外也可以使用b或者B(both) 来同时进行描边和填充操作。</p>
+<h3 id="非0缠绕规则和奇偶绕组规则">非0缠绕规则和奇偶绕组规则</h3>
+<p>上述图形，我们很明确的仅定义了一个简单的区域，当出现重叠的复杂区域时，该如何进行填充呢？这里有两套不同的填充规则，即非0缠绕规则和奇偶绕组规则。</p>
+<pre tabindex="0"><code>3 0 obj     % 页面内容流
+&lt;&lt; &gt;&gt;
+stream      % 流的开始
+100 350 200 200 re %生成矩形左上角坐标 (100, 350) 宽高都是200
+120 370 160 160 re f %按照非0缠绕规则
+400 350 200 200 re %生成矩形左上角坐标 (400, 350) 宽高都是200
+420 370 160 160 re f* %按照奇偶缠绕规则
+endstream   % 流结束
+endobj
+</code></pre><p>这里显示的效果如下
+<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://i-blog.csdnimg.cn/direct/f972b3e296424fa78b4eedcfe8ee1db4.png#pic_center"
+        data-srcset="https://i-blog.csdnimg.cn/direct/f972b3e296424fa78b4eedcfe8ee1db4.png#pic_center, https://i-blog.csdnimg.cn/direct/f972b3e296424fa78b4eedcfe8ee1db4.png#pic_center 1.5x, https://i-blog.csdnimg.cn/direct/f972b3e296424fa78b4eedcfe8ee1db4.png#pic_center 2x"
+        data-sizes="auto"
+        alt="https://i-blog.csdnimg.cn/direct/f972b3e296424fa78b4eedcfe8ee1db4.png#pic_center"
+        title="在这里插入图片描述" />
+我们在这里定义了两组矩形，每组有两个矩形路径进行了重叠。第一组采用非0缠绕规则，第二组采用奇偶规则来填充。
+我们先以这两个图形为例，来说明这两个规则
+<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://i-blog.csdnimg.cn/direct/65b0f5b88d19422cbf23c60ad8b9005d.png#pic_center"
+        data-srcset="https://i-blog.csdnimg.cn/direct/65b0f5b88d19422cbf23c60ad8b9005d.png#pic_center, https://i-blog.csdnimg.cn/direct/65b0f5b88d19422cbf23c60ad8b9005d.png#pic_center 1.5x, https://i-blog.csdnimg.cn/direct/65b0f5b88d19422cbf23c60ad8b9005d.png#pic_center 2x"
+        data-sizes="auto"
+        alt="https://i-blog.csdnimg.cn/direct/65b0f5b88d19422cbf23c60ad8b9005d.png#pic_center"
+        title="在这里插入图片描述" />
+非0规则：</p>
+<ol>
+<li>初始化环绕数到 0 。</li>
+<li>从图形中的任意一点 P 向外任意引一条射线。</li>
+<li>每遇到一条与该线的交叉线，如果射线与路劲的顺时针相交则计数加一，否则计数减一</li>
+<li>假如环绕数不等于 0 ，则点 P 在多边形内。</li>
+<li>但是这个方法有局限性 , 不适合相交 , 或者选一条正切的射线 . 因为射线的方向是任意的 , 这个规则简单的选用射线并不碰到这些情况</li>
+</ol>
+<p>例如上面我们定义了两个矩形，这两个矩形划分出了两个区域，也就是图中A和B所在区域。我们从A区域随意一点往外引一条射线。从图上看，射线与两条路劲相交，并且都是顺时针相交，所以这里的技术是2。同理，B点与一条顺时针路径路径计数是1。这两个区域的计数都不是0，所以他们都需要进行填充，因此它显示的是上图左侧的效果</p>
+<p>奇偶规则：</p>
+<ol>
+<li>从区域内某一点向外引一条射线。</li>
+<li>简单计算与该射线相交线的数量。</li>
+<li>如果这个数是奇数，则认为点在图形内。
+根据这个规则，我们看到A点的计数是2，是偶数，Bdian的计数是1，是奇数。按照奇偶规则，B点需要填充，而A点不需要进行填充。所以它显示的是上图右侧的效果</li>
+</ol>
+<p>我们再看一个例子</p>
+<pre tabindex="0"><code>3 0 obj     % 页面内容流
+&lt;&lt; &gt;&gt;
+stream      % 流的开始
+
+150 50 m 150 250 l 250 50 l 50 150 l 350 150 l h f 
+550 50 m 550 250 l 650 50 l 450 150 l 750 150 l h f*
+endstream   % 流结束
+endobj
+</code></pre><p>这里我们画了两个五角星，线条的顺序按照m给出的为起点，每一个l代表笔画移动的一个端点，根据上述给出的值我们可以得到对应路径的环绕方向，具体的分析过程这里就不展开了，有兴趣的小伙伴可以自己尝试着画图分析一下,然后使用pdf阅读软件打开看看效果与预估的是否一样</p>
+<h3 id="定义裁剪区域">定义裁剪区域</h3>
+<p>我们利用一些操作符来定义一个路径，这些路径可以作为图形显示出来，也可以作为一个裁剪区域，在该区域中的内容显示出来，不在该区域的内容则丢弃。</p>
+<p>对于给出的路径，我们使用W (非0缠绕)或者 W*(奇偶规则)来定义一个裁剪区域。例如下面有一个例子</p>
+<pre tabindex="0"><code>3 0 obj     % 页面内容流
+&lt;&lt; &gt;&gt;
+stream      % 流的开始
+100 100 200 200 re h
+W %将上述路径设置为裁剪路径
+150 150 m 200 200 l S %在裁剪路径中，所以会显示
+0 0 m 500 800 l S %只显示裁剪路径中的内容
+endstream   % 流结束
+endobj
+</code></pre><p>这里我们定义了一个长宽都为200的矩形，并且使用<code>h</code> 将矩形区域封闭，然后使用W来将矩形内部作为裁剪区域，然后在(150, 150) 的位置画一条直线到 (200, 200) 的位置。这两个点都在矩形内部，所以会显示出来，另外再画一条从 (0, 0) 到 (500, 800) 的线条，因为这条线有一部分在裁剪区域外，一部分在裁剪区域内，所以只会显示一部分线条。最终图形呈现的效果如下
+<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://i-blog.csdnimg.cn/direct/41f7456bb2f14dc3885d6451b19550ab.png#pic_center"
+        data-srcset="https://i-blog.csdnimg.cn/direct/41f7456bb2f14dc3885d6451b19550ab.png#pic_center, https://i-blog.csdnimg.cn/direct/41f7456bb2f14dc3885d6451b19550ab.png#pic_center 1.5x, https://i-blog.csdnimg.cn/direct/41f7456bb2f14dc3885d6451b19550ab.png#pic_center 2x"
+        data-sizes="auto"
+        alt="https://i-blog.csdnimg.cn/direct/41f7456bb2f14dc3885d6451b19550ab.png#pic_center"
+        title="在这里插入图片描述" /></p>
+<h2 id="总结">总结</h2>
+<p>本文主要介绍PDF中基本的图形操作符。一般构建图形的操作符有3中</p>
+<ol>
+<li>使用<code>m</code> 定义画笔的起始位置，然后使用 <code>l</code> 来画一条直线</li>
+<li>或者直接使用 <code>re</code> 操作符来绘制一个矩形</li>
+<li>还可以使用<code>c</code> 来构建贝塞尔曲线</li>
+</ol>
+<p>对于构建的路径，可以使用 <code>h</code> 来进行画笔起始位置和终点位置的连线，这个连线一般是一条直线。对于这个路径我们可以使用 <code>S</code> (stroke) 来对路劲进行描边显示或者使用 f(非0缠绕) f*(奇偶规则)进行内容的填充，又或者使用 b(B) 来描边和填充。</p>
+<p>我们可以使用 W (非0缠绕)或者 W*(奇偶规则) 来将路径作为一个裁剪区域</p>
+</div><div class="post-footer" id="post-footer">
+    <div class="post-info">
+        <div class="post-info-line">
+            <div class="post-info-mod">
+                <span>Updated on 2024-10-07</span>
+            </div></div>
+        <div class="post-info-line">
+            <div class="post-info-md"></div>
+            <div class="post-info-share">
+                <span><a href="javascript:void(0);" title="Share on Twitter" data-sharer="twitter" data-url="http://HaiLateBoy.github.io/posts/pdf-reference-4/" data-title="PDF标准详解（四）——图形操作符" data-hashtags="PDF"><i class="fab fa-twitter fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Facebook" data-sharer="facebook" data-url="http://HaiLateBoy.github.io/posts/pdf-reference-4/" data-hashtag="PDF"><i class="fab fa-facebook-square fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Hacker News" data-sharer="hackernews" data-url="http://HaiLateBoy.github.io/posts/pdf-reference-4/" data-title="PDF标准详解（四）——图形操作符"><i class="fab fa-hacker-news fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Line" data-sharer="line" data-url="http://HaiLateBoy.github.io/posts/pdf-reference-4/" data-title="PDF标准详解（四）——图形操作符"><i data-svg-src="https://cdn.jsdelivr.net/npm/simple-icons@7.3.0/icons/line.svg" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on 微博" data-sharer="weibo" data-url="http://HaiLateBoy.github.io/posts/pdf-reference-4/" data-title="PDF标准详解（四）——图形操作符"><i class="fab fa-weibo fa-fw" aria-hidden="true"></i></a></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="post-info-more">
+        <section class="post-tags"><i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/pdf/">PDF</a></section>
+        <section>
+            <span><a href="javascript:void(0);" onclick="window.history.back();">Back</a></span>&nbsp;|&nbsp;<span><a href="/">Home</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav"><a href="/posts/pdf-reference-3/" class="prev" rel="prev" title="PDF标准详解（三）—— PDF坐标系统和坐标变换"><i class="fas fa-angle-left fa-fw" aria-hidden="true"></i>PDF标准详解（三）—— PDF坐标系统和坐标变换</a>
+            <a href="/posts/pdf-reference-5/" class="next" rel="next" title="PDF标准详解（五）——图形状态">PDF标准详解（五）——图形状态<i class="fas fa-angle-right fa-fw" aria-hidden="true"></i></a></div>
+</div>
+</article></div>
+            </main><footer class="footer">
+        <div class="footer-container"><div class="footer-line">Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener noreffer" title="Hugo 0.121.2">Hugo</a> | Theme - <a href="https://github.com/dillonzq/LoveIt" target="_blank" rel="noopener noreffer" title="LoveIt 0.2.11"><i class="far fa-kiss-wink-heart fa-fw" aria-hidden="true"></i> LoveIt</a>
+                </div><div class="footer-line" itemscope itemtype="http://schema.org/CreativeWork"><i class="far fa-copyright fa-fw" aria-hidden="true"></i><span itemprop="copyrightYear">2022 - 2024</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="https://www.masimaro.xyz" target="_blank">Masimaro</a></span></div>
+        </div>
+    </footer></div>
+
+        <div id="fixed-buttons"><a href="#" id="back-to-top" class="fixed-button" title="Back to Top">
+                <i class="fas fa-arrow-up fa-fw" aria-hidden="true"></i>
+            </a><a href="#" id="view-comments" class="fixed-button" title="View Comments">
+                <i class="fas fa-comment fa-fw" aria-hidden="true"></i>
+            </a>
+        </div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.css"><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/autocomplete.js@0.38.1/dist/autocomplete.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lunr@2.3.9/lunr.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lazysizes@5.3.2/lazysizes.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/clipboard@2.0.11/dist/clipboard.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/sharer.js@0.5.1/sharer.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/auto-render.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/copy-tex.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/mhchem.min.js"></script><script type="text/javascript">window.config={"code":{"copyTitle":"Copy to clipboard","maxShownLines":50},"comment":{},"math":{"delimiters":[{"display":true,"left":"$$","right":"$$"},{"display":true,"left":"\\[","right":"\\]"},{"display":true,"left":"\\begin{equation}","right":"\\end{equation}"},{"display":true,"left":"\\begin{equation*}","right":"\\end{equation*}"},{"display":true,"left":"\\begin{align}","right":"\\end{align}"},{"display":true,"left":"\\begin{align*}","right":"\\end{align*}"},{"display":true,"left":"\\begin{alignat}","right":"\\end{alignat}"},{"display":true,"left":"\\begin{alignat*}","right":"\\end{alignat*}"},{"display":true,"left":"\\begin{gather}","right":"\\end{gather}"},{"display":true,"left":"\\begin{CD}","right":"\\end{CD}"},{"display":false,"left":"$","right":"$"},{"display":false,"left":"\\(","right":"\\)"}],"strict":false},"search":{"highlightTag":"em","maxResultLength":10,"noResultsFound":"No results found","snippetLength":50}};</script><script type="text/javascript" src="/js/theme.min.js"></script></body>
+</html>
